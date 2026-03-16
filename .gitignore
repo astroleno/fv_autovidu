@@ -1,0 +1,77 @@
+# ===========================================
+# fv_autovidu 项目 .gitignore
+# ===========================================
+
+# ------------ 环境与密钥 ------------
+.env
+.env.local
+.env.*.local
+*.local
+*.pem
+*.key
+secrets/
+
+# ------------ Python ------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+eggs/
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# 类型检查 / 测试 / 覆盖
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.tox/
+.nox/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ------------ 脚本生成输出 ------------
+output/
+*.log
+logs/
+
+# ------------ 编辑器和 IDE ------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# ------------ 系统文件 ------------
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ------------ 其他 ------------
+*.bak
+*.tmp
+*.temp
+.cache/
