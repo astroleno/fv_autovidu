@@ -1,0 +1,27 @@
+# fv_autovidu 默认配置
+# 详见 docs/vidu/i2v.md
+
+vidu:
+  # API 端点（图生视频）
+  api_url: "https://api.vidu.cn/ent/v2/img2video"
+  # 模型选择
+  model: "viduq3-pro"  # 720p pro
+  # 视频时长（秒）
+  duration: 5
+  # 分辨率
+  resolution: "720p"
+  # 音视频直出：音效+人声，不要 BGM
+  audio: true
+  audio_type: "all"  # all=音效+人声 speech_only=仅人声 sound_effect_only=仅音效
+  bgm: false
+  # 错峰模式（更省积分，48小时内完成）
+  off_peak: false
+
+# 分镜包路径（相对项目根目录）
+paths:
+  shot_base: "public/img/shot"
+  output_frames: "output/frames"
+  output_videos: "output/videos"
+
+# 默认分镜包名称
+default_episode: "第2集_EP02_分镜包"
