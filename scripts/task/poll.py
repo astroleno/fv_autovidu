@@ -109,7 +109,7 @@ def main():
     for tid, r in result.items():
         label = label_by_id.get(tid, tid)
         rec = rec_by_vid.get(tid, {})
-        out.append({
+        item = {
             "task_id": label,
             "vidu_task_id": tid,
             "state": r["state"],
@@ -118,7 +118,14 @@ def main():
             "seed": rec.get("seed"),
             "duration": rec.get("duration"),
             "timestamp": rec.get("timestamp"),
-        })
+        }
+        # 完整 query 返回值（含积分、model、prompt 等）
+        if r.get("raw"):
+            raw = dict(r["raw"])
+            if "images" in raw and raw["images"]:
+                raw["images"] = ["<base64_or_url>"]
+            item["query_response"] = raw
+        out.append(item)
     records_dir = Path(records_path).parent if records_path else default_records.parent
     out_path = records_dir / "poll_results.json"
     records_dir.mkdir(parents=True, exist_ok=True)

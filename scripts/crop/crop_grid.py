@@ -57,13 +57,16 @@ def get_scene_descriptions(prompt_path: Path) -> list[str]:
 
 
 def infer_layout_from_prompt(prompt_path: Path, img_width: int, img_height: int) -> tuple[int, int]:
-    """根据 prompt 场景数和图片尺寸推断最佳 rows×cols。"""
+    """
+    根据 prompt 场景数和图片尺寸推断最佳 rows×cols。
+    3 个场景时使用 2×2 网格、仅取前 3 格（左上、右上、左下）。
+    """
     scenes = parse_prompt_scenes(prompt_path)
     n = len(scenes)
     if n == 0:
         raise ValueError(f"未在 {prompt_path} 中找到 S1:, S2: 等场景")
     if n == 3:
-        return (3, 1)
+        return (2, 2)
     if n == 4:
         return (2, 2)
     if n == 5:
