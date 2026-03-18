@@ -103,6 +103,7 @@ def run_test(
                     bgm=vidu_cfg.get("bgm", False),
                     seed=0,
                     payload=payload_str,
+                    aspect_ratio="9:16",  # 竖屏，与 crop 9:16 一致
                 )
                 tid = resp.get("task_id", "?")
                 seed = resp.get("seed")

@@ -4,6 +4,9 @@ Vidu API 客户端
 
 封装 Vidu 多种能力：
 - 图生视频 (i2v)：POST /img2video，详见 docs/vidu/i2v.md
+- 参考生视频 (reference2video)：POST /reference2video，详见 docs/vidu/reference.md
+  - 主体调用：支持多主体 + 台词（音视频直出）
+  - 非主体调用：多图参考，支持 viduq2-pro
 - 电商一键成片 (ad-one-click)：详见 docs/vidu/ad.md
 - 视频复刻 (trending-replicate)：详见 docs/vidu/replicate.md
 """
@@ -115,6 +118,171 @@ class ViduClient:
         """
         b64 = self._image_to_base64(image_path)
         return self.img2video(images=[b64], prompt=prompt, **kwargs)
+
+    # -------------------- 参考生视频 (reference2video) --------------------
+    # 详见 docs/vidu/reference.md
+
+    def reference2video_with_subjects(
+        self,
+        subjects: list[dict[str, Any]],
+        prompt: str,
+        *,
+        model: str = "viduq2",
+        duration: int = 5,
+        audio: bool = False,
+        audio_type: str = "all",
+        resolution: str = "720p",
+        aspect_ratio: str = "16:9",
+        seed: int = 0,
+        off_peak: bool = False,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """
+        参考生视频 - 主体调用（支持音视频直出/台词）。
+
+        指定 1-7 个主体，每个主体有 id、images(1-3 张)、可选 voice_id。
+        prompt 中通过 @id 引用主体，可用「旁白音说XXX」加入台词。
+        注意：viduq2-pro 不支持主体调用，需用 viduq2/viduq1/vidu2.0。
+
+        Args:
+            subjects: 主体列表 [{"id": str, "images": [url/base64], "voice_id": ""}, ...]
+            prompt: 提示词，含 @id 与可选「旁白音说XXX」
+            model: viduq2 | viduq1 | vidu2.0（不支持 viduq2-pro）
+            duration: 时长（秒）
+            audio: 是否音视频直出（含台词）
+            audio_type: all | speech_only | sound_effect_only
+            **kwargs: 其他参数
+
+        Returns:
+            task_id, state, model, prompt, duration, seed, ...
+        """
+        if not 1 <= len(subjects) <= 7:
+            raise ValueError("主体调用支持 1-7 个主体")
+        url = f"{self.base_url}/reference2video"
+        payload = {
+            "model": model,
+            "subjects": subjects,
+            "prompt": prompt[:5000],
+            "duration": duration,
+            "audio": audio,
+            "audio_type": audio_type if audio else None,
+            "resolution": resolution,
+            "aspect_ratio": aspect_ratio,
+            "seed": seed,
+            "off_peak": off_peak,
+            **kwargs,
+        }
+        payload = {k: v for k, v in payload.items() if v is not None and v != ""}
+        resp = self._session.post(url, json=payload, timeout=60)
+        resp.raise_for_status()
+        return resp.json()
+
+    def reference2video_with_images(
+        self,
+        images: list[str],
+        prompt: str,
+        *,
+        model: str = "viduq2-pro",
+        duration: int = 5,
+        bgm: bool = False,
+        resolution: str = "720p",
+        aspect_ratio: str = "16:9",
+        seed: int = 0,
+        videos: list[str] | None = None,
+        off_peak: bool = False,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """
+        参考生视频 - 非主体调用（视频直出，无台词）。
+
+        传入 1-7 张参考图（或 URL/base64），模型依此生成主体一致视频。
+        viduq2-pro 支持视频参考（videos 参数）。
+
+        Args:
+            images: 参考图片，1-7 张 URL 或 base64
+            prompt: 文本提示词
+            model: viduq2-pro | viduq2 | viduq1 | vidu2.0
+            duration: 时长（秒）
+            bgm: 是否添加背景音乐
+            videos: 视频参考（仅 viduq2-pro）
+            **kwargs: 其他参数
+
+        Returns:
+            task_id, state, model, prompt, images, duration, ...
+        """
+        if not 1 <= len(images) <= 7:
+            raise ValueError("非主体调用支持 1-7 张参考图")
+        url = f"{self.base_url}/reference2video"
+        payload = {
+            "model": model,
+            "images": images,
+            "prompt": prompt[:5000],
+            "duration": duration,
+            "bgm": bgm,
+            "resolution": resolution,
+            "aspect_ratio": aspect_ratio,
+            "seed": seed,
+            "videos": videos,
+            "off_peak": off_peak,
+            **kwargs,
+        }
+        payload = {k: v for k, v in payload.items() if v is not None}
+        if payload.get("videos") is None:
+            del payload["videos"]
+        resp = self._session.post(url, json=payload, timeout=60)
+        resp.raise_for_status()
+        return resp.json()
+
+    def reference2video_from_files(
+        self,
+        image_paths: list[PathOrStr],
+        prompt: str,
+        *,
+        use_subjects: bool = False,
+        dialogue: str | None = None,
+        subject_ids: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """
+        从本地图片文件提交参考生视频任务。
+
+        Args:
+            image_paths: 1-7 个图片路径，首张可作为参考首帧
+            prompt: 视频描述提示词
+            use_subjects: True=主体调用（可含台词），False=非主体调用
+            dialogue: 台词文本，仅 use_subjects 时生效，会追加「旁白音说{dialogue}」
+            subject_ids: 主体 id 列表，仅 use_subjects 时生效，长度需与 image_paths 一致
+            **kwargs: 透传给 reference2video_with_subjects 或 reference2video_with_images
+
+        Returns:
+            API 响应
+        """
+        if not 1 <= len(image_paths) <= 7:
+            raise ValueError("支持 1-7 张图片")
+        b64_list = [self._image_to_base64(Path(p)) for p in image_paths]
+        if use_subjects:
+            ids = subject_ids or [str(i + 1) for i in range(len(image_paths))]
+            if len(ids) != len(image_paths):
+                raise ValueError("subject_ids 长度需与 image_paths 一致")
+            subjects = [
+                {"id": sid, "images": [b64], "voice_id": ""}
+                for sid, b64 in zip(ids, b64_list)
+            ]
+            full_prompt = prompt
+            if dialogue:
+                full_prompt = f"{prompt}，并且旁白音说{dialogue}" if prompt else f"旁白音说{dialogue}"
+            return self.reference2video_with_subjects(
+                subjects=subjects,
+                prompt=full_prompt,
+                audio=bool(dialogue),
+                **kwargs,
+            )
+        # 非主体调用不支持台词，仅使用视频描述
+        return self.reference2video_with_images(
+            images=b64_list,
+            prompt=prompt,
+            **kwargs,
+        )
 
     def query_tasks(self, task_ids: list[str]) -> dict[str, Any]:
         """
