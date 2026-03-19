@@ -47,6 +47,9 @@ htmlcov/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
+# ------------ 本地数据（拉取后的剧集/资产，勿提交） ------------
+data/
+
 # ------------ 脚本生成输出 ------------
 output/
 *.log
