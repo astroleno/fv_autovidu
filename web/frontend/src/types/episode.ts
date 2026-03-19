@@ -1,0 +1,102 @@
+/**
+ * FV Studio 核心数据类型定义
+ * 基于 episode.json 结构，与后台 API 响应一致
+ */
+
+/** Shot 状态：从拉取到选定终版的完整生命周期 */
+export type ShotStatus =
+  | "pending" // 刚拉取，未开始
+  | "endframe_generating" // 尾帧生成中
+  | "endframe_done" // 尾帧已生成
+  | "video_generating" // 视频生成中
+  | "video_done" // 视频已生成（有候选）
+  | "selected" // 已选定最终视频
+  | "error" // 出错
+
+/** 资产类型：角色/场景/道具 */
+export type AssetType = "character" | "location" | "prop" | "other"
+
+/** 视频生成模式 */
+export type VideoMode = "first_frame" | "first_last_frame" | "reference"
+
+/** 任务状态（Vidu 侧） */
+export type TaskStatus = "pending" | "processing" | "success" | "failed"
+
+/**
+ * Shot 关联的资产
+ * 用于尾帧生成、单帧重生时作为参考图
+ */
+export interface ShotAsset {
+  assetId: string
+  name: string
+  type: AssetType
+  localPath: string // 本地路径 "assets/达里尔.png"
+  prompt: string // 资产描述文本
+}
+
+/**
+ * 视频候选
+ * 同一 Shot 可能有多个候选（不同 seed、模式），用户选定其一
+ */
+export interface VideoCandidate {
+  id: string
+  videoPath: string // "videos/S01/v1.mp4"
+  thumbnailPath: string
+  seed: number
+  model: string
+  mode: VideoMode
+  selected: boolean
+  createdAt: string
+  taskId: string
+  taskStatus: TaskStatus
+}
+
+/**
+ * Shot：单镜头
+ * 包含首帧、尾帧、视频候选、资产、prompt 等完整信息
+ */
+export interface Shot {
+  shotId: string
+  shotNumber: number // 全局编号，1-based
+  imagePrompt: string
+  videoPrompt: string
+  duration: number // 秒
+  cameraMovement: string
+  aspectRatio: string // "9:16" / "16:9"
+  firstFrame: string // 本地路径 "frames/S01.png"
+  assets: ShotAsset[]
+  status: ShotStatus
+  endFrame: string | null
+  videoCandidates: VideoCandidate[]
+}
+
+/**
+ * Scene：场景
+ * 一个 Episode 下多个 Scene，每个 Scene 包含多个 Shot
+ */
+export interface Scene {
+  sceneId: string
+  sceneNumber: number
+  title: string
+  shots: Shot[]
+}
+
+/**
+ * Episode：剧集
+ * 从平台拉取后的完整数据，episode.json 根结构
+ */
+export interface Episode {
+  projectId: string
+  episodeId: string
+  episodeTitle: string
+  episodeNumber: number
+  pulledAt: string // ISO 8601
+  scenes: Scene[]
+  /** 剧集级全量资产库，供资产库页面 / RegenPage 使用 */
+  assets?: ShotAsset[]
+}
+
+/** 扁平化 Shot 列表（从 scenes 中提取） */
+export function flattenShots(episode: Episode): Shot[] {
+  return episode.scenes.flatMap((scene) => scene.shots)
+}

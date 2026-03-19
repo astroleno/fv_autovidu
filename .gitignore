@@ -70,6 +70,9 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
+# ------------ Node.js / 前端 ------------
+node_modules/
+
 # ------------ 其他 ------------
 *.bak
 *.tmp
