@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+"""Pydantic 数据模型，与前端 types/ 精确对齐。"""
+
+from .schemas import (
+    AssetType,
+    Episode,
+    ExportRoughCutRequest,
+    ExportRoughCutResponse,
+    GenerateEndframeRequest,
+    GenerateEndframeResponse,
+    GenerateVideoRequest,
+    GenerateVideoResponse,
+    PullEpisodeRequest,
+    RegenFrameRequest,
+    RegenFrameResponse,
+    Scene,
+    SelectCandidateRequest,
+    Shot,
+    ShotAsset,
+    ShotStatus,
+    TaskStatus,
+    TaskStatusResponse,
+    VideoCandidate,
+    VideoMode,
+)
+
+__all__ = [
+    "AssetType",
+    "Episode",
+    "ExportRoughCutRequest",
+    "ExportRoughCutResponse",
+    "GenerateEndframeRequest",
+    "GenerateEndframeResponse",
+    "GenerateVideoRequest",
+    "GenerateVideoResponse",
+    "PullEpisodeRequest",
+    "RegenFrameRequest",
+    "RegenFrameResponse",
+    "Scene",
+    "SelectCandidateRequest",
+    "Shot",
+    "ShotAsset",
+    "ShotStatus",
+    "TaskStatus",
+    "TaskStatusResponse",
+    "VideoCandidate",
+    "VideoMode",
+]

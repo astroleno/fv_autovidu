@@ -68,6 +68,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description="轮询 Vidu 任务状态")
     parser.add_argument("--records", default=None, help="i2v_*_records.json 路径")
+    parser.add_argument("--from-json", type=Path, default=None, help="episode.json 路径，从 videoCandidates 提取 taskId")
     parser.add_argument("--task-ids", nargs="+", default=[], help="直接传入 task_id 列表")
     parser.add_argument("--interval", type=int, default=15, help="轮询间隔(秒)")
     args = parser.parse_args()
@@ -81,8 +82,26 @@ def main():
     records_path = args.records
     label_by_id = {}
     records_data = []
-    default_records = PROJECT_ROOT / "output/frames/第2集_EP02_分镜包/group_01/i2v_test_records.json"
-    if records_path or (not task_ids and default_records.exists()):
+    episode_dir = None
+
+    if args.from_json:
+        json_path = args.from_json if args.from_json.is_absolute() else Path.cwd() / args.from_json
+        if not json_path.exists():
+            print(f"未找到 {json_path}")
+            sys.exit(1)
+        episode_dir = json_path.parent
+        data = json.loads(json_path.read_text(encoding="utf-8"))
+        for scene in data.get("scenes", []):
+            for shot in scene.get("shots", []):
+                sn = shot.get("shotNumber", 0)
+                for i, c in enumerate(shot.get("videoCandidates", [])):
+                    tid = c.get("taskId", "")
+                    if tid and c.get("taskStatus") not in ("success", "failed"):
+                        task_ids.append(tid)
+                        label_by_id[tid] = f"S{sn:02d}_v{i+1}"
+        records_data = [{"vidu_task_id": tid, "task_id": label_by_id.get(tid, tid), "shotNumber": None} for tid in task_ids]
+    elif records_path or (not task_ids and (PROJECT_ROOT / "output/frames/第2集_EP02_分镜包/group_01/i2v_test_records.json").exists()):
+        default_records = PROJECT_ROOT / "output/frames/第2集_EP02_分镜包/group_01/i2v_test_records.json"
         path = Path(records_path) if records_path else default_records
         if path.exists():
             records_data = json.loads(path.read_text(encoding="utf-8"))
@@ -96,7 +115,7 @@ def main():
             sys.exit(1)
 
     if not task_ids:
-        print("请提供 --records 或 --task-ids")
+        print("请提供 --records、--from-json 或 --task-ids")
         sys.exit(1)
 
     task_ids = list(dict.fromkeys(task_ids))
@@ -104,7 +123,12 @@ def main():
     client = ViduClient(api_key=api_key)
     result = poll_until_done(client, task_ids, interval=args.interval)
 
-    rec_by_vid = {str(r["vidu_task_id"]): r for r in records_data}
+    rec_by_vid = {}
+    if records_data:
+        for r in records_data:
+            vid = str(r.get("vidu_task_id", r.get("task_id", "")))
+            if vid:
+                rec_by_vid[vid] = r
     out = []
     for tid, r in result.items():
         label = label_by_id.get(tid, tid)
@@ -119,19 +143,37 @@ def main():
             "duration": rec.get("duration"),
             "timestamp": rec.get("timestamp"),
         }
-        # 完整 query 返回值（含积分、model、prompt 等）
         if r.get("raw"):
             raw = dict(r["raw"])
             if "images" in raw and raw["images"]:
                 raw["images"] = ["<base64_or_url>"]
             item["query_response"] = raw
         out.append(item)
-    records_dir = Path(records_path).parent if records_path else default_records.parent
+    default_records_dir = PROJECT_ROOT / "output/frames/第2集_EP02_分镜包/group_01"
+    records_dir = episode_dir if episode_dir else (Path(records_path).parent if records_path else default_records_dir)
     out_path = records_dir / "poll_results.json"
     records_dir.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
     print(f"\n结果已保存: {out_path}")
+
+    if episode_dir and args.from_json:
+        json_path = args.from_json if args.from_json.is_absolute() else Path.cwd() / args.from_json
+        data = json.loads(json_path.read_text(encoding="utf-8"))
+        tid_to_result = {tid: r for tid, r in result.items()}
+        for scene in data.get("scenes", []):
+            for shot in scene.get("shots", []):
+                for c in shot.get("videoCandidates", []):
+                    tid = c.get("taskId", "")
+                    if tid in tid_to_result:
+                        r = tid_to_result[tid]
+                        c["taskStatus"] = "success" if r["state"] == "success" else "failed"
+                        if r.get("url"):
+                            c["url"] = r["url"]
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print(f"已更新 episode.json 中的 taskStatus")
+
     success = sum(1 for r in result.values() if r["state"] == "success")
     total_credits = sum(r.get("credits") or 0 for r in result.values())
     print(f"完成: {success}/{len(task_ids)} success | 消耗积分: {total_credits}")

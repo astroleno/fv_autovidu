@@ -3,24 +3,32 @@
 尾帧生成脚本：基于首帧图 + 终态提示词 + 可选资产图，调用 yunwu Gemini 生成尾帧。
 
 用法:
+    # 传统模式（prompt.md + assets_by_shot.json）
     python scripts/endframe/gen_tail.py
     python scripts/endframe/gen_tail.py --shots 1
     python scripts/endframe/gen_tail.py --dry-run
+
+    # episode.json 模式（平台拉取数据）
+    python scripts/endframe/gen_tail.py --from-json data/proj/ep02/episode.json --shots 1,2,3
 """
 
 from __future__ import annotations
 
 import argparse
-import base64
 import json
 import re
 import sys
 from pathlib import Path
 
+# 确保项目根在 path 中
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
 # 加载 .env
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(_PROJECT_ROOT / ".env")
 except ImportError:
     pass
 
@@ -125,26 +133,22 @@ def parse_prompt_md(prompt_path: Path) -> list[tuple[str, str, str]]:
     return blocks
 
 
+# 复用 src.yunwu.client 中的函数（避免重复）
+def _get_yunwu():
+    from src.yunwu.client import call_yunwu, read_image_as_base64, resolve_asset_path, select_assets
+    return call_yunwu, read_image_as_base64, resolve_asset_path, select_assets
+
+
 def resolve_asset_path(assets_dir: Path, name: str) -> Path | None:
-    """
-    解析资产文件路径，支持 .png 和 .jpg。
-    """
-    for ext in (".png", ".jpg", ".jpeg"):
-        p = assets_dir / f"{name}{ext}"
-        if p.exists():
-            return p
-    return None
+    """解析资产文件路径，支持 .png 和 .jpg。"""
+    _, _, resolve, _ = _get_yunwu()
+    return resolve(assets_dir, name)
 
 
 def read_image_as_base64(path: Path) -> tuple[str, str]:
-    """
-    读取图片为 base64，返回 (mime_type, base64_str)。
-    """
-    data = path.read_bytes()
-    b64 = base64.standard_b64encode(data).decode("ascii")
-    ext = path.suffix.lower()
-    mime = "image/png" if ext in (".png",) else "image/jpeg"
-    return mime, b64
+    """读取图片为 base64。"""
+    _, read_img, _, _ = _get_yunwu()
+    return read_img(path)
 
 
 def select_assets(
@@ -152,18 +156,9 @@ def select_assets(
     assets_dir: Path,
     max_count: int = 2,
 ) -> list[Path]:
-    """
-    从资产名列表中选取最多 max_count 个已存在的图片路径。
-    优先选择角色类（人名），其次道具/场景。
-    """
-    chosen: list[Path] = []
-    for name in asset_names:
-        if len(chosen) >= max_count:
-            break
-        p = resolve_asset_path(assets_dir, name)
-        if p and p not in chosen:
-            chosen.append(p)
-    return chosen
+    """从资产名列表选取最多 max_count 个图片路径。"""
+    _, _, _, sel = _get_yunwu()
+    return sel(asset_names, assets_dir, max_count)
 
 
 def build_tail_prompt(
@@ -206,62 +201,93 @@ def call_yunwu(
     aspect_ratio: str = "9:16",
     image_size: str = "2K",
 ) -> bytes:
-    """
-    调用 yunwu generateContent，返回生成的图片二进制。
-    endpoint: 可覆盖默认，用于切换模型（如 gemini-3-pro-image-preview）。
-    """
-    parts: list[dict] = [{"text": text}]
-    parts.append({
-        "inline_data": {
-            "mime_type": first_frame_b64[0],
-            "data": first_frame_b64[1],
-        },
-    })
-    for mime, b64 in asset_images:
-        parts.append({
-            "inline_data": {
-                "mime_type": mime,
-                "data": b64,
-            },
-        })
-
-    payload = {
-        "contents": [{"role": "user", "parts": parts}],
-        "generationConfig": {
-            "responseModalities": ["TEXT", "IMAGE"],
-            "imageConfig": {
-                "aspectRatio": aspect_ratio,
-                "imageSize": image_size,
-            },
-        },
-    }
-
-    url = endpoint or ENDPOINT
-    resp = requests.post(
-        url,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        json=payload,
-        timeout=480,
+    """调用 yunwu generateContent，返回生成的图片二进制。"""
+    call_fn, _, _, _ = _get_yunwu()
+    return call_fn(
+        api_key, text, first_frame_b64, asset_images,
+        endpoint=endpoint, aspect_ratio=aspect_ratio, image_size=image_size,
     )
-    resp.raise_for_status()
-    data = resp.json()
 
-    # 解析返回的图片：candidates[0].content.parts 中找 inline_data
-    cands = data.get("candidates", [])
-    if not cands:
-        raise RuntimeError(f"API 未返回候选: {json.dumps(data, ensure_ascii=False)[:500]}")
 
-    for part in cands[0].get("content", {}).get("parts", []):
-        if "inlineData" in part:
-            inline = part["inlineData"]
-            b64_str = inline.get("data")
-            if b64_str:
-                return base64.standard_b64decode(b64_str)
-
-    raise RuntimeError("API 返回中未找到图片数据")
+def run_from_json(args) -> None:
+    """从 episode.json 读取数据，批量生成尾帧。"""
+    json_path = args.from_json if args.from_json.is_absolute() else Path.cwd() / args.from_json
+    if not json_path.exists():
+        raise SystemExit(f"episode.json 不存在: {json_path}")
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    episode_dir = json_path.parent
+    assets_dir = episode_dir / "assets"
+    endframes_dir = episode_dir / "endframes"
+    endframes_dir.mkdir(parents=True, exist_ok=True)
+    api_key = load_env_key()
+    call_fn, read_img, _, _ = _get_yunwu()
+    prompt_template = load_prompt_template(
+        args.prompt_template if args.prompt_template.is_absolute() else Path.cwd() / args.prompt_template
+    )
+    shot_nums = []
+    if "-" in args.shots and "," not in args.shots:
+        lo, hi = map(int, args.shots.split("-", 1))
+        shot_nums = list(range(lo, hi + 1))
+    else:
+        shot_nums = [int(s.strip()) for s in args.shots.split(",") if s.strip()]
+    scene_list = data.get("scenes", [])
+    for scene in scene_list:
+        for shot in scene.get("shots", []):
+            num = shot.get("shotNumber", 0)
+            if shot_nums and num not in shot_nums:
+                continue
+            shot_id = shot.get("shotId", "")
+            first_rel = shot.get("firstFrame", f"frames/S{num:02d}.png")
+            first_path = episode_dir / first_rel
+            if not first_path.exists():
+                print(f"[Skip] Shot {num}: 首帧不存在 {first_rel}")
+                continue
+            end_rel = f"endframes/S{num:02d}_end.png"
+            end_path = episode_dir / end_rel
+            if end_path.exists() and not args.retry:
+                print(f"[Skip] Shot {num}: {end_rel} 已存在，用 --retry 覆盖")
+                continue
+            image_prompt = shot.get("imagePrompt", "")
+            video_prompt = shot.get("videoPrompt", "")
+            assets = shot.get("assets", [])
+            asset_paths = []
+            asset_names = []
+            for a in assets[:2]:
+                lp = a.get("localPath", "")
+                name = a.get("name", "")
+                if lp:
+                    p = episode_dir / lp
+                    if p.exists():
+                        asset_paths.append(p)
+                        asset_names.append(name)
+            prompt_text = build_tail_prompt(
+                prompt_template, image_prompt, video_prompt, asset_names
+            )
+            first_b64 = read_img(first_path)
+            asset_b64_list = [read_img(p) for p in asset_paths]
+            if args.dry_run:
+                print(f"[DryRun] Shot {num}: {first_rel} -> {end_rel}")
+                continue
+            endpoint = f"{YUNWU_BASE}/{args.model}:generateContent"
+            print(f"[Run] Shot {num}: {first_rel} -> {end_rel} ({args.model}) ...")
+            try:
+                img_data = call_fn(
+                    api_key, prompt_text, first_b64, asset_b64_list,
+                    endpoint=endpoint, aspect_ratio="9:16", image_size=args.image_size,
+                )
+                end_path.write_bytes(img_data)
+                for s in scene["shots"]:
+                    if s.get("shotNumber") == num:
+                        s["endFrame"] = end_rel
+                        s["status"] = "endframe_done"
+                        break
+                with open(json_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                print(f"  -> {end_path}")
+            except Exception as e:
+                print(f"  [Error] {e}", file=sys.stderr)
+                if args.fail_fast:
+                    raise
 
 
 def get_shot_to_frame(episode_dir: Path) -> list[tuple[str, str]]:
@@ -346,7 +372,18 @@ def main() -> None:
         action="store_true",
         help="遇错立即退出，默认继续下一个 shot",
     )
+    parser.add_argument(
+        "--from-json",
+        type=Path,
+        default=None,
+        help="episode.json 路径，启用 episode.json 模式（从平台拉取的数据）",
+    )
     args = parser.parse_args()
+
+    # ---- episode.json 模式 ----
+    if args.from_json:
+        run_from_json(args)
+        return
 
     # 解析 shots：支持 "1,2,3" 或 "1-10"
     shot_str = args.shots.strip()

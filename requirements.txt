@@ -11,3 +11,7 @@ PyYAML>=6.0
 
 # 环境变量（可选，用于 .env 加载 API Key）
 python-dotenv>=1.0.0
+
+# 后端 API（web/server）
+fastapi>=0.115.0
+uvicorn>=0.30.0
