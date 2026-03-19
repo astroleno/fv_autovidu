@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FV Studio - Episode List</title>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#168866",
+              "newsprint-off-white": "#F9F9F7",
+              "newsprint-black": "#111111",
+              "on-secondary": "#ffffff",
+              "on-surface": "#111111",
+              "surface": "#F9F9F7",
+              "outline": "#111111",
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {
+              "DEFAULT": "0px",
+              "lg": "0px",
+              "xl": "0px",
+              "full": "0px"
+            },
+            boxShadow: {
+              "hard": "4px 4px 0px 0px #111111",
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #F9F9F7;
+        background-image: radial-gradient(#111111 0.5px, transparent 0.5px);
+        background-size: 20px 20px;
+        background-attachment: fixed;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-color: #F9F9F7;
+        opacity: 0.96;
+        z-index: -1;
+      }
+      h1, h2, h3, .brand-font {
+        font-family: 'Manrope', sans-serif;
+      }
+      .newsprint-border {
+        border: 1px solid #111111;
+      }
+      .newsprint-card {
+        background-color: #F9F9F7;
+        border: 1px solid #111111;
+        transition: all 0.2s ease;
+      }
+      .newsprint-card:hover {
+        box-shadow: 4px 4px 0px 0px #111111;
+        transform: translate(-2px, -2px);
+      }
+      .grayscale-img {
+        filter: grayscale(100%);
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-[240px] sticky left-0 top-0 transition-all duration-300 bg-newsprint-off-white border-r border-newsprint-black flex flex-col py-6">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-8 h-8 newsprint-border bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">movie_filter</span>
+</div>
+<div>
+<div class="text-lg font-extrabold uppercase tracking-tight text-newsprint-black leading-tight">FV Studio</div>
+<div class="text-[9px] uppercase tracking-[0.2em] text-newsprint-black font-bold opacity-60">Vol. 04 / Ed. 2024</div>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<!-- Active Tab: Episode List -->
+<a class="flex items-center gap-3 px-3 py-2 bg-primary text-white font-bold border border-newsprint-black transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="video_library">video_library</span>
+<span class="text-xs uppercase tracking-widest font-bold">Episode List</span>
+</a>
+<!-- Inactive Tab: Settings -->
+<a class="flex items-center gap-3 px-3 py-2 text-newsprint-black border border-transparent hover:border-newsprint-black transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-xs uppercase tracking-widest font-bold">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-3 space-y-1">
+<!-- Edition Metadata -->
+<div class="px-3 py-4 border-t border-newsprint-black mb-4">
+<div class="text-[10px] uppercase font-black tracking-tighter mb-1">Last Edition</div>
+<div class="text-[10px] font-mono opacity-60">AUG_14_2024_08:42</div>
+</div>
+<!-- Footer Tab: API Connected -->
+<div class="flex items-center gap-3 px-3 py-1.5 text-newsprint-black text-[10px] uppercase tracking-wider font-bold">
+<span class="material-symbols-outlined text-[16px]" data-icon="hub">hub</span>
+<span>System: Online</span>
+</div>
+<!-- Footer Tab: Running Tasks -->
+<div class="flex items-center gap-3 px-3 py-1.5 text-newsprint-black text-[10px] uppercase tracking-wider font-bold">
+<span class="material-symbols-outlined text-[16px]" data-icon="analytics">analytics</span>
+<span>Active: 04</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col">
+<!-- Top Header / TopNavBar Hybrid -->
+<header class="sticky top-0 z-40 bg-newsprint-off-white border-b border-newsprint-black flex justify-between items-center w-full px-8 h-16">
+<div class="flex items-center gap-4">
+<nav aria-label="Breadcrumb" class="flex text-[10px] font-black uppercase tracking-tighter text-newsprint-black">
+<ol class="inline-flex items-center space-x-1 md:space-x-3">
+<li class="inline-flex items-center">
+<a class="hover:underline" href="#">Index</a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-xs mx-1">chevron_right</span>
+<span class="font-black">Episodes</span>
+</div>
+</li>
+</ol>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<!-- Action Button -->
+<button class="bg-primary hover:bg-newsprint-black text-white px-5 py-2 newsprint-border font-black uppercase text-xs flex items-center gap-2 transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5">
+<span class="material-symbols-outlined text-lg" data-icon="cloud_download">cloud_download</span>
+                    Sync Latest Episode
+                </button>
+<div class="h-6 w-px bg-newsprint-black mx-2 opacity-20"></div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-newsprint-black hover:opacity-100 opacity-60 cursor-pointer" data-icon="notifications">notifications</span>
+<img alt="User Avatar" class="w-8 h-8 newsprint-border grayscale-img object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjRrydn54C9mK4iCUthQ1RLf4-ZNtW-b-SlVvmJrd2PZIlbdQt4_gguXvKDjr5TxQOHlTBwNmdp4M5bFq6rAkdCuo8jYvaHtpdTR5SQUa4T5xtgsa2nOAXNHVEt7oOxwUyN_GUwBelj7R63qAZAj3CRgAqkOOT7WULpLKRXI1Ph351fWOXQNM32Z5fkvgOsQYpDtRXuVbC7j4qyOfV64ddETPQp40x6MUO1f7vjhwC_aN92esC60TsI_tT8lt-YGncf4fbN58iLxwZ"/>
+</div>
+</div>
+</header>
+<!-- Episode Grid Canvas -->
+<section class="p-8">
+<div class="mb-10 border-l-4 border-primary pl-6">
+<h1 class="text-4xl font-extrabold tracking-tighter text-newsprint-black uppercase mb-1">Episode Management</h1>
+<p class="text-newsprint-black font-medium opacity-70 text-sm uppercase tracking-tight">AI Rendering Pipeline Monitoring &amp; Shot Classification</p>
+</div>
+<!-- Bento Grid / Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+<!-- Card 1 -->
+<div class="newsprint-card p-6 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="text-[10px] font-black uppercase tracking-widest text-primary mb-1 block">Ref. EP_002</span>
+<h3 class="text-xl font-extrabold uppercase text-newsprint-black">Episode 02</h3>
+</div>
+<span class="text-[10px] font-black uppercase opacity-40">2H AGO</span>
+</div>
+<div class="flex items-center gap-2 mb-6 text-newsprint-black border-y border-newsprint-black border-dashed py-2">
+<span class="material-symbols-outlined text-sm" data-icon="layers">layers</span>
+<span class="text-[11px] font-black uppercase tracking-tight">42 Shots Classified</span>
+</div>
+<!-- Progress Bar -->
+<div class="mb-8">
+<div class="flex justify-between items-center mb-2">
+<span class="text-[10px] font-black uppercase tracking-tighter">Status: Processed</span>
+<span class="text-[10px] font-black text-primary">85%</span>
+</div>
+<div class="flex h-4 newsprint-border overflow-hidden bg-white p-0.5">
+<div class="h-full w-[10%] bg-primary" title="Selected"></div>
+<div class="h-full w-[40%] bg-newsprint-black opacity-30" title="Video Done"></div>
+<div class="h-full w-[35%] bg-primary opacity-40" title="Endframe Done"></div>
+<div class="h-full w-[15%] bg-transparent" title="Pending"></div>
+</div>
+<div class="flex justify-between mt-3">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 newsprint-border bg-primary"></div>
+<span class="text-[9px] font-black uppercase">Approved</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 newsprint-border bg-white"></div>
+<span class="text-[9px] font-black uppercase opacity-60">Pending</span>
+</div>
+</div>
+</div>
+<button class="mt-auto w-full py-2.5 newsprint-border bg-newsprint-black text-white font-black uppercase text-xs hover:bg-primary transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 flex items-center justify-center gap-2">
+                        Open File
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Card 2 -->
+<div class="newsprint-card p-6 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="text-[10px] font-black uppercase tracking-widest text-primary mb-1 block">Ref. EP_003</span>
+<h3 class="text-xl font-extrabold uppercase text-newsprint-black">Episode 03</h3>
+</div>
+<span class="text-[10px] font-black uppercase opacity-40">5H AGO</span>
+</div>
+<div class="flex items-center gap-2 mb-6 text-newsprint-black border-y border-newsprint-black border-dashed py-2">
+<span class="material-symbols-outlined text-sm" data-icon="layers">layers</span>
+<span class="text-[11px] font-black uppercase tracking-tight">128 Shots Classified</span>
+</div>
+<div class="mb-8">
+<div class="flex justify-between items-center mb-2">
+<span class="text-[10px] font-black uppercase tracking-tighter">Status: Rendering</span>
+<span class="text-[10px] font-black text-primary">42%</span>
+</div>
+<div class="flex h-4 newsprint-border overflow-hidden bg-white p-0.5">
+<div class="h-full w-[5%] bg-primary"></div>
+<div class="h-full w-[15%] bg-newsprint-black opacity-30"></div>
+<div class="h-full w-[22%] bg-primary opacity-40"></div>
+<div class="h-full w-[58%] bg-transparent"></div>
+</div>
+<div class="flex justify-between mt-3">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 newsprint-border bg-newsprint-black opacity-30"></div>
+<span class="text-[9px] font-black uppercase">Video</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 newsprint-border bg-primary opacity-40"></div>
+<span class="text-[9px] font-black uppercase">Frames</span>
+</div>
+</div>
+</div>
+<button class="mt-auto w-full py-2.5 newsprint-border bg-newsprint-black text-white font-black uppercase text-xs hover:bg-primary transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 flex items-center justify-center gap-2">
+                        Open File
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Card 3 -->
+<div class="newsprint-card p-6 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="text-[10px] font-black uppercase tracking-widest text-primary mb-1 block">Ref. EP_004</span>
+<h3 class="text-xl font-extrabold uppercase text-newsprint-black">Episode 04</h3>
+</div>
+<span class="text-[10px] font-black uppercase opacity-40">12H AGO</span>
+</div>
+<div class="flex items-center gap-2 mb-6 text-newsprint-black border-y border-newsprint-black border-dashed py-2">
+<span class="material-symbols-outlined text-sm" data-icon="layers">layers</span>
+<span class="text-[11px] font-black uppercase tracking-tight">64 Shots Classified</span>
+</div>
+<div class="mb-8">
+<div class="flex justify-between items-center mb-2">
+<span class="text-[10px] font-black uppercase tracking-tighter">Status: Finished</span>
+<span class="text-[10px] font-black text-primary">98%</span>
+</div>
+<div class="flex h-4 newsprint-border overflow-hidden bg-white p-0.5">
+<div class="h-full w-[25%] bg-primary"></div>
+<div class="h-full w-[45%] bg-newsprint-black opacity-30"></div>
+<div class="h-full w-[28%] bg-primary opacity-40"></div>
+<div class="h-full w-[2%] bg-transparent"></div>
+</div>
+<div class="flex justify-between mt-3">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 newsprint-border bg-primary"></div>
+<span class="text-[9px] font-black uppercase">Completed Edition</span>
+</div>
+</div>
+</div>
+<button class="mt-auto w-full py-2.5 newsprint-border bg-newsprint-black text-white font-black uppercase text-xs hover:bg-primary transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 flex items-center justify-center gap-2">
+                        Open File
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Card 4 (Empty State) -->
+<div class="newsprint-card p-6 border-dashed border-2 flex flex-col items-center justify-center text-center group cursor-pointer">
+<div class="w-12 h-12 newsprint-border bg-white flex items-center justify-center text-newsprint-black group-hover:bg-primary group-hover:text-white transition-all mb-4">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</div>
+<span class="text-xs font-black uppercase tracking-tighter">Start New Edition</span>
+<p class="text-[10px] font-medium uppercase opacity-50 mt-2 px-4 leading-tight">Initialize Assets &amp; Remote Pipeline Execution</p>
+</div>
+</div>
+</section>
+<!-- Stats Overlay (Asymmetric Sophistication) -->
+<div class="mt-auto p-8 grid grid-cols-4 gap-0 border-t border-newsprint-black bg-white">
+<div class="p-6 border-r border-newsprint-black">
+<span class="text-[10px] uppercase tracking-widest text-newsprint-black font-black block mb-2">Capacity Util</span>
+<div class="text-2xl font-black text-newsprint-black">1.2<span class="text-sm opacity-40 italic">/5.0 TB</span></div>
+<div class="h-2 w-full newsprint-border bg-white mt-2 p-0.5">
+<div class="h-full w-[24%] bg-primary"></div>
+</div>
+</div>
+<div class="p-6 border-r border-newsprint-black">
+<span class="text-[10px] uppercase tracking-widest text-newsprint-black font-black block mb-2">Aggregate Output</span>
+<div class="text-2xl font-black text-newsprint-black">2,541</div>
+<div class="inline-block mt-1 newsprint-border px-1.5 py-0.5 bg-primary text-white text-[9px] font-black uppercase">+12% Gain</div>
+</div>
+<div class="p-6 border-r border-newsprint-black">
+<span class="text-[10px] uppercase tracking-widest text-newsprint-black font-black block mb-2">Node Efficiency</span>
+<div class="text-2xl font-black text-newsprint-black">04 <span class="text-sm opacity-40 italic">Active</span></div>
+<div class="inline-block mt-1 newsprint-border px-1.5 py-0.5 bg-newsprint-black text-white text-[9px] font-black uppercase">High-Perf-Core</div>
+</div>
+<div class="p-6">
+<span class="text-[10px] uppercase tracking-widest text-newsprint-black font-black block mb-2">Rel. Sync T-Minus</span>
+<div class="text-2xl font-black text-newsprint-black">00:42:15</div>
+<span class="text-[9px] text-newsprint-black font-bold uppercase opacity-40 italic tracking-tighter">Automated API Refresh Sequence</span>
+</div>
+</div>
+</main>
+</body></html>

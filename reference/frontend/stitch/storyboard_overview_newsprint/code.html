@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FV Studio - Episode Storyboard (Newsprint Edition)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#168866",
+                        "background": "#F9F9F7",
+                        "on-surface": "#000000",
+                        "outline": "#000000",
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "0px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #F9F9F7;
+            background-image: radial-gradient(#e5e5e5 0.5px, transparent 0.5px);
+            background-size: 3px 3px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .halftone {
+            background-image: radial-gradient(circle, #000 10%, transparent 11%);
+            background-size: 4px 4px;
+            opacity: 0.1;
+        }
+        .hard-shadow:hover {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+            transform: translate(-2px, -2px);
+        }
+        .rigid-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+        }
+        .border-rigid {
+            border: 1px solid #000;
+        }
+        .small-caps {
+            font-variant: small-caps;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface flex min-h-screen">
+<!-- SideNavBar Component -->
+<aside class="h-screen w-[240px] sticky left-0 top-0 bg-background border-r border-black flex flex-col py-6 z-50">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 border border-black bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-weight="fill">movie</span>
+</div>
+<div>
+<h1 class="text-lg font-extrabold text-black font-headline leading-tight uppercase">FV Studio</h1>
+<p class="text-[10px] uppercase font-bold tracking-tighter text-black/60">AI Video Production</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-0">
+<p class="px-2 text-[10px] uppercase font-black text-black mb-2 small-caps">Workspace</p>
+<a class="flex items-center gap-3 px-3 py-2 border border-black bg-primary text-white font-bold mb-1" href="#">
+<span class="material-symbols-outlined text-sm">video_library</span>
+<span class="text-xs uppercase">Episode List</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 border border-transparent hover:border-black transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span class="text-xs uppercase font-bold">Settings</span>
+</a>
+</nav>
+<div class="px-4 mt-auto space-y-1">
+<div class="flex items-center gap-2 px-2 py-1 border border-black/10">
+<div class="w-2 h-2 bg-primary border border-black"></div>
+<span class="text-[9px] uppercase font-black">API Connected</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar Component -->
+<header class="top-0 sticky z-40 bg-background border-b border-black flex justify-between items-center w-full px-8 h-16">
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex items-center gap-0 border-x border-black h-16">
+<a class="text-xs font-black uppercase px-6 h-full flex items-center hover:bg-black hover:text-white transition-colors border-r border-black" href="#">Projects</a>
+<a class="text-xs font-black uppercase px-6 h-full flex items-center hover:bg-black hover:text-white transition-colors" href="#">Assets</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative border border-black">
+<input class="bg-transparent border-none py-1.5 pl-10 pr-4 text-xs font-bold uppercase focus:ring-0 w-64" placeholder="Search shots..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-black text-lg">search</span>
+</div>
+<div class="flex items-center border-l border-black h-16 px-4 gap-4">
+<button class="text-black hover:bg-black hover:text-white p-1 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 border border-black overflow-hidden bg-white">
+<img class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVa_oHCU_Nd-S7x5rqPHYVwESylQte7sQQMKGd7AeWoWQ4HHvisTUxqfabFHKOAcVC-jOR3uSCeNZg0RaL5mZt4ETI8kvOZDrFy8y02txmAOsDfpzGnDuCag1xupImdeqHzX5X61Ecn8CsNU8pb9y1ybapeTRRlDVh6qLaWrnTHVkyo_zX6xCyFfXang4FwB-U-lAwa3-3WhC_Mg7dniuASXqMI6g0NXTZDB7H9tFQOYGFTOQJf-v8b74oFJHUj5-XpOl_bn0kJmF4"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Storyboard Header -->
+<section class="border-b border-black bg-background p-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<nav class="flex items-center gap-2 text-[10px] font-black uppercase text-black/50 mb-3 small-caps">
+<a class="hover:text-black" href="#">Home</a>
+<span>/</span>
+<span class="text-black">Episode 2</span>
+</nav>
+<h2 class="text-4xl font-extrabold font-headline tracking-tighter uppercase text-black leading-none">Storyboard Overview</h2>
+</div>
+<div class="flex items-center gap-px bg-black border border-black">
+<button class="px-4 py-2 bg-background hover:bg-black hover:text-white text-[10px] font-black uppercase transition-colors">Batch Endframe</button>
+<button class="px-4 py-2 bg-background hover:bg-black hover:text-white text-[10px] font-black uppercase transition-colors">Batch Video</button>
+<button class="px-6 py-2 bg-primary text-white text-[10px] font-black uppercase hover:invert transition-all">Rough Cut</button>
+</div>
+</div>
+</section>
+<!-- Scene Content -->
+<section class="p-8 pb-12">
+<!-- Scene 1 Group -->
+<div class="mb-12">
+<div class="flex items-center justify-between py-4 border-b-2 border-black mb-8">
+<div class="flex items-center gap-4">
+<h3 class="text-2xl font-black font-headline uppercase tracking-tighter">Scene 1: Abandoned Warehouse Exterior</h3>
+<span class="px-2 py-0.5 border border-black text-[10px] font-black uppercase small-caps">4 Shots</span>
+</div>
+<button class="text-[10px] font-black uppercase border border-black px-3 py-1 hover:bg-black hover:text-white transition-colors">Preview Scene</button>
+</div>
+<!-- Shot Grid (4 columns) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Shot Card 1 -->
+<div class="bg-background border border-black p-4 hard-shadow transition-all group">
+<div class="flex items-center justify-between mb-3 border-b border-black pb-2">
+<span class="text-[10px] font-black uppercase tracking-widest small-caps">S01 | PUSH_IN | 5S</span>
+<span class="material-symbols-outlined text-sm">more_horiz</span>
+</div>
+<!-- Main Thumbnail -->
+<div class="relative aspect-video border border-black bg-black overflow-hidden mb-4">
+<img class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOhbvTH78fVWyW57ur_kHV9mGgdyPni5WeEl6rQOizMXYN6mKiujYdUIlryYicp3Xm80fZzVtXO94IXpeKjCj3OxNna_4cj4nx5zvv4gg_8pANXoJREUhVqBC_7o1zQj-_Jynyz0BwzvQdiawW1vM-kRM8rWCeMrnwMb0Fo1YD7H33e9SluqK2PfAgRGEOMOKYrY2iIimun9rFIBpECnqkSWpflpWw7uXVPagegw6n_PqZP64yGMta2JJ3JzgE7OmNKpejf-eEbmZW"/>
+</div>
+<!-- Status -->
+<div class="space-y-4 mb-4">
+<div class="flex justify-between items-start border-b border-black/10 pb-2">
+<div>
+<p class="text-[9px] font-black uppercase small-caps mb-1 opacity-60">End Frame</p>
+<div class="h-10 w-16 border border-black relative bg-white overflow-hidden">
+<div class="absolute inset-0 halftone"></div>
+<span class="absolute inset-0 flex items-center justify-center text-[8px] font-bold uppercase italic">Pending</span>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[9px] font-black uppercase small-caps mb-1 opacity-60">Status</p>
+<div class="flex items-center justify-end gap-1.5">
+<div class="w-2.5 h-2.5 bg-amber-500 border border-black"></div>
+<span class="text-[9px] font-black uppercase">Generating</span>
+</div>
+</div>
+</div>
+<div class="flex gap-1.5">
+<span class="px-2 py-0.5 border border-black text-[9px] font-black uppercase">Daryl</span>
+<span class="px-2 py-0.5 border border-black text-[9px] font-black uppercase">Warehouse</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="grid grid-cols-3 gap-1">
+<button class="border border-black py-1.5 text-[9px] font-black uppercase hover:bg-black hover:text-white transition-colors">Regen</button>
+<button class="border border-black py-1.5 text-[9px] font-black uppercase hover:bg-black hover:text-white transition-colors">Frame</button>
+<button class="bg-primary text-white py-1.5 text-[9px] font-black uppercase border border-black hover:invert transition-colors">Video</button>
+</div>
+</div>
+<!-- Shot Card 2 (Generating State) -->
+<div class="bg-background border border-black p-4 hard-shadow transition-all group">
+<div class="flex items-center justify-between mb-3 border-b border-black pb-2">
+<span class="text-[10px] font-black uppercase tracking-widest small-caps">S02 | STATIC | 3S</span>
+<span class="material-symbols-outlined text-sm">more_horiz</span>
+</div>
+<div class="relative aspect-video border border-black bg-white flex items-center justify-center overflow-hidden mb-4">
+<div class="absolute inset-0 halftone"></div>
+<div class="flex flex-col items-center gap-2 relative z-10">
+<div class="w-6 h-6 border-2 border-black border-t-transparent animate-spin"></div>
+<span class="text-[9px] font-black uppercase tracking-widest">Rendering...</span>
+</div>
+</div>
+<div class="space-y-4 animate-pulse">
+<div class="h-10 bg-black/5 border border-black/10"></div>
+<div class="h-8 bg-black/5 border border-black/10 w-2/3"></div>
+</div>
+</div>
+<!-- Shot Card 3 -->
+<div class="bg-background border border-black p-4 hard-shadow transition-all group">
+<div class="flex items-center justify-between mb-3 border-b border-black pb-2">
+<span class="text-[10px] font-black uppercase tracking-widest small-caps">S03 | WIDE | 8S</span>
+<span class="material-symbols-outlined text-sm">more_horiz</span>
+</div>
+<div class="relative aspect-video border border-black bg-black mb-4">
+<img class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDm8etK1wj87K_MkhuemA2-6fTIXPjGJ3Spb8FpWXZ3opUEdDIie2uL_vLofJy96BKHOJFzk2nblW3Exwfhu6FX5CbvJHAA15icciHB_l4nKF5Q11M57rYG4RH7rQcvUxDgztDpwfuRixmGEmTrfGiY-oxP1yLGd8RaBToW_X4occPd1xXoc8ByfbaLhsItAwB4rDeThBPGMcTiW_YsRPOtiR4fIJDF2z7G1wGTkgw6IZ0KJ87G7k3nmuGKtVJYFbNHme8ZW37KbA_v"/>
+</div>
+<div class="space-y-4 mb-4">
+<div class="flex justify-between items-start border-b border-black/10 pb-2">
+<div>
+<p class="text-[9px] font-black uppercase small-caps mb-1 opacity-60">End Frame</p>
+<div class="h-10 w-16 border border-black">
+<img class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkVw1u8eEuSe_CD-sZOarRFEiycbZ8dg-YCXpKRQBE4r1SVdwG1AOy4SJDL7H9QgY94MTHEzn1JLLfoOxUCgyrAOgVGuLm_eWrMfwPTLtD-UQrwLAYz0bU1nchBEXLwDTcniANlzPlTHTg7xUPlUGyUEUKhmUEb9EKYx4aYDkmlDcOrwD1KoW8MB-oyg_s0d6Xb6V_WeLQltgz1HX3gOjBGKzC517cKqFL-lVEwULmQMJtLPbPUtD5GqItpIMErqkJ0zs4RflzQupM"/>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[9px] font-black uppercase small-caps mb-1 opacity-60">Status</p>
+<div class="flex items-center justify-end gap-1.5">
+<div class="w-2.5 h-2.5 bg-primary border border-black"></div>
+<span class="text-[9px] font-black uppercase">Ready</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-1">
+<button class="border border-black py-1.5 text-[9px] font-black uppercase hover:bg-black hover:text-white transition-colors">Regen</button>
+<button class="border border-black py-1.5 text-[9px] font-black uppercase hover:bg-black hover:text-white transition-colors">Frame</button>
+<button class="bg-primary text-white py-1.5 text-[9px] font-black uppercase border border-black hover:invert transition-colors">Video</button>
+</div>
+</div>
+<!-- Shot Card 4 -->
+<div class="bg-background border border-black p-4 hard-shadow transition-all group">
+<div class="flex items-center justify-between mb-3 border-b border-black pb-2">
+<span class="text-[10px] font-black uppercase tracking-widest small-caps">S04 | TILT_UP | 4S</span>
+<span class="material-symbols-outlined text-sm">more_horiz</span>
+</div>
+<div class="relative aspect-video border border-black bg-black mb-4">
+<img class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgFKN_7Oan3XuGSsgUn90cK3AmX8cOQCIx0Zy0BGVYL8jNwb9PeU9BzZ2xDNc--m28K3ftfrbf57aomgsDZ3udlM9Gs14K-uiIngZweuiQqowQ2Wp6lobT1V9iVGBGxNuMMIhCVn7VrSZu9nfB5TR3HULZfXYIMY-OBQiokkRG5nZjSrh-PkbLxlv2itWOOhjI-5ZOBFZWqfBqy8xd1T9As4qfYtleQEJ7e530giESn0fu2mmh0L4092hlamlJvvps38lfYHcgR3Dc"/>
+</div>
+<div class="space-y-4 mb-4">
+<div class="flex justify-between items-start border-b border-black/10 pb-2">
+<div>
+<p class="text-[9px] font-black uppercase small-caps mb-1 opacity-60">Motion</p>
+<p class="text-[10px] font-black uppercase">Intense (8.0)</p>
+</div>
+<div class="text-right">
+<p class="text-[9px] font-black uppercase small-caps mb-1 opacity-60">Status</p>
+<div class="flex items-center justify-end gap-1.5">
+<div class="w-2.5 h-2.5 bg-gray-400 border border-black"></div>
+<span class="text-[9px] font-black uppercase">Standby</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-1">
+<button class="border border-black py-1.5 text-[9px] font-black uppercase hover:bg-black hover:text-white transition-colors">Regen</button>
+<button class="border border-black py-1.5 text-[9px] font-black uppercase hover:bg-black hover:text-white transition-colors">Frame</button>
+<button class="border border-black py-1.5 text-[9px] font-black uppercase hover:bg-black hover:text-white transition-colors">Video</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Ornamental Divider -->
+<div class="flex items-center justify-center gap-6 my-16 text-black opacity-30 select-none">
+<div class="h-px w-full bg-black"></div>
+<span class="text-2xl">✻</span>
+<span class="text-2xl">✻</span>
+<span class="text-2xl">✻</span>
+<div class="h-px w-full bg-black"></div>
+</div>
+<!-- Scene 2 Preview Header -->
+<div class="flex items-center justify-between py-6 group cursor-pointer border-b border-black opacity-40 hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-3xl">add</span>
+<h3 class="text-3xl font-black font-headline uppercase tracking-tighter">Scene 2: Corridor Chase</h3>
+<span class="px-2 py-0.5 border border-black text-xs font-black uppercase small-caps">7 Shots</span>
+</div>
+</div>
+</section>
+</main>
+</body></html>
