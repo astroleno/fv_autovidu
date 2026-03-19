@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#168866",
+                        "on-surface": "#111111",
+                        "surface": "#f4f1ea", // Newsprint color
+                        "outline": "#111111",
+                        "on-background": "#111111",
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "0px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.newsprint-texture {
+    background-color: #f4f1ea;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCdaHoyOeW7v3qNYC2pkkBb85AUUecP_4n9ivAZh-xA7Eja685aQvRLkVG5VabWc1UpvXhe-wdOuJQyg2_YxQ5DfpteNsAUWw7Rv4HcJBCiAXd1PHH8vHu50VwdfsuuIErwO94ac-5cQH2NiCZadxN-rAdTMCowr05MdIxYeQjITEsk4tM__ktrxeHZQ0tgcZJjoPx9gBFfkM8jDGHWhrWfbP6YBA3Fdh3-yYbVwYTXHe0GNZsAUX31pJ5ECr4hNw51Q1G68ezUPOuY)
+    }
+.halftone {
+    position: relative
+    }
+.halftone::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#000 10%, transparent 10%);
+    background-size: 3px 3px;
+    opacity: 0.1;
+    pointer-events: none
+    }
+.hard-shadow-hover:hover {
+    box-shadow: 4px 4px 0 0 #111;
+    transform: translate(-2px, -2px)
+    }
+.border-b-thick {
+    border-bottom-width: 4px;
+    border-color: #111
+    }
+.border-r-thick {
+    border-right-width: 4px;
+    border-color: #111
+    }
+.border-thick {
+    border-width: 4px;
+    border-color: #111
+    }
+/* Reset all components to 0 radius globally */
+* {
+    border-radius: 0 !important
+    }</style>
+</head>
+<body class="newsprint-texture font-body text-on-surface">
+<!-- Main Workspace (Underlay) -->
+<div class="flex h-screen overflow-hidden grayscale opacity-40 pointer-events-none">
+<aside class="h-screen w-[240px] border-r-thick flex flex-col py-6 bg-surface">
+<div class="px-6 mb-8">
+<h1 class="text-xl font-black uppercase font-headline">FV Studio</h1>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<div class="px-3 py-2 border border-black bg-black text-white text-xs font-bold uppercase">Episode List</div>
+<div class="px-3 py-2 border border-black text-xs font-bold uppercase">Settings</div>
+</nav>
+</aside>
+<main class="flex-1 flex flex-col bg-surface">
+<header class="h-16 border-b-thick flex items-center px-8 justify-between">
+<span class="font-black text-2xl uppercase tracking-tighter">FV Chronicle</span>
+<div class="flex gap-4">
+<div class="w-8 h-8 border border-black bg-black"></div>
+<div class="w-8 h-8 border border-black"></div>
+</div>
+</header>
+<div class="p-8">
+<div class="h-64 border-thick bg-white/50"></div>
+</div>
+</main>
+</div>
+<!-- Newsprint Modal Overlay -->
+<div class="fixed inset-0 z-50 bg-on-surface/40 flex items-center justify-center p-6 backdrop-blur-sm">
+<div class="bg-surface w-full max-w-6xl h-[870px] border-thick shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col overflow-hidden relative">
+<!-- Modal Header -->
+<div class="px-8 py-6 border-b-thick flex justify-between items-center bg-white/30">
+<div class="flex items-center gap-6">
+<div class="text-xs font-black uppercase tracking-[0.2em] border-r border-black pr-6">
+                    VOL. 04 / ED. 2024
+                </div>
+<div>
+<h3 class="text-2xl font-black font-headline uppercase leading-none">Regenerate Shot Frame</h3>
+<p class="text-[10px] font-bold uppercase mt-1 tracking-widest opacity-70">Shot 02: Character Introduction · Sequence A</p>
+</div>
+</div>
+<button class="w-10 h-10 border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-all">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Content Grid -->
+<div class="flex-1 overflow-hidden grid grid-cols-12">
+<!-- Left Column: Current Frame -->
+<div class="col-span-3 border-r border-black p-6 flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<span class="text-[11px] font-black uppercase tracking-wider font-label">Original Asset</span>
+<span class="px-2 py-0.5 border border-black text-[10px] font-black uppercase">REF: 01A</span>
+</div>
+<div class="aspect-video w-full border-2 border-black halftone overflow-hidden mb-6 bg-white grayscale">
+<img class="w-full h-full object-cover mix-blend-multiply opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWMm1zr6hZFd5oxj6Qt2sgma2c3J2SnWRaeBx9zQ6qisYFyExFsmeEeAY2DU-4gDcByoRVkP6u1jr0ny1_8bg2YirJwzpc5MnkNMgkqVUpxtnpUrYFPAH8XkpUyO_wxVNRYTnAWIhRcAPev_I21UHgtAI2ZIykyALo8mNhz9XMeM3EO0QjhVCGgKRz46KSlb9s6uChp-MGA0MuoWOiV4aPC05uG6tIi7GLT7nBPQfCMFKCbdSW7aRrDbxEm40PpIaLEKaLNVWPczTY"/>
+</div>
+<div class="space-y-6">
+<div>
+<p class="text-[11px] font-black uppercase mb-2 border-b border-black/20 pb-1">Technical Spec Sheet</p>
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-1 border border-black text-[10px] font-bold">16:9</span>
+<span class="px-2 py-1 border border-black text-[10px] font-bold">RAW_CINEMA</span>
+<span class="px-2 py-1 border border-black text-[10px] font-bold">24FPS</span>
+</div>
+</div>
+<p class="text-xs font-bold leading-relaxed italic border-l-2 border-black pl-3 opacity-80">
+                        "A high-contrast cinematic silhouette against a misty sunset background..."
+                    </p>
+</div>
+</div>
+<!-- Center Column: Controls -->
+<div class="col-span-5 p-8 flex flex-col bg-white/20">
+<div class="space-y-8 h-full flex flex-col">
+<!-- Prompt Input -->
+<div class="space-y-3">
+<label class="text-[11px] font-black uppercase tracking-widest block">Generation Prompt</label>
+<div class="relative">
+<textarea class="w-full h-40 bg-white border-2 border-black p-4 text-sm focus:ring-0 transition-all resize-none font-bold uppercase placeholder:opacity-30" placeholder="ENTER SCENE DESCRIPTION..."></textarea>
+<div class="absolute bottom-3 right-3 text-[10px] font-black">128/500</div>
+</div>
+</div>
+<!-- Asset Selector -->
+<div class="space-y-3 flex-1 overflow-hidden flex flex-col">
+<label class="text-[11px] font-black uppercase tracking-widest block">Reference Catalog</label>
+<div class="grid grid-cols-1 gap-2 overflow-y-auto pr-2 no-scrollbar">
+<!-- Asset Item -->
+<label class="flex items-center p-3 border-2 border-black bg-white hover:bg-surface transition-all cursor-pointer hard-shadow-hover">
+<div class="w-12 h-12 border border-black grayscale halftone mr-4">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_oNZPY4LrkBydC8e4NZAywEpw-acdzVfwu_ErDEo_9RvNJaNbULz73eYxYOjnna5S17RfDtG-uIrECz_mWx9O8sLCMWYyA2zBXcXfnP2gVpQaDiO_rCvOO7n9SPAR7nW5mr3nMUDsIwjy8Ce2eYEBTIv3njMfK6OIypGYqx-Ki8263jeYzSGEsGw1splHiavka7AAQusV0Kjo4G4vXKR8qkM-sKukFXhRtNaHDrbbZ8c7j15dYSUlJPlUw9DXJNETGTNvQKmVL1By"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-black uppercase">Daryl</p>
+<p class="text-[10px] font-bold opacity-60">MAIN PROTAGONIST · V3</p>
+</div>
+<input checked="" class="w-5 h-5 border-2 border-black text-primary focus:ring-0" type="checkbox"/>
+</label>
+<!-- Asset Item -->
+<label class="flex items-center p-3 border-2 border-black bg-white hover:bg-surface transition-all cursor-pointer hard-shadow-hover">
+<div class="w-12 h-12 border border-black grayscale halftone mr-4">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBesjBHkKlFvcg266IMcf81cGDz5oMbFK4TiOF0od43JUhlLgIPGPSMSQ2Wzq7v9rmYTvzrECYbLQ8qCtpLiqLiHIrYIlm7PmxsjPgjIlqUH-THz7LAy0JsOx7EOkdJqbr4tvXj_igJx3LX9Re7-dEhlO5ayIE5sf_kDR-j0zqMublWMi-aSzAUiA4OP7qkvGc0Lwx_i7Qzio8_5PMhF1Qz8HY2cASdFMjkDzwYChtle03U9QThuFyRKv22gljeFQg1n2B-29t_67uj"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-black uppercase">Carl</p>
+<p class="text-[10px] font-bold opacity-60">SIDEKICK · V1.2</p>
+</div>
+<input class="w-5 h-5 border-2 border-black text-primary focus:ring-0" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full py-5 bg-primary text-white border-2 border-black font-black uppercase tracking-widest transition-all hard-shadow-hover flex items-center justify-center gap-3">
+<span class="material-symbols-outlined">bolt</span>
+                        Execute Generation
+                    </button>
+</div>
+</div>
+<!-- Right Column: Candidates -->
+<div class="col-span-4 p-6 border-l border-black flex flex-col bg-white/40">
+<div class="flex items-center justify-between mb-6">
+<span class="text-[11px] font-black uppercase tracking-widest">Candidate Proofs</span>
+<div class="flex gap-1.5">
+<div class="w-2 h-2 bg-black"></div>
+<div class="w-2 h-2 border border-black"></div>
+<div class="w-2 h-2 border border-black"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-6 overflow-y-auto pr-2 no-scrollbar">
+<!-- Candidate 1 -->
+<div class="bg-white border-2 border-black transition-all hard-shadow-hover group">
+<div class="aspect-video relative border-b-2 border-black grayscale halftone">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACb0pax_hJdTJjCPtRRqdCrKp4Yjh46hcNZY7fddbw2Jd_91TXTGb8IE208tcc9gMBIvwFs_RSu-rBfiKm14z-jMua5mTtbMW-yDrlkYwpLft2iGVphIdXwWgLcUkUl2nRahpy_rWDTEeGRDtSVfJde_tx8oyduuvmQjlQ_BvEo7OITnVPZaoQIoAea35yKQdHTHZAw5WksdMs6lta1dZUb-jDp2QkLCd1dUGq-tm64aG1nXU1cm1rdVUZyroUBsfum5OI8KISO15h"/>
+<div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<button class="px-4 py-2 bg-white text-black text-xs font-black uppercase border border-black">Full Preview</button>
+</div>
+</div>
+<div class="p-3 flex items-center justify-between">
+<span class="text-[10px] font-black font-mono">VAR_01</span>
+<button class="px-4 py-1.5 bg-primary text-white text-[10px] font-black uppercase border border-black transition-all hover:bg-on-surface">Select Proof</button>
+</div>
+</div>
+<!-- Candidate 2 -->
+<div class="bg-white border-2 border-black transition-all hard-shadow-hover group">
+<div class="aspect-video relative border-b-2 border-black grayscale halftone">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAscfB6R1cihqgppiNMTDmrFZ7dsHsPYTwUt1lV4kBtQ10Vk8nxlEYMKs9ORQO3o7GhiQD0sMQcxjduuqo2y5xs20wXSXcAsYYY9IRbIvjeZ9xKjnmygpgZ_Kg2d4z4GIjDRU6MiJQ-xATIMi7_2RX4yJ6yj0dDAB446i5q7yH1KfAEkgz1S7_jaEf-aZTIYOoS0AUuL7bM59a-m_dDpQBJQReztY7zY3HrJNnfi8-2wD1aasApQt-nKFghpZtbic_zyELzdv7e_VLy"/>
+<div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<button class="px-4 py-2 bg-white text-black text-xs font-black uppercase border border-black">Full Preview</button>
+</div>
+</div>
+<div class="p-3 flex items-center justify-between">
+<span class="text-[10px] font-black font-mono">VAR_02</span>
+<button class="px-4 py-1.5 bg-primary text-white text-[10px] font-black uppercase border border-black transition-all hover:bg-on-surface">Select Proof</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Confirmation Popup (Nested Overlay) -->
+<div class="absolute inset-0 bg-white/80 flex items-center justify-center z-[60] backdrop-blur-[4px]">
+<div class="bg-surface w-[400px] border-thick shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] p-8">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 border-2 border-black bg-white flex items-center justify-center">
+<span class="material-symbols-outlined text-black scale-125" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<h4 class="text-2xl font-black uppercase font-headline leading-none">Heads Up!</h4>
+</div>
+<p class="text-sm font-bold uppercase tracking-tight mb-8 leading-relaxed">
+                    Confirm adoption? This will <span class="bg-black text-white px-1">OVERWRITE</span> all existing sequence data. Action is final.
+                </p>
+<div class="flex gap-4">
+<button class="flex-1 py-3 text-xs font-black uppercase border-2 border-black hover:bg-black hover:text-white transition-all">Cancel</button>
+<button class="flex-1 py-3 bg-primary text-white text-xs font-black uppercase border-2 border-black transition-all hard-shadow-hover">Adopt Frame</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

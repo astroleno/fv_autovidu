@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shot Detail &amp; Comparison | FV Studio</title>
+<!-- Google Fonts: Manrope, Inter, JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#168866",
+              "on-surface": "#1a1c1e",
+              "surface": "#F9F9F7",
+              "outline": "#000000",
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "mono": ["'JetBrains Mono'", "monospace"],
+            },
+            borderRadius: {
+              "none": "0px",
+              "DEFAULT": "0px",
+              "lg": "0px",
+              "xl": "0px",
+              "full": "0px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #F9F9F7;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .line-grid {
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .justified-text { text-align: justify; text-justify: inter-word; }
+        .grayscale-hover img { filter: grayscale(100%); transition: filter 0.3s ease; }
+        .grayscale-hover:hover img { filter: grayscale(0%); }
+        .active-selection img { filter: grayscale(0%) !important; }
+    </style>
+</head>
+<body class="font-body text-on-surface overflow-hidden">
+<div class="flex h-screen w-full border-4 border-black">
+<!-- SideNavBar -->
+<aside class="h-full w-[200px] bg-white border-r-4 border-black flex flex-col py-6">
+<div class="px-6 mb-10">
+<h1 class="text-xl font-black uppercase tracking-tighter font-headline border-b-4 border-black pb-1">FV Studio</h1>
+<p class="text-[10px] uppercase font-bold text-black mt-2 font-mono">Terminal 0.4.1</p>
+</div>
+<nav class="flex-1 space-y-0 px-0">
+<a class="flex items-center gap-3 px-6 py-3 bg-black text-white font-bold transition-all" href="#">
+<span class="material-symbols-outlined text-sm">video_library</span>
+<span class="text-xs uppercase tracking-widest">Episodes</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-black hover:bg-black hover:text-white border-b border-black transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span class="text-xs uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-6 space-y-4 py-6 border-t-2 border-black">
+<div class="space-y-1">
+<div class="text-[9px] font-bold uppercase text-slate-400">System Status</div>
+<div class="flex items-center gap-2 text-[10px] font-mono font-bold">
+<span class="w-2 h-2 bg-primary"></span> API_LIVE
+                </div>
+</div>
+<div class="space-y-1">
+<div class="text-[9px] font-bold uppercase text-slate-400">Memory</div>
+<div class="w-full h-2 border border-black p-[1px]">
+<div class="h-full bg-black w-[65%]"></div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-8 h-14 bg-white border-b-4 border-black z-40">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-black text-[10px] font-bold uppercase tracking-widest">
+<span>Episodes</span>
+<span class="text-slate-300">/</span>
+<span>EP_02</span>
+<span class="text-slate-300">/</span>
+<span class="bg-black text-white px-2 py-0.5">Shot_03</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center border-2 border-black px-3 py-1 bg-surface">
+<span class="material-symbols-outlined text-sm mr-2">search</span>
+<input class="bg-transparent border-none text-[10px] font-bold uppercase focus:ring-0 w-40 p-0 placeholder-slate-400" placeholder="Filter parameters..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="w-8 h-8 border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">notifications</span>
+</button>
+<div class="w-8 h-8 border-2 border-black">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7dL4o-KqK5YazZdcZQysZ5guNSfQZozZKk9cBZ8z9MUxfhxuim1I31f8E_J9p13OoHVCGWfgOndImvJqJrMG7SU37MFFW0fQ1VygCaZwEnFBOxLbqIchxuMdHTdLKzDaV3-J1SE6cqG-rNi-D6Av4kUKcwDaOvpz_K-iMVI6sWkEceVbJ0CefZj_py47d10oEaNu1YSTeNBsopCOc6EjogwpJCn98qixP4rw9tkqrYSizio9tKJVqdKDrd6lXAX6suPgmchzpOFxV"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Area: 5 / 7 split -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Panel (5/12 approx 41.6%) -->
+<section class="w-[41.66%] bg-white border-r-4 border-black overflow-y-auto scrollbar-hide line-grid p-6 space-y-6">
+<div class="space-y-0">
+<div class="border-4 border-black bg-white mb-4">
+<div class="bg-black text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest flex justify-between">
+<span>Input_Start_Frame</span>
+<span class="font-mono">FR_000</span>
+</div>
+<div class="aspect-video w-full overflow-hidden grayscale">
+<img alt="Start Frame" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACGZleqgIHfhURHIutKYqYKWINYOt9MT_60Tc1wP3roCt-FeIPaUe8jj-OaTheLvSXuhQs4OFEhRhPdcjTJQUqkXG_qIuABXuyXvfCj46MkRmpJ8Zzs1XiQc8JHF2Vo1K8qJ7eJrqJl4uhlzPX3gdBcu5DrxR57JMI0NhrO0wx8Oq_c8-uvuG3jxWl01xJruvfPSZbmhQlzqw_n27lklwKD_vzOy1VbCyaJwFs37hJsCil9zE_OWcgTB3pzkcj1QSh-0WYrKbNg1Ba"/>
+</div>
+</div>
+<div class="border-4 border-black bg-white">
+<div class="bg-black text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest flex justify-between">
+<span>Input_End_Frame</span>
+<span class="font-mono">FR_120</span>
+</div>
+<div class="aspect-video w-full overflow-hidden grayscale">
+<img alt="End Frame" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMfCGgnHdMvlzp9C_c5_jRigfi_q2U-MIHnbCdeu6T5p9dawSqGLfvJ0ZcFSrR1hgAB2lOvsFz3TwmdOv6PKfWHxEJAnAzoMEx5i_AI8dO1jXw7-N5dHBHZa6AxchYsoyHHGjYZk8_3ySqKIiDID9PjrPnM0ZblZKvRm_4bQLlBwTwHOuA1iy60kjlLoZ8fJWlQgfCXPhdv_WKdh0fMHQc51AqyUdoHcxiqwnSrII8d1Bg9xrM0vGRnKnqFFcREpm3uMDjWfz3rO9u"/>
+</div>
+</div>
+</div>
+<!-- Editorial Layout Prompts -->
+<div class="space-y-6">
+<div class="p-4 border-2 border-black bg-surface">
+<div class="flex justify-between items-baseline mb-3 border-b border-black pb-1">
+<h3 class="text-[10px] font-black uppercase tracking-tighter">Editorial_Prompt</h3>
+<span class="font-mono text-[9px]">UUID: 882-X</span>
+</div>
+<p class="text-sm text-black leading-relaxed font-body italic justified-text px-1">"A futuristic semi-truck parked in a high-tech warehouse, neon lighting, 8k resolution, cinematic atmosphere, hyper-detailed textures."</p>
+</div>
+<div class="p-4 border-4 border-primary bg-white">
+<h3 class="text-[10px] font-black uppercase tracking-tighter mb-3 border-b border-primary pb-1">Motion_Directive</h3>
+<p class="text-sm text-black font-bold leading-snug justified-text px-1 uppercase tracking-tight">"The camera pushes in slowly towards the driver's cabin as the headlights flicker on. Dust motes dance in the light rays."</p>
+</div>
+<div class="grid grid-cols-2 gap-px bg-black border-2 border-black">
+<div class="bg-white p-3">
+<div class="text-[9px] font-black uppercase mb-1">Subject</div>
+<div class="text-xs font-mono font-bold">CYBER_TRUCK_V2</div>
+</div>
+<div class="bg-white p-3">
+<div class="text-[9px] font-black uppercase mb-1">Environment</div>
+<div class="text-xs font-mono font-bold">WH_04_NEON</div>
+</div>
+<div class="bg-white p-3">
+<div class="text-[9px] font-black uppercase mb-1">Movement</div>
+<div class="text-xs font-mono font-bold">PUSH_Z_AXIS</div>
+</div>
+<div class="bg-white p-3">
+<div class="text-[9px] font-black uppercase mb-1">Dimensions</div>
+<div class="text-xs font-mono font-bold">3840x2160</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Panel (7/12 approx 58.3%) -->
+<section class="w-[58.33%] flex flex-col bg-surface relative">
+<!-- Header -->
+<div class="px-8 py-4 flex justify-between items-center border-b-4 border-black bg-white">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-primary"></span>
+<h2 class="font-headline font-black uppercase text-xl tracking-tighter">Candidate_Comparison</h2>
+</div>
+<div class="flex items-center gap-0">
+<button class="w-10 h-10 border-2 border-black flex items-center justify-center bg-white hover:bg-black hover:text-white transition-all">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="h-10 border-y-2 border-black flex items-center px-4 font-mono text-[10px] font-bold bg-white">
+                            S_03 / 12
+                        </div>
+<button class="w-10 h-10 border-2 border-black flex items-center justify-center bg-white hover:bg-black hover:text-white transition-all">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Candidates Scroll -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide pb-32">
+<!-- Candidate v1 (Selected) -->
+<div class="bg-white border-4 border-primary active-selection grayscale-hover group relative">
+<div class="aspect-video bg-black relative border-b-4 border-primary">
+<img alt="Video Preview v1" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0B6ezZggXPdor8bCJ5Rq1T071mciDqX3-ka52HRO55iPeYofez00q-q88EJyOC8y0HWAJuL0Bzlb4hG5QJvR0PVTiv44MViEEZNcnK4zmsS2gzZWtjxxHlMUwwuRnlITZGy7kmNp94GtGq0uSzhq4hRwy7aB4mk7s5xyjlNUj7j9hGym5NjsKvyw-FULtHFukR2dW6Lg85eAVn68Z6vUZSWm7T6iZc3SF3_7n5pYZNmYlqQu1_8LDvrOd7CY3K6OWQpYVS4qaeBaM"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-16 h-16 bg-primary text-white flex items-center justify-center border-4 border-black hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="absolute top-0 left-0 bg-primary text-white text-[10px] px-3 py-1 font-black uppercase tracking-widest border-r-4 border-b-4 border-black">Active_Version</div>
+</div>
+<div class="p-4 flex justify-between items-center bg-white">
+<div class="space-y-1">
+<div class="text-[10px] font-black uppercase tracking-widest">Candidate_01</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold font-mono">MODEL: viduq2-pro-fast</span>
+<span class="text-[10px] font-mono text-slate-500">SEED: 88231902</span>
+</div>
+</div>
+<div class="bg-primary text-white px-6 py-2 text-xs font-black uppercase tracking-widest border-2 border-black">Selected</div>
+</div>
+</div>
+<!-- Candidate v2 -->
+<div class="bg-white border-4 border-black grayscale-hover group relative">
+<div class="aspect-video bg-black relative border-b-4 border-black">
+<img alt="Video Preview v2" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyQ1yiOXOBaoS23HxomcXQm28Rh2zdxSAHBaGx7V_EOTMTTDfInDRCakpEDg7htHld02r83VaGY_v4E2R-EO9sukyJakLB21G2fbb7onY8sUB-0Um-4oY877E5ATJuRtzcc08p6Z5aMdoyNsvoBBX2Ff168EnOBYzDcqnbeP5va73OJEXSs2IOWFyXn-oD_y6FgQQ82ikufqEWzU3xq-uODDoEUTyQAlBYrmzWPmsgYTeMck-OuMHq1FGR4mPQ-eR-tcC2Lb-2fURx"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-12 h-12 bg-white text-black flex items-center justify-center border-4 border-black hover:bg-black hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="p-4 flex justify-between items-center bg-white">
+<div class="space-y-1">
+<div class="text-[10px] font-black uppercase tracking-widest">Candidate_02</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold font-mono">MODEL: viduq2-pro-fast</span>
+<span class="text-[10px] font-mono text-slate-500">SEED: 41209341</span>
+</div>
+</div>
+<button class="px-6 py-2 border-2 border-black bg-white hover:bg-black hover:text-white text-xs font-black uppercase tracking-widest transition-colors">Compare</button>
+</div>
+</div>
+<!-- Candidate v3 -->
+<div class="bg-white border-4 border-black grayscale-hover group relative">
+<div class="aspect-video bg-black relative border-b-4 border-black">
+<img alt="Video Preview v3" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIuZOSfbwRfdrucl7h6BNdca-WL5yee2wH4VdNIX7rz0gMAqi4njnPnqOg6jIQhpPHay36_7QcUmCKGHb4UoL3Y3tRA8seNAZ-XoZchK1LgPKqMSpBSSAQ4AFHcQyYqDMcwq03wIg-SLGMBq9cRHlYSeZN8OhnjI5tRHdZYLHVdtDTRUHoJjgCq962ayWcO5PlSjaPuZ1Y1xS3OLoVJaRlft9cCKg-7kFpMjU9x7r1Qipn4V4I603w2DbFYrGo-K8NtWZIePxneXhJ"/>
+</div>
+<div class="p-4 flex justify-between items-center bg-white">
+<div class="space-y-1">
+<div class="text-[10px] font-black uppercase tracking-widest">Candidate_03</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold font-mono">MODEL: viduq2-pro-fast</span>
+<span class="text-[10px] font-mono text-slate-500">SEED: 11094852</span>
+</div>
+</div>
+<button class="px-6 py-2 border-2 border-black bg-white hover:bg-black hover:text-white text-xs font-black uppercase tracking-widest transition-colors">Compare</button>
+</div>
+</div>
+</div>
+<!-- Bottom Action Bar -->
+<div class="absolute bottom-0 left-0 right-0 bg-white p-6 border-t-4 border-black flex items-center justify-between z-50">
+<div class="flex items-center gap-10">
+<div class="flex flex-col">
+<span class="text-[9px] uppercase tracking-widest font-black mb-1">Compute_Allocation</span>
+<div class="w-48 h-4 border-2 border-black p-[2px] bg-surface">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+<div class="font-mono text-xs font-bold">
+                            14 / 20 <span class="text-slate-400">BATCH_CYCLES</span>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-3 border-4 border-black bg-white text-black font-black uppercase tracking-widest text-sm hover:bg-black hover:text-white transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">refresh</span>
+                            Redraw_Frames
+                        </button>
+<button class="px-10 py-3 bg-primary text-white border-4 border-black font-black uppercase tracking-widest text-sm flex items-center gap-2 hover:translate-x-1 hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">movie</span>
+                            Render_Sequence
+                        </button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

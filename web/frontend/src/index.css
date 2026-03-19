@@ -1,0 +1,119 @@
+/**
+ * FV Studio 全局样式
+ * Design System: Stitch 报纸风格 (High-End Editorial Newsprint)
+ * 参考 reference/frontend/stitch/fv_chronicle/DESIGN.md
+ * - 0px 圆角、硬阴影、点阵背景、灰度图、UPPERCASE 标签
+ */
+@import "tailwindcss";
+
+@theme {
+  /* ========== Stitch 调色板 ========== */
+  --color-primary: #168866;
+  --color-primary-light: #1da87e;
+  --color-primary-dark: #0f6b50;
+  --color-primary-50: #e6f5ef;
+  --color-newsprint-off-white: #F9F9F7;
+  --color-newsprint-black: #111111;
+  --color-outline-variant: #E5E5E0;
+  --color-accent: #f59e0b;
+  --color-error: #ef4444;
+  --color-success: #168866;
+  --color-surface: #F9F9F7;
+  --color-card: #F9F9F7;
+  --color-ink: #111111;
+  --color-muted: #6b7280;
+  --color-border: #111111;
+  --color-divider: #E5E5E0;
+
+  /* ========== 圆角：Stitch 0px 规则 ========== */
+  --radius: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+
+  /* ========== 字体：Manrope 标题 / Inter 正文 ========== */
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-headline: "Manrope", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ========== 硬阴影：4px 4px 0px 0px #111 ========== */
+  --shadow-hard: 4px 4px 0px 0px #111111;
+  --shadow-sm: none;
+  --shadow: 4px 4px 0px 0px #111111;
+  --shadow-md: 4px 4px 0px 0px #111111;
+}
+
+/* 全局 box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+/* Stitch 点阵背景 + 纸张色 */
+body {
+  margin: 0;
+  background-color: var(--color-surface);
+  background-image: radial-gradient(var(--color-newsprint-black) 0.5px, transparent 0.5px);
+  background-size: 12px 12px;
+  background-attachment: fixed;
+  color: var(--color-ink);
+  min-height: 100vh;
+  min-width: 1024px;
+}
+
+/* 轻微遮罩避免点阵过强 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-surface);
+  opacity: 0.92;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Manrope 用于标题 */
+h1, h2, h3, .font-headline {
+  font-family: var(--font-headline);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ========== Stitch 工具类 ========== */
+.newsprint-border {
+  border: 1px solid var(--color-newsprint-black);
+}
+
+.newsprint-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-newsprint-black);
+  transition: all 0.2s ease;
+}
+.newsprint-card:hover {
+  box-shadow: var(--shadow-hard);
+  transform: translate(-2px, -2px);
+}
+
+.hard-shadow {
+  box-shadow: var(--shadow-hard);
+}
+.hard-shadow:hover {
+  box-shadow: var(--shadow-hard);
+  transform: translate(-2px, -2px);
+}
+
+/* 图片默认灰度，hover 父级(.group)时恢复彩色（报纸印刷感） */
+.grayscale-img {
+  filter: grayscale(100%);
+  transition: filter 0.2s ease;
+}
+.grayscale-img:hover,
+.group:hover .grayscale-img {
+  filter: grayscale(0%);
+}

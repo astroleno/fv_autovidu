@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FV Studio - Timeline Preview (Newsprint Edition)</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#0e8463",
+              "on-secondary": "#ffffff",
+              "on-surface": "#191c1d",
+              "tertiary-fixed": "#ffddb8",
+              "on-secondary-fixed": "#1a1a2e",
+              "tertiary": "#825100",
+              "surface-container-low": "#f2f4f5",
+              "on-secondary-container": "#63627a",
+              "outline": "#6e7a73",
+              "on-tertiary-fixed-variant": "#653e00",
+              "primary-fixed": "#92f6cd",
+              "on-secondary-fixed-variant": "#45455b",
+              "surface-variant": "#e1e3e4",
+              "surface-bright": "#f8fafb",
+              "on-primary-container": "#f5fff8",
+              "background": "#F9F9F7",
+              "on-error": "#ffffff",
+              "on-tertiary-container": "#fffbff",
+              "tertiary-container": "#a36700",
+              "on-background": "#191c1d",
+              "inverse-primary": "#75d9b2",
+              "on-tertiary-fixed": "#2a1700",
+              "on-tertiary": "#ffffff",
+              "surface": "#F9F9F7",
+              "secondary-fixed-dim": "#c6c4df",
+              "primary": "#00694d",
+              "inverse-on-surface": "#eff1f2",
+              "secondary-container": "#e2e0fc",
+              "on-primary-fixed-variant": "#00513b",
+              "on-primary-fixed": "#002116",
+              "surface-dim": "#d8dadb",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed-dim": "#75d9b2",
+              "secondary-fixed": "#e2e0fc",
+              "on-surface-variant": "#3e4943",
+              "surface-container": "#eceeef",
+              "outline-variant": "#bdc9c2",
+              "inverse-surface": "#2e3132",
+              "on-primary": "#ffffff",
+              "surface-tint": "#006c4f",
+              "surface-container-high": "#e6e8e9",
+              "secondary": "#5d5c74",
+              "on-error-container": "#93000a",
+              "tertiary-fixed-dim": "#ffb95f",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e1e3e4",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"],
+              "mono": ["JetBrains Mono", "monospace"]
+            },
+            borderRadius: {
+                "DEFAULT": "0px", 
+                "lg": "0px", 
+                "xl": "0px", 
+                "full": "0px"
+            },
+          },
+        },
+      }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    vertical-align: middle
+    }
+.custom-scrollbar::-webkit-scrollbar {
+    height: 4px;
+    width: 4px
+    }
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1
+    }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #000
+    }
+.waveform-path {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.5;
+    stroke-linecap: square
+    }
+.newsprint-bg {
+    background-color: #F9F9F7;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAYobV2S1Q-H-n2pysdJZRgVAR95jRyCBwUMYoEIV7TT1TvWADd2wK3fIermhM-w-a0Emdmy7pEfcRABRnD-8MazJ_HmQDT7YP-za4GcuKpRq2f8tQvJNcpt-Ed0zeLfv8CShginCXIFVBy5DnjwlenjbAi-dYmubgbtaPDWLKeUn5hEUCBE3tJv2TDdjubmECOWkLNl3uO58kXn4c8MqSOrRPq3uGYVekNLqbKAVohW0A6eGelVPZOjXfXqcQkgtSBB86MQeWdVpXs)
+    }
+.grayscale-clip {
+    filter: grayscale(1) contrast(1.2)
+    }</style>
+</head>
+<body class="newsprint-bg font-body text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="h-screen w-[240px] sticky left-0 top-0 transition-all duration-300 border-r border-black flex flex-col py-6 z-50 bg-white">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 bg-black flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm" data-icon="auto_videocam" style="font-variation-settings: 'FILL' 1;">auto_videocam</span>
+</div>
+<div>
+<h1 class="text-lg font-bold text-black font-headline uppercase tracking-tighter">FV Studio</h1>
+<p class="text-[10px] uppercase tracking-widest text-black/60 font-label">AI Video Production</p>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 bg-black text-white font-bold transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="video_library" style="font-variation-settings: 'FILL' 1;">video_library</span>
+<span class="text-sm font-semibold uppercase">Episode List</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-black hover:bg-black hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-sm font-semibold uppercase">Settings</span>
+</a>
+</nav>
+<div class="px-3 mt-auto space-y-1 border-t border-black pt-4">
+<div class="flex items-center gap-3 px-3 py-2 text-black text-[11px] uppercase tracking-wider font-mono">
+<span class="material-symbols-outlined text-sm" data-icon="hub">hub</span>
+<span>API: ONLINE</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-black text-[11px] uppercase tracking-wider font-mono font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="analytics">analytics</span>
+<span>TASKS: 04</span>
+</div>
+</div>
+</aside>
+<div class="flex-1 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-8 h-16 bg-white border-b border-black sticky top-0 z-40">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-1">
+<span class="text-xs font-mono uppercase text-black/50">Projects /</span>
+<span class="text-sm font-bold text-black uppercase">Rough Cut: Episode 04</span>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-black/60 hover:text-black text-xs font-bold uppercase transition-colors" href="#">Projects</a>
+<a class="text-black/60 hover:text-black text-xs font-bold uppercase transition-colors" href="#">Assets</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-black">
+<span class="material-symbols-outlined text-sm" data-icon="search">search</span>
+</span>
+<input class="bg-white border border-black rounded-none pl-10 pr-4 py-1.5 text-xs w-48 focus:ring-0 focus:border-primary transition-all font-mono" placeholder="SEARCH SCENES..." type="text"/>
+</div>
+<div class="flex items-center border-l border-black ml-2 pl-4 gap-2">
+<button class="p-2 text-black hover:bg-black hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<img alt="User Avatar" class="w-8 h-8 border border-black grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLipWLz0uw8vpQDrP759kGbx1ICKgU05ywglXmLcnbtu4ZLiKeimquntt7zDxVBCzoDgQDIVmNemYHmuPbSDQ2cm5N1ZMzlGDtMpS358Xi9yqeZzsoMdCfBhiDKOPJmuNAmvY69fCgcH05dGC6yfYew5_gvMVsDiogexBJ4NhNYAA1Q3vme9AEZyxKve2EFnHol071pmYntSBTQ2jUPQASs9lCfEeT1JELUSBFdTXj6S7I85F3jSotahkrkoh5WQCjFlQ6A2umFOJE"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Video Player Section -->
+<section class="flex-1 p-6 flex flex-col min-h-0 bg-white">
+<div class="flex-1 bg-black border border-black overflow-hidden relative group">
+<img alt="Video Preview" class="w-full h-full object-cover grayscale opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOIWMOh_ggFVky5LkRCSo6V6SIxHpPt0L-nqtL-Za1IIkimwFXD-CdRR3XrAUWFJTKnwBP3LDNTgI9ANdijWacEi5v90JsuaUCg00BYwEfwnqDBIW8QnJ8UKNH2jTx-E89_v7MjM3bJmRAgJoKRlXFt1TIjW_N_J53u0CeI8u0MsqLK_SLBhYgdyKbpu-tkz-RP6MriY-ivTDU9Q7uKA-pQ-5e1FmM1cqBOT2MTi8z97zFC9YpN5YvrY74uLkq7K92j5YcC3whR2f7"/>
+<!-- Overlay Controls -->
+<div class="absolute inset-x-0 bottom-0 p-4 bg-white border-t border-black flex flex-col gap-3">
+<div class="w-full bg-black/10 h-1 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-primary w-[45%]"></div>
+</div>
+<div class="flex items-center justify-between text-black">
+<div class="flex items-center gap-6">
+<button class="hover:text-primary"><span class="material-symbols-outlined" data-icon="skip_previous">skip_previous</span></button>
+<button class="w-8 h-8 bg-black text-white flex items-center justify-center hover:bg-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<button class="hover:text-primary"><span class="material-symbols-outlined" data-icon="skip_next">skip_next</span></button>
+<div class="text-[10px] font-mono font-bold">04:22 / 12:45</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:text-primary"><span class="material-symbols-outlined text-sm" data-icon="volume_up">volume_up</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined text-sm" data-icon="settings">settings</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined text-sm" data-icon="fullscreen">fullscreen</span></button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Bar -->
+<section class="px-6 py-3 flex items-center justify-between bg-white border-t border-b border-black z-10">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-black uppercase font-mono">Res.</span>
+<select class="bg-white border border-black text-[10px] font-bold px-3 py-1 rounded-none focus:ring-0 text-black cursor-pointer uppercase">
+<option>1080p (FHD)</option>
+<option>4K (UHD)</option>
+<option>720p (HD)</option>
+</select>
+</div>
+<div class="h-6 w-px bg-black"></div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 border border-black hover:bg-black hover:text-white transition-colors text-black flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">library_music</span>
+<span class="text-[10px] font-bold uppercase">Add Audio</span>
+</button>
+<button class="px-3 py-1.5 border border-black hover:bg-black hover:text-white transition-colors text-black flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">magic_button</span>
+<span class="text-[10px] font-bold uppercase">Auto Align</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 text-[10px] font-bold text-black uppercase border border-black hover:bg-black/5 transition-colors">Save Project</button>
+<button class="bg-primary text-white px-6 py-2 border border-black font-bold text-[10px] uppercase hover:bg-black transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="file_download">file_download</span>
+                        Export MP4
+                    </button>
+</div>
+</section>
+<!-- Timeline Section -->
+<section class="h-80 bg-[#F9F9F7] newsprint-bg flex flex-col border-t border-black relative select-none">
+<!-- Timeline Rulers & Scene Groups -->
+<div class="flex">
+<!-- Empty Header Corner -->
+<div class="w-[180px] bg-white border-r border-black border-b border-black flex items-center px-4">
+<span class="text-[10px] font-bold text-black tracking-widest uppercase font-mono">Tracks</span>
+</div>
+<!-- Time Markers -->
+<div class="flex-1 overflow-hidden">
+<div class="h-8 bg-white border-b border-black flex items-center relative overflow-x-auto no-scrollbar">
+<div class="flex gap-20 pl-4 text-[10px] text-black font-mono font-bold w-full">
+<span>00:00:00</span><span>00:00:05</span><span>00:00:10</span><span>00:00:15</span><span>00:00:20</span><span>00:00:25</span><span>00:00:30</span><span>00:00:35</span><span>00:00:40</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tracks Container -->
+<div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col relative">
+<!-- Playhead (Global) -->
+<div class="absolute left-[40%] top-0 bottom-0 w-[1px] bg-primary z-40 pointer-events-none">
+<div class="absolute top-0 -left-[2px] w-[5px] h-[5px] bg-primary"></div>
+</div>
+<!-- Track Rows Wrapper -->
+<div class="min-w-max">
+<!-- VIDEO TRACK V1 -->
+<div class="flex h-20 border-b border-black group/track transition-colors bg-white/50">
+<div class="w-[180px] sticky left-0 z-30 bg-white border-r border-black p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-black uppercase font-mono">V1_VIDEO</span>
+<div class="flex gap-0">
+<button class="w-6 h-6 border border-black flex items-center justify-center text-[10px] font-bold text-black hover:bg-black hover:text-white transition-colors">M</button>
+<button class="w-6 h-6 border-y border-r border-black flex items-center justify-center text-[10px] font-bold text-black hover:bg-black hover:text-white transition-colors">S</button>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-black text-xs">visibility</span>
+<span class="text-[8px] font-mono text-black/50 uppercase">Active</span>
+</div>
+</div>
+<div class="flex-1 p-0 flex items-center gap-0 bg-transparent">
+<!-- Clip 1 -->
+<div class="w-56 h-14 bg-white border border-black relative group cursor-pointer hover:bg-black/5 transition-all overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover grayscale-clip opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5JMsbFEdbCHSEQlCHg-VVmBN-peBPrbwudts9sk0EXdGo10OcVIikH1F61olgZqr9TLKuPWvtITGHNBbkv1tYOqwpDRTpdV9bTUuEBNjh4Z9bJQBWKCTK744nJyMAO-B0dXNMMgZEXmnyv9ngLcCplz9gjR93R-NNQRdk3jXklRO-WyOsRkvPQITBEeNZyl0yVO0wbMTc7NB9eJTbxJBE6zD81BGUIiGAbIrb-1Z7vyOKv2lKfytZl_eNQeqjMIHN_VBtpUrYVIdA"/>
+<div class="absolute inset-0 p-1.5 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="bg-black text-[9px] font-bold text-white px-1 font-mono uppercase">SHOT_01</span>
+<span class="text-[9px] font-mono font-bold text-black bg-white px-1 border border-black">04:12</span>
+</div>
+</div>
+</div>
+<!-- Transition -->
+<div class="w-8 h-8 -mx-4 z-10 bg-white border border-black flex items-center justify-center hover:bg-black hover:text-white transition-transform cursor-pointer">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+</div>
+<!-- Clip 2 (Selected) -->
+<div class="w-72 h-14 bg-primary/10 border-2 border-primary relative group cursor-pointer overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover grayscale-clip opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3NYSpgqwNq6sbKkCrC2EI0FngiQv6KgIPWI3RNEr7hg_Za7W8jBrW8eCl5phQhvOt0NGx8MWfZFEuRAsNt81ZttcsXaTMavHr0nPV-bXtSWiTjbeonux1s16swKfERQ3_rshqlEoIvtWoaEaxfWDbvOH0NMHpTep-VtTFMlgLsSGvjqf4HmhTcZAQ9RBtxUMva2bLLdiEABbrRYYNvPjOpeGojBwdbKUIU7L8aX9OwHKDr4mMZSfzmBAdwNKqgd00AwVK23DC-mm9"/>
+<div class="absolute inset-0 p-1.5 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="bg-primary text-[9px] font-bold text-white px-1 font-mono uppercase">SHOT_02</span>
+<span class="text-[9px] font-mono font-bold text-white bg-primary px-1">08:05</span>
+</div>
+</div>
+</div>
+<!-- Transition -->
+<div class="w-8 h-8 -mx-4 z-10 bg-white border border-black flex items-center justify-center hover:bg-black hover:text-white transition-transform cursor-pointer">
+<span class="material-symbols-outlined text-[14px]">blur_on</span>
+</div>
+<!-- Clip 3 (Pending) -->
+<div class="w-48 h-14 border border-dashed border-black bg-white/30 relative group cursor-pointer hover:bg-white transition-all flex-shrink-0 flex items-center justify-center">
+<div class="text-center">
+<p class="text-[9px] font-bold text-black font-mono">SHOT_03</p>
+<p class="text-[8px] text-black/40 font-bold uppercase tracking-widest font-mono">PENDING</p>
+</div>
+</div>
+</div>
+</div>
+<!-- AUDIO TRACK A1 (Music) -->
+<div class="flex h-14 border-b border-black group/track transition-colors bg-white/50">
+<div class="w-[180px] sticky left-0 z-30 bg-white border-r border-black p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-black uppercase font-mono">A1_BGM</span>
+<div class="flex gap-0">
+<button class="w-6 h-6 border border-black flex items-center justify-center text-[10px] font-bold text-black hover:bg-black hover:text-white transition-colors">M</button>
+<button class="w-6 h-6 border-y border-r border-black bg-primary text-white flex items-center justify-center text-[10px] font-bold">S</button>
+</div>
+</div>
+<span class="material-symbols-outlined text-black text-xs">music_note</span>
+</div>
+<div class="flex-1 p-0 flex items-center">
+<!-- Background Music Waveform Clip -->
+<div class="w-[1200px] h-10 bg-white border border-black relative group cursor-pointer overflow-hidden mx-2">
+<svg class="w-full h-full opacity-20" preserveaspectratio="none" viewbox="0 0 100 100">
+<path class="waveform-path" d="M0 50 L2 40 L4 60 L6 30 L8 70 L10 50 L12 45 L14 55 L16 35 L18 65 L20 50 L22 40 L24 60 L26 30 L28 70 L30 50 L32 45 L34 55 L36 35 L38 65 L40 50 L42 40 L44 60 L46 30 L48 70 L50 50 L52 45 L54 55 L56 35 L58 65 L60 50 L62 40 L64 60 L66 30 L68 70 L70 50 L72 45 L74 55 L76 35 L78 65 L80 50 L82 40 L84 60 L86 30 L88 70 L90 50 L92 45 L94 55 L96 35 L98 65 L100 50"></path>
+</svg>
+<div class="absolute inset-0 p-1.5 pointer-events-none flex items-center">
+<span class="text-[9px] font-bold text-black font-mono uppercase bg-white border border-black px-1">Inspirational_Piano_Main.wav</span>
+</div>
+</div>
+</div>
+</div>
+<!-- AUDIO TRACK A2 (SFX / Voiceover) -->
+<div class="flex h-14 border-b border-black group/track transition-colors bg-white/50">
+<div class="w-[180px] sticky left-0 z-30 bg-white border-r border-black p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-black uppercase font-mono">A2_SFX/VO</span>
+<div class="flex gap-0">
+<button class="w-6 h-6 border border-black flex items-center justify-center text-[10px] font-bold text-black hover:bg-black hover:text-white transition-colors">M</button>
+<button class="w-6 h-6 border-y border-r border-black flex items-center justify-center text-[10px] font-bold text-black hover:bg-black hover:text-white transition-colors">S</button>
+</div>
+</div>
+<span class="material-symbols-outlined text-black text-xs">keyboard_voice</span>
+</div>
+<div class="flex-1 p-0 flex items-center gap-4">
+<!-- VO Clip -->
+<div class="w-80 h-10 bg-white border border-black relative group cursor-pointer hover:bg-black/5 transition-all overflow-hidden ml-[200px]">
+<svg class="w-full h-full opacity-10" preserveaspectratio="none" viewbox="0 0 100 100">
+<path class="waveform-path" d="M0 50 L5 48 L10 52 L15 30 L20 70 L25 50 L30 45 L35 55 L40 20 L45 80 L50 50 L55 40 L60 60 L65 30 L70 70 L75 50 L80 45 L85 55 L90 35 L95 65 L100 50" style="stroke: #000;"></path>
+</svg>
+<div class="absolute inset-0 p-1.5 pointer-events-none flex items-center">
+<span class="text-[9px] font-bold text-black font-mono uppercase bg-white border border-black px-1">Voiceover_Part_01.mp3</span>
+</div>
+</div>
+<!-- SFX Clip -->
+<div class="w-20 h-10 bg-white border border-black relative group cursor-pointer hover:bg-black hover:text-white transition-all overflow-hidden ml-10 flex items-center justify-center">
+<span class="text-[9px] font-bold text-black font-mono uppercase group-hover:text-white">SWOOSH</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

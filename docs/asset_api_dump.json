@@ -1,0 +1,1502 @@
+[
+  {
+    "id": "ced2292f-71fc-4d74-845b-52c3fdaf3d83",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.886Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "scene",
+    "name": "监狱外围",
+    "description": null,
+    "prompt": "风格参考 image1。监狱外围环境，用于场景资产。斜侧视角，视觉引导线构图，视觉焦点落在带有粗重滑轮组的金属滑轨大门。场景由多层防御体系构成：前景为颠簸的碎石泥土路，路边杂草丛生；中景为两道高耸的连锁铁丝网围栏，顶部缠绕着密集的生锈刺网（Barbed Wire）；远景为宏伟的混凝土监狱主建筑外墙，墙体高大且带有荒废的岗哨塔。材质以剥落的冷灰色混凝土与深褐色氧化金属为主。铁丝网呈现大面积锈蚀痕迹（重度），混凝土墙面布满纵向的水渍侵蚀与干枯的爬山虎残骸（中度），地面有明显的车辙印与裂缝。自然散射光照，整体色调低饱和度，空气中带有轻微的尘埃感。纯环境图，绝对无人物。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-6671f4tbu6-0-e695768ea4c38af97498cded67e81454",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-vl59jreayu-0-2ef005885b30edec4ee4c9af3fcd295d"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "监狱外围",
+      "time": "白天",
+      "type": "室外",
+      "env_json": {
+        "sounds": "行尸低吼，金属门滑动声",
+        "weather": "晴朗",
+        "lighting": "开阔强光",
+        "atmosphere": "宏伟，肃穆，潜在威胁"
+      },
+      "reusable": true,
+      "baseState": {
+        "name": "监狱外围_正常",
+        "trigger": "初始",
+        "scene_ids": [
+          "2"
+        ],
+        "description": "宏伟的监狱围墙保存完好，配有生锈但功能正常的铁丝网与金属滑轮门系统，外围有少量行尸游荡。",
+        "is_base_state": true,
+        "parent_location": "监狱外围"
+      },
+      "scene_ids": [
+        "2"
+      ],
+      "art_features": {
+        "atmosphere": "末世荒凉感",
+        "color_palette": [
+          "冷灰色",
+          "枯草黄"
+        ],
+        "texture_keywords": [
+          "混凝土",
+          "铁锈",
+          "荒地"
+        ],
+        "lighting_keywords": [
+          "烈日",
+          "硬调光"
+        ]
+      },
+      "visual_features": [
+        "宏伟围墙",
+        "铁丝网",
+        "滑轮门系统",
+        "游荡的行尸"
+      ]
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "ced2292f-71fc-4d74-845b-52c3fdaf3d83",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825245267_t5hai4.jpg?sign=1773923670-x6s6ovcs9g-0-a9eea26615d0df87646706aaaf0048e1",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "0e7fc6ec-ecd8-471d-b473-408c3b575327",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.872Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "scene",
+    "name": "监狱公共区",
+    "description": null,
+    "prompt": "风格参考 image1。监狱公共区内景，用于场景资产。视觉引导线构图，斜侧视角，视觉焦点落在中央锈蚀的金属长桌。两层结构的牢房区，四周环绕着黑色铁栅栏门与狭窄的走廊。粗糙的混凝土墙面布满不规则裂纹与剥落的墙皮（重度），金属构件表面覆盖厚重的暗红色锈斑（中度）。地面散落着简陋的生活补给品、塑料水桶与破旧织物，呈现长期居住的痕迹。高处狭小的铁窗透射入几束强烈的体积光 (Volumetric Lighting)，光柱中可见漂浮的微尘，与阴暗角落形成高光比对比。配色以冷灰色与铁锈棕为主。纯环境图，绝对无人物。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-6owjrzm2eh-0-9217f7039140f0f4ddf8e0c8820bd317",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-ls1pgtzv6w-0-a81914e13b7da13ec0b197f5341b6249"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "监狱公共区",
+      "time": "白天",
+      "type": "室内",
+      "env_json": {
+        "sounds": "拐杖声，婴儿啼哭，金属撞击声",
+        "weather": "室内无天气影响",
+        "lighting": "昏暗，局部顶光",
+        "atmosphere": "冷静，秩序感，微妙的社交压力"
+      },
+      "reusable": true,
+      "baseState": {
+        "name": "监狱公共区_正常",
+        "trigger": "初始",
+        "scene_ids": [
+          "4"
+        ],
+        "description": "监狱C区内部，拥有金属长桌和多层牢房结构，虽然昏暗但清理干净，具有一定的工业秩序感与安全性。",
+        "is_base_state": true,
+        "parent_location": "监狱公共区"
+      },
+      "scene_ids": [
+        "4"
+      ],
+      "art_features": {
+        "atmosphere": "冰冷但安全",
+        "color_palette": [
+          "冷青色",
+          "金属银"
+        ],
+        "texture_keywords": [
+          "冷轧钢",
+          "水泥墙面"
+        ],
+        "lighting_keywords": [
+          "室内阴影",
+          "工业风光影"
+        ]
+      },
+      "visual_features": [
+        "金属长桌",
+        "多层牢房结构",
+        "医疗箱",
+        "金属门"
+      ]
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "0e7fc6ec-ecd8-471d-b473-408c3b575327",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825251772_s72ac9.jpg?sign=1773923670-i8vb7hise5-0-51b59adedf7258e8e74a67fef4fc88f0",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "bbb19f3f-d3d2-4ab7-b2a9-c9e7ae76edea",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.881Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "玛格丽特",
+    "description": "赫谢尔的女儿，年轻女性。穿着日常耐磨服装，具备医疗常识与战斗力，性格友善，负责照顾伤员与协助团队日常运作。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为玛格丽特，年轻白人女性，体态匀称且肌肉紧致，中性站姿。面部轮廓清晰，下颌线分明，眉眼舒展且眼神专注，呈现出温和且坚毅的可视化特征，深棕色齐肩发利落束起。身着灰绿色耐磨帆布衬衫，袖口卷至肘部，下部扎入深蓝色厚实丹宁牛仔裤中，配有棕色皮革腰带，足蹬深棕色系带户外登山靴。衬衫领口与腋下有因长期户外活动产生的轻微汗渍沉淀（轻度），膝盖部位布料有明显的跪地磨白痕迹（中度），靴头皮革表面带有细碎的刮擦划痕（轻度）。皮肤质感真实，仅在耳廓与鼻翼处展现次表面散射（SSS）效果。柔和均匀光照。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-5hp815p7hf-0-c09ec93a97a351af4019ff229c5d0d20",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-phauloothm-0-671e881cc6e4379dfeb7db8a6504c453"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "玛格丽特",
+      "aliases": [
+        "MAGGIE"
+      ],
+      "baseForm": {
+        "name": "玛格丽特_基础",
+        "trigger": "初始",
+        "scene_ids": [
+          "场景 4",
+          "场景 5"
+        ],
+        "description": "日常服装，处于搀扶他人的姿态。",
+        "is_base_form": true,
+        "parent_character": "玛格丽特"
+      },
+      "role_type": "supporting",
+      "episode_behavior": {
+        "actions": [
+          "扶格雷去牢房",
+          "介绍妹妹贝丝"
+        ],
+        "interactions": [
+          {
+            "type": "ally",
+            "target": "格雷·金斯顿",
+            "summary": "提供身体上的搀扶和照顾。"
+          }
+        ],
+        "emotional_arc": "友善",
+        "dialogue_summary": "主动提出由自己来帮格雷处理私密的伤口检查。"
+      },
+      "merged_description": "赫谢尔的女儿，年轻女性。穿着日常耐磨服装，具备医疗常识与战斗力，性格友善，负责照顾伤员与协助团队日常运作。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "bbb19f3f-d3d2-4ab7-b2a9-c9e7ae76edea",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825244460_dc7ln3.jpg?sign=1773923670-olh456fbtt-0-17814d339838753f85fa684d6daeeb13",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "8b4bb4ce-5117-4535-b5d3-095b3d2ba051",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.883Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "瑞克",
+    "description": "团队领袖，中年男性。常穿米色领口衬衫，外表干练利落但眼神中透着长期求生的疲惫，是监狱幸存者社区的核心人物，负责决策与接纳新人。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为瑞克，中年男性领袖。体态干练利落，中性站姿。面部特征包括清晰的下颌线，眼神深邃但带有长期的疲惫感，眼窝略深并伴有轻微黑眼圈，额头有浅淡的抬头纹，面部留有粗糙的灰白胡茬。身着米色棉质翻领衬衫，袖口卷至小臂处，质感干爽且纹理清晰；下身穿着深棕色耐磨工装长裤，系深色皮质腰带。服饰配色以米色、深棕色等大地色系为主。磨损痕迹：衬衫领口与腋下有淡褐色汗渍及灰尘积聚（中度），裤脚边缘有细微起毛与磨损（轻度），靴面覆盖一层薄薄的干涸泥土。皮肤局部表现次表面散射（SSS）质感以增强生物真实感。柔和均匀光照。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-lnd6g2ogp7-0-a4aa3ce963c5489605db032f167c984f",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-yza2zxyclt-0-37ce58da490641a205f2964cef756307"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "瑞克",
+      "aliases": [
+        "RICK",
+        "爸"
+      ],
+      "baseForm": {
+        "name": "瑞克_基础",
+        "trigger": "初始",
+        "scene_ids": [
+          "场景 3"
+        ],
+        "description": "身穿米色衬衫，外观干练但神情疲惫。",
+        "is_base_form": true,
+        "parent_character": "瑞克"
+      },
+      "bindings": [
+        {
+          "prop": "补给品",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "瑞克",
+          "first_scene": "场景 4"
+        }
+      ],
+      "role_type": "protagonist",
+      "episode_behavior": {
+        "actions": [
+          "迎接归来的车辆",
+          "拥抱并收留格雷",
+          "向团队成员介绍格雷的身份"
+        ],
+        "interactions": [
+          {
+            "type": "family",
+            "target": "格雷·金斯顿",
+            "summary": "以老邻居身份热情拥抱并提供庇护。"
+          },
+          {
+            "type": "family",
+            "target": "卡尔",
+            "summary": "确认儿子的安全，并调侃其童年往事。"
+          }
+        ],
+        "emotional_arc": "疲惫 -> 震惊 -> 欣喜 -> 尴尬",
+        "dialogue_summary": "表达对格雷出现的震惊，宣布格雷是朋友并邀请其留下。"
+      },
+      "merged_description": "团队领袖，中年男性。常穿米色领口衬衫，外表干练利落但眼神中透着长期求生的疲惫，是监狱幸存者社区的核心人物，负责决策与接纳新人。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "8b4bb4ce-5117-4535-b5d3-095b3d2ba051",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825255057_3l5duq.jpg?sign=1773923670-htk3mpzmit-0-02eadd7d19b3889f9723d54a4d1a07bf",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "9afd5f94-4cdf-4287-b3d3-b17d14974392",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.878Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "scene",
+    "name": "汽车内",
+    "description": null,
+    "prompt": "风格参考 image1。末世题材SUV汽车内景，用于场景资产。斜侧视角构图，视角从后座斜向前方，视觉焦点落在布满厚重灰尘的中控台与带有胶带修补痕迹的仪表盘。车内空间呈现极度写实的损耗感，座椅皮革多处炸裂并露出内部黄色海绵（中度），方向盘边缘因长期抓握导致皮质脱落（重度）；地垫上堆积着干涸的泥块，门板储物格塞满发黄的旧地图与杂物。配色以炭黑、深褐与橄榄绿等低饱和度大地色为主。强烈的自然侧光透过布满泥点与细微裂纹的车窗射入，光束中可见密集的空气微尘，形成高对比度的明暗空间。窗外背景为透视虚化的荒凉土路。纯环境图，绝对无人物。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-qgy8yyeskq-0-04c1fad90825a6484d8a5968bad6455b",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-tbxt00g8ac-0-a3c641a582d99f51cd255ed1a2bf233b"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "汽车",
+      "time": "白天",
+      "type": "室内",
+      "env_json": {
+        "sounds": "引擎声，土路颠簸声",
+        "weather": "晴朗",
+        "lighting": "自然光，车窗透光",
+        "atmosphere": "局促，略带紧张与温情"
+      },
+      "reusable": true,
+      "baseState": {
+        "name": "汽车_正常",
+        "trigger": "初始",
+        "scene_ids": [
+          "1"
+        ],
+        "description": "车内空间局促，后座狭窄，带有土路颠簸后的尘土感，作为临时避难与移动空间，内部存有简陋的止血物资。",
+        "is_base_state": true,
+        "parent_location": "汽车"
+      },
+      "scene_ids": [
+        "1"
+      ],
+      "art_features": {
+        "atmosphere": "写实且压抑",
+        "color_palette": [
+          "土褐色",
+          "复古色调"
+        ],
+        "texture_keywords": [
+          "皮革",
+          "金属",
+          "污渍织物"
+        ],
+        "lighting_keywords": [
+          "自然光",
+          "明暗交替"
+        ]
+      },
+      "visual_features": [
+        "土路颠簸",
+        "简陋止血带",
+        "狭窄后座"
+      ]
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "9afd5f94-4cdf-4287-b3d3-b17d14974392",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825247202_kzu1wb.jpg?sign=1773923670-hygsg2ltcs-0-6971ff1826e5307e05f95909a2b12a7b",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "d61430b7-aefa-4ffe-90eb-243c5e296c96",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.894Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "prop",
+    "name": "弓",
+    "description": null,
+    "prompt": "一把现代反曲猎弓，单体居中构图，3/4视角。弓身由哑光黑复合材料制成，呈现出冷峻的工业质感。握把处紧密缠绕着因长期抓握而产生轻微包浆的深褐色皮革，边缘有细微起毛。弓弦为多股强化纤维材质，局部可见极轻微的纤维磨损。因长期在荒野狩猎导致的弓臂表面不规则划痕（中度）、金属连接件处的漆面脱落（轻度）以及缝隙中残留的极少量干涸泥垢。整体呈现出末世生存环境下的实用主义美学，无任何多余装饰。纯白背景，无阴影，无文字，无水印，无透视变形。超写实真人。",
+    "metadata": {
+      "referenceMapping": []
+    },
+    "referenceUrls": [],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "desc": "达里尔使用的武器，曾射伤格雷",
+      "name": "弓",
+      "used_by": [
+        "达里尔"
+      ],
+      "bindings": [
+        {
+          "prop": "弓",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "达里尔",
+          "first_scene": "场景 4"
+        }
+      ],
+      "category": "武器",
+      "baseState": {
+        "name": "弓_基础",
+        "trigger": "初始",
+        "scene_ids": [
+          "场景 4",
+          "场景 5"
+        ],
+        "description": "达里尔使用的远程武器",
+        "parent_prop": "弓",
+        "is_base_state": true
+      },
+      "importance": "高",
+      "first_scene": "场景 4"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "d61430b7-aefa-4ffe-90eb-243c5e296c96",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825261345_79nwx5.jpg?sign=1773923670-sr0xl8445k-0-852a949097fa0ec3f8cad314c9bf5515",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "fd3632a9-2e63-47eb-a0b0-53c24a33e87d",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.888Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "scene",
+    "name": "牢房",
+    "description": null,
+    "prompt": "风格参考 image1。监狱C区牢房内景，用于场景资产。斜侧视角构图，视觉引导线由铁栅栏延伸至室内，视觉焦点落在下铺的金属床架。狭窄的矩形混凝土空间，左侧为通顶的竖向生锈铁栅栏与滑动门轨。室内靠墙摆放一组双层金属架子床，下铺床垫塌陷，覆盖着粗糙的深灰色羊毛毯。地面为斑驳的抛光混凝土，床腿周围有因长期潮湿产生的暗色霉斑（中度），铁栅栏接缝处可见厚重的红褐色氧化层与掉漆（重度）。整体配色以冷灰色、铁锈棕与暗橄榄绿为主。光照采用高位侧光，阳光通过上方带格栅的小窗斜射入室内，形成清晰的光束与飞尘效果，明暗对比强烈。纯环境图，绝对无人物。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-xluy5c5uvx-0-692d4f50794d66da9494f93f433a81e9",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-qn7jlbn7xn-0-8c4aef1b2f26672757a9d4624e090184"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "牢房",
+      "time": "白天",
+      "type": "室内",
+      "env_json": {
+        "sounds": "酒精擦拭声，低沉嘶吼",
+        "weather": "室内",
+        "lighting": "微弱光线，阴影沉重",
+        "atmosphere": "私密，疼痛，女性间的互助"
+      },
+      "reusable": true,
+      "baseState": {
+        "name": "牢房_正常",
+        "trigger": "初始",
+        "scene_ids": [
+          "5"
+        ],
+        "description": "狭窄的室内空间，配有生锈的铁制上下铺和粗糙的棉麻床品，窗户透光微弱，作为私人居住与伤口处理场所。",
+        "is_base_state": true,
+        "parent_location": "牢房"
+      },
+      "scene_ids": [
+        "5"
+      ],
+      "art_features": {
+        "atmosphere": "幽闭且真实",
+        "color_palette": [
+          "深灰色",
+          "暗影"
+        ],
+        "texture_keywords": [
+          "生锈铁管",
+          "棉麻"
+        ],
+        "lighting_keywords": [
+          "低调光",
+          "侧光"
+        ]
+      },
+      "visual_features": [
+        "铁制上下铺",
+        "粗糙床品",
+        "狭窄空间"
+      ]
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "fd3632a9-2e63-47eb-a0b0-53c24a33e87d",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825267221_3cn5vw.jpg?sign=1773923670-42at0uq50y-0-61d98f89131b3c886052667d45b6ca12",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "f69d57ff-9766-4640-9608-d0452ff22151",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.869Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "格伦",
+    "description": "团队外勤骨干，亚裔男性。身穿轻便灵活的运动或户外服饰，行动敏捷，负责监狱大门的机械操作与物资搬运任务。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色格伦为亚裔青年男性，体态消瘦精干，肌肉线条紧致，呈现轻盈敏捷的中性站姿。面部轮廓清晰，下颌线紧实，眉宇间带有警惕感，眼神明亮，黑色短发被深蓝色棒球帽遮盖。身着深蓝色轻便户外连帽防风衣，聚酯纤维材质，表面有微小的防撕裂网格纹理；下穿深灰色多口袋耐磨帆布工装裤，腰间系有战术腰带挂载小型工具包。裤子膝盖处有干涸的泥土污渍分布（中度），防风衣袖口因频繁机械操作有轻微起毛与磨损（轻度），鞋尖处有细微擦痕。柔和均匀光照，仅在皮肤质感上体现自然的次表面散射（SSS）。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-d7v931yjud-0-647f4fe51a0efbdb835b326c30e41d6b",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-nzfs6eiwtv-0-2b72aea416376f815b1054263e065d80"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "格伦",
+      "aliases": [
+        "GLENN"
+      ],
+      "bindings": [
+        {
+          "prop": "武器",
+          "scenes": [
+            "场景 2"
+          ],
+          "relation": "手持",
+          "character": "格伦",
+          "first_scene": "场景 2"
+        },
+        {
+          "prop": "滑轮系统",
+          "scenes": [
+            "场景 2"
+          ],
+          "relation": "手持",
+          "character": "格伦",
+          "first_scene": "场景 2"
+        },
+        {
+          "prop": "补给品",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "格伦",
+          "first_scene": "场景 4"
+        }
+      ],
+      "role_type": "supporting",
+      "episode_behavior": {
+        "actions": [
+          "操作滑轮系统开门",
+          "搬运补给品"
+        ],
+        "interactions": [
+          {
+            "type": "ally",
+            "target": "卡罗尔",
+            "summary": "被对方提醒注意在孩子面前的言辞。"
+          }
+        ],
+        "emotional_arc": "兴奋",
+        "dialogue_summary": "对弄到新车感到兴奋。"
+      },
+      "merged_description": "团队外勤骨干，亚裔男性。身穿轻便灵活的运动或户外服饰，行动敏捷，负责监狱大门的机械操作与物资搬运任务。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "f69d57ff-9766-4640-9608-d0452ff22151",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825256296_0h7oen.jpg?sign=1773923670-jz1wiqhw4j-0-dbec2b85a71cdf49220c1f834068c057",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "4a68da4b-67a8-49eb-a8bf-6b718a39fb3f",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.764Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "卡尔",
+    "description": "瑞克的儿子，少年幸存者。穿着美式少年风格服饰，随身带有末世生存的警惕感，正处于从受保护者向战斗员转变的成长阶段。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为卡尔，一名处于末世环境中的少年，体态处于成长期，略显消瘦但四肢有力，中性站姿。面部轮廓开始显现棱角，眉宇间透着与年龄不符的警惕与沉稳，眼神锐利且专注，嘴角平直，面部肌肉呈现轻微的紧绷感。身着美式少年风格的叠穿服饰：外层为一件磨损严重的深蓝色牛仔夹克，内搭深灰色连帽衫。下身穿着深棕色耐磨工装裤，脚蹬一双沾满泥土且头端有明显划痕的皮质登山靴。材质表现为粗糙的牛仔布、厚实的棉质布料与带有划痕的陈旧皮革。磨损痕迹：夹克肘部与袖口有明显的起毛与破损（中度），工装裤膝盖位置有深色的泥土污渍与磨白痕迹（中度），靴底侧缘有干涸的泥浆堆积（重度）。柔和均匀光照。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-jc9m44dx8f-0-7803cb7c9d40ecee131d3b97206c9c65",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-qqcrqm6v35-0-79726af50669b4facbc21740de257859"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "卡尔",
+      "aliases": [
+        "CARL"
+      ],
+      "baseForm": {
+        "name": "卡尔_基础",
+        "trigger": "初始",
+        "scene_ids": [
+          "场景 1",
+          "场景 2",
+          "场景 3"
+        ],
+        "description": "少年装扮，处于观察和交流状态。",
+        "is_base_form": true,
+        "parent_character": "卡尔"
+      },
+      "bindings": [
+        {
+          "prop": "补给品",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "卡尔",
+          "first_scene": "场景 4"
+        }
+      ],
+      "role_type": "supporting",
+      "episode_behavior": {
+        "actions": [
+          "在车内与格雷交谈",
+          "向瑞克引荐格雷"
+        ],
+        "interactions": [
+          {
+            "type": "ally",
+            "target": "格雷·金斯顿",
+            "summary": "作为旧识在车内友好交流。"
+          }
+        ],
+        "emotional_arc": "轻松 -> 严肃 -> 兴奋",
+        "dialogue_summary": "谈论对行尸的称呼，向格雷介绍监狱情况，抗议父亲揭露童年糗事。"
+      },
+      "merged_description": "瑞克的儿子，少年幸存者。穿着美式少年风格服饰，随身带有末世生存的警惕感，正处于从受保护者向战斗员转变的成长阶段。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "4a68da4b-67a8-49eb-a8bf-6b718a39fb3f",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825240589_k9b5nm.jpg?sign=1773923670-z4ukmebz4k-0-2758e6606a554037f2df7a8126e7bc56",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "53e9a561-bb14-4377-9e8e-02e5ee9391ab",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.857Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "达里尔",
+    "description": "团队核心成员，面部神情冷峻。身穿耐磨的野外生存服饰，整体气质粗犷，负责狩猎与外勤任务，是具备极强行动力的生存专家。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。左侧为正面全身、背面全身、面朝右侧的严格侧面全身水平并排，右侧为面部特写。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为达里尔，中年男性，生存专家。体态精壮、略显紧绷的中性站姿。面部神情冷峻，眉骨深邃，眼窝下凹，眼神锐利且充满戒备，下颌线条硬朗清晰，留有杂乱的深色胡茬，头发油腻且凌乱。身穿一件带有磨损痕迹的深棕色翻领皮背心，内搭一件污浊的灰色长袖棉质衬衫，袖口卷起。下身穿着深色耐磨帆布工装裤，裤腿塞进沾满干涸泥土的黑色高帮登山靴中。腰间配有皮革材质的战术腰带与刀鞘。服饰表面呈现明显的末世生存痕迹：肘部与膝部布料严重磨白（重度）、背心边缘有皮革皲裂与油渍（中度）、靴尖有明显的刮痕。光照均匀柔和。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-hzrky4aeev-0-66144311e13ce374dace9b02347ea9e6",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-xgvxio4fo8-0-a759810055b7edb7c6de9fb14c90e32e"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "达里尔",
+      "aliases": [
+        "DARYL",
+        "达里尔·迪克森"
+      ],
+      "baseForm": {
+        "name": "达里尔_基础",
+        "trigger": "初始",
+        "scene_ids": [
+          "场景 1",
+          "场景 3"
+        ],
+        "description": "面无表情，穿着野外生存服装，双手操作方向盘或空手状态。",
+        "is_base_form": true,
+        "parent_character": "达里尔"
+      },
+      "bindings": [
+        {
+          "prop": "汽车",
+          "scenes": [
+            "场景 1",
+            "场景 3"
+          ],
+          "relation": "手持",
+          "character": "达里尔",
+          "first_scene": "场景 1"
+        },
+        {
+          "prop": "弓",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "达里尔",
+          "first_scene": "场景 4"
+        },
+        {
+          "prop": "医药箱",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "达里尔",
+          "first_scene": "场景 4"
+        }
+      ],
+      "role_type": "supporting",
+      "episode_behavior": {
+        "actions": [
+          "驾驶车辆回到监狱",
+          "两次横抱受伤的格雷",
+          "主动拿医药箱并试图亲自为格雷包扎"
+        ],
+        "interactions": [
+          {
+            "type": "neutral",
+            "target": "格雷·金斯顿",
+            "summary": "误伤后负责将其搬运并试图照顾。"
+          },
+          {
+            "type": "ally",
+            "target": "赫谢尔",
+            "summary": "在医疗处理问题上产生小争执。"
+          }
+        ],
+        "emotional_arc": "冷峻 -> 局促 -> 笨拙的责任感",
+        "dialogue_summary": "承认误伤了格雷，因吵醒婴儿向贝丝道歉，与赫谢尔斗嘴。"
+      },
+      "merged_description": "团队核心成员，面部神情冷峻。身穿耐磨的野外生存服饰，整体气质粗犷，负责狩猎与外勤任务，是具备极强行动力的生存专家。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "53e9a561-bb14-4377-9e8e-02e5ee9391ab",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825250031_59e2dm.jpg?sign=1773923670-vyw90h7snf-0-2191e057c73ddd206677824b123b546b",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "13f190e8-4907-45b2-94dd-c31a52668f4f",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.867Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "卡罗尔",
+    "description": "团队女性成员，短发。衣着朴素实用，具备基本的战斗与医疗护理能力，性格外冷内热，常负责照顾伤员与补给整理。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为卡罗尔，中年女性，身形精干。留着极短的灰色碎发，发丝质感硬朗。面部特征转译：下颌线清晰坚毅，眼窝略深且眼神专注冷静（体现外冷），但眉宇间在观察伤员时略微舒展，嘴角线条柔和（体现内热）。身着深橄榄色做旧棉质长袖衬衫，外搭一件深灰色多口袋战术帆布背心，下身穿着深蓝色耐磨牛仔裤与深褐色系带皮靴。衣着风格极度朴素实用，无任何装饰。因长期整理补给和护理伤员导致的衬衫肘部布料发白磨损（轻度）、裤腿处散布干涸的泥渍与暗色污迹（中度）。光照均匀中性。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-0tcpakn35e-0-09d905b0fd2a0c97b47f7363f23561a7",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-ro6iscalus-0-68ed1f6168baa23a49a28b9247eac7ad"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "卡罗尔",
+      "aliases": [
+        "CAROL"
+      ],
+      "bindings": [
+        {
+          "prop": "武器",
+          "scenes": [
+            "场景 2"
+          ],
+          "relation": "手持",
+          "character": "卡罗尔",
+          "first_scene": "场景 2"
+        },
+        {
+          "prop": "补给品",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "卡罗尔",
+          "first_scene": "场景 4"
+        },
+        {
+          "prop": "棉布",
+          "scenes": [
+            "场景 5"
+          ],
+          "relation": "手持",
+          "character": "卡罗尔",
+          "first_scene": "场景 5"
+        },
+        {
+          "prop": "酒精",
+          "scenes": [
+            "场景 5"
+          ],
+          "relation": "携带",
+          "character": "卡罗尔",
+          "first_scene": "场景 5"
+        }
+      ],
+      "role_type": "supporting",
+      "episode_behavior": {
+        "actions": [
+          "迎接车辆",
+          "在牢房内为格雷清理伤口"
+        ],
+        "interactions": [
+          {
+            "type": "ally",
+            "target": "格雷·金斯顿",
+            "summary": "为其清理伤口并进行心理安抚。"
+          }
+        ],
+        "emotional_arc": "警惕 -> 友善",
+        "dialogue_summary": "告诫格伦注意言辞，向格雷解释达里尔外冷内热的性格。"
+      },
+      "merged_description": "团队女性成员，短发。衣着朴素实用，具备基本的战斗与医疗护理能力，性格外冷内热，常负责照顾伤员与补给整理。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "13f190e8-4907-45b2-94dd-c31a52668f4f",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825239862_7zd04c.jpg?sign=1773923670-6y9i4a4lg0-0-ed3ba68261707116c4392a513f7dfd3e",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "2b600ed5-e63f-4796-be21-32d9d3c09d09",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.725Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "格雷·金斯顿",
+    "description": "瑞克一家的旧邻居，年轻女性。身穿适合户外行动的耐磨服装与牛仔裤，面部带有长途跋涉的疲态，属于团队新加入的幸存者，身份为需要医疗救助的伤员。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为格雷·金斯顿，年轻女性幸存者，体态消瘦但保持行动力，中性站姿。面部轮廓清晰，眼窝微陷显露长途跋涉的疲态，眉心因忍受痛楚而轻微蹙起，嘴唇略显干裂。身着深橄榄色耐磨帆布夹克，面料质感粗砺。下身穿着深蓝色丹宁牛仔裤，右大腿处有明显的箭伤破损，伤口上方紧紧缠绕着一件血迹斑斑的白色棉质衬衫作为临时止血带，鲜血浸透布料中心并向边缘晕染（重度磨损）。脚穿沾满干涸泥浆的深咖啡色皮革远足靴。夹克袖口与裤脚边缘有明显的起毛与破损，整体衣物布满灰尘与暗淡污渍。柔和均匀光照，强调皮肤纹理与面料纤维细节。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-xzokz9zb97-0-e608eef5a9b006dd0dd9f7e6bb437586",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-rb5lrvx29f-0-262a34d98d851734c147a59f76ca0e83"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "格雷·金斯顿",
+      "aliases": [
+        "格雷",
+        "GREY"
+      ],
+      "bindings": [
+        {
+          "prop": "衬衫",
+          "scenes": [
+            "场景 1"
+          ],
+          "relation": "携带",
+          "character": "格雷·金斯顿",
+          "first_scene": "场景 1"
+        },
+        {
+          "prop": "牛仔裤",
+          "scenes": [
+            "场景 3",
+            "场景 5"
+          ],
+          "relation": "佩戴",
+          "character": "格雷·金斯顿",
+          "first_scene": "场景 3"
+        },
+        {
+          "prop": "床柱",
+          "scenes": [
+            "场景 5"
+          ],
+          "relation": "手持",
+          "character": "格雷·金斯顿",
+          "first_scene": "场景 5"
+        }
+      ],
+      "role_type": "protagonist",
+      "episode_behavior": {
+        "actions": [
+          "处理大腿弩箭伤口",
+          "随车进入监狱并被达里尔抱入牢房区",
+          "在牢房内接受卡罗尔的伤口清洗"
+        ],
+        "interactions": [
+          {
+            "type": "family",
+            "target": "瑞克",
+            "summary": "旧识重逢，感受到对方的保护与接纳。"
+          },
+          {
+            "type": "neutral",
+            "target": "达里尔",
+            "summary": "被对方误伤后又被其抱进监狱，互动中带有微妙的尴尬。"
+          },
+          {
+            "type": "ally",
+            "target": "卡罗尔",
+            "summary": "接受对方的医疗照顾，听其评价达里尔。"
+          }
+        ],
+        "emotional_arc": "坚强忍痛 -> 震惊 -> 感伤重逢 -> 略显局促的幽默",
+        "dialogue_summary": "与卡尔叙旧，与瑞克重逢并确认其母亲离世的消息，吐槽被达里尔抱着的尴尬。"
+      },
+      "merged_description": "瑞克一家的旧邻居，年轻女性。身穿适合户外行动的耐磨服装与牛仔裤，面部带有长途跋涉的疲态，属于团队新加入的幸存者，身份为需要医疗救助的伤员。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "2b600ed5-e63f-4796-be21-32d9d3c09d09",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825238068_fweog9.jpg?sign=1773923670-9fj7m2cpmj-0-54eee0768c2c27cc448d4af06c2a9916",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "21e9a8aa-6382-4141-a08b-aedd24f159c8",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.849Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "赫谢尔",
+    "description": "团队的长者与医疗支撑。白发胡须，因伤残需使用拐杖行走，气质慈祥从容，负责监狱内的医疗指导与团队心理疏导。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为赫谢尔，老年男性，身形清瘦，中性站姿，重心略微倾向拐杖一侧。面部轮廓柔和，眉眼舒展，眼角有细密慈祥的笑纹，眼神平和从容，留有浓密且修剪整齐的纯白色络腮胡与短白发。身着浅棕色与米色相间的格子法兰绒衬衫，质感粗糙写实，下穿深灰色耐磨棉质工装裤。右手拄着一根深色实木拐杖，拐杖表面有自然的木质纹理与长期握持的油亮感。因长期在监狱环境生活，裤脚处有少量干涸的泥渍（轻度），衬衫袖口有轻微的纤维起毛（轻度），拐杖底部触地处有明显的磨损痕迹（中度）。仅在面部皮肤与耳廓部位应用极轻微的次表面散射（SSS）以体现真实皮肤质感。柔和均匀光照。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-2wjuhtjmyr-0-6559568b323d560e2a8d2343e19874c1",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-daz7ter6sh-0-08c924c0a9d8931d2af07e7e19bfc8ac"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "赫谢尔",
+      "aliases": [
+        "HERSHEL"
+      ],
+      "bindings": [
+        {
+          "prop": "拐杖",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "赫谢尔",
+          "first_scene": "场景 4"
+        }
+      ],
+      "role_type": "supporting",
+      "episode_behavior": {
+        "actions": [
+          "拄拐杖迎接新人",
+          "指令达里尔取药箱",
+          "欢迎格雷加入"
+        ],
+        "interactions": [
+          {
+            "type": "ally",
+            "target": "达里尔",
+            "summary": "指挥并调侃达里尔的主动行为。"
+          }
+        ],
+        "emotional_arc": "从容 -> 幽默",
+        "dialogue_summary": "表达对格雷的欢迎，并幽默地调侃达里尔的笨拙。"
+      },
+      "merged_description": "团队的长者与医疗支撑。白发胡须，因伤残需使用拐杖行走，气质慈祥从容，负责监狱内的医疗指导与团队心理疏导。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "21e9a8aa-6382-4141-a08b-aedd24f159c8",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825289793_wg8eu7.jpg?sign=1773923670-2nssgkym8x-0-1af37c22d93d8b3e88274d26a5c1c336",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "c98eac1c-7341-409b-ac66-d3e1cf7cbfaf",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.874Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "贝丝",
+    "description": "赫谢尔的小女儿。形象温婉清秀，在监狱中主要负责照顾婴儿，穿着简单的居家服饰，常处于看护弱小的状态。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为贝丝（Beth），年轻白人女性，体态纤细，肢体语言放松。面部特征温婉清秀，面部轮廓柔和，眉眼舒展，眼神中带有悲悯与平静，嘴角微扬。浅金色的长发整齐地披在肩头。身着简单的末世居家服饰：内穿一件米白色纯棉长袖T恤，外搭一件浅灰色细针织开衫，质感柔软；下身穿着深蓝色修身牛仔裤，裤腿塞入棕色短皮靴中。由于长期在监狱内照顾婴儿，开衫肘部有轻微的起球与磨损（轻度），牛仔裤膝盖处有自然的洗水发白（轻度）。柔和均匀光照，仅在皮肤区域表现细腻的次表面散射（SSS）质感。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-tno6d9k1r8-0-834b359abc253ea9ff3e304a43e2bc8c",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-o1uswmitoi-0-f9af4b6ec244cb171dded6917ca6f155"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "贝丝",
+      "aliases": [
+        "BETH"
+      ],
+      "role_type": "supporting",
+      "episode_behavior": {
+        "actions": [
+          "抱着婴儿出现在门口"
+        ],
+        "interactions": [
+          {
+            "type": "ally",
+            "target": "达里尔",
+            "summary": "因噪音问题对其进行责备。"
+          }
+        ],
+        "emotional_arc": "怨气",
+        "dialogue_summary": "责备达里尔制造噪音吵醒了刚哄睡的婴儿。"
+      },
+      "merged_description": "赫谢尔的小女儿。形象温婉清秀，在监狱中主要负责照顾婴儿，穿着简单的居家服饰，常处于看护弱小的状态。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "c98eac1c-7341-409b-ac66-d3e1cf7cbfaf",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825244544_fncirl.jpg?sign=1773923670-w7x36hsvv7-0-f7ad3ed27355457c5885e7bc6c5ccc18",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "85c3cb7e-c103-47ae-8ba5-f78ce49e754f",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.862Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "character",
+    "name": "朱迪斯",
+    "description": "襁褓中的女婴。被包裹在柔软的织物中，是团队中年龄最小的成员，通常由贝丝等女性成员抱持照顾。",
+    "prompt": "风格参考 image1。角色转面图，用于资产制作。正面全身、背面全身、面朝右侧的严格侧面全身水平并排，面部特写置于右侧。正交视角（orthographic），无透视畸变，平视镜头（eye-level）。角色为朱迪斯（Judith），一名处于襁褓中的女婴。面部轮廓极度圆润，五官柔和，皮肤呈现自然细腻的质感，面颊与耳廓带有真实的次表面散射（SSS）效果。双眼微闭，表情平静中性。身体被多层柔软的织物包裹，外层为浅灰色的针织毛毯，内层为米白色的棉质包被。襁褓结构紧凑，包裹严实。织物细节丰富，可见清晰的纤维纹理，边缘处有由于长期携带产生的轻微起球（轻度）和极细微的陈旧污渍（极轻度）。柔和均匀光照。纯白背景，无投影，无环境元素。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-8ihm0rov99-0-1a70138684ae6579630b862bfa9c4089",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-vcsqjvub0h-0-6c61e00e3104333a59769323b9e5d3f7"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "朱迪斯",
+      "aliases": [
+        "小朱迪斯",
+        "婴儿"
+      ],
+      "role_type": "extra",
+      "episode_behavior": {
+        "actions": [
+          "在贝丝怀中啼哭"
+        ],
+        "interactions": [
+          {
+            "type": "family",
+            "target": "贝丝",
+            "summary": "由贝丝照顾并哄睡。"
+          }
+        ],
+        "emotional_arc": "受惊",
+        "dialogue_summary": ""
+      },
+      "merged_description": "襁褓中的女婴。被包裹在柔软的织物中，是团队中年龄最小的成员，通常由贝丝等女性成员抱持照顾。"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "85c3cb7e-c103-47ae-8ba5-f78ce49e754f",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825277605_9qdf2u.jpg?sign=1773923670-ycrgmlem5o-0-28527d0202bc3a25d2e1e3e367450bbb",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "1336ae73-9fe8-4576-a40a-56c7d7d21ddf",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.876Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "scene",
+    "name": "监狱院内",
+    "description": null,
+    "prompt": "风格参考 image1。废土风格的监狱院内场景，用于场景资产。广角俯视图，视觉焦点落在院子中央的简易加固金属闸门。两层高耸的连锁金属围栏（Chain-link Fence）环绕，顶部缠绕着大量锈迹斑斑的倒钩铁丝刺网（Barbed Wire）。院内地面由开裂的沥青与暗淡泥土组成，散布着干涸的油渍、散落的弹壳与缝隙中钻出的枯黄杂草。中景停放着一辆加固过、布满泥浆与深度划痕的深色越野车。远景可见混凝土结构的监狱哨塔，墙面带有重度雨水冲刷泪痕与大面积剥落的墙皮。配色以工业灰、铁锈橙与枯草色为主。强烈的自然散射光配合深重的阴影，营造出压抑的纵深空间感。纯环境图，绝对无人物。超写实真人。",
+    "metadata": {
+      "referenceMapping": [
+        {
+          "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-vqlp83upna-0-2dd4a137ae1c717d0ce038171157a3ff",
+          "assetId": "",
+          "assetName": "image1",
+          "assetType": "style"
+        }
+      ]
+    },
+    "referenceUrls": [
+      "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823565543_umd2h5.png?sign=1773923670-dqraitp0td-0-e77d2c797058f9eb20cd03f285e26119"
+    ],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "name": "监狱院内",
+      "time": "白天",
+      "type": "室外",
+      "env_json": {
+        "sounds": "汽车熄火声，人声喧哗",
+        "weather": "晴朗",
+        "lighting": "均匀日光",
+        "atmosphere": "忙碌，重逢的惊喜，疲惫"
+      },
+      "reusable": true,
+      "baseState": {
+        "name": "监狱院内_正常",
+        "trigger": "初始",
+        "scene_ids": [
+          "3"
+        ],
+        "description": "作为社区营地使用的泥土空地，停放有幸存者的车辆，堆放着简易补给品，呈现出末世中的生活秩序。",
+        "is_base_state": true,
+        "parent_location": "监狱院内"
+      },
+      "scene_ids": [
+        "3"
+      ],
+      "art_features": {
+        "atmosphere": "社区营地感",
+        "color_palette": [
+          "米色",
+          "灰尘色"
+        ],
+        "texture_keywords": [
+          "泥土",
+          "粗糙布料"
+        ],
+        "lighting_keywords": [
+          "全景光"
+        ]
+      },
+      "visual_features": [
+        "泥土小路",
+        "停放的车辆",
+        "简易补给品"
+      ]
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "1336ae73-9fe8-4576-a40a-56c7d7d21ddf",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825253463_5ll2c6.jpg?sign=1773923670-r1egf8usx3-0-90e18646085274e4accc615792c46d17",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "30f00e3c-b85d-4f9c-8db4-1ab2dfe4d417",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.890Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "prop",
+    "name": "医药箱",
+    "description": null,
+    "prompt": "一个末世风格的手提式金属医药箱，单体居中构图，3/4视角略高机位。矩形工业结构，顶部配有折叠式金属转轴提手，正面带有两个生锈的机械卡扣。箱体采用斑驳的米白色烤漆，中心印有褪色且边缘模糊的暗红色十字标识。材质为厚重的冷轧钢，表面呈现细微的颗粒感与哑光漫反射。因长期在恶劣环境中移动导致的边缘重度锈蚀与漆皮剥落，箱体侧面有一处因剧烈撞击产生的明显凹痕（中度），表面布满干涸的污渍与细碎划痕（中度）。整体呈现粗犷的生存主义质感。纯白背景，严格无阴影，无透视变形，无文字，无UI水印。超写实真人。",
+    "metadata": {
+      "referenceMapping": []
+    },
+    "referenceUrls": [],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "desc": "包含医疗用品的箱子",
+      "name": "医药箱",
+      "used_by": [
+        "达里尔",
+        "赫谢尔",
+        "卡罗尔"
+      ],
+      "bindings": [
+        {
+          "prop": "医药箱",
+          "scenes": [
+            "场景 4"
+          ],
+          "relation": "手持",
+          "character": "达里尔",
+          "first_scene": "场景 4"
+        }
+      ],
+      "category": "关键道具",
+      "baseState": {
+        "name": "医药箱_基础",
+        "trigger": "初始",
+        "scene_ids": [
+          "场景 4"
+        ],
+        "description": "包含医疗用品的便携箱子",
+        "parent_prop": "医药箱",
+        "is_base_state": true
+      },
+      "importance": "高",
+      "first_scene": "场景 4"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "30f00e3c-b85d-4f9c-8db4-1ab2dfe4d417",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825247903_61l8ll.jpg?sign=1773923670-wcxbu979c9-0-c64785e441e75217032bc8c053d255ba",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  },
+  {
+    "id": "a2bfa03d-ae9c-4690-94c5-b6ade4e6ec67",
+    "createdAt": "2026-03-18T17:05:23.628Z",
+    "updatedAt": "2026-03-18T17:42:46.892Z",
+    "deletedAt": null,
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84",
+    "type": "prop",
+    "name": "汽车",
+    "description": null,
+    "prompt": "一辆末世风格的越野车，单体居中构图，3/4视角略高机位。早期型号的四门越野车形态，方正厚重的金属结构。深炭灰色哑光涂装，表面覆盖大面积干涸的浅褐色泥渍与灰尘。金属车身分布着细碎的刮擦痕迹（中度），挡风玻璃边缘带有不均匀的污垢。后车门把手处留有少量干涸的暗红色血迹（轻度）。轮胎胎面嵌有厚重的干泥块。整体呈现长期在荒野土路行驶的自然磨损与漆面氧化质感。纯白背景，无阴影，无体积光，无环境反射色，无文字水印。超写实真人。",
+    "metadata": {
+      "referenceMapping": []
+    },
+    "referenceUrls": [],
+    "source": "ai",
+    "status": "pending_confirm",
+    "claimedBy": null,
+    "claimer": null,
+    "claimedAt": null,
+    "boundNodeId": null,
+    "aiRawData": {
+      "desc": "土路颠簸，内部有方向盘，可载人",
+      "name": "汽车",
+      "used_by": [
+        "达里尔",
+        "格雷",
+        "卡尔"
+      ],
+      "bindings": [
+        {
+          "prop": "汽车",
+          "scenes": [
+            "场景 1",
+            "场景 3"
+          ],
+          "relation": "手持",
+          "character": "达里尔",
+          "first_scene": "场景 1"
+        }
+      ],
+      "category": "日常物品",
+      "baseState": {
+        "name": "汽车_基础",
+        "trigger": "初始",
+        "scene_ids": [
+          "场景 1",
+          "场景 2",
+          "场景 3"
+        ],
+        "description": "土路行驶中的普通汽车，内部有方向盘，可载人",
+        "parent_prop": "汽车",
+        "is_base_state": true
+      },
+      "importance": "高",
+      "first_scene": "场景 1"
+    },
+    "createdBy": "14c3aa2b-2522-4ede-85a3-5b7534f1531c",
+    "assetEpisodeRelations": [
+      {
+        "assetId": "a2bfa03d-ae9c-4690-94c5-b6ade4e6ec67",
+        "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+      }
+    ],
+    "thumbnail": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825247600_5awbr9.jpg?sign=1773923670-rdvcciv22g-0-2f677c711e9e887a7e7256407a58b47d",
+    "episodeIds": [
+      "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+    ]
+  }
+]
