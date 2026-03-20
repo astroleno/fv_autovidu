@@ -81,3 +81,6 @@ node_modules/
 *.tmp
 *.temp
 .cache/
+
+# Specstory 历史记录
+.specstory/
