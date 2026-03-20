@@ -22,6 +22,17 @@ export interface GenerateEndframeRequest {
   shotIds: string[]
 }
 
+/** 单条尾帧任务（兼容旧版单任务响应可单独使用 taskId/shotId） */
+export interface EndframeTaskItem {
+  taskId: string
+  shotId: string
+}
+
+/** 批量生成尾帧响应 */
+export interface BatchEndframeResponse {
+  tasks: EndframeTaskItem[]
+}
+
 /** 生成尾帧响应 */
 export interface GenerateEndframeResponse {
   taskId: string
@@ -35,6 +46,9 @@ export interface GenerateVideoRequest {
   mode: "first_frame" | "first_last_frame" | "reference"
   model?: string
   duration?: number
+  resolution?: string
+  /** 多参考图模式：限定使用的资产 id；不传则使用各 shot 下全部可用资产图 */
+  referenceAssetIds?: string[]
 }
 
 /** 生成视频响应 */

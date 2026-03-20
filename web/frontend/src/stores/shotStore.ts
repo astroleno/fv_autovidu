@@ -5,6 +5,7 @@
 import { create } from "zustand"
 import type { Shot, ShotStatus } from "@/types"
 import { shotsApi } from "@/api/shots"
+import { useEpisodeStore } from "./episodeStore"
 
 type StatusFilter = ShotStatus | "all"
 
@@ -35,6 +36,8 @@ export const useShotStore = create<ShotStore>((set, get) => ({
         shot.shotId === shotId ? res.data : shot
       ),
     }))
+    // 详情页从 currentEpisode 读数据，需同步刷新 episode.json
+    await useEpisodeStore.getState().fetchEpisodeDetail(episodeId)
   },
 
   getFilteredShots: () => {
