@@ -98,7 +98,12 @@ export interface Episode {
   assets?: ShotAsset[]
 }
 
-/** 扁平化 Shot 列表（从 scenes 中提取） */
+/**
+ * 扁平化 Shot 列表：叙事顺序 = 场景按 sceneNumber 升序 → 每场内 shots 数组顺序。
+ * 不可按 shotNumber 全局排序（多场均为 1,2,3 时会乱序）。
+ */
 export function flattenShots(episode: Episode): Shot[] {
-  return episode.scenes.flatMap((scene) => scene.shots)
+  return [...episode.scenes]
+    .sort((a, b) => a.sceneNumber - b.sceneNumber)
+    .flatMap((scene) => scene.shots)
 }

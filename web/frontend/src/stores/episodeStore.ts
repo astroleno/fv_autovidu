@@ -14,6 +14,8 @@ interface EpisodeStore {
   error: string | null
   fetchEpisodes: () => Promise<void>
   fetchEpisodeDetail: (id: string) => Promise<void>
+  /** 重新拉取当前正在查看的剧集详情（任务完成后刷新分镜状态） */
+  refreshEpisode: () => Promise<void>
   pullNewEpisode: (
     episodeId: string,
     forceRedownload?: boolean,
@@ -29,7 +31,7 @@ interface EpisodeStore {
   ) => Promise<void>
 }
 
-export const useEpisodeStore = create<EpisodeStore>((set) => ({
+export const useEpisodeStore = create<EpisodeStore>((set, get) => ({
   episodes: [],
   currentEpisode: null,
   loading: false,
@@ -70,6 +72,12 @@ export const useEpisodeStore = create<EpisodeStore>((set) => ({
     } finally {
       set({ loading: false })
     }
+  },
+
+  refreshEpisode: async () => {
+    const id = get().currentEpisode?.episodeId
+    if (!id) return
+    await get().fetchEpisodeDetail(id)
   },
 
   pullNewEpisode: async (

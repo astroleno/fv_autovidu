@@ -1,13 +1,21 @@
 /**
  * ShotCard Shot 卡片
  * Stitch 报纸风格：newsprint-card、灰度图、方角、UPPERCASE 标签
+ * 首帧与尾帧同屏双列对比（ShotFrameCompare），便于左右对照
+ * 尾帧 / 出视频：调用后端批量生成 API，并由 taskStore 轮询任务状态
  */
+import { useState } from "react"
 import { Link } from "react-router"
-import type { Shot } from "@/types"
+import { Loader2 } from "lucide-react"
+import type { Shot, VideoMode } from "@/types"
 import { Badge } from "@/components/ui"
-import { StatusIndicator, AssetTag } from "@/components/business"
+import { StatusIndicator } from "./StatusIndicator"
+import { AssetTag } from "./AssetTag"
+import { ShotFrameCompare } from "./ShotFrameCompare"
 import { shotStatusLabels } from "@/utils/format"
-import { getFileUrl } from "@/utils/file"
+import { generateApi } from "@/api/generate"
+import { useTaskStore } from "@/stores/taskStore"
+import { useToastStore } from "@/stores/toastStore"
 
 interface ShotCardProps {
   shot: Shot
@@ -18,8 +26,68 @@ interface ShotCardProps {
 }
 
 export function ShotCard({ shot, episodeId, basePath = "", cacheBust }: ShotCardProps) {
-  const firstFrameUrl = getFileUrl(shot.firstFrame, basePath, cacheBust)
-  const endFrameUrl = shot.endFrame ? getFileUrl(shot.endFrame, basePath, cacheBust) : null
+  const [submitting, setSubmitting] = useState<"endframe" | "video" | null>(null)
+  const startPolling = useTaskStore((s) => s.startPolling)
+  const pushToast = useToastStore((s) => s.push)
+
+  const busyEnd = shot.status === "endframe_generating"
+  const busyVid = shot.status === "video_generating"
+  const canEndframe =
+    Boolean(shot.firstFrame) && !busyEnd && !busyVid && submitting !== "endframe"
+  const canVideo =
+    Boolean(shot.firstFrame) && !busyEnd && !busyVid && submitting !== "video"
+
+  const defaultVideoMode: VideoMode = shot.endFrame ? "first_last_frame" : "first_frame"
+
+  const showEndSkeleton =
+    busyEnd || shot.status === "endframe_generating" || submitting === "endframe"
+
+  const handleEndframe = async () => {
+    if (!canEndframe) return
+    setSubmitting("endframe")
+    try {
+      const res = await generateApi.endframe({
+        episodeId,
+        shotIds: [shot.shotId],
+      })
+      const { tasks } = res.data
+      const ids = tasks.map((t) => t.taskId)
+      startPolling(ids, {
+        episodeId,
+        onAllSettled: () => {
+          pushToast(`尾帧任务已完成（S${String(shot.shotNumber).padStart(2, "0")}）`, "success")
+        },
+      })
+    } catch (e) {
+      pushToast(e instanceof Error ? e.message : "尾帧生成请求失败", "error")
+    } finally {
+      setSubmitting(null)
+    }
+  }
+
+  const handleVideo = async () => {
+    if (!canVideo) return
+    setSubmitting("video")
+    try {
+      const res = await generateApi.video({
+        episodeId,
+        shotIds: [shot.shotId],
+        mode: defaultVideoMode,
+        model: undefined,
+      })
+      const ids = res.data.tasks.map((t) => t.taskId)
+      startPolling(ids, {
+        episodeId,
+        onAllSettled: () => {
+          pushToast(`视频任务已完成（S${String(shot.shotNumber).padStart(2, "0")}）`, "success")
+        },
+      })
+    } catch (e) {
+      pushToast(e instanceof Error ? e.message : "视频生成请求失败", "error")
+    } finally {
+      setSubmitting(null)
+    }
+  }
 
   return (
     <div className="newsprint-card p-4 box-border">
@@ -27,45 +95,32 @@ export function ShotCard({ shot, episodeId, basePath = "", cacheBust }: ShotCard
         <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--color-newsprint-black)] opacity-80">
           S{String(shot.shotNumber).padStart(2, "0")} | {shot.cameraMovement} | {shot.duration}s
         </span>
-        <StatusIndicator status={shot.status} />
-      </div>
-      <Link to={`/episode/${episodeId}/shot/${shot.shotId}`} className="group block">
-        <div className="relative aspect-video overflow-hidden bg-[var(--color-outline-variant)] mb-4 border border-[var(--color-newsprint-black)]">
-          {firstFrameUrl ? (
-            <img
-              src={firstFrameUrl}
-              alt={`Shot ${shot.shotNumber}`}
-              className="w-full h-full object-cover grayscale-img"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-[var(--color-muted)] text-sm uppercase">
-              暂无首帧
-            </div>
-          )}
-        </div>
-      </Link>
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2 text-[10px] font-black uppercase tracking-wider">
-          <span className="text-[var(--color-muted)]">尾帧</span>
-          <Badge status={shot.status} pulse={
-            shot.status === "endframe_generating" || shot.status === "video_generating"
-          }>
+        <div className="flex items-center gap-2 shrink-0">
+          <StatusIndicator status={shot.status} />
+          <Badge
+            status={shot.status}
+            pulse={
+              shot.status === "endframe_generating" || shot.status === "video_generating"
+            }
+          >
             {shotStatusLabels[shot.status]}
           </Badge>
         </div>
-        {endFrameUrl ? (
-          <img
-            src={endFrameUrl}
-            alt="尾帧"
-            className="h-12 w-16 object-cover border border-[var(--color-newsprint-black)] grayscale-img"
-          />
-        ) : (
-          <div className="h-12 w-16 border border-dashed border-[var(--color-newsprint-black)] flex items-center justify-center text-[10px] text-[var(--color-muted)] uppercase">
-            待生成
-          </div>
-        )}
       </div>
-      {/* 画面描述 + 图片/视频提示词预览 */}
+
+      {/* 首帧 + 尾帧：同屏左右对比 */}
+      <div className="mb-4">
+        <ShotFrameCompare
+          shot={shot}
+          episodeId={episodeId}
+          basePath={basePath}
+          cacheBust={cacheBust}
+          variant="card"
+          showEndSkeleton={showEndSkeleton}
+          onRetryEndframe={shot.status === "error" ? handleEndframe : undefined}
+        />
+      </div>
+
       {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) && (
         <div
           className="mb-3 text-[10px] text-[var(--color-muted)] line-clamp-3 box-border"
@@ -99,18 +154,34 @@ export function ShotCard({ shot, episodeId, basePath = "", cacheBust }: ShotCard
         </Link>
         <button
           type="button"
-          className="w-full py-1.5 text-[10px] font-black uppercase tracking-wider border border-[var(--color-newsprint-black)] bg-transparent hover:shadow-[4px_4px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
+          disabled={!canEndframe}
+          onClick={handleEndframe}
+          className="w-full py-1.5 text-[10px] font-black uppercase tracking-wider border border-[var(--color-newsprint-black)] bg-transparent hover:shadow-[4px_4px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          尾帧
+          {busyEnd || submitting === "endframe" ? (
+            <span className="inline-flex items-center justify-center gap-1">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              尾帧
+            </span>
+          ) : (
+            "尾帧"
+          )}
         </button>
-        <Link to={`/episode/${episodeId}/shot/${shot.shotId}`}>
-          <button
-            type="button"
-            className="w-full py-1.5 text-[10px] font-black uppercase tracking-wider bg-[var(--color-newsprint-black)] text-[var(--color-newsprint-off-white)] border border-[var(--color-newsprint-black)] hover:bg-[var(--color-primary)] hover:shadow-[4px_4px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
-          >
-            出视频
-          </button>
-        </Link>
+        <button
+          type="button"
+          disabled={!canVideo}
+          onClick={handleVideo}
+          className="w-full py-1.5 text-[10px] font-black uppercase tracking-wider bg-[var(--color-newsprint-black)] text-[var(--color-newsprint-off-white)] border border-[var(--color-newsprint-black)] hover:bg-[var(--color-primary)] hover:shadow-[4px_4px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {busyVid || submitting === "video" ? (
+            <span className="inline-flex items-center justify-center gap-1">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              视频
+            </span>
+          ) : (
+            "出视频"
+          )}
+        </button>
       </div>
     </div>
   )

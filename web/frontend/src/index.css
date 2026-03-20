@@ -108,12 +108,11 @@ h1, h2, h3, .font-headline {
   transform: translate(-2px, -2px);
 }
 
-/* 图片默认灰度，hover 父级(.group)时恢复彩色（报纸印刷感） */
+/*
+ * 分镜/资产缩略图：默认即彩色（用户要求不必悬浮才显示彩色）。
+ * 若需恢复「灰度默认、hover 彩色」的报纸感，可改回 grayscale(100%) 并恢复下方 :hover 规则。
+ */
 .grayscale-img {
-  filter: grayscale(100%);
-  transition: filter 0.2s ease;
-}
-.grayscale-img:hover,
-.group:hover .grayscale-img {
-  filter: grayscale(0%);
+  box-sizing: border-box;
+  filter: none;
 }

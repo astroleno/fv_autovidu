@@ -8,7 +8,8 @@ import { CloudDownload } from "lucide-react"
 import { SideNavBar } from "./SideNavBar"
 import { TopNavBar } from "./TopNavBar"
 import { Dialog, Button } from "@/components/ui"
-import { useEpisodeStore, useUIStore } from "@/stores"
+import { Toast } from "@/components/ui/Toast"
+import { useEpisodeStore, useToastStore, useUIStore } from "@/stores"
 import { MODAL_PULL_EPISODE } from "@/stores/uiStore"
 
 export default function AppLayout() {
@@ -24,6 +25,7 @@ export default function AppLayout() {
   /** 剧集相关页（分镜板、资产库、镜头详情等）也显示拉取按钮 */
   const isEpisodePage = Boolean(routeEpisodeId)
   const { pullNewEpisode, currentEpisode } = useEpisodeStore()
+  const { toasts, dismiss: dismissToast } = useToastStore()
   const { activeModal, openModal, closeModal } = useUIStore()
   const pullOpen = activeModal === MODAL_PULL_EPISODE
 
@@ -80,6 +82,8 @@ export default function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      <Toast toasts={toasts} onDismiss={dismissToast} />
 
       <Dialog open={pullOpen} onClose={handleClosePull} title="从平台拉取剧集">
         <div className="space-y-4">

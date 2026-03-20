@@ -17,6 +17,8 @@ export type {
   PullEpisodeRequest,
   GenerateEndframeRequest,
   GenerateEndframeResponse,
+  BatchEndframeResponse,
+  EndframeTaskItem,
   GenerateVideoRequest,
   GenerateVideoResponse,
   RegenFrameRequest,

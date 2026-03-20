@@ -7,8 +7,8 @@ import { Link } from "react-router"
 import type { Shot } from "@/types"
 import { Badge } from "@/components/ui"
 import { StatusIndicator, AssetTag, ShotPromptCells } from "@/components/business"
+import { ShotFrameCompare } from "./ShotFrameCompare"
 import { shotStatusLabels } from "@/utils/format"
-import { getFileUrl } from "@/utils/file"
 import { useEpisodeStore } from "@/stores"
 
 interface ShotRowProps {
@@ -21,33 +21,20 @@ interface ShotRowProps {
 
 export function ShotRow({ shot, episodeId, basePath = "", cacheBust }: ShotRowProps) {
   const { updateShot } = useEpisodeStore()
-  const firstFrameUrl = getFileUrl(shot.firstFrame, basePath, cacheBust)
-  const endFrameUrl = shot.endFrame ? getFileUrl(shot.endFrame, basePath, cacheBust) : null
+  const showEndSkeleton = shot.status === "endframe_generating"
 
   return (
     <tr className="border-b border-[var(--color-divider)] hover:bg-[var(--color-divider)]/50">
       <td className="py-3 px-4 text-sm font-medium">{shot.shotNumber}</td>
-      <td className="py-3 px-4">
-        {firstFrameUrl ? (
-          <img
-            src={firstFrameUrl}
-            alt=""
-            className="w-12 h-8 object-cover border border-[var(--color-newsprint-black)] grayscale-img"
-          />
-        ) : (
-          <div className="w-12 h-8 bg-[var(--color-outline-variant)] border border-[var(--color-newsprint-black)]" />
-        )}
-      </td>
-      <td className="py-3 px-4">
-        {endFrameUrl ? (
-          <img
-            src={endFrameUrl}
-            alt=""
-            className="w-12 h-8 object-cover border border-[var(--color-newsprint-black)] grayscale-img"
-          />
-        ) : (
-          <div className="w-12 h-8 bg-[var(--color-outline-variant)] border border-dashed border-[var(--color-newsprint-black)]" />
-        )}
+      <td className="py-3 px-4 align-top min-w-[11rem]">
+        <ShotFrameCompare
+          shot={shot}
+          episodeId={episodeId}
+          basePath={basePath}
+          cacheBust={cacheBust}
+          variant="row"
+          showEndSkeleton={showEndSkeleton}
+        />
       </td>
       <td className="py-3 px-4">
         <div className="flex items-center gap-2">

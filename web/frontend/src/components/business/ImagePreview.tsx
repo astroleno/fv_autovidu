@@ -1,6 +1,6 @@
 /**
  * ImagePreview 图片预览
- * Stitch：灰度图默认、hover 彩色、0px 圆角、newsprint 边框
+ * Stitch：默认彩色、0px 圆角、newsprint 边框（与全局 .grayscale-img 一致现为彩色）
  */
 import { useState } from "react"
 

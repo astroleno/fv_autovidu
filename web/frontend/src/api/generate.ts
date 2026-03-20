@@ -3,8 +3,8 @@
  * POST /api/generate/endframe, /api/generate/video, /api/generate/regen-frame
  */
 import type {
+  BatchEndframeResponse,
   GenerateEndframeRequest,
-  GenerateEndframeResponse,
   GenerateVideoRequest,
   GenerateVideoResponse,
   RegenFrameRequest,
@@ -14,7 +14,7 @@ import { apiClient } from "./client"
 
 export const generateApi = {
   endframe: (params: GenerateEndframeRequest) =>
-    apiClient.post<GenerateEndframeResponse>("/generate/endframe", params),
+    apiClient.post<BatchEndframeResponse>("/generate/endframe", params),
   video: (params: GenerateVideoRequest) =>
     apiClient.post<GenerateVideoResponse>("/generate/video", params),
   regenFrame: (params: RegenFrameRequest) =>

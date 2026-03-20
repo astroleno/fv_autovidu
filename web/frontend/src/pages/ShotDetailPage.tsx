@@ -8,7 +8,7 @@ import { useParams, Link } from "react-router"
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
 import { useEpisodeStore, useShotStore } from "@/stores"
 import { Button } from "@/components/ui"
-import { VideoPlayer, ImagePreview, AssetTag } from "@/components/business"
+import { VideoPlayer, AssetTag, ShotFrameCompare } from "@/components/business"
 import { flattenShots } from "@/types"
 import { getFileUrl } from "@/utils/file"
 
@@ -40,9 +40,6 @@ export default function ShotDetailPage() {
   if (!shot) {
     return <div className="p-8">未找到该镜头</div>
   }
-
-  const firstFrameUrl = getFileUrl(shot.firstFrame, basePath, cacheBust)
-  const endFrameUrl = shot.endFrame ? getFileUrl(shot.endFrame, basePath, cacheBust) : null
 
   return (
     <div className="p-8 flex flex-col h-full">
@@ -76,38 +73,19 @@ export default function ShotDetailPage() {
       </div>
 
       <div className="flex gap-8 flex-1 min-h-0">
-        {/* 左侧 40% */}
-        <div className="w-[40%] shrink-0 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-xs text-[var(--color-muted)] mb-2">首帧</p>
-              {firstFrameUrl ? (
-                <ImagePreview
-                  src={firstFrameUrl}
-                  alt="首帧"
-                  className="aspect-video"
-                />
-              ) : (
-                <div className="aspect-video bg-[var(--color-outline-variant)] border border-[var(--color-newsprint-black)] flex items-center justify-center text-[var(--color-muted)]">
-                  暂无
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="text-xs text-[var(--color-muted)] mb-2">尾帧</p>
-              {endFrameUrl ? (
-                <ImagePreview
-                  src={endFrameUrl}
-                  alt="尾帧"
-                  className="aspect-video"
-                />
-              ) : (
-                <div className="aspect-video bg-[var(--color-outline-variant)] border border-[var(--color-newsprint-black)] flex items-center justify-center text-[var(--color-muted)]">
-                  待生成
-                </div>
-              )}
-            </div>
-          </div>
+        {/* 左侧：首尾帧同屏对比 + 文案与资产 */}
+        <div className="w-[45%] min-w-[320px] shrink-0 space-y-4 box-border">
+          <p className="text-sm font-bold text-[var(--color-newsprint-black)] uppercase tracking-tight mb-2">
+            首尾帧对比
+          </p>
+          <ShotFrameCompare
+            shot={shot}
+            episodeId={episodeId}
+            basePath={basePath}
+            cacheBust={cacheBust}
+            variant="detail"
+            showEndSkeleton={shot.status === "endframe_generating"}
+          />
           {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) && (
             <>
               <div>
