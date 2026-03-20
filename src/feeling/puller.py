@@ -4,6 +4,10 @@
 
 从 Feeling 平台拉取分镜表（shots）、场景（scenes）、资产（assets），
 下载所有首帧图和资产图到本地，组装 episode.json（格式与前端 Episode 类型一致）。
+
+镜头顺序：全局序号 1…N 与 frames/S001.png 命名按「场景顺序 → 场内叙事顺序」递增。
+场内顺序优先使用 Scene.shotIds 数组顺序；否则用 GET /shots 列表中的出现顺序（及可选 order 字段），
+**禁止**按平台 shotNumber 数值排序（场记号常与叙事顺序不一致）。
 """
 
 from __future__ import annotations
@@ -11,9 +15,15 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+# 允许直接执行 `python src/feeling/puller.py` 时找到 `src.*` 包（无需手动 export PYTHONPATH）
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from src.feeling.client import FeelingClient
 
@@ -97,6 +107,29 @@ def _get_frame_url(sh: dict) -> str:
 def _safe_name(name: str) -> str:
     """将资产名转为安全文件名，避免特殊字符。"""
     return re.sub(r'[<>:"/\\|?*]', "_", name).strip() or "asset"
+
+
+def _shot_narrative_sort_key(
+    sh: dict,
+    shot_index_in_raw: dict[str, int],
+) -> tuple[int, int]:
+    """
+    场内镜头叙事排序用 key。
+
+    **禁止**使用平台 `shotNumber` 排序：场记号常按「场」重复（1,2,3），且可能与分镜编辑顺序不一致，
+    按数值排序会把叙事顺序打乱。
+
+    优先使用平台显式顺序字段（若有），否则使用 GET /shots 列表中的全局下标（越早出现越靠前）。
+    """
+    sid = str(_get(sh, "id", "shotId", default=""))
+    for key in ("order", "sortOrder", "sequence", "shotOrder", "idx"):
+        v = _get(sh, key, default=None)
+        if v is not None and str(v).strip() != "":
+            try:
+                return (0, int(v))
+            except (TypeError, ValueError):
+                pass
+    return (1, shot_index_in_raw.get(sid, 10**9))
 
 
 def pull_episode(
@@ -205,6 +238,13 @@ def pull_episode(
         if sid:
             scene_id_to_shot_ids.setdefault(sid, []).append(shot_id_val)
 
+    # GET /shots 返回列表的全局顺序（叙事主参考）：shot_id -> 在 raw_shots 中的下标
+    shot_index_in_raw: dict[str, int] = {}
+    for i, s in enumerate(raw_shots):
+        _sid = str(_get(s, "id", "shotId", default=""))
+        if _sid:
+            shot_index_in_raw[_sid] = i
+
     # 4. 处理 scenes；若平台未返回 scene，则构造一个包含所有 shot 的默认场景
     if not raw_scenes and raw_shots:
         raw_scenes = [{
@@ -216,7 +256,13 @@ def pull_episode(
 
     scenes_out: list[dict] = []
     shot_counter = 0
-    for sc in sorted(raw_scenes, key=lambda x: int(_get(x, "sceneNumber", "scene_number", default=0) or 0)):
+    for sc in sorted(
+        raw_scenes,
+        key=lambda x: (
+            int(_get(x, "sceneNumber", "scene_number", default=0) or 0),
+            str(_get(x, "id", "sceneId", default="")),
+        ),
+    ):
         sid = str(_get(sc, "id", "sceneId", default="")).strip().lower()
         snum = int(_get(sc, "sceneNumber", "scene_number", default=1) or 1)
         title = _get(sc, "title", "name", default="未命名场景")
@@ -229,18 +275,36 @@ def pull_episode(
         else:
             ids_in_scene = scene_id_to_shot_ids.get(sid, [])
             scene_shots_raw = [shot_by_id[s] for s in ids_in_scene if s in shot_by_id]
+        preserve_scene_shot_order = False
         if not scene_shots_raw:
             shots_from_scene = _get(sc, "shots") or []
             scene_shots_raw = [x for x in shots_from_scene if isinstance(x, dict)]
+            if scene_shots_raw:
+                # 场景内嵌 shots 数组顺序以平台为准，不再重排
+                preserve_scene_shot_order = True
         if not scene_shots_raw and not scenes_out and raw_shots:
             # 兜底：首场景无匹配时，将全部 shot 归入（API sceneId 可能为不同格式）
             scene_shots_raw = list(raw_shots)
+            preserve_scene_shot_order = True
+
+        # 叙事顺序：Scene 上 shotIds 或内嵌 shots / 全量 raw 兜底 已保证顺序，仅按 sceneId 聚合时
+        # 用「显式 order > GET/shots 全局下标」排序；禁止按平台 shotNumber 排序。
+        if shot_ids:
+            scene_shots_ordered = scene_shots_raw
+        elif preserve_scene_shot_order:
+            scene_shots_ordered = scene_shots_raw
+        else:
+            scene_shots_ordered = sorted(
+                scene_shots_raw,
+                key=lambda sh: _shot_narrative_sort_key(sh, shot_index_in_raw),
+            )
 
         shots_out: list[dict] = []
-        for sh in sorted(scene_shots_raw, key=lambda x: int(_get(x, "shotNumber", "shot_number", default=0) or 0)):
+        for sh in scene_shots_ordered:
             shot_counter += 1
             shot_id = str(_get(sh, "id", "shotId", default=f"shot-{shot_counter}"))
-            shot_num = int(_get(sh, "shotNumber", "shot_number", default=shot_counter) or shot_counter)
+            # 展示用编号：与首帧文件名一致的全局序号 1…N（平台常按场景给 1-5 重复，不可直接写入）
+            global_shot_number = shot_counter
             image_prompt, video_prompt = _get_shot_prompts(sh)
             visual_desc = _get_visual_description(sh)
             duration = int(_get(sh, "durationSec", "duration", default=5) or 5)
@@ -284,7 +348,7 @@ def pull_episode(
 
             shots_out.append({
                 "shotId": shot_id,
-                "shotNumber": shot_num,
+                "shotNumber": global_shot_number,
                 "visualDescription": visual_desc,
                 "imagePrompt": image_prompt,
                 "videoPrompt": video_prompt,
@@ -317,7 +381,7 @@ def pull_episode(
             # 补处理该 shot：下载首帧、关联资产
             shot_counter += 1
             shot_id = sid
-            shot_num = int(_get(s, "shotNumber", "shot_number", default=shot_counter) or shot_counter)
+            global_shot_number = shot_counter
             image_prompt, video_prompt = _get_shot_prompts(s)
             visual_desc = _get_visual_description(s)
             duration = int(_get(s, "durationSec", "duration", default=5) or 5)
@@ -356,7 +420,7 @@ def pull_episode(
                 shot_assets.append(asset_by_id[used_assets])
             orphan_shots.append({
                 "shotId": shot_id,
-                "shotNumber": shot_num,
+                "shotNumber": global_shot_number,
                 "visualDescription": visual_desc,
                 "imagePrompt": image_prompt,
                 "videoPrompt": video_prompt,

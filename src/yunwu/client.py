@@ -98,21 +98,26 @@ def call_yunwu(
     endpoint: str | None = None,
     aspect_ratio: str = "9:16",
     image_size: str = "2K",
+    system_instruction: str | None = None,
 ) -> bytes:
     """
     调用 yunwu Gemini generateContent，生成图片。
 
-    请求格式：文本 prompt + 首帧图（inline_data）+ 资产图（可选 0-2 张）。
+    请求格式：
+    - 可选 systemInstruction：固定规则（与 Gemini v1beta GenerateContentRequest 一致）
+    - contents：一条 user，parts 顺序为 文本 text → 首帧 inline_data → 资产图（0-2）
+
     响应解析：从 candidates[0].content.parts 中提取 inlineData.data。
 
     Args:
         api_key: yunwu API Key（Bearer 认证）
-        text: 文本提示词
+        text: user 侧文本（本镜头变量说明；若未传 system_instruction，也可包含完整合并提示词）
         first_frame_b64: 首帧图 (mime_type, base64_str)
         asset_images: 资产图列表 [(mime, b64), ...]，最多 2 张
         endpoint: 可覆盖默认端点，用于切换模型
         aspect_ratio: 输出图片比例，如 "9:16"
         image_size: 输出尺寸，1K | 2K | 4K
+        system_instruction: 可选。非空时写入请求体 systemInstruction.parts[0].text
 
     Returns:
         生成的图片二进制数据
@@ -135,7 +140,8 @@ def call_yunwu(
             },
         })
 
-    payload = {
+    # Gemini REST：systemInstruction 为 Content，至少包含 parts[].text
+    payload: dict = {
         "contents": [{"role": "user", "parts": parts}],
         "generationConfig": {
             "responseModalities": ["TEXT", "IMAGE"],
@@ -145,6 +151,10 @@ def call_yunwu(
             },
         },
     }
+    if system_instruction and system_instruction.strip():
+        payload["systemInstruction"] = {
+            "parts": [{"text": system_instruction.strip()}],
+        }
 
     url = endpoint or DEFAULT_ENDPOINT
     resp = requests.post(
