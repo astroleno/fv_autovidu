@@ -19,6 +19,7 @@ const mockEpisode = {
         {
           shotId: "shot-001",
           shotNumber: 1,
+          visualDescription: "仓库外黄昏，达里尔背影面向铁门。",
           imagePrompt: "中景，达里尔站在废弃仓库门口...",
           videoPrompt: "镜头缓慢推进...",
           duration: 5,

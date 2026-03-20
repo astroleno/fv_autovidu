@@ -108,24 +108,39 @@ export default function ShotDetailPage() {
               )}
             </div>
           </div>
-          <div>
-            <p className="text-xs text-[var(--color-muted)] mb-1">画面描述</p>
-            <p className="text-sm text-[var(--color-ink)] bg-[var(--color-divider)] border border-[var(--color-newsprint-black)] p-3 max-h-24 overflow-y-auto">
-              {shot.imagePrompt}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-[var(--color-muted)] mb-1">视频描述</p>
-            <p className="text-sm text-[var(--color-ink)] bg-[var(--color-divider)] border border-[var(--color-newsprint-black)] p-3 max-h-24 overflow-y-auto">
-              {shot.videoPrompt}
-            </p>
-          </div>
+          {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) && (
+            <>
+              <div>
+                <p className="text-xs text-[var(--color-muted)] mb-1">画面描述</p>
+                <p className="text-sm text-[var(--color-ink)] bg-[var(--color-divider)] border border-[var(--color-newsprint-black)] p-3 max-h-24 overflow-y-auto">
+                  {shot.visualDescription || "暂无"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[var(--color-muted)] mb-1">图片提示词</p>
+                <p className="text-sm text-[var(--color-ink)] bg-[var(--color-divider)] border border-[var(--color-newsprint-black)] p-3 max-h-24 overflow-y-auto">
+                  {shot.imagePrompt || "暂无"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[var(--color-muted)] mb-1">视频提示词</p>
+                <p className="text-sm text-[var(--color-ink)] bg-[var(--color-divider)] border border-[var(--color-newsprint-black)] p-3 max-h-24 overflow-y-auto">
+                  {shot.videoPrompt || "暂无"}
+                </p>
+              </div>
+            </>
+          )}
           {shot.assets.length > 0 && (
             <div>
               <p className="text-xs text-[var(--color-muted)] mb-2">资产</p>
               <div className="flex flex-wrap gap-2">
                 {shot.assets.map((a) => (
-                  <AssetTag key={a.assetId} asset={a} />
+                  <AssetTag
+                    key={a.assetId}
+                    asset={a}
+                    basePath={basePath}
+                    cacheBust={cacheBust}
+                  />
                 ))}
               </div>
             </div>

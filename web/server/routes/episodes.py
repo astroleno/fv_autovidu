@@ -61,6 +61,7 @@ def pull_episode(req: PullEpisodeRequest):
             DATA_ROOT,
             project_id=project_id,
             force_redownload=getattr(req, "forceRedownload", False),
+            skip_images=getattr(req, "skipImages", False),
         )
         return Episode.model_validate(result)
     except Exception as e:

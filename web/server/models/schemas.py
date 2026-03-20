@@ -8,7 +8,7 @@ Pydantic 数据模型
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -64,6 +64,7 @@ class Shot(BaseModel):
 
     shotId: str
     shotNumber: int
+    visualDescription: str = ""  # 画面描述，平台 visualDescription
     imagePrompt: str
     videoPrompt: str
     duration: int = 5
@@ -72,7 +73,8 @@ class Shot(BaseModel):
     firstFrame: str
     assets: list[ShotAsset] = Field(default_factory=list)
     status: ShotStatus = "pending"
-    endFrame: str | None = None
+    # 使用 Optional 而非 str | None，兼容 Python 3.9 + Pydantic 对注解的解析
+    endFrame: Optional[str] = None
     videoCandidates: list[VideoCandidate] = Field(default_factory=list)
 
 
@@ -105,8 +107,10 @@ class PullEpisodeRequest(BaseModel):
     """拉取 Episode 请求。"""
 
     episodeId: str
-    projectId: str | None = None  # 可选，拉资产需正确 projectId；缺省时从本地已存在剧集推断
+    projectId: Optional[str] = None  # 可选，拉资产需正确 projectId；缺省时从本地已存在剧集推断
     forceRedownload: bool = False  # 强制重新下载资产图（修复拉成风格图时使用）
+    # True：不下载首帧/资产图，只写 episode.json（画面描述、提示词等仍从平台拉取）
+    skipImages: bool = False
 
 
 class GenerateEndframeRequest(BaseModel):
@@ -129,8 +133,8 @@ class GenerateVideoRequest(BaseModel):
     episodeId: str
     shotIds: list[str]
     mode: VideoMode = "first_frame"
-    model: str | None = None
-    duration: int | None = None
+    model: Optional[str] = None
+    duration: Optional[int] = None
 
 
 class GenerateVideoResponse(BaseModel):
@@ -166,7 +170,7 @@ class ExportRoughCutRequest(BaseModel):
     """导出粗剪请求。"""
 
     episodeId: str
-    shotIds: list[str] | None = None
+    shotIds: Optional[list[str]] = None
 
 
 class ExportRoughCutResponse(BaseModel):
@@ -180,6 +184,6 @@ class TaskStatusResponse(BaseModel):
 
     taskId: str
     status: TaskStatus
-    progress: int | None = None
-    result: dict | None = None
-    error: str | None = None
+    progress: Optional[int] = None
+    result: Optional[dict[str, Any]] = None
+    error: Optional[str] = None

@@ -26,21 +26,57 @@ def _get_data_root() -> Path:
     return p
 
 
-def _find_episode_dir(episode_id: str) -> Path | None:
+def _score_episode_dir(ep_dir: Path) -> tuple[int, int, str]:
     """
-    根据 episodeId 查找 episode.json 所在目录。
-    扫描 DATA_ROOT/*/*/episode.json，匹配 episodeId。
+    用于在多个目录对应同一 episodeId 时择优。
+    优先：含画面描述 shot 更多 > 非 proj-default > pulledAt 更新。
     """
+    try:
+        data = json.loads((ep_dir / "episode.json").read_text(encoding="utf-8"))
+    except Exception:
+        return (0, 0, "")
+    pid = data.get("projectId", "")
+    pulled = data.get("pulledAt", "")
+    vd_count = 0
+    for sc in data.get("scenes", []):
+        for sh in sc.get("shots", []):
+            if (sh.get("visualDescription") or "").strip():
+                vd_count += 1
+    prefer_real_project = 0 if pid == "proj-default" else 1
+    return (vd_count, prefer_real_project, pulled)
+
+
+def _pick_best_episode_dir(candidates: list[Path]) -> Path | None:
+    """从多个候选目录中选最优 episode.json 所在目录。"""
+    if not candidates:
+        return None
+    if len(candidates) == 1:
+        return candidates[0]
+    return max(candidates, key=_score_episode_dir)
+
+
+def _collect_episode_dirs_for_id(episode_id: str) -> list[Path]:
+    """收集 DATA_ROOT 下所有 episodeId 匹配的剧集目录。"""
     root = _get_data_root()
     if not root.exists():
-        return None
+        return []
+    out: list[Path] = []
     for proj_dir in root.iterdir():
         if not proj_dir.is_dir():
             continue
         ep_dir = proj_dir / episode_id
         if ep_dir.is_dir() and (ep_dir / "episode.json").exists():
-            return ep_dir
-    return None
+            out.append(ep_dir)
+    return out
+
+
+def _find_episode_dir(episode_id: str) -> Path | None:
+    """
+    根据 episodeId 查找 episode.json 所在目录。
+    若存在多个 data/{projectId}/{episodeId}/（如 proj-default 与真实项目各一份），
+    择优返回含 visualDescription 更完整、且非占位 projectId 的一份。
+    """
+    return _pick_best_episode_dir(_collect_episode_dirs_for_id(episode_id))
 
 
 def list_episodes() -> list[dict[str, Any]]:
@@ -49,11 +85,13 @@ def list_episodes() -> list[dict[str, Any]]:
 
     扫描 DATA_ROOT/{projectId}/{episodeId}/episode.json，
     返回 Episode 摘要列表（用于 GET /api/episodes）。
+    同一 episodeId 多目录时只保留择优后的一条，避免列表重复且读到缺字段的旧副本。
     """
     root = _get_data_root()
     if not root.exists():
         return []
-    result: list[dict[str, Any]] = []
+    # episodeId -> 该 id 下所有 episode 目录
+    by_eid: dict[str, list[Path]] = {}
     for proj_dir in root.iterdir():
         if not proj_dir.is_dir():
             continue
@@ -65,16 +103,28 @@ def list_episodes() -> list[dict[str, Any]]:
                 continue
             try:
                 data = json.loads(json_path.read_text(encoding="utf-8"))
-                result.append({
-                    "projectId": data.get("projectId", proj_dir.name),
-                    "episodeId": data.get("episodeId", ep_dir.name),
-                    "episodeTitle": data.get("episodeTitle", ""),
-                    "episodeNumber": data.get("episodeNumber", 0),
-                    "pulledAt": data.get("pulledAt", ""),
-                    "scenes": data.get("scenes", []),
-                })
+                eid = str(data.get("episodeId", ep_dir.name))
+                by_eid.setdefault(eid, []).append(ep_dir)
             except Exception:
                 continue
+
+    result: list[dict[str, Any]] = []
+    for eid, dirs in by_eid.items():
+        best = _pick_best_episode_dir(dirs)
+        if not best:
+            continue
+        try:
+            data = json.loads((best / "episode.json").read_text(encoding="utf-8"))
+            result.append({
+                "projectId": data.get("projectId", best.parent.name),
+                "episodeId": data.get("episodeId", eid),
+                "episodeTitle": data.get("episodeTitle", ""),
+                "episodeNumber": data.get("episodeNumber", 0),
+                "pulledAt": data.get("pulledAt", ""),
+                "scenes": data.get("scenes", []),
+            })
+        except Exception:
+            continue
     return result
 
 

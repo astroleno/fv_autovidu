@@ -33,6 +33,57 @@ def _get(obj: dict, *keys: str, default: Any = "") -> Any:
     return default
 
 
+def _get_visual_description(sh: dict) -> str:
+    """从 shot 中提取画面描述（平台 visualDescription 字段）。"""
+    prompts_obj = sh.get("prompts") if isinstance(sh, dict) else None
+    vd = _get(sh, "visualDescription", "visual_description")
+    if not vd and isinstance(prompts_obj, dict):
+        vd = _get(prompts_obj, "visualDescription", "visual_description")
+    return vd or ""
+
+
+def _get_shot_prompts(sh: dict) -> tuple[str, str]:
+    """
+    从 shot 对象中提取图片提示词和视频提示词。
+    平台 API：imgPrompt（图片）、videoPrompt/prompt（视频）。
+    画面描述 visualDescription 单独由 _get_visual_description 提取。
+    Returns:
+        (image_prompt, video_prompt)
+    """
+    # 图片提示词：不含 visualDescription，避免与画面描述混淆
+    image_prompt = _get(
+        sh,
+        "imgPrompt",
+        "imagePrompt",
+        "image_prompt",
+        "description",
+        "prompt",
+    )
+    # 平台 videoPrompt 常为空，用 prompt 存视频/动作描述
+    video_prompt = _get(sh, "videoPrompt", "video_prompt", "videoPrompt", "prompt")
+    # 嵌套 prompts 对象：prompts.image / prompts.imgPrompt 等
+    prompts_obj = sh.get("prompts") if isinstance(sh, dict) else None
+    if isinstance(prompts_obj, dict):
+        nested_img = _get(
+            prompts_obj,
+            "imgPrompt",
+            "imagePrompt",
+            "image",
+            "visualDescription",
+            "description",
+            "prompt",
+        )
+        if nested_img and not image_prompt:
+            image_prompt = nested_img
+        nested_vid = _get(prompts_obj, "videoPrompt", "video", "video_prompt")
+        if nested_vid and not video_prompt:
+            video_prompt = nested_vid
+    # videoPrompt 为空时用 imagePrompt 兜底（prompt 已在上方 _get 中作为 video 来源）
+    if not video_prompt:
+        video_prompt = image_prompt
+    return (image_prompt or "", video_prompt or "")
+
+
 def _get_frame_url(sh: dict) -> str:
     """从 shot 中解析首帧图 URL。支持 firstframeMedia.url 或直接 URL 字段。"""
     media = _get(sh, "firstframeMedia", "firstFrameUrl", "firstFrame", "selectedFrameUrl", "imageUrl")
@@ -57,15 +108,16 @@ def pull_episode(
     episode_number: int = 1,
     client: FeelingClient | None = None,
     force_redownload: bool = False,
+    skip_images: bool = False,
 ) -> dict[str, Any]:
     """
     一键拉取 Episode 数据到本地。
 
     流程：
     1. 调用 get_scenes、get_shots、get_assets
-    2. 下载所有首帧图 -> frames/S{nn}.png
-    3. 下载所有资产图 -> assets/{name}.png
-    4. 组装 episode.json 写入 output_dir
+    2. 下载所有首帧图 -> frames/S{nn}.png（skip_images=True 时跳过）
+    3. 下载所有资产图 -> assets/{name}.png（skip_images=True 时跳过）
+    4. 组装 episode.json 写入 output_dir（含 visualDescription / 提示词 等）
 
     Args:
         episode_id: Episode UUID
@@ -74,6 +126,7 @@ def pull_episode(
         episode_title: 剧集标题，缺省时用 "第N集"
         episode_number: 剧集编号
         client: FeelingClient 实例，缺省时新建
+        skip_images: True 时不下载任何图片，仅写入 episode.json（适合只看画面描述/提示词）
 
     Returns:
         组装好的 Episode dict（与前端 Episode 类型一致）
@@ -122,7 +175,11 @@ def pull_episode(
         local_name = f"{_safe_name(name)}.png"
         local_path = f"assets/{local_name}"
         full_path = assets_dir / local_name
-        if img_url and (force_redownload or not full_path.exists()):
+        if (
+            not skip_images
+            and img_url
+            and (force_redownload or not full_path.exists())
+        ):
             try:
                 client.download_file(img_url, full_path)
             except Exception as e:
@@ -184,8 +241,8 @@ def pull_episode(
             shot_counter += 1
             shot_id = str(_get(sh, "id", "shotId", default=f"shot-{shot_counter}"))
             shot_num = int(_get(sh, "shotNumber", "shot_number", default=shot_counter) or shot_counter)
-            image_prompt = _get(sh, "imgPrompt", "imagePrompt", "image_prompt", "description", "prompt")
-            video_prompt = _get(sh, "videoPrompt", "video_prompt", "videoPrompt", default=image_prompt)
+            image_prompt, video_prompt = _get_shot_prompts(sh)
+            visual_desc = _get_visual_description(sh)
             duration = int(_get(sh, "durationSec", "duration", default=5) or 5)
             camera = _get(sh, "cameraMovement", "camera_movement", "camera", default="push_in")
             aspect = _get(sh, "aspectRatio", "aspect_ratio", default="9:16")
@@ -195,7 +252,11 @@ def pull_episode(
             frame_name = f"S{shot_counter:03d}.png"
             frame_rel = f"frames/{frame_name}"
             frame_path = frames_dir / frame_name
-            if frame_url and not frame_path.exists():
+            if (
+                not skip_images
+                and frame_url
+                and not frame_path.exists()
+            ):
                 try:
                     client.download_file(frame_url, frame_path)
                 except Exception as e:
@@ -224,6 +285,7 @@ def pull_episode(
             shots_out.append({
                 "shotId": shot_id,
                 "shotNumber": shot_num,
+                "visualDescription": visual_desc,
                 "imagePrompt": image_prompt,
                 "videoPrompt": video_prompt,
                 "duration": duration,
@@ -256,8 +318,8 @@ def pull_episode(
             shot_counter += 1
             shot_id = sid
             shot_num = int(_get(s, "shotNumber", "shot_number", default=shot_counter) or shot_counter)
-            image_prompt = _get(s, "imgPrompt", "imagePrompt", "image_prompt", "description", "prompt")
-            video_prompt = _get(s, "videoPrompt", "video_prompt", "videoPrompt", default=image_prompt)
+            image_prompt, video_prompt = _get_shot_prompts(s)
+            visual_desc = _get_visual_description(s)
             duration = int(_get(s, "durationSec", "duration", default=5) or 5)
             camera = _get(s, "cameraMovement", "camera_movement", "camera", default="push_in")
             aspect = _get(s, "aspectRatio", "aspect_ratio", default="9:16")
@@ -265,7 +327,11 @@ def pull_episode(
             frame_name = f"S{shot_counter:03d}.png"
             frame_rel = f"frames/{frame_name}"
             frame_path = frames_dir / frame_name
-            if frame_url and not frame_path.exists():
+            if (
+                not skip_images
+                and frame_url
+                and not frame_path.exists()
+            ):
                 try:
                     client.download_file(frame_url, frame_path)
                 except Exception as e:
@@ -291,6 +357,7 @@ def pull_episode(
             orphan_shots.append({
                 "shotId": shot_id,
                 "shotNumber": shot_num,
+                "visualDescription": visual_desc,
                 "imagePrompt": image_prompt,
                 "videoPrompt": video_prompt,
                 "duration": duration,
@@ -338,7 +405,10 @@ def pull_episode(
     json_path = ep_dir / "episode.json"
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(episode, f, ensure_ascii=False, indent=2)
-    print(f"[OK] 已拉取至 {json_path}")
+    if skip_images:
+        print(f"[OK] 已拉取文案至 {json_path}（已跳过图片下载）")
+    else:
+        print(f"[OK] 已拉取至 {json_path}")
     return episode
 
 
@@ -348,6 +418,7 @@ def pull_project(
     *,
     client: FeelingClient | None = None,
     force_redownload: bool = False,
+    skip_images: bool = False,
 ) -> list[dict[str, Any]]:
     """
     一键拉取整个项目的所有剧集。
@@ -377,6 +448,7 @@ def pull_project(
                 episode_number=num,
                 client=client,
                 force_redownload=force_redownload,
+                skip_images=skip_images,
             )
             results.append(result)
         except Exception as e:
@@ -392,15 +464,14 @@ def main() -> None:
     parser.add_argument("--title", default=None, help="剧集标题（仅 --episode-id 时有效）")
     parser.add_argument("--number", type=int, default=1, help="剧集编号（仅 --episode-id 时有效）")
     parser.add_argument("--force", action="store_true", help="强制重新下载资产图（修复拉错图时使用）")
+    parser.add_argument(
+        "--skip-images",
+        action="store_true",
+        help="不下载首帧/资产图，只写 episode.json（含画面描述、提示词等元数据）",
+    )
     args = parser.parse_args()
 
-    if args.project_id:
-        pull_project(
-            args.project_id,
-            args.output,
-            force_redownload=args.force,
-        )
-        return
+    # 同时传 --episode-id 与 --project-id 时：只拉单集，project-id 仅用于资产接口与目录名
     if args.episode_id:
         pull_episode(
             args.episode_id,
@@ -409,6 +480,15 @@ def main() -> None:
             episode_title=args.title,
             episode_number=args.number,
             force_redownload=args.force,
+            skip_images=args.skip_images,
+        )
+        return
+    if args.project_id:
+        pull_project(
+            args.project_id,
+            args.output,
+            force_redownload=args.force,
+            skip_images=args.skip_images,
         )
         return
     parser.error("请指定 --episode-id 或 --project-id")

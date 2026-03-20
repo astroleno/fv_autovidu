@@ -58,6 +58,8 @@ export interface VideoCandidate {
 export interface Shot {
   shotId: string
   shotNumber: number // 全局编号，1-based
+  /** 画面描述：平台 visualDescription，简洁场景/动作描述 */
+  visualDescription?: string
   imagePrompt: string
   videoPrompt: string
   duration: number // 秒

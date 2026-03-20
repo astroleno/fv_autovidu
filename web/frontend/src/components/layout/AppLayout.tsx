@@ -15,6 +15,8 @@ export default function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [pullId, setPullId] = useState("")
   const [pullForce, setPullForce] = useState(false)
+  /** 仅同步 episode.json（画面描述、提示词），不下载首帧/资产图，速度更快 */
+  const [pullSkipImages, setPullSkipImages] = useState(false)
   const [pullLoading, setPullLoading] = useState(false)
   const location = useLocation()
   const { episodeId: routeEpisodeId } = useParams<{ episodeId?: string }>()
@@ -36,6 +38,7 @@ export default function AppLayout() {
     closeModal()
     setPullId("")
     setPullForce(false)
+    setPullSkipImages(false)
   }
 
   const handlePull = async () => {
@@ -46,7 +49,7 @@ export default function AppLayout() {
         routeEpisodeId && currentEpisode?.episodeId === routeEpisodeId
           ? currentEpisode.projectId
           : undefined
-      await pullNewEpisode(pullId.trim(), pullForce, projectId)
+      await pullNewEpisode(pullId.trim(), pullForce, projectId, pullSkipImages)
       handleClosePull()
     } finally {
       setPullLoading(false)
@@ -92,11 +95,32 @@ export default function AppLayout() {
               className="w-full px-3 py-2 border border-[var(--color-newsprint-black)] box-border"
             />
           </div>
-          <div className="p-3 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/50">
+          <div className="p-3 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/50 space-y-3">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
+                checked={pullSkipImages}
+                onChange={(e) => {
+                  const v = e.target.checked
+                  setPullSkipImages(v)
+                  if (v) setPullForce(false)
+                }}
+                className="w-4 h-4 shrink-0"
+              />
+              <span className="text-sm font-medium">
+                仅拉取分镜文案（不下载图片）
+              </span>
+            </label>
+            <p className="text-xs text-[var(--color-muted)] ml-7 -mt-2">
+              只写入 episode.json，含画面描述、图片/视频提示词；首帧与资产图占位路径不变，本地可无图。
+            </p>
+            <label
+              className={`flex items-center gap-3 ${pullSkipImages ? "opacity-40 pointer-events-none" : "cursor-pointer"}`}
+            >
+              <input
+                type="checkbox"
                 checked={pullForce}
+                disabled={pullSkipImages}
                 onChange={(e) => setPullForce(e.target.checked)}
                 className="w-4 h-4 shrink-0"
               />
@@ -105,7 +129,7 @@ export default function AppLayout() {
               </span>
             </label>
             <p className="text-xs text-[var(--color-muted)] mt-1 ml-7">
-              修复资产图拉错成风格图时勾选
+              修复资产图拉错成风格图时勾选（与「仅文案」互斥）
             </p>
           </div>
           <div className="flex justify-end gap-2">

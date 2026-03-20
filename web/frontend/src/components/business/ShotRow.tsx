@@ -1,13 +1,15 @@
 /**
  * ShotRow 列表视图行
- * 表格形式：编号 | 首帧缩略 | 尾帧缩略 | 状态 | prompt 摘要 | 资产 | 视频候选数 | 操作
+ * 编号 | 首帧 | 尾帧 | 状态 | 画面描述 | 图片提示词 | 视频提示词 | 资产（悬浮） | 候选数 | 操作
+ * 提示词列支持悬浮显示、点击编辑、失焦保存
  */
 import { Link } from "react-router"
 import type { Shot } from "@/types"
 import { Badge } from "@/components/ui"
-import { StatusIndicator } from "@/components/business"
+import { StatusIndicator, AssetTag, ShotPromptCells } from "@/components/business"
 import { shotStatusLabels } from "@/utils/format"
 import { getFileUrl } from "@/utils/file"
+import { useEpisodeStore } from "@/stores"
 
 interface ShotRowProps {
   shot: Shot
@@ -18,6 +20,7 @@ interface ShotRowProps {
 }
 
 export function ShotRow({ shot, episodeId, basePath = "", cacheBust }: ShotRowProps) {
+  const { updateShot } = useEpisodeStore()
   const firstFrameUrl = getFileUrl(shot.firstFrame, basePath, cacheBust)
   const endFrameUrl = shot.endFrame ? getFileUrl(shot.endFrame, basePath, cacheBust) : null
 
@@ -52,10 +55,28 @@ export function ShotRow({ shot, episodeId, basePath = "", cacheBust }: ShotRowPr
           <Badge status={shot.status}>{shotStatusLabels[shot.status]}</Badge>
         </div>
       </td>
-      <td className="py-3 px-4 text-xs text-[var(--color-muted)] max-w-[200px] truncate">
-        {shot.imagePrompt.slice(0, 40)}...
+      <ShotPromptCells
+        shot={shot}
+        episodeId={episodeId}
+        updateShot={updateShot}
+        maxPreviewLen={40}
+      />
+      <td className="py-3 px-4">
+        <div className="flex flex-wrap gap-1">
+          {shot.assets.length > 0 ? (
+            shot.assets.map((a) => (
+              <AssetTag
+                key={a.assetId}
+                asset={a}
+                basePath={basePath}
+                cacheBust={cacheBust}
+              />
+            ))
+          ) : (
+            <span className="text-xs text-[var(--color-muted)]">-</span>
+          )}
+        </div>
       </td>
-      <td className="py-3 px-4 text-xs">{shot.assets.map((a) => a.name).join(", ") || "-"}</td>
       <td className="py-3 px-4 text-sm">{shot.videoCandidates.length}</td>
       <td className="py-3 px-4">
         <Link to={`/episode/${episodeId}/shot/${shot.shotId}`}>

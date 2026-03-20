@@ -65,10 +65,26 @@ export function ShotCard({ shot, episodeId, basePath = "", cacheBust }: ShotCard
           </div>
         )}
       </div>
+      {/* 画面描述 + 图片/视频提示词预览 */}
+      {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) && (
+        <div
+          className="mb-3 text-[10px] text-[var(--color-muted)] line-clamp-3 box-border"
+          title={[shot.visualDescription, shot.imagePrompt, shot.videoPrompt].filter(Boolean).join("\n\n")}
+        >
+          {shot.visualDescription ? `画面: ${(shot.visualDescription || "").slice(0, 30)}…` : null}
+          {shot.imagePrompt ? ` 图: ${(shot.imagePrompt || "").slice(0, 30)}…` : null}
+          {shot.videoPrompt ? ` 视: ${(shot.videoPrompt || "").slice(0, 30)}…` : null}
+        </div>
+      )}
       {shot.assets.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-4">
           {shot.assets.map((a) => (
-            <AssetTag key={a.assetId} asset={a} />
+            <AssetTag
+              key={a.assetId}
+              asset={a}
+              basePath={basePath}
+              cacheBust={cacheBust}
+            />
           ))}
         </div>
       )}

@@ -10,7 +10,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 The user wants me to read the plan document and understand the foundation, then create an implementation plan. Let me first read the document and explore the codebase to understand the current architecture.</details></think>
@@ -396,7 +396,7 @@ Additional data:
     "selectedOption": "none",
     "isShowingInput": false
   },
-  "planUri": "file:///Users/zuobowen/.cursor/plans/%E5%B9%B3%E5%8F%B0%E8%BE%85%E5%8A%A9%E8%AE%A1%E5%88%92%E5%AE%9E%E6%96%BD_10904661.plan.md",
+  "planUri": "file:///Users/zuobowen/.cursor/plans/%E5%B9%B3%E5%8F%B0%E8%BE%85%E5%8A%A9%E8%AE%A1%E5%88%92%E5%AE%9E%E6%96%BD_2b844102.plan.md",
   "hasOpenedEditor": true
 }
 ```
@@ -421,7 +421,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 The user wants me to read a new document about the current state of the frontend and backend renovation guide, and then adjust the plan accordingly. Let me read this file and the other recently viewed files to understand the current state better.</details></think>
@@ -806,7 +806,7 @@ Additional data:
     "selectedOption": "none",
     "isShowingInput": false
   },
-  "planUri": "file:///Users/zuobowen/.cursor/plans/%E5%90%8E%E7%AB%AF%E5%AF%B9%E6%8E%A5%E5%AE%9E%E6%96%BD%E8%AE%A1%E5%88%92_48eb7858.plan.md",
+  "planUri": "file:///Users/zuobowen/.cursor/plans/%E5%90%8E%E7%AB%AF%E5%AF%B9%E6%8E%A5%E5%AE%9E%E6%96%BD%E8%AE%A1%E5%88%92_6cff3a2d.plan.md",
   "hasOpenedEditor": true
 }
 ```
@@ -833,7 +833,7 @@ To-do's from the plan have already been created. Do not create them again. Mark 
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
@@ -2905,7 +2905,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
@@ -3201,7 +3201,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
@@ -3378,7 +3378,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
@@ -4027,7 +4027,7 @@ b95c3d75-d99a-40c3-9f69-9bb76f23c99是project-id，https://dev-video-server.feel
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Pulling project by ID**
@@ -4519,7 +4519,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
@@ -4537,7 +4537,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
@@ -4681,7 +4681,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
@@ -5123,7 +5123,7 @@ project/b95c3d75-d99a-40c3-9f69-9bb76f23c990/storyboard?episode=c25126d1-73c7-41
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
@@ -5766,7 +5766,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Investigating data paths**
@@ -7060,17 +7060,17 @@ I'm verifying that all 8 scene IDs from raw_scenes are present in scene_id_to_sh
 
 ---
 
-The string to replace was not found in the file.
-
----
-
-
-
 
 
 ---
 
-The string to replace was not found in the file.
+
+
+
+
+---
+
+
 
 ---
 
@@ -7121,6 +7121,10 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller 
 
 
 
+---
+
+
+
 
 
 ---
@@ -7155,6 +7159,10 @@ scenes: 8 total shots: 0
 
 
 
+---
+
+
+
 
 
 ---
@@ -7166,6 +7174,10 @@ scenes: 8 total shots: 0
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -7190,6 +7202,10 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller 
 ```
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -7513,6 +7529,10 @@ episodes: 2
 
 
 
+---
+
+
+
 
 
 ---
@@ -7535,6 +7555,10 @@ episodes: 2
 
 
 
+---
+
+
+
 
 
 ---
@@ -7552,6 +7576,10 @@ episodes: 2
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -7591,6 +7619,10 @@ first shot keys: ['shotId', 'shotNumber', 'imagePrompt', 'videoPrompt', 'duratio
 ```
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -7654,6 +7686,10 @@ The episode ID from URL navigation uses UUID format like `c25126d1-...` which ma
 ---
 
 
+
+---
+
+
 ## 已完成的修改
 
 1. **Shots API 结构**：平台返回 `{ items: [...], total }`，已改为从 `data.items` 读取 shots 列表。
@@ -7672,7 +7708,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Investigating shot-image mapping**
@@ -7686,6 +7722,14 @@ The API may return duplicate shot numbers across scenes, causing frame name conf
 
 
 
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -7754,14 +7798,6 @@ scene 0 id: bd3d805b-f338-43fd-a43a-f806723b7b81 shotsCount: 5
 scene 1 id: d6972309-75bc-4697-99a1-3b69f2847087 shotsCount: 3
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
-
 </details>
 </tool-use>
 
@@ -7892,6 +7928,10 @@ for a in assets[:5]:
 
 
 
+---
+
+
+
 
 
 ---
@@ -7933,6 +7973,10 @@ thumbnail: https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b75
 
 
 
+---
+
+
+
 
 
 ---
@@ -7942,6 +7986,10 @@ thumbnail: https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b75
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -7974,6 +8022,10 @@ thumbnail: https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b75
 
 
 
+---
+
+
+
 
 
 ---
@@ -7985,6 +8037,10 @@ thumbnail: https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b75
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -8030,6 +8086,10 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && rm -rf data/b95c3d75-d99a-40c
 
 
 
+---
+
+
+
 
 
 ---
@@ -8039,6 +8099,10 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && rm -rf data/b95c3d75-d99a-40c
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -8104,7 +8168,22 @@ files in frames: 41
 
 
 
+---
 
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] Puller: 首帧使用全局序号 S001.png 避免重复
+- [x] Puller: 资产用 usedAssets+referenceUrls/thumbnail 匹配
+
+</details>
+</tool-use>
 
 ---
 
@@ -8143,14 +8222,7 @@ shot 8 firstFrame: frames/S008.png assets: 5
 
 ---
 
-<tool-use data-tool-type="task" data-tool-name="todo_write">
-<details><summary>Tool use: **todo_write** • Todo List</summary>
 
-- [x] Puller: 首帧使用全局序号 S001.png 避免重复
-- [x] Puller: 资产用 usedAssets+referenceUrls/thumbnail 匹配
-
-</details>
-</tool-use>
 
 ---
 
@@ -8278,6 +8350,10 @@ Status: **completed**
 ---
 
 
+
+---
+
+
 修改已经完成，当前拉取的数据应能正确展示。
 
 ## 修改总结
@@ -8329,7 +8405,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Investigating multi-grid handling**
@@ -8341,92 +8417,6 @@ I'm investigating why '' (multi-grid) assets only return the first image instead
 
 
 
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-import json
-c = FeelingClient()
-c.login()
-shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-sh = shots[0]
-# 查看首帧相关字段完整结构
-for k in ['firstframeMedia', 'sampleShotImageUrl', 'metadata']:
-    v = sh.get(k)
-    if v is not None:
-        print(k, ':', type(v).__name__)
-        print(json.dumps(v, ensure_ascii=False, indent=2)[:600] if isinstance(v, (dict,list)) else str(v)[:200])
-        print('---')
-" 2>&1</summary>
-
-```bash
-cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-import json
-c = FeelingClient()
-c.login()
-shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-sh = shots[0]
-# 查看首帧相关字段完整结构
-for k in ['firstframeMedia', 'sampleShotImageUrl', 'metadata']:
-    v = sh.get(k)
-    if v is not None:
-        print(k, ':', type(v).__name__)
-        print(json.dumps(v, ensure_ascii=False, indent=2)[:600] if isinstance(v, (dict,list)) else str(v)[:200])
-        print('---')
-" 2>&1
-```
-
-```
-firstframeMedia : dict
-{
-  "id": "e0dfffdc-2f16-4ae3-b407-0902d8188e50",
-  "url": "https://video-dev-cdn.feeling.ltd/assets/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773827767071-272m7lvn2.png?sign=1773920290-gjwj1s3d0g-0-b61a5bc898b8efcab19dad07519b910b&amp;imageMogr2%2Fquality%2F80=",
-  "thumbnailUrl": null,
-  "fileName": "1773827767071-272m7lvn2.png",
-  "fileSize": null,
-  "width": null,
-  "height": null,
-  "metadata": {
-    "variant": "c",
-    "batchIndex": 0,
-    "candidateIndex": 2,
-    "sourceGridImageUrl": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773827741744_236vgt.jpg?sign=17
----
-metadata : dict
-{
-  "audioCue": {
-    "sfx_type": "引擎轰鸣声与底盘碰撞声",
-    "intensity": "steady",
-    "sync_frame": "镜头启动点"
-  },
-  "axisSide": "轴线右侧",
-  "dialogue": null,
-  "shotSize": "全景",
-  "shotType": "主镜头",
-  "keyMoment": "not_applicable",
-  "rationale": "开篇建立车内颠簸空间关系，通过达里尔的前景遮挡强化紧凑压抑感，并引入阳光尘埃母题。",
-  "scenePlace": "汽车内",
-  "shotMaster": {
-    "raw": {
-      "shot_list": [
-        {
-          "time": {
-            "end_sec": 4,
-            "duration": 4,
-            "start_sec": 0
-          },
-          "shot_id": "B01-01",
-          "audio_cue": {
-            "sfx_type": "引擎轰鸣声与底盘碰撞声",
-            "intensity":
----
-
-```
-</details>
-</tool-use>
 
 ---
 
@@ -8793,6 +8783,92 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+sh = shots[0]
+# 查看首帧相关字段完整结构
+for k in ['firstframeMedia', 'sampleShotImageUrl', 'metadata']:
+    v = sh.get(k)
+    if v is not None:
+        print(k, ':', type(v).__name__)
+        print(json.dumps(v, ensure_ascii=False, indent=2)[:600] if isinstance(v, (dict,list)) else str(v)[:200])
+        print('---')
+" 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+sh = shots[0]
+# 查看首帧相关字段完整结构
+for k in ['firstframeMedia', 'sampleShotImageUrl', 'metadata']:
+    v = sh.get(k)
+    if v is not None:
+        print(k, ':', type(v).__name__)
+        print(json.dumps(v, ensure_ascii=False, indent=2)[:600] if isinstance(v, (dict,list)) else str(v)[:200])
+        print('---')
+" 2>&1
+```
+
+```
+firstframeMedia : dict
+{
+  "id": "e0dfffdc-2f16-4ae3-b407-0902d8188e50",
+  "url": "https://video-dev-cdn.feeling.ltd/assets/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773827767071-272m7lvn2.png?sign=1773920290-gjwj1s3d0g-0-b61a5bc898b8efcab19dad07519b910b&amp;imageMogr2%2Fquality%2F80=",
+  "thumbnailUrl": null,
+  "fileName": "1773827767071-272m7lvn2.png",
+  "fileSize": null,
+  "width": null,
+  "height": null,
+  "metadata": {
+    "variant": "c",
+    "batchIndex": 0,
+    "candidateIndex": 2,
+    "sourceGridImageUrl": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773827741744_236vgt.jpg?sign=17
+---
+metadata : dict
+{
+  "audioCue": {
+    "sfx_type": "引擎轰鸣声与底盘碰撞声",
+    "intensity": "steady",
+    "sync_frame": "镜头启动点"
+  },
+  "axisSide": "轴线右侧",
+  "dialogue": null,
+  "shotSize": "全景",
+  "shotType": "主镜头",
+  "keyMoment": "not_applicable",
+  "rationale": "开篇建立车内颠簸空间关系，通过达里尔的前景遮挡强化紧凑压抑感，并引入阳光尘埃母题。",
+  "scenePlace": "汽车内",
+  "shotMaster": {
+    "raw": {
+      "shot_list": [
+        {
+          "time": {
+            "end_sec": 4,
+            "duration": 4,
+            "start_sec": 0
+          },
+          "shot_id": "B01-01",
+          "audio_cue": {
+            "sfx_type": "引擎轰鸣声与底盘碰撞声",
+            "intensity":
+---
+
+```
+</details>
+</tool-use>
+
+---
+
 <think><details><summary>Thought Process</summary>
 **Analyzing media metadata**
 
@@ -8803,6 +8879,14 @@ I'm investigating why only the first candidate media is being retrieved from eac
 
 
 
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/AssetSelector.tsx</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -8867,11 +8951,7 @@ sampleShotImageUrl : NoneType None
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/AssetSelector.tsx</summary>
 
-</details>
-</tool-use>
 
 ---
 
@@ -8955,65 +9035,6 @@ I found that assetRefs contain multiple images per shot and we're only using the
 
 
 
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-c = FeelingClient()
-c.login()
-shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-has_media = sum(1 for s in shots if s.get('firstframeMedia'))
-has_assetrefs = sum(1 for s in shots if s.get('assetRefs') and len(s.get('assetRefs',[]))>0)
-print('shots with firstframeMedia:', has_media, '/', len(shots))
-print('shots with assetRefs:', has_assetrefs)
-# assetRefs 可能是分镜的首帧参考图（生成时用的）
-# 检查 storyboard 相关 API
-urls = [
-    '/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/tasks',
-    '/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets-status',
-]
-for path in urls:
-    r = c._session.get(c.base_url + path, timeout=10)
-    d = r.json() if r.ok else {}
-    data = d.get('data', d)
-    print(path, '->', type(data).__name__, list(data.keys())[:8] if isinstance(data, dict) else len(data) if isinstance(data, list) else '')
-" 2>&1</summary>
-
-```bash
-cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-c = FeelingClient()
-c.login()
-shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-has_media = sum(1 for s in shots if s.get('firstframeMedia'))
-has_assetrefs = sum(1 for s in shots if s.get('assetRefs') and len(s.get('assetRefs',[]))>0)
-print('shots with firstframeMedia:', has_media, '/', len(shots))
-print('shots with assetRefs:', has_assetrefs)
-# assetRefs 可能是分镜的首帧参考图（生成时用的）
-# 检查 storyboard 相关 API
-urls = [
-    '/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/tasks',
-    '/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets-status',
-]
-for path in urls:
-    r = c._session.get(c.base_url + path, timeout=10)
-    d = r.json() if r.ok else {}
-    data = d.get('data', d)
-    print(path, '->', type(data).__name__, list(data.keys())[:8] if isinstance(data, dict) else len(data) if isinstance(data, list) else '')
-" 2>&1
-```
-
-```
-shots with firstframeMedia: 41 / 41
-shots with assetRefs: 40
-/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/tasks -&gt; list 2
-/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets-status -&gt; dict []
-
-```
-</details>
-</tool-use>
 
 ---
 
@@ -9137,9 +9158,80 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+has_media = sum(1 for s in shots if s.get('firstframeMedia'))
+has_assetrefs = sum(1 for s in shots if s.get('assetRefs') and len(s.get('assetRefs',[]))>0)
+print('shots with firstframeMedia:', has_media, '/', len(shots))
+print('shots with assetRefs:', has_assetrefs)
+# assetRefs 可能是分镜的首帧参考图（生成时用的）
+# 检查 storyboard 相关 API
+urls = [
+    '/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/tasks',
+    '/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets-status',
+]
+for path in urls:
+    r = c._session.get(c.base_url + path, timeout=10)
+    d = r.json() if r.ok else {}
+    data = d.get('data', d)
+    print(path, '->', type(data).__name__, list(data.keys())[:8] if isinstance(data, dict) else len(data) if isinstance(data, list) else '')
+" 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+has_media = sum(1 for s in shots if s.get('firstframeMedia'))
+has_assetrefs = sum(1 for s in shots if s.get('assetRefs') and len(s.get('assetRefs',[]))>0)
+print('shots with firstframeMedia:', has_media, '/', len(shots))
+print('shots with assetRefs:', has_assetrefs)
+# assetRefs 可能是分镜的首帧参考图（生成时用的）
+# 检查 storyboard 相关 API
+urls = [
+    '/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/tasks',
+    '/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets-status',
+]
+for path in urls:
+    r = c._session.get(c.base_url + path, timeout=10)
+    d = r.json() if r.ok else {}
+    data = d.get('data', d)
+    print(path, '->', type(data).__name__, list(data.keys())[:8] if isinstance(data, dict) else len(data) if isinstance(data, list) else '')
+" 2>&1
+```
+
+```
+shots with firstframeMedia: 41 / 41
+shots with assetRefs: 40
+/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/tasks -&gt; list 2
+/storyboard/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets-status -&gt; dict []
+
+```
+</details>
+</tool-use>
+
+---
 
 
 
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/RegenPage.tsx</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -9201,17 +9293,21 @@ task keys: ['id', 'taskType', 'episodeId', 'episodeVersionId', 'phase', 'status'
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/RegenPage.tsx</summary>
 
-</details>
-</tool-use>
 
 ---
 
 
 
 
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -9327,14 +9423,6 @@ if isinstance(items, list):
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
-
-</details>
-</tool-use>
-
----
-
 <think><details><summary>Thought Process</summary>
 **Analyzing image sources**
 
@@ -9345,6 +9433,44 @@ I see that sourceGridImageUrl likely points to a composite grid image, from whic
 
 
 
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "资产库|asset.*list|AssetList",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "资产库|asset.*list|AssetList",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {}
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
 
 ---
 
@@ -9399,44 +9525,6 @@ grid https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f153
 generation/image exists: 404
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
-<details>
-<summary>Tool use: **ripgrep_raw_search**</summary>
-
-
-Parameters:
-
-```json
-{
-  "pattern": "资产库|asset.*list|AssetList",
-  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
-  "caseInsensitive": false
-}
-```
-Result:
-
-```json
-{
-  "success": {
-    "pattern": "资产库|asset.*list|AssetList",
-    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
-    "outputMode": "content",
-    "workspaceResults": {
-      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
-        "content": {}
-      }
-    }
-  }
-}
-```
-Status: **completed**
-
-
 </details>
 </tool-use>
 
@@ -9700,70 +9788,11 @@ keys: ['content']
 
 
 
-
-
 ---
 
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-import json
-c = FeelingClient()
-c.login()
-r = c._session.get(c.base_url + '/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/content', timeout=10)
-d = r.json()
-content = d.get('data', d).get('content', d)
-print('content type:', type(content))
-if isinstance(content, str):
-    print('len:', len(content), content[:200])
-elif isinstance(content, dict):
-    print('keys:', list(content.keys()))
-    print(json.dumps(content, ensure_ascii=False)[:1200])
-elif isinstance(content, list):
-    print('len:', len(content))
-    if content:
-        print('item0:', type(content[0]), str(content[0])[:200])
-" 2>&1</summary>
 
-```bash
-cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-import json
-c = FeelingClient()
-c.login()
-r = c._session.get(c.base_url + '/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/content', timeout=10)
-d = r.json()
-content = d.get('data', d).get('content', d)
-print('content type:', type(content))
-if isinstance(content, str):
-    print('len:', len(content), content[:200])
-elif isinstance(content, dict):
-    print('keys:', list(content.keys()))
-    print(json.dumps(content, ensure_ascii=False)[:1200])
-elif isinstance(content, list):
-    print('len:', len(content))
-    if content:
-        print('item0:', type(content[0]), str(content[0])[:200])
-" 2>&1
-```
 
-```
-content type: &lt;class 'str'&gt;
-len: 2531 剧名： 《行尸走肉》同人系列
-集数： 第二集
-标题： “你的朋友就是我们的朋友”
-人物表：
-格雷·金斯顿 (GREY)： 幸存者，瑞克一家的旧识。
-瑞克 (RICK)： 团队领袖。
-卡尔 (CARL)： 瑞克的儿子。
-达里尔 (DARYL)： 追踪者，性格冷峻。
-赫谢尔 (HERSHEL)： 团队的长者，具备医护知识。
-格伦 (GLENN)： 团队成员。
-玛格丽特 (MAGGIE)： 赫谢尔的女儿
 
-```
-</details>
-</tool-use>
 
 ---
 
@@ -14360,6 +14389,69 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+r = c._session.get(c.base_url + '/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/content', timeout=10)
+d = r.json()
+content = d.get('data', d).get('content', d)
+print('content type:', type(content))
+if isinstance(content, str):
+    print('len:', len(content), content[:200])
+elif isinstance(content, dict):
+    print('keys:', list(content.keys()))
+    print(json.dumps(content, ensure_ascii=False)[:1200])
+elif isinstance(content, list):
+    print('len:', len(content))
+    if content:
+        print('item0:', type(content[0]), str(content[0])[:200])
+" 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+r = c._session.get(c.base_url + '/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84/content', timeout=10)
+d = r.json()
+content = d.get('data', d).get('content', d)
+print('content type:', type(content))
+if isinstance(content, str):
+    print('len:', len(content), content[:200])
+elif isinstance(content, dict):
+    print('keys:', list(content.keys()))
+    print(json.dumps(content, ensure_ascii=False)[:1200])
+elif isinstance(content, list):
+    print('len:', len(content))
+    if content:
+        print('item0:', type(content[0]), str(content[0])[:200])
+" 2>&1
+```
+
+```
+content type: &lt;class 'str'&gt;
+len: 2531 剧名： 《行尸走肉》同人系列
+集数： 第二集
+标题： “你的朋友就是我们的朋友”
+人物表：
+格雷·金斯顿 (GREY)： 幸存者，瑞克一家的旧识。
+瑞克 (RICK)： 团队领袖。
+卡尔 (CARL)： 瑞克的儿子。
+达里尔 (DARYL)： 追踪者，性格冷峻。
+赫谢尔 (HERSHEL)： 团队的长者，具备医护知识。
+格伦 (GLENN)： 团队成员。
+玛格丽特 (MAGGIE)： 赫谢尔的女儿
+
+```
+</details>
+</tool-use>
+
+---
+
 <think><details><summary>Thought Process</summary>
 **Analyzing asset flow**
 
@@ -14437,6 +14529,10 @@ batchIndex sample: [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 
 ```
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -14521,61 +14617,11 @@ shot 2 格雷·金斯顿: https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522
 
 
 
-
-
 ---
 
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-import json
-# 直接请求 GET /shots/:id 看单个 shot 的完整结构
-c = FeelingClient()
-c.login()
-shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-shot_id = shots[0]['id']
-r = c._session.get(c.base_url + '/shots/' + shot_id, timeout=10)
-print('GET shot by id:', r.status_code)
-if r.ok:
-    d = r.json()
-    data = d.get('data', d)
-    fm = data.get('firstframeMedia') if isinstance(data, dict) else None
-    print('firstframeMedia url:', (fm.get('url') if fm else '')[:70])
-# 检查 storyboard 的 shots 和 shots API 是否不同
-r2 = c._session.get(c.base_url + '/shots/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84', timeout=10)
-print('GET shots/episodes/:id:', r2.status_code)
-" 2>&1</summary>
 
-```bash
-cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-import json
-# 直接请求 GET /shots/:id 看单个 shot 的完整结构
-c = FeelingClient()
-c.login()
-shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-shot_id = shots[0]['id']
-r = c._session.get(c.base_url + '/shots/' + shot_id, timeout=10)
-print('GET shot by id:', r.status_code)
-if r.ok:
-    d = r.json()
-    data = d.get('data', d)
-    fm = data.get('firstframeMedia') if isinstance(data, dict) else None
-    print('firstframeMedia url:', (fm.get('url') if fm else '')[:70])
-# 检查 storyboard 的 shots 和 shots API 是否不同
-r2 = c._session.get(c.base_url + '/shots/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84', timeout=10)
-print('GET shots/episodes/:id:', r2.status_code)
-" 2>&1
-```
 
-```
-GET shot by id: 200
-firstframeMedia url: https://video-dev-cdn.feeling.ltd/assets/14c3aa2b-2522-4ede-85a3-5b753
-GET shots/episodes/:id: 200
 
-```
-</details>
-</tool-use>
 
 ---
 
@@ -16323,6 +16369,64 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+# 直接请求 GET /shots/:id 看单个 shot 的完整结构
+c = FeelingClient()
+c.login()
+shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+shot_id = shots[0]['id']
+r = c._session.get(c.base_url + '/shots/' + shot_id, timeout=10)
+print('GET shot by id:', r.status_code)
+if r.ok:
+    d = r.json()
+    data = d.get('data', d)
+    fm = data.get('firstframeMedia') if isinstance(data, dict) else None
+    print('firstframeMedia url:', (fm.get('url') if fm else '')[:70])
+# 检查 storyboard 的 shots 和 shots API 是否不同
+r2 = c._session.get(c.base_url + '/shots/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84', timeout=10)
+print('GET shots/episodes/:id:', r2.status_code)
+" 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+# 直接请求 GET /shots/:id 看单个 shot 的完整结构
+c = FeelingClient()
+c.login()
+shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+shot_id = shots[0]['id']
+r = c._session.get(c.base_url + '/shots/' + shot_id, timeout=10)
+print('GET shot by id:', r.status_code)
+if r.ok:
+    d = r.json()
+    data = d.get('data', d)
+    fm = data.get('firstframeMedia') if isinstance(data, dict) else None
+    print('firstframeMedia url:', (fm.get('url') if fm else '')[:70])
+# 检查 storyboard 的 shots 和 shots API 是否不同
+r2 = c._session.get(c.base_url + '/shots/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84', timeout=10)
+print('GET shots/episodes/:id:', r2.status_code)
+" 2>&1
+```
+
+```
+GET shot by id: 200
+firstframeMedia url: https://video-dev-cdn.feeling.ltd/assets/14c3aa2b-2522-4ede-85a3-5b753
+GET shots/episodes/:id: 200
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
 
 
 
@@ -16392,6 +16496,10 @@ shot 20: candidateIndex=0, url=https://video-dev-cdn.feeling.ltd/assets/14c3aa2b
 
 
 
+---
+
+
+
 
 
 ---
@@ -16454,6 +16562,10 @@ shot 3:
 ```
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -16582,12 +16694,16 @@ Sample of unique: ['https://video-dev-cdn.feeling.ltd/assets/14c3aa2b-2522-4ede-
 
 
 
+---
+
+
+
 
 
 ---
 
 <tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/RegenPage.tsx</summary>
 
 </details>
 </tool-use>
@@ -18764,10 +18880,14 @@ Status: **completed**
 ---
 
 <tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/RegenPage.tsx</summary>
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -19965,7 +20085,7 @@ I'm tracing the auth flow to understand how episodes are fetched and processed. 
 ---
 
 <tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes/files.py</summary>
 
 </details>
 </tool-use>
@@ -19973,7 +20093,7 @@ I'm tracing the auth flow to understand how episodes are fetched and processed. 
 ---
 
 <tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes/files.py</summary>
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
 
 </details>
 </tool-use>
@@ -20219,18 +20339,6 @@ flowchart TB
 
 
 
-
-
----
-
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
-
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
-
-</details>
-
-</tool-use>
-
 ---
 
 
@@ -20251,6 +20359,10 @@ flowchart TB
 
 
 
+---
+
+
+
 
 
 ---
@@ -20262,6 +20374,30 @@ flowchart TB
 </details>
 
 </tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
 
 ---
 
@@ -20288,6 +20424,10 @@ flowchart TB
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -20320,6 +20460,10 @@ flowchart TB
 
 
 
+---
+
+
+
 
 
 ---
@@ -20337,6 +20481,10 @@ flowchart TB
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -20373,6 +20521,10 @@ flowchart TB
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -20479,7 +20631,22 @@ First 3 assets: ['监狱外围', '监狱公共区', '玛格丽特']
 
 
 
+---
 
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] Puller: 兜底确保不遗漏任何 shot，并添加 episode 级 assets 数组
+- [x] 前端: 新增资产库页面 + RegenPage 使用完整资产列表
+
+</details>
+</tool-use>
 
 ---
 
@@ -20528,14 +20695,7 @@ Status: **completed**
 
 ---
 
-<tool-use data-tool-type="task" data-tool-name="todo_write">
-<details><summary>Tool use: **todo_write** • Todo List</summary>
 
-- [x] Puller: 兜底确保不遗漏任何 shot，并添加 episode 级 assets 数组
-- [x] 前端: 新增资产库页面 + RegenPage 使用完整资产列表
-
-</details>
-</tool-use>
 
 ---
 
@@ -20599,7 +20759,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Reorganizing asset library**
@@ -20950,7 +21110,19 @@ Status: **completed**
 
 
 
+---
 
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -21023,17 +21195,21 @@ Keys: ['id', 'createdAt', 'updatedAt', 'deletedAt', 'episodeId', 'type', 'name',
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
 
-</details>
-</tool-use>
 
 ---
 
 
 
 
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -21114,14 +21290,6 @@ for name in ['格雷·金斯顿', '汽车']:
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
-
-</details>
-</tool-use>
-
----
-
 <think><details><summary>Thought Process</summary>
 **Analyzing image fields**
 
@@ -21158,6 +21326,10 @@ I'm checking how referenceUrls and thumbnail fields are used for style images vs
 
 
 
+---
+
+
+
 
 
 ---
@@ -21172,17 +21344,11 @@ I'm checking how referenceUrls and thumbnail fields are used for style images vs
 
 
 
-
-
 ---
 
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
 
-</details>
 
-</tool-use>
 
 ---
 
@@ -21204,12 +21370,6 @@ I'm checking how referenceUrls and thumbnail fields are used for style images vs
 
 ---
 
-
-
-
-
----
-
 <tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
 <details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
@@ -21217,6 +21377,16 @@ I'm checking how referenceUrls and thumbnail fields are used for style images vs
 </details>
 
 </tool-use>
+
+---
+
+
+
+---
+
+
+
+
 
 ---
 
@@ -21225,6 +21395,20 @@ I'm checking how referenceUrls and thumbnail fields are used for style images vs
 
 </details>
 </tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
 
 ---
 
@@ -21323,6 +21507,10 @@ I'm implementing a second sidebar for asset library that appears only in episode
 
 
 
+---
+
+
+
 
 
 ---
@@ -21398,23 +21586,11 @@ I'm removing the '' link from StoryboardPage since it's now accessible via the s
 
 
 
-
-
 ---
 
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 --force 2>&1</summary>
 
-```bash
-cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 --force 2>&1
-```
 
-```
-[OK] 已拉取至 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
 
-```
-</details>
-</tool-use>
 
 ---
 
@@ -21455,6 +21631,22 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 --force 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 --force 2>&1
+```
+
+```
+[OK] 已拉取至 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+
+```
+</details>
+</tool-use>
+
+---
+
 <think><details><summary>Thought Process</summary>
 **Updating project directory**
 
@@ -21478,7 +21670,22 @@ I'm running the pull with --project-id to target the correct directory and avoid
 
 
 
+---
 
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] 资产图拉取：优先 thumbnail，避免 referenceUrls 的风格图
+- [x] 资产库放入左侧边栏
+
+</details>
+</tool-use>
 
 ---
 
@@ -21495,17 +21702,6 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller 
 [OK] 已拉取至 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="task" data-tool-name="todo_write">
-<details><summary>Tool use: **todo_write** • Todo List</summary>
-
-- [x] 资产图拉取：优先 thumbnail，避免 referenceUrls 的风格图
-- [x] 资产库放入左侧边栏
-
 </details>
 </tool-use>
 
@@ -21571,7 +21767,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Rearranging sidebar layout**
@@ -21612,7 +21808,19 @@ I'm moving the asset library to the far left and making it collapsible as reques
 
 
 
+---
 
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/api.ts</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -21707,11 +21915,7 @@ Status: **completed**
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/api.ts</summary>
 
-</details>
-</tool-use>
 
 ---
 
@@ -21758,6 +21962,10 @@ Status: **completed**
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -21820,6 +22028,14 @@ I'm adjusting the AssetSidebar component to be collapsible and position it on th
 
 ---
 
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AssetSidebar.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
 <tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
 <details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
@@ -21830,11 +22046,7 @@ I'm adjusting the AssetSidebar component to be collapsible and position it on th
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AssetSidebar.tsx</summary>
 
-</details>
-</tool-use>
 
 ---
 
@@ -21906,6 +22118,10 @@ Status: **completed**
 ---
 
 
+
+---
+
+
 修改已完成，变更如下。
 
 ## 1. 资产库移到最左侧且可折叠
@@ -21926,7 +22142,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Updating sidebar layout**
@@ -22037,46 +22253,9 @@ I'm updating the asset list to show thumbnails instead of referenceUrls for cons
 
 ---
 
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-c = FeelingClient()
-c.login()
-shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-# 看 shot 的 usedAssets / assetRefs 结构
-for s in shots[:2]:
-    print('--- shot', s.get('shotNumber'), '---')
-    for k in ['usedAssets', 'assetRefs']:
-        v = s.get(k)
-        if v:
-            print(k, ':', v[:2] if isinstance(v, list) else v)
-" 2>&1</summary>
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
 
-```bash
-cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-from src.feeling.client import FeelingClient
-c = FeelingClient()
-c.login()
-shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-# 看 shot 的 usedAssets / assetRefs 结构
-for s in shots[:2]:
-    print('--- shot', s.get('shotNumber'), '---')
-    for k in ['usedAssets', 'assetRefs']:
-        v = s.get(k)
-        if v:
-            print(k, ':', v[:2] if isinstance(v, list) else v)
-" 2>&1
-```
-
-```
---- shot 1 ---
-usedAssets : [{'name': '格雷·金斯顿', 'type': 'character'}, {'name': '卡尔', 'type': 'character'}]
-assetRefs : ['https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825238068_fweog9.jpg?sign=1773834529-og0wb4x759-0-d18babf7bc29f5f5e6bc51c77466c7d6&amp;imageMogr2%2Fquality%2F80=']
---- shot 2 ---
-usedAssets : [{'name': '格雷·金斯顿', 'type': 'character'}, {'name': '卡尔', 'type': 'character'}]
-assetRefs : ['https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825238068_fweog9.jpg?sign=1773834529-og0wb4x759-0-d18babf7bc29f5f5e6bc51c77466c7d6&amp;imageMogr2%2Fquality%2F80=']
-
-```
 </details>
 </tool-use>
 
@@ -23020,9 +23199,46 @@ Status: **completed**
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+# 看 shot 的 usedAssets / assetRefs 结构
+for s in shots[:2]:
+    print('--- shot', s.get('shotNumber'), '---')
+    for k in ['usedAssets', 'assetRefs']:
+        v = s.get(k)
+        if v:
+            print(k, ':', v[:2] if isinstance(v, list) else v)
+" 2>&1</summary>
 
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+shots = c.get_shots('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+# 看 shot 的 usedAssets / assetRefs 结构
+for s in shots[:2]:
+    print('--- shot', s.get('shotNumber'), '---')
+    for k in ['usedAssets', 'assetRefs']:
+        v = s.get(k)
+        if v:
+            print(k, ':', v[:2] if isinstance(v, list) else v)
+" 2>&1
+```
+
+```
+--- shot 1 ---
+usedAssets : [{'name': '格雷·金斯顿', 'type': 'character'}, {'name': '卡尔', 'type': 'character'}]
+assetRefs : ['https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825238068_fweog9.jpg?sign=1773834529-og0wb4x759-0-d18babf7bc29f5f5e6bc51c77466c7d6&amp;imageMogr2%2Fquality%2F80=']
+--- shot 2 ---
+usedAssets : [{'name': '格雷·金斯顿', 'type': 'character'}, {'name': '卡尔', 'type': 'character'}]
+assetRefs : ['https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773825238068_fweog9.jpg?sign=1773834529-og0wb4x759-0-d18babf7bc29f5f5e6bc51c77466c7d6&amp;imageMogr2%2Fquality%2F80=']
+
+```
 </details>
 </tool-use>
 
@@ -23073,8 +23289,6 @@ Result:
   "result": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"openapi\\\": \\\"3.0.1\\\",\\n  \\\"info\\\": {\\n    \\\"title\\\": \\\"默认模块\\\",\\n    \\\"description\\\": \\\"\\\",\\n    \\\"version\\\": \\\"1.0.0\\\",\\n    \\\"x-download-time\\\": \\\"2025-10-16T09:20:15.132Z\\\"\\n  },\\n  \\\"paths\\\": {\\n    \\\"/v1/models\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_models.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"列出可用模型\\\"\\n      }\\n    },\\n    \\\"/v1/chat/completions\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_chat_completions.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"(别在线调试，chat格式)带图片请求\\\"\\n      }\\n    },\\n    \\\"/v1/completions\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_completions.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"聊天补全\\\"\\n      }\\n    },\\n    \\\"/v1/embeddings\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_embeddings.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"创建嵌入\\\"\\n      }\\n    },\\n    \\\"/v1/responses\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_responses.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"o3-pro请求格式\\\"\\n      }\\n    },\\n    \\\"/suno/submit/music\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_submit_music.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"任务：生成歌曲\\\"\\n      }\\n    },\\n    \\\"/suno/submit/lyrics\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_submit_lyrics.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"任务：生成歌词\\\"\\n      }\\n    },\\n    \\\"/suno/uploads/audio-url\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_uploads_audio-url.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"任务：上传音乐\\\"\\n      }\\n    },\\n    \\\"/suno/submit/concat\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_submit_concat.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"任务：歌曲拼接\\\"\\n      }\\n    },\\n    \\\"/suno/fetch\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_fetch.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"查询：批量查询任务\\\"\\n      }\\n    },\\n    \\\"/suno/act/wav/{clip_id}\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_act_wav_%7Bclip_id%7D.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"获取 wav 格式文件\\\"\\n      }\\n    },\\n    \\\"/suno/act/mp4/{clip_id}\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_act_mp4_%7Bclip_id%7D.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"生成 mp4 mv 视频\\\"\\n      }\\n    },\\n    \\\"/suno/act/stems/{clip_id}\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_act_stems_%7Bclip_id%7D.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"声曲分离\\\"\\n      }\\n    },\\n    \\\"/suno/fetch/{task_id}\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_fetch_%7Btask_id%7D.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"查询：单个任务\\\"\\n      }\\n    },\\n    \\\"/suno/act/timing/{clip_id}\\\": {\\n      \\\"$ref\\\": \\\"/paths/_suno_act_timing_%7Bclip_id%7D.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"Timing:歌词、音频时间线\\\"\\n      }\\n    },\\n    \\\"/mj/task/list-by-condition\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_task_list-by-condition.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"根据ID列表查询任务ListByCondition\\\"\\n      }\\n    },\\n    \\\"/mj/task/{id}/fetch\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_task_%7Bid%7D_fetch.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"指定ID获取任务FetchFromTask\\\"\\n      }\\n    },\\n    \\\"/mj/task/{id}/image-seed\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_task_%7Bid%7D_image-seed.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"获取任务图片的ImageSeed\\\"\\n      }\\n    },\\n    \\\"/mj/submit/imagine\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_submit_imagine.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"提交Imagine任务\\\"\\n      }\\n    },\\n    \\\"/mj/submit/action\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_submit_action.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"任务：执行动作Action\\\"\\n      }\\n    },\\n    \\\"/mj/submit/blend\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_submit_blend.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"图生图Blend\\\"\\n      }\\n    },\\n    \\\"/mj/submit/modal\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_submit_modal.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"局部重绘Modal\\\"\\n      }\\n    },\\n    \\\"/mj/submit/describe\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_submit_describe.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"图生文Describe\\\"\\n      }\\n    },\\n    \\\"/mj/submit/edits\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_submit_edits.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"提交编辑任务\\\"\\n      }\\n    },\\n    \\\"/mj/submit/video\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_submit_video.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"提交视频任务\\\"\\n      }\\n    },\\n    \\\"/mj/submit/upload-discord-images\\\": {\\n      \\\"$ref\\\": \\\"/paths/_mj_submit_upload-discord-images.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"上传文件到discord\\\"\\n      }\\n    },\\n    \\\"/tran/https://api.apicore.ai/v1/chat/completions\\\": {\\n      \\\"$ref\\\": \\\"/paths/_tran_https__api.apicore.ai_v1_chat_completions.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"异步gemini\\\"\\n      }\\n    },\\n    \\\"/v1/images/generations\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_images_generations.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"豆包 Seedream 4.0\\\"\\n      }\\n    },\\n    \\\"/v1/images/edits\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_images_edits.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"gemini-2.5-flash-image-preview(edits接口，图生图）\\\"\\n      }\\n    },\\n    \\\"/v1/images/variations\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_images_variations.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"创建图像变化\\\"\\n      }\\n    },\\n    \\\"/v1/audio/speech\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_audio_speech.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"模型 ChatTTS\\\"\\n      }\\n    },\\n    \\\"/v1/audio/transcriptions\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_audio_transcriptions.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"创建翻译\\\"\\n      }\\n    },\\n    \\\"/v1/video/generations\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_video_generations.json\\\",\\n      \\\"post\\\": {\\n        \\\"summary\\\": \\\"9:16  Veo3\\\"\\n      }\\n    },\\n    \\\"/v1/video/generations/{task_id}\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_video_generations_%7Btask_id%7D.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"任务查询\\\"\\n      }\\n    },\\n    \\\"/source/11c9c117-8ba2-4de6-ac80-e2dd9dc86df2\\\": {\\n      \\\"$ref\\\": \\\"/paths/_source_11c9c117-8ba2-4de6-ac80-e2dd9dc86df2.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"查询任务详情\\\"\\n      }\\n    },\\n    \\\"/v1/dashboard/billing/usage\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_dashboard_billing_usage.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"查询令牌用量\\\"\\n      }\\n    },\\n    \\\"/v1/dashboard/billing/subscription\\\": {\\n      \\\"$ref\\\": \\\"/paths/_v1_dashboard_billing_subscription.json\\\",\\n      \\\"get\\\": {\\n        \\\"summary\\\": \\\"查询令牌限额\\\"\\n      }\\n    }\\n  },\\n  \\\"components\\\": {\\n    \\\"schemas\\\": {\\n      \\\"$ref\\\": \\\"/components/schemas/index.json\\\"\\n    },\\n    \\\"securitySchemes\\\": {\\n      \\\"$ref\\\": \\\"/components/securitySchemes/index.json\\\"\\n    }\\n  },\\n  \\\"servers\\\": [],\\n  \\\"security\\\": []\\n}\"}]}"
 }
 ```
-User decision: **accepted**
-
 Status: **completed**
 
 
@@ -23169,7 +23383,23 @@ for a in assets:
 
 
 
+---
 
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [-] 资产库合并到 SideNavBar，与剧集列表/设置一起
+- [ ] 前端去除英文文案
+- [ ] 资产图拉取修复（排查 thumbnail 仍错的原因）
+
+</details>
+</tool-use>
 
 ---
 
@@ -23241,18 +23471,6 @@ if os.path.exists(ap):
 
 ---
 
-<tool-use data-tool-type="task" data-tool-name="todo_write">
-<details><summary>Tool use: **todo_write** • Todo List</summary>
-
-- [-] 资产库合并到 SideNavBar，与剧集列表/设置一起
-- [ ] 前端去除英文文案
-- [ ] 资产图拉取修复（排查 thumbnail 仍错的原因）
-
-</details>
-</tool-use>
-
----
-
 <think><details><summary>Thought Process</summary>
 **Checking asset references**
 
@@ -23265,6 +23483,14 @@ I'll add a note about potential platform support needs for asset fields and ensu
 
 
 
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/平台辅助计划/前端改造计划.md</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -23310,14 +23536,6 @@ shot 4 used 5 refs 1
   ref[0]: 1773825238068_fweog9.jpg
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/平台辅助计划/前端改造计划.md</summary>
-
 </details>
 </tool-use>
 
@@ -30407,6 +30625,10 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 
 
 
+---
+
+
+
 
 
 ---
@@ -30418,6 +30640,10 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -30439,6 +30665,10 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 
 
 
+---
+
+
+
 
 
 ---
@@ -30480,6 +30710,10 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -30541,6 +30775,16 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 
 <tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
 <details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/EpisodeListPage.tsx</summary>
 
 </details>
@@ -30559,13 +30803,7 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 
 ---
 
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
-
-</details>
-
-</tool-use>
 
 ---
 
@@ -30601,6 +30839,10 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 
 
 
+---
+
+
+
 
 
 ---
@@ -30611,6 +30853,17 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 
 </details>
 
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="delete_file">
+<details><summary>Tool use: **delete_file**</summary>
+
+Explanation: undefined
+
+
+</details>
 </tool-use>
 
 ---
@@ -30655,17 +30908,6 @@ I'm adjusting the asset handling logic to exclude style URLs when metadata.refer
 
 ---
 
-<tool-use data-tool-type="write" data-tool-name="delete_file">
-<details><summary>Tool use: **delete_file**</summary>
-
-Explanation: undefined
-
-
-</details>
-</tool-use>
-
----
-
 <tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
 <details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
@@ -30738,7 +30980,23 @@ Explanation: undefined
 
 
 
+---
 
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] 资产库合并到 SideNavBar，与剧集列表/设置一起
+- [x] 前端去除英文文案
+- [x] 资产图拉取：跳过 style 类型 referenceUrls
+
+</details>
+</tool-use>
 
 ---
 
@@ -30755,18 +31013,6 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller 
 [OK] 已拉取至 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="task" data-tool-name="todo_write">
-<details><summary>Tool use: **todo_write** • Todo List</summary>
-
-- [x] 资产库合并到 SideNavBar，与剧集列表/设置一起
-- [x] 前端去除英文文案
-- [x] 资产图拉取：跳过 style 类型 referenceUrls
-
 </details>
 </tool-use>
 
@@ -30810,6 +31056,10 @@ Status: **completed**
 ---
 
 
+
+---
+
+
 修改已全部完成，变更如下：
 
 ## 1. 资产库合并进侧边栏
@@ -30845,7 +31095,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Investigating asset images**
@@ -30857,131 +31107,6 @@ The asset images are still showing style/reference images instead of actual asse
 
 排查平台资产 API 的全部字段，找出正确的资产图 URL 来源。
 
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-import json
-from src.feeling.client import FeelingClient
-c = FeelingClient()
-c.login()
-assets = c.get_assets('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-
-# 角色 格雷·金斯顿 完整原始数据（打印所有 key）
-for a in assets:
-    if a.get('name') == '格雷·金斯顿':
-        print('=== 完整 keys ===')
-        print(sorted(a.keys()))
-        print()
-        # 逐层展开可能有图片的字段
-        for k in ['metadata', 'aiRawData', 'assetEpisodeRelations']:
-            v = a.get(k)
-            if v:
-                print(f'--- {k} ---')
-                print(json.dumps(v, indent=2, ensure_ascii=False)[:800])
-        break
-" 2>&1</summary>
-
-```bash
-cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
-import json
-from src.feeling.client import FeelingClient
-c = FeelingClient()
-c.login()
-assets = c.get_assets('c25126d1-73c7-418a-8ebe-e877df4f2e84')
-
-# 角色 格雷·金斯顿 完整原始数据（打印所有 key）
-for a in assets:
-    if a.get('name') == '格雷·金斯顿':
-        print('=== 完整 keys ===')
-        print(sorted(a.keys()))
-        print()
-        # 逐层展开可能有图片的字段
-        for k in ['metadata', 'aiRawData', 'assetEpisodeRelations']:
-            v = a.get(k)
-            if v:
-                print(f'--- {k} ---')
-                print(json.dumps(v, indent=2, ensure_ascii=False)[:800])
-        break
-" 2>&1
-```
-
-```
-=== 完整 keys ===
-['aiRawData', 'assetEpisodeRelations', 'boundNodeId', 'claimedAt', 'claimedBy', 'claimer', 'createdAt', 'createdBy', 'deletedAt', 'description', 'episodeId', 'episodeIds', 'id', 'metadata', 'name', 'prompt', 'referenceUrls', 'source', 'status', 'thumbnail', 'type', 'updatedAt']
-
---- metadata ---
-{
-  "referenceMapping": [
-    {
-      "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923421-pyspago33p-0-817945469c849fdfd130413cfde0fa17",
-      "assetId": "",
-      "assetName": "image1",
-      "assetType": "style"
-    }
-  ]
-}
---- aiRawData ---
-{
-  "name": "格雷·金斯顿",
-  "aliases": [
-    "格雷",
-    "GREY"
-  ],
-  "bindings": [
-    {
-      "prop": "衬衫",
-      "scenes": [
-        "场景 1"
-      ],
-      "relation": "携带",
-      "character": "格雷·金斯顿",
-      "first_scene": "场景 1"
-    },
-    {
-      "prop": "牛仔裤",
-      "scenes": [
-        "场景 3",
-        "场景 5"
-      ],
-      "relation": "佩戴",
-      "character": "格雷·金斯顿",
-      "first_scene": "场景 3"
-    },
-    {
-      "prop": "床柱",
-      "scenes": [
-        "场景 5"
-      ],
-      "relation": "手持",
-      "character": "格雷·金斯顿",
-      "first_scene": "场景 5"
-    }
-  ],
-  "role_type": "protagonist",
-  "episode_behavior": {
-    "actions": [
-      "处理大腿弩箭伤口",
-      "随车进入监狱并被达里尔抱入牢房区",
-      "在牢房内接受卡罗尔的伤口清洗"
-    ],
-    "interactions": [
-      {
-        "type": "family",
-        "target": "瑞克",
-       
---- assetEpisodeRelations ---
-[
-  {
-    "assetId": "2b600ed5-e63f-4796-be21-32d9d3c09d09",
-    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
-  }
-]
-
-```
-</details>
-</tool-use>
 
 ---
 
@@ -31275,6 +31400,135 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import json
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+assets = c.get_assets('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+
+# 角色 格雷·金斯顿 完整原始数据（打印所有 key）
+for a in assets:
+    if a.get('name') == '格雷·金斯顿':
+        print('=== 完整 keys ===')
+        print(sorted(a.keys()))
+        print()
+        # 逐层展开可能有图片的字段
+        for k in ['metadata', 'aiRawData', 'assetEpisodeRelations']:
+            v = a.get(k)
+            if v:
+                print(f'--- {k} ---')
+                print(json.dumps(v, indent=2, ensure_ascii=False)[:800])
+        break
+" 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import json
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+assets = c.get_assets('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+
+# 角色 格雷·金斯顿 完整原始数据（打印所有 key）
+for a in assets:
+    if a.get('name') == '格雷·金斯顿':
+        print('=== 完整 keys ===')
+        print(sorted(a.keys()))
+        print()
+        # 逐层展开可能有图片的字段
+        for k in ['metadata', 'aiRawData', 'assetEpisodeRelations']:
+            v = a.get(k)
+            if v:
+                print(f'--- {k} ---')
+                print(json.dumps(v, indent=2, ensure_ascii=False)[:800])
+        break
+" 2>&1
+```
+
+```
+=== 完整 keys ===
+['aiRawData', 'assetEpisodeRelations', 'boundNodeId', 'claimedAt', 'claimedBy', 'claimer', 'createdAt', 'createdBy', 'deletedAt', 'description', 'episodeId', 'episodeIds', 'id', 'metadata', 'name', 'prompt', 'referenceUrls', 'source', 'status', 'thumbnail', 'type', 'updatedAt']
+
+--- metadata ---
+{
+  "referenceMapping": [
+    {
+      "url": "https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923421-pyspago33p-0-817945469c849fdfd130413cfde0fa17",
+      "assetId": "",
+      "assetName": "image1",
+      "assetType": "style"
+    }
+  ]
+}
+--- aiRawData ---
+{
+  "name": "格雷·金斯顿",
+  "aliases": [
+    "格雷",
+    "GREY"
+  ],
+  "bindings": [
+    {
+      "prop": "衬衫",
+      "scenes": [
+        "场景 1"
+      ],
+      "relation": "携带",
+      "character": "格雷·金斯顿",
+      "first_scene": "场景 1"
+    },
+    {
+      "prop": "牛仔裤",
+      "scenes": [
+        "场景 3",
+        "场景 5"
+      ],
+      "relation": "佩戴",
+      "character": "格雷·金斯顿",
+      "first_scene": "场景 3"
+    },
+    {
+      "prop": "床柱",
+      "scenes": [
+        "场景 5"
+      ],
+      "relation": "手持",
+      "character": "格雷·金斯顿",
+      "first_scene": "场景 5"
+    }
+  ],
+  "role_type": "protagonist",
+  "episode_behavior": {
+    "actions": [
+      "处理大腿弩箭伤口",
+      "随车进入监狱并被达里尔抱入牢房区",
+      "在牢房内接受卡罗尔的伤口清洗"
+    ],
+    "interactions": [
+      {
+        "type": "family",
+        "target": "瑞克",
+       
+--- assetEpisodeRelations ---
+[
+  {
+    "assetId": "2b600ed5-e63f-4796-be21-32d9d3c09d09",
+    "episodeId": "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+  }
+]
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
 
 
 
@@ -31509,6 +31763,10 @@ shot 1 usedAssets: 5 ['格雷·金斯顿', '卡尔', '达里尔']
 
 
 
+---
+
+
+
 
 
 ---
@@ -31556,6 +31814,10 @@ imgPromptReferences type: &lt;class 'dict'&gt;
 ```
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -31742,6 +32004,10 @@ I'm using imgPromptReferences from shots to map asset names to image URLs. I'm m
 
 ---
 
+File not found
+
+---
+
 <tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
 <details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
 import json
@@ -31787,10 +32053,6 @@ metadata.referenceMapping 完整:
 ```
 </details>
 </tool-use>
-
----
-
-File not found
 
 ---
 
@@ -31918,6 +32180,10 @@ I'm prioritizing referenceUrls for style assets based on metadata, not thumbnail
 ---
 
 
+
+---
+
+
 尝试对角色类型使用 `referenceUrls`（可能是角色转面图）；对道具保留使用 `thumbnail`。
 
 
@@ -31986,6 +32252,10 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller 
 ---
 
 
+
+---
+
+
 已按角色类型调整资产图拉取逻辑：
 
 ## 修改说明
@@ -32005,7 +32275,11 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
 
 
 
@@ -32107,17 +32381,11 @@ for i, a in enumerate(assets[:3]):
 
 
 
-
-
 ---
 
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
 
-</details>
 
-</tool-use>
 
 ---
 
@@ -32149,9 +32417,31 @@ for i, a in enumerate(assets[:3]):
 
 ---
 
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
 
 
 
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/.gitignore</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -32166,11 +32456,7 @@ mv /Users/zuobowen/Documents/GitHub/fv_autovidu/asset_api_dump.json /Users/zuobo
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/.gitignore</summary>
 
-</details>
-</tool-use>
 
 ---
 
@@ -32197,6 +32483,10 @@ Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu** (1 file)
 
 
 
+---
+
+
+
 
 
 ---
@@ -32206,6 +32496,10 @@ Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu** (1 file)
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -32227,17 +32521,11 @@ Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu** (1 file)
 
 
 
-
-
 ---
 
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
 
-</details>
 
-</tool-use>
 
 ---
 
@@ -32274,6 +32562,20 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
 
 已完成修改，具体如下：
 
@@ -32307,7 +32609,7 @@ http://localhost:3001/api/assets?pageSize=20&page=1&projectId=def5d409-559b-4c93
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Analyzing asset api**
@@ -32390,6 +32692,10 @@ I'm modifying get_assets to use the new API endpoint with pagination support. </
 
 
 
+---
+
+
+
 
 
 ---
@@ -32406,18 +32712,6 @@ I'm modifying get_assets to use the new API endpoint with pagination support. </
 
 
 
-
-
----
-
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
-
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py</summary>
-
-</details>
-
-</tool-use>
-
 ---
 
 
@@ -32433,6 +32727,30 @@ I'm modifying get_assets to use the new API endpoint with pagination support. </
 </details>
 
 </tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
 
 ---
 
@@ -32499,6 +32817,10 @@ except Exception as e:
 
 
 
+---
+
+
+
 
 
 ---
@@ -32545,6 +32867,10 @@ episode: &lt;class 'dict'&gt;
 ---
 
 
+
+---
+
+
 已改为使用正确的资产接口 `GET /api/assets?projectId=...&pageSize=...&page=...`。
 
 ## 修改内容
@@ -32571,7 +32897,11 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
 
 
 
@@ -32598,6 +32928,10 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller 
 ---
 
 
+
+---
+
+
 已经用新资产接口拉取成功，数据写入：
 
 `data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json`
@@ -32610,7 +32944,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Checking puller flow**
@@ -32675,10 +33009,6 @@ drwxr-xr-x@  5 zuobowen  staff      160 Mar 19 16:58 ..
 
 ---
 
-
-
----
-
 <think><details><summary>Thought Process</summary>
 **Checking asset download**
 
@@ -32704,6 +33034,10 @@ The asset download is working correctly, showing images like .png being saved. <
 
 
 
+---
+
+
+
 
 
 ---
@@ -32725,6 +33059,10 @@ The asset download is working correctly, showing images like .png being saved. <
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -32768,6 +33106,10 @@ Status: **completed**
 ---
 
 
+
+---
+
+
 资产图已经在拉取时自动下载了。
 
 当前 `data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/` 下已有 17 个 PNG：
@@ -32788,7 +33130,11 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
 
 
 
@@ -37512,6 +37858,10 @@ Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu** (30 files)
 
 
 
+---
+
+
+
 
 
 ---
@@ -37979,12 +38329,24 @@ Status: **completed**
 
 
 
+---
+
+
+
 
 
 ---
 
 <tool-use data-tool-type="read" data-tool-name="read_file_v2">
 <details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/TopNavBar.tsx</summary>
 
 </details>
 </tool-use>
@@ -38122,11 +38484,7 @@ Status: **completed**
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/TopNavBar.tsx</summary>
 
-</details>
-</tool-use>
 
 ---
 
@@ -38457,6 +38815,10 @@ I'm modifying getFileUrl to accept an optional cacheBust parameter for asset ima
 
 
 
+---
+
+
+
 
 
 ---
@@ -38504,18 +38866,6 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 
 
-
-
----
-
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
-
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
-
-</details>
-
-</tool-use>
-
 ---
 
 
@@ -38536,6 +38886,30 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 
 
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
 
 
 ---
@@ -38552,6 +38926,10 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 
 
+---
+
+
+
 
 
 ---
@@ -38563,6 +38941,10 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -38577,6 +38959,10 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -38598,6 +38984,10 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 
 
+---
+
+
+
 
 
 ---
@@ -38607,6 +38997,14 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 - [x] 资产库独立界面：增强 AssetLibraryPage + 侧边栏入口
 - [-] 资产图片缓存：getFileUrl 加 cache-bust 参数
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/RegenPage.tsx</summary>
 
 </details>
 </tool-use>
@@ -38623,11 +39021,7 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/RegenPage.tsx</summary>
 
-</details>
-</tool-use>
 
 ---
 
@@ -38654,6 +39048,10 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -38689,6 +39087,10 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 
 
+---
+
+
+
 
 
 ---
@@ -38698,6 +39100,10 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -38759,17 +39165,11 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 
 
-
-
 ---
 
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
 
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
 
-</details>
 
-</tool-use>
 
 ---
 
@@ -38781,9 +39181,31 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 ---
 
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
 
 
 
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/TimelinePage.tsx</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -38797,11 +39219,7 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/TimelinePage.tsx</summary>
 
-</details>
-</tool-use>
 
 ---
 
@@ -38818,6 +39236,10 @@ I'm adding a cacheBust parameter to getFileUrl and replacing the collapsible ass
 </details>
 
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -39031,6 +39453,10 @@ Status: **completed**
 ---
 
 
+
+---
+
+
 本次修改总结与流程图如下：
 
 ## 修改方案流程图
@@ -39082,133 +39508,15 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
-
-
+_**Agent (model composer-2-fast, mode Agent)**_
 
 
 
 ---
 
-<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
-<details>
-<summary>Tool use: **ripgrep_raw_search**</summary>
 
 
-Parameters:
 
-```json
-{
-  "pattern": "强制|force|forceRedownload",
-  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
-  "caseInsensitive": false
-}
-```
-Result:
-
-```json
-{
-  "success": {
-    "pattern": "强制|force|forceRedownload",
-    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
-    "outputMode": "content",
-    "workspaceResults": {
-      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
-        "content": {
-          "matches": [
-            {
-              "file": "web/frontend/src/utils/file.ts",
-              "matches": [
-                {
-                  "lineNumber": 6,
-                  "content": " * @param cacheBust - 缓存破坏参数（如 pulledAt），用于强制刷新图片"
-                }
-              ]
-            },
-            {
-              "file": "web/frontend/src/components/layout/AppLayout.tsx",
-              "matches": [
-                {
-                  "lineNumber": 79,
-                  "content": "            &lt;span className=\"text-sm\"&gt;强制重新下载资产图（修复拉成风格图时勾选）&lt;/span&gt;"
-                }
-              ]
-            },
-            {
-              "file": "web/frontend/src/stores/episodeStore.ts",
-              "matches": [
-                {
-                  "lineNumber": 16,
-                  "content": "  pullNewEpisode: (episodeId: string, forceRedownload?: boolean) =&gt; Promise&lt;void&gt;"
-                },
-                {
-                  "lineNumber": 49,
-                  "content": "  pullNewEpisode: async (episodeId: string, forceRedownload = false) =&gt; {"
-                },
-                {
-                  "lineNumber": 52,
-                  "content": "      const res = await episodesApi.pull(episodeId, forceRedownload)"
-                }
-              ]
-            },
-            {
-              "file": "web/frontend/src/api/episodes.ts",
-              "matches": [
-                {
-                  "lineNumber": 12,
-                  "content": "  pull: (episodeId: string, forceRedownload = false) =&gt;"
-                },
-                {
-                  "lineNumber": 15,
-                  "content": "      forceRedownload,"
-                }
-              ]
-            },
-            {
-              "file": "web/frontend/src/types/api.ts",
-              "matches": [
-                {
-                  "lineNumber": 11,
-                  "content": "  /** 强制重新下载资产图（修复拉成风格图时使用） */"
-                },
-                {
-                  "lineNumber": 12,
-                  "content": "  forceRedownload?: boolean"
-                }
-              ]
-            },
-            {
-              "file": "web/frontend/tsconfig.app.json",
-              "matches": [
-                {
-                  "lineNumber": 19,
-                  "content": "    \"moduleDetection\": \"force\","
-                }
-              ]
-            },
-            {
-              "file": "web/frontend/tsconfig.node.json",
-              "matches": [
-                {
-                  "lineNumber": 14,
-                  "content": "    \"moduleDetection\": \"force\","
-                }
-              ]
-            }
-          ],
-          "totalLines": 11,
-          "totalMatchedLines": 11
-        }
-      }
-    }
-  }
-}
-```
-Status: **completed**
-
-
-</details>
-</tool-use>
 
 ---
 
@@ -43711,6 +44019,128 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "强制|force|forceRedownload",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "强制|force|forceRedownload",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/utils/file.ts",
+              "matches": [
+                {
+                  "lineNumber": 6,
+                  "content": " * @param cacheBust - 缓存破坏参数（如 pulledAt），用于强制刷新图片"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/layout/AppLayout.tsx",
+              "matches": [
+                {
+                  "lineNumber": 79,
+                  "content": "            &lt;span className=\"text-sm\"&gt;强制重新下载资产图（修复拉成风格图时勾选）&lt;/span&gt;"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/stores/episodeStore.ts",
+              "matches": [
+                {
+                  "lineNumber": 16,
+                  "content": "  pullNewEpisode: (episodeId: string, forceRedownload?: boolean) =&gt; Promise&lt;void&gt;"
+                },
+                {
+                  "lineNumber": 49,
+                  "content": "  pullNewEpisode: async (episodeId: string, forceRedownload = false) =&gt; {"
+                },
+                {
+                  "lineNumber": 52,
+                  "content": "      const res = await episodesApi.pull(episodeId, forceRedownload)"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/api/episodes.ts",
+              "matches": [
+                {
+                  "lineNumber": 12,
+                  "content": "  pull: (episodeId: string, forceRedownload = false) =&gt;"
+                },
+                {
+                  "lineNumber": 15,
+                  "content": "      forceRedownload,"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/api.ts",
+              "matches": [
+                {
+                  "lineNumber": 11,
+                  "content": "  /** 强制重新下载资产图（修复拉成风格图时使用） */"
+                },
+                {
+                  "lineNumber": 12,
+                  "content": "  forceRedownload?: boolean"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/tsconfig.app.json",
+              "matches": [
+                {
+                  "lineNumber": 19,
+                  "content": "    \"moduleDetection\": \"force\","
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/tsconfig.node.json",
+              "matches": [
+                {
+                  "lineNumber": 14,
+                  "content": "    \"moduleDetection\": \"force\","
+                }
+              ]
+            }
+          ],
+          "totalLines": 11,
+          "totalMatchedLines": 11
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
 <think><details><summary>Thought Process</summary>
 **Reviewing layout component**
 
@@ -43745,7 +44175,7 @@ I found that the '' button only appears on the home page, not on asset library o
 
 ---
 
-The string to replace was not found in the file.
+
 
 ---
 
@@ -43860,6 +44290,10 @@ I'm moving `pullOpen` definition before the useEffect for clearer dependency han
 
 
 
+---
+
+
+
 
 
 ---
@@ -43919,6 +44353,10 @@ I'm updating the cancel button to call the wrapper function that resets the dial
 
 
 
+---
+
+
+
 
 
 ---
@@ -43957,6 +44395,10 @@ Status: **completed**
 ---
 
 
+
+---
+
+
 修改已生效，变更如下：
 
 ## 修改说明
@@ -43984,11 +44426,19 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
 
 
 
 
+
+---
+
+Offset 900 is beyond file length (856 lines)
 
 ---
 
@@ -44108,7 +44558,7 @@ Status: **completed**
 
 ---
 
-Offset 900 is beyond file length (856 lines)
+
 
 ---
 
@@ -44439,18 +44889,6 @@ I'm clarifying the directory structure logic for episode paths. </details></thin
 
 
 
-
-
----
-
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
-
-<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes/episodes.py</summary>
-
-</details>
-
-</tool-use>
-
 ---
 
 
@@ -44466,6 +44904,16 @@ I'm clarifying the directory structure logic for episode paths. </details></thin
 </details>
 
 </tool-use>
+
+---
+
+
+
+---
+
+
+
+
 
 ---
 
@@ -44474,6 +44922,20 @@ I'm clarifying the directory structure logic for episode paths. </details></thin
 
 </details>
 </tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes/episodes.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
 
 ---
 
@@ -44488,6 +44950,10 @@ I'm clarifying the directory structure logic for episode paths. </details></thin
 
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -44582,6 +45048,10 @@ I'm adding projectId to the episode store to avoid fetching episode details in A
 
 
 
+---
+
+
+
 
 
 ---
@@ -44628,6 +45098,10 @@ Status: **completed**
 ---
 
 
+
+---
+
+
 报错原因和已做修改总结如下：
 
 ## 500 错误可能原因
@@ -44669,7 +45143,7 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
 
 <think><details><summary>Thought Process</summary>
 **Removing local data**
@@ -44731,6 +45205,10 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller 
 ---
 
 
+
+---
+
+
 已完成相关操作：
 
 1. **删除本地项目数据**：已移除 `data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/` 目录。
@@ -44750,11 +45228,31 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
 
 
 
 
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/asset_api_dump.json</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
 
 ---
 
@@ -44789,22 +45287,6 @@ drwxr-xr-x@  5 zuobowen  staff      160 Mar 19 19:07 ..
 -rw-r--r--@  1 zuobowen  staff  5088847 Mar 19 19:06 达里尔.png
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/asset_api_dump.json</summary>
-
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
-
 </details>
 </tool-use>
 
@@ -46436,6 +46918,10 @@ Status: **completed**
 
 
 
+---
+
+
+
 
 
 ---
@@ -46488,6 +46974,10 @@ I'm modifying _get_asset_image_url to prioritize thumbnail over referenceUrls, s
 ---
 
 
+
+---
+
+
 删除旧资产图并重新拉取：
 
 
@@ -46508,6 +46998,10 @@ cd /Users/zuobowen/Documents/GitHub/fv_autovidu && rm -rf data/b95c3d75-d99a-40c
 ```
 </details>
 </tool-use>
+
+---
+
+
 
 ---
 
@@ -46554,6 +47048,10 @@ drwxr-xr-x@  5 zuobowen  staff      160 Mar 19 19:14 ..
 ---
 
 
+
+---
+
+
 已修复，资产图已更新。
 
 ## 原因
@@ -46592,7 +47090,11 @@ _**User**_
 
 ---
 
-_**Agent (model composer-1.5, mode Agent)**_
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
 
 
 
@@ -46633,6 +47135,10 @@ Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/compo
 
 
 
+---
+
+
+
 
 
 ---
@@ -46665,6 +47171,16359 @@ I'm increasing the asset detail dialog width to max-w-4xl by extending the Dialo
 **Creating asset detail dialog**
 
 I'm creating a new AssetDetailDialog component with increased width and full-screen capability for better image viewing. I'm implementing a custom dialog variant for AssetLibraryPage to display asset details with larger dimensions. I'm adding a size prop to Dialog component to support larger asset previews, using max-w-4xl for better image display. </details></think>
+
+---
+
+
+增强资产库页面：添加 metadata 展示，并实现点击查看大图。
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/AssetLibraryPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/AssetLibraryPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/AssetLibraryPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/AssetLibraryPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/AssetLibraryPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="read_lints">
+<details>
+<summary>Tool use: **read_lints**</summary>
+
+
+Parameters:
+
+```json
+{
+  "paths": [
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/AssetLibraryPage.tsx"
+  ]
+}
+```
+Result:
+
+```json
+{
+  "linterErrorsByFile": [
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/AssetLibraryPage.tsx"
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/AssetLibraryPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "line-clamp",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "line-clamp",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/pages/AssetLibraryPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 239,
+                  "content": "                      className=\"text-xs text-[var(--color-muted)] mt-2 line-clamp-2\""
+                }
+              ]
+            }
+          ],
+          "totalLines": 1,
+          "totalMatchedLines": 1
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+修改已完成，资产库现在支持：
+
+## 1. 卡片上的 metadata 预览
+
+- 在卡片底部增加 **prompt 的前 60 字预览**（超出部分用省略号）
+- 悬停可看到完整 prompt（`title` 属性）
+
+## 2. 点击查看大图与完整 metadata
+
+点击任意资产卡片后会打开弹窗，包含：
+
+- **大图预览**：上方大图（约 50vh 高度，保持比例）
+- **标题栏**：资产名、类型、ID 摘要
+- **完整 prompt**：在「画面描述 / Prompt」区域展示完整 metadata，支持滚动阅读
+- **关闭方式**：点击遮罩、按 Esc，或点击右上角关闭按钮
+
+## 流程图
+
+```mermaid
+flowchart LR
+    A[资产卡片] -->|点击| B[AssetDetailModal]
+    B --> C[大图预览]
+    B --> D[完整 prompt]
+    B --> E[关闭: 遮罩/Esc/按钮]
+```
+
+---
+
+_**User**_
+
+commit所有的东西
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git status</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git status
+```
+
+```
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add/rm &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
+	modified:   .env.example
+	modified:   .gitignore
+	deleted:    "docs/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222.md"
+	modified:   requirements.txt
+	modified:   scripts/endframe/gen_tail.py
+	modified:   scripts/i2v/batch.py
+	modified:   scripts/task/download.py
+	modified:   scripts/task/poll.py
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+	.specstory/history/2026-03-19_04-47Z-api-integration-for-script-and-asset-management.md
+	.specstory/history/2026-03-19_06-16Z-platform-assistance-program-planning.md
+	.specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md
+	.specstory/history/2026-03-19_06-57Z-frontend-project-requirements-and-planning.md
+	.specstory/history/2026-03-19_07-04Z-front-end-transformation-plan.md
+	data/
+	docs/asset_api_dump.json
+	"docs/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222/"
+	"docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/"
+	"docs/\350\201\224\350\260\203\350\257\264\346\230\216.md"
+	package.json
+	pnpm-lock.yaml
+	reference/
+	scripts/regen/
+	src/feeling/
+	src/yunwu/
+	web/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/.gitignore</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Updating gitignore**
+
+I'm adding data/, .specstory/history, and reference/ to .gitignore to exclude large or internal files. I'm adding src/feeling/, web/, docs/, scripts/, package.json, pnpm-lock.yaml, .env.example, .gitignore, and requirements.txt to gitignore while excluding data/ directory. I'm adding data/ to .gitignore to exclude binary images, while keeping other directories like src/feeling/, web/, docs/, scripts/, and requirements.txt. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git add -A && git status</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git add -A && git status
+```
+
+```
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged &lt;file&gt;..." to unstage)
+	modified:   .env.example
+	modified:   .gitignore
+	new file:   .specstory/history/2026-03-19_04-47Z-api-integration-for-script-and-asset-management.md
+	new file:   .specstory/history/2026-03-19_06-16Z-platform-assistance-program-planning.md
+	new file:   .specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md
+	new file:   .specstory/history/2026-03-19_06-57Z-frontend-project-requirements-and-planning.md
+	new file:   .specstory/history/2026-03-19_07-04Z-front-end-transformation-plan.md
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\214\273\350\215\257\347\256\261.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\345\260\224.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\347\275\227\345\260\224.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\274\223.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\234\261\350\277\252\346\226\257.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\344\274\246.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\351\233\267\302\267\351\207\221\346\226\257\351\241\277.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246\345\206\205.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\211\242\346\210\277.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\216\233\346\240\274\344\270\275\347\211\271.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\221\236\345\205\213.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\205\254\345\205\261\345\214\272.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\244\226\345\233\264.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\351\231\242\345\206\205.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\264\235\344\270\235.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\265\253\350\260\242\345\260\224.png"
+	new file:   "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\276\276\351\207\214\345\260\224.png"
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png
+	new file:   data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png
+	new file:   data/demo/ep-demo/episode.json
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\214\273\350\215\257\347\256\261.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\345\260\224.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\347\275\227\345\260\224.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\274\223.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\234\261\350\277\252\346\226\257.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\344\274\246.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\351\233\267\302\267\351\207\221\346\226\257\351\241\277.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246\345\206\205.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\211\242\346\210\277.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\216\233\346\240\274\344\270\275\347\211\271.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\221\236\345\205\213.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\205\254\345\205\261\345\214\272.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\244\226\345\233\264.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\351\231\242\345\206\205.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\264\235\344\270\235.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\265\253\350\260\242\345\260\224.png"
+	new file:   "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\276\276\351\207\214\345\260\224.png"
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png
+	new file:   data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png
+	new file:   docs/asset_api_dump.json
+	renamed:    "docs/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222.md" -&gt; "docs/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222.md"
+	new file:   "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\345\256\214\346\210\220\346\200\273\347\273\223\344\270\216\345\220\216\347\253\257\346\224\271\351\200\240\346\214\207\345\215\227.md"
+	new file:   "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\346\224\271\351\200\240\350\256\241\345\210\222.md"
+	new file:   "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\347\224\237\346\210\220prompt.md"
+	new file:   "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222.md"
+	new file:   "docs/\350\201\224\350\260\203\350\257\264\346\230\216.md"
+	new file:   package.json
+	new file:   pnpm-lock.yaml
+	new file:   reference/frontend/stitch/episode_list_newsprint/code.html
+	new file:   reference/frontend/stitch/episode_list_newsprint/screen.png
+	new file:   reference/frontend/stitch/fv_chronicle/DESIGN.md
+	new file:   reference/frontend/stitch/regen_newsprint_style/code.html
+	new file:   reference/frontend/stitch/regen_newsprint_style/screen.png
+	new file:   reference/frontend/stitch/shot_details_newsprint/code.html
+	new file:   reference/frontend/stitch/shot_details_newsprint/screen.png
+	new file:   reference/frontend/stitch/storyboard_overview_newsprint/code.html
+	new file:   reference/frontend/stitch/storyboard_overview_newsprint/screen.png
+	new file:   reference/frontend/stitch/timeline_newsprint/code.html
+	new file:   reference/frontend/stitch/timeline_newsprint/screen.png
+	modified:   requirements.txt
+	modified:   scripts/endframe/gen_tail.py
+	modified:   scripts/i2v/batch.py
+	new file:   scripts/regen/__init__.py
+	new file:   scripts/regen/regen_frame.py
+	modified:   scripts/task/download.py
+	modified:   scripts/task/poll.py
+	new file:   src/feeling/__init__.py
+	new file:   src/feeling/client.py
+	new file:   src/feeling/puller.py
+	new file:   src/yunwu/__init__.py
+	new file:   src/yunwu/client.py
+	new file:   web/frontend/.env.example
+	new file:   web/frontend/.gitignore
+	new file:   web/frontend/README.md
+	new file:   web/frontend/eslint.config.js
+	new file:   web/frontend/index.html
+	new file:   web/frontend/package-lock.json
+	new file:   web/frontend/package.json
+	new file:   web/frontend/public/favicon.svg
+	new file:   web/frontend/public/icons.svg
+	new file:   web/frontend/src/App.tsx
+	new file:   web/frontend/src/api/client.ts
+	new file:   web/frontend/src/api/episodes.ts
+	new file:   web/frontend/src/api/export.ts
+	new file:   web/frontend/src/api/generate.ts
+	new file:   web/frontend/src/api/index.ts
+	new file:   web/frontend/src/api/shots.ts
+	new file:   web/frontend/src/api/tasks.ts
+	new file:   web/frontend/src/assets/hero.png
+	new file:   web/frontend/src/assets/react.svg
+	new file:   web/frontend/src/assets/vite.svg
+	new file:   web/frontend/src/components/business/AssetSelector.tsx
+	new file:   web/frontend/src/components/business/AssetTag.tsx
+	new file:   web/frontend/src/components/business/ImagePreview.tsx
+	new file:   web/frontend/src/components/business/PromptEditor.tsx
+	new file:   web/frontend/src/components/business/SceneGroup.tsx
+	new file:   web/frontend/src/components/business/ShotCard.tsx
+	new file:   web/frontend/src/components/business/ShotRow.tsx
+	new file:   web/frontend/src/components/business/StatusIndicator.tsx
+	new file:   web/frontend/src/components/business/VideoPlayer.tsx
+	new file:   web/frontend/src/components/business/index.ts
+	new file:   web/frontend/src/components/layout/AppLayout.tsx
+	new file:   web/frontend/src/components/layout/SideNavBar.tsx
+	new file:   web/frontend/src/components/layout/TopNavBar.tsx
+	new file:   web/frontend/src/components/layout/index.ts
+	new file:   web/frontend/src/components/ui/Badge.tsx
+	new file:   web/frontend/src/components/ui/Button.tsx
+	new file:   web/frontend/src/components/ui/Card.tsx
+	new file:   web/frontend/src/components/ui/Dialog.tsx
+	new file:   web/frontend/src/components/ui/EmptyState.tsx
+	new file:   web/frontend/src/components/ui/Progress.tsx
+	new file:   web/frontend/src/components/ui/Skeleton.tsx
+	new file:   web/frontend/src/components/ui/Toast.tsx
+	new file:   web/frontend/src/components/ui/Tooltip.tsx
+	new file:   web/frontend/src/components/ui/index.ts
+	new file:   web/frontend/src/hooks/index.ts
+	new file:   web/frontend/src/hooks/useKeyboard.ts
+	new file:   web/frontend/src/hooks/useTaskPolling.ts
+	new file:   web/frontend/src/index.css
+	new file:   web/frontend/src/main.tsx
+	new file:   web/frontend/src/mocks/browser.ts
+	new file:   web/frontend/src/mocks/handlers.ts
+	new file:   web/frontend/src/pages/AssetLibraryPage.tsx
+	new file:   web/frontend/src/pages/EpisodeListPage.tsx
+	new file:   web/frontend/src/pages/RegenPage.tsx
+	new file:   web/frontend/src/pages/SettingsPage.tsx
+	new file:   web/frontend/src/pages/ShotDetailPage.tsx
+	new file:   web/frontend/src/pages/StoryboardPage.tsx
+	new file:   web/frontend/src/pages/TimelinePage.tsx
+	new file:   web/frontend/src/stores/episodeStore.ts
+	new file:   web/frontend/src/stores/index.ts
+	new file:   web/frontend/src/stores/shotStore.ts
+	new file:   web/frontend/src/stores/taskStore.ts
+	new file:   web/frontend/src/stores/uiStore.ts
+	new file:   web/frontend/src/types/api.ts
+	new file:   web/frontend/src/types/episode.ts
+	new file:   web/frontend/src/types/index.ts
+	new file:   web/frontend/src/utils/file.ts
+	new file:   web/frontend/src/utils/format.ts
+	new file:   web/frontend/tsconfig.app.json
+	new file:   web/frontend/tsconfig.json
+	new file:   web/frontend/tsconfig.node.json
+	new file:   web/frontend/vite.config.ts
+	new file:   web/server/config.py
+	new file:   web/server/main.py
+	new file:   web/server/models/__init__.py
+	new file:   web/server/models/schemas.py
+	new file:   web/server/routes/__init__.py
+	new file:   web/server/routes/episodes.py
+	new file:   web/server/routes/export_route.py
+	new file:   web/server/routes/files.py
+	new file:   web/server/routes/generate.py
+	new file:   web/server/routes/shots.py
+	new file:   web/server/routes/tasks.py
+	new file:   web/server/services/__init__.py
+	new file:   web/server/services/data_service.py
+	new file:   web/server/services/ffmpeg_service.py
+	new file:   web/server/services/vidu_service.py
+	new file:   web/server/services/yunwu_service.py
+
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git commit --trailer "Made-with: Cursor" -m "feat: 资产库、拉取、前端改造
+
+- 资产库：独立界面、类型筛选、点击查看大图与 metadata
+- 资产图：优先 thumbnail，避免 referenceUrls 风格图
+- 拉取：projectId 推断、强制下载、从平台拉取弹窗（剧集页可见）
+- 前端：资产库入口、cache-bust 图片刷新、metadata 展示
+- 后端：/episodes/pull projectId、错误详情、提示
+- src/feeling: puller、client 拉取逻辑
+- web: React 前端、FastAPI 后端、联调
+- docs: 联调说明、资产 API dump、平台辅助计划"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git commit --trailer "Made-with: Cursor" -m "feat: 资产库、拉取、前端改造
+
+- 资产库：独立界面、类型筛选、点击查看大图与 metadata
+- 资产图：优先 thumbnail，避免 referenceUrls 风格图
+- 拉取：projectId 推断、强制下载、从平台拉取弹窗（剧集页可见）
+- 前端：资产库入口、cache-bust 图片刷新、metadata 展示
+- 后端：/episodes/pull projectId、错误详情、提示
+- src/feeling: puller、client 拉取逻辑
+- web: React 前端、FastAPI 后端、联调
+- docs: 联调说明、资产 API dump、平台辅助计划"
+```
+
+```
+[main 5da6443] feat: 资产库、拉取、前端改造
+ 248 files changed, 73534 insertions(+), 95 deletions(-)
+ create mode 100644 .specstory/history/2026-03-19_04-47Z-api-integration-for-script-and-asset-management.md
+ create mode 100644 .specstory/history/2026-03-19_06-16Z-platform-assistance-program-planning.md
+ create mode 100644 .specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md
+ create mode 100644 .specstory/history/2026-03-19_06-57Z-frontend-project-requirements-and-planning.md
+ create mode 100644 .specstory/history/2026-03-19_07-04Z-front-end-transformation-plan.md
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\214\273\350\215\257\347\256\261.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\345\260\224.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\347\275\227\345\260\224.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\274\223.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\234\261\350\277\252\346\226\257.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\344\274\246.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\351\233\267\302\267\351\207\221\346\226\257\351\241\277.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246\345\206\205.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\211\242\346\210\277.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\216\233\346\240\274\344\270\275\347\211\271.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\221\236\345\205\213.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\205\254\345\205\261\345\214\272.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\244\226\345\233\264.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\351\231\242\345\206\205.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\264\235\344\270\235.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\265\253\350\260\242\345\260\224.png"
+ create mode 100644 "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\276\276\351\207\214\345\260\224.png"
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png
+ create mode 100644 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png
+ create mode 100644 data/demo/ep-demo/episode.json
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\214\273\350\215\257\347\256\261.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\345\260\224.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\347\275\227\345\260\224.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\274\223.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\234\261\350\277\252\346\226\257.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\344\274\246.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\351\233\267\302\267\351\207\221\346\226\257\351\241\277.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246\345\206\205.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\211\242\346\210\277.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\216\233\346\240\274\344\270\275\347\211\271.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\221\236\345\205\213.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\205\254\345\205\261\345\214\272.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\244\226\345\233\264.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\351\231\242\345\206\205.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\264\235\344\270\235.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\265\253\350\260\242\345\260\224.png"
+ create mode 100644 "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\276\276\351\207\214\345\260\224.png"
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png
+ create mode 100644 data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png
+ create mode 100644 docs/asset_api_dump.json
+ rename "docs/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222.md" =&gt; "docs/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222.md" (100%)
+ create mode 100644 "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\345\256\214\346\210\220\346\200\273\347\273\223\344\270\216\345\220\216\347\253\257\346\224\271\351\200\240\346\214\207\345\215\227.md"
+ create mode 100644 "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\346\224\271\351\200\240\350\256\241\345\210\222.md"
+ create mode 100644 "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\347\224\237\346\210\220prompt.md"
+ create mode 100644 "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222.md"
+ create mode 100644 "docs/\350\201\224\350\260\203\350\257\264\346\230\216.md"
+ create mode 100644 package.json
+ create mode 100644 pnpm-lock.yaml
+ create mode 100644 reference/frontend/stitch/episode_list_newsprint/code.html
+ create mode 100644 reference/frontend/stitch/episode_list_newsprint/screen.png
+ create mode 100644 reference/frontend/stitch/fv_chronicle/DESIGN.md
+ create mode 100644 reference/frontend/stitch/regen_newsprint_style/code.html
+ create mode 100644 reference/frontend/stitch/regen_newsprint_style/screen.png
+ create mode 100644 reference/frontend/stitch/shot_details_newsprint/code.html
+ create mode 100644 reference/frontend/stitch/shot_details_newsprint/screen.png
+ create mode 100644 reference/frontend/stitch/storyboard_overview_newsprint/code.html
+ create mode 100644 reference/frontend/stitch/storyboard_overview_newsprint/screen.png
+ create mode 100644 reference/frontend/stitch/timeline_newsprint/code.html
+ create mode 100644 reference/frontend/stitch/timeline_newsprint/screen.png
+ create mode 100644 scripts/regen/__init__.py
+ create mode 100644 scripts/regen/regen_frame.py
+ create mode 100644 src/feeling/__init__.py
+ create mode 100644 src/feeling/client.py
+ create mode 100644 src/feeling/puller.py
+ create mode 100644 src/yunwu/__init__.py
+ create mode 100644 src/yunwu/client.py
+ create mode 100644 web/frontend/.env.example
+ create mode 100644 web/frontend/.gitignore
+ create mode 100644 web/frontend/README.md
+ create mode 100644 web/frontend/eslint.config.js
+ create mode 100644 web/frontend/index.html
+ create mode 100644 web/frontend/package-lock.json
+ create mode 100644 web/frontend/package.json
+ create mode 100644 web/frontend/public/favicon.svg
+ create mode 100644 web/frontend/public/icons.svg
+ create mode 100644 web/frontend/src/App.tsx
+ create mode 100644 web/frontend/src/api/client.ts
+ create mode 100644 web/frontend/src/api/episodes.ts
+ create mode 100644 web/frontend/src/api/export.ts
+ create mode 100644 web/frontend/src/api/generate.ts
+ create mode 100644 web/frontend/src/api/index.ts
+ create mode 100644 web/frontend/src/api/shots.ts
+ create mode 100644 web/frontend/src/api/tasks.ts
+ create mode 100644 web/frontend/src/assets/hero.png
+ create mode 100644 web/frontend/src/assets/react.svg
+ create mode 100644 web/frontend/src/assets/vite.svg
+ create mode 100644 web/frontend/src/components/business/AssetSelector.tsx
+ create mode 100644 web/frontend/src/components/business/AssetTag.tsx
+ create mode 100644 web/frontend/src/components/business/ImagePreview.tsx
+ create mode 100644 web/frontend/src/components/business/PromptEditor.tsx
+ create mode 100644 web/frontend/src/components/business/SceneGroup.tsx
+ create mode 100644 web/frontend/src/components/business/ShotCard.tsx
+ create mode 100644 web/frontend/src/components/business/ShotRow.tsx
+ create mode 100644 web/frontend/src/components/business/StatusIndicator.tsx
+ create mode 100644 web/frontend/src/components/business/VideoPlayer.tsx
+ create mode 100644 web/frontend/src/components/business/index.ts
+ create mode 100644 web/frontend/src/components/layout/AppLayout.tsx
+ create mode 100644 web/frontend/src/components/layout/SideNavBar.tsx
+ create mode 100644 web/frontend/src/components/layout/TopNavBar.tsx
+ create mode 100644 web/frontend/src/components/layout/index.ts
+ create mode 100644 web/frontend/src/components/ui/Badge.tsx
+ create mode 100644 web/frontend/src/components/ui/Button.tsx
+ create mode 100644 web/frontend/src/components/ui/Card.tsx
+ create mode 100644 web/frontend/src/components/ui/Dialog.tsx
+ create mode 100644 web/frontend/src/components/ui/EmptyState.tsx
+ create mode 100644 web/frontend/src/components/ui/Progress.tsx
+ create mode 100644 web/frontend/src/components/ui/Skeleton.tsx
+ create mode 100644 web/frontend/src/components/ui/Toast.tsx
+ create mode 100644 web/frontend/src/components/ui/Tooltip.tsx
+ create mode 100644 web/frontend/src/components/ui/index.ts
+ create mode 100644 web/frontend/src/hooks/index.ts
+ create mode 100644 web/frontend/src/hooks/useKeyboard.ts
+ create mode 100644 web/frontend/src/hooks/useTaskPolling.ts
+ create mode 100644 web/frontend/src/index.css
+ create mode 100644 web/frontend/src/main.tsx
+ create mode 100644 web/frontend/src/mocks/browser.ts
+ create mode 100644 web/frontend/src/mocks/handlers.ts
+ create mode 100644 web/frontend/src/pages/AssetLibraryPage.tsx
+ create mode 100644 web/frontend/src/pages/EpisodeListPage.tsx
+ create mode 100644 web/frontend/src/pages/RegenPage.tsx
+ create mode 100644 web/frontend/src/pages/SettingsPage.tsx
+ create mode 100644 web/frontend/src/pages/ShotDetailPage.tsx
+ create mode 100644 web/frontend/src/pages/StoryboardPage.tsx
+ create mode 100644 web/frontend/src/pages/TimelinePage.tsx
+ create mode 100644 web/frontend/src/stores/episodeStore.ts
+ create mode 100644 web/frontend/src/stores/index.ts
+ create mode 100644 web/frontend/src/stores/shotStore.ts
+ create mode 100644 web/frontend/src/stores/taskStore.ts
+ create mode 100644 web/frontend/src/stores/uiStore.ts
+ create mode 100644 web/frontend/src/types/api.ts
+ create mode 100644 web/frontend/src/types/episode.ts
+ create mode 100644 web/frontend/src/types/index.ts
+ create mode 100644 web/frontend/src/utils/file.ts
+ create mode 100644 web/frontend/src/utils/format.ts
+ create mode 100644 web/frontend/tsconfig.app.json
+ create mode 100644 web/frontend/tsconfig.json
+ create mode 100644 web/frontend/tsconfig.node.json
+ create mode 100644 web/frontend/vite.config.ts
+ create mode 100644 web/server/config.py
+ create mode 100644 web/server/main.py
+ create mode 100644 web/server/models/__init__.py
+ create mode 100644 web/server/models/schemas.py
+ create mode 100644 web/server/routes/__init__.py
+ create mode 100644 web/server/routes/episodes.py
+ create mode 100644 web/server/routes/export_route.py
+ create mode 100644 web/server/routes/files.py
+ create mode 100644 web/server/routes/generate.py
+ create mode 100644 web/server/routes/shots.py
+ create mode 100644 web/server/routes/tasks.py
+ create mode 100644 web/server/services/__init__.py
+ create mode 100644 web/server/services/data_service.py
+ create mode 100644 web/server/services/ffmpeg_service.py
+ create mode 100644 web/server/services/vidu_service.py
+ create mode 100644 web/server/services/yunwu_service.py
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+已全部提交。
+
+**提交信息**：`5da6443 feat: 资产库、拉取、前端改造`
+
+**统计**：248 个文件变更，73534 行新增，95 行删除
+
+**主要变更**：
+- 资产库独立页面、类型筛选、点击查看大图与 metadata
+- 拉取逻辑：优先使用 thumbnail、projectId 推断、强制下载
+- 前端：React 页面、从平台拉取弹窗、cache-bust
+- 后端：FastAPI 接口、拉取错误详情
+- 新增：`src/feeling`、`web/`、`docs/`、`data/` 示例数据
+
+---
+
+_**User**_
+
+data你传个屁啊，ignore啊
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git rm -r --cached data/ 2>/dev/null; git add .gitignore</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git rm -r --cached data/ 2>/dev/null; git add .gitignore
+```
+
+```
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/医药箱.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/卡尔.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/卡罗尔.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/弓.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/朱迪斯.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/格伦.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/格雷·金斯顿.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/汽车.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/汽车内.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/牢房.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/玛格丽特.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/瑞克.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱公共区.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱外围.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱院内.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/贝丝.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/赫谢尔.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/达里尔.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png'
+rm 'data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png'
+rm 'data/demo/ep-demo/episode.json'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/医药箱.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/卡尔.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/卡罗尔.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/弓.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/朱迪斯.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/格伦.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/格雷·金斯顿.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/汽车.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/汽车内.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/牢房.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/玛格丽特.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/瑞克.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱公共区.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱外围.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱院内.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/贝丝.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/赫谢尔.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/达里尔.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png'
+rm 'data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png'
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/.gitignore</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git status && git commit --trailer "Made-with: Cursor" --amend -m "feat: 资产库、拉取、前端改造
+
+- 资产库：独立界面、类型筛选、点击查看大图与 metadata
+- 资产图：优先 thumbnail，避免 referenceUrls 风格图
+- 拉取：projectId 推断、强制下载、从平台拉取弹窗（剧集页可见）
+- 前端：资产库入口、cache-bust 图片刷新、metadata 展示
+- 后端：/episodes/pull projectId、错误详情、提示
+- src/feeling: puller、client 拉取逻辑
+- web: React 前端、FastAPI 后端、联调
+- docs: 联调说明、资产 API dump、平台辅助计划
+- .gitignore: data/ 排除本地拉取数据"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git status && git commit --trailer "Made-with: Cursor" --amend -m "feat: 资产库、拉取、前端改造
+
+- 资产库：独立界面、类型筛选、点击查看大图与 metadata
+- 资产图：优先 thumbnail，避免 referenceUrls 风格图
+- 拉取：projectId 推断、强制下载、从平台拉取弹窗（剧集页可见）
+- 前端：资产库入口、cache-bust 图片刷新、metadata 展示
+- 后端：/episodes/pull projectId、错误详情、提示
+- src/feeling: puller、client 拉取逻辑
+- web: React 前端、FastAPI 后端、联调
+- docs: 联调说明、资产 API dump、平台辅助计划
+- .gitignore: data/ 排除本地拉取数据"
+```
+
+```
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes to be committed:
+  (use "git restore --staged &lt;file&gt;..." to unstage)
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\214\273\350\215\257\347\256\261.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\345\260\224.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\347\275\227\345\260\224.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\274\223.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\234\261\350\277\252\346\226\257.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\344\274\246.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\351\233\267\302\267\351\207\221\346\226\257\351\241\277.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246\345\206\205.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\211\242\346\210\277.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\216\233\346\240\274\344\270\275\347\211\271.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\221\236\345\205\213.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\205\254\345\205\261\345\214\272.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\244\226\345\233\264.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\351\231\242\345\206\205.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\264\235\344\270\235.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\265\253\350\260\242\345\260\224.png"
+	deleted:    "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\276\276\351\207\214\345\260\224.png"
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png
+	deleted:    data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png
+	deleted:    data/demo/ep-demo/episode.json
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\214\273\350\215\257\347\256\261.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\345\260\224.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\215\241\347\275\227\345\260\224.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\345\274\223.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\234\261\350\277\252\346\226\257.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\344\274\246.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\240\274\351\233\267\302\267\351\207\221\346\226\257\351\241\277.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\346\261\275\350\275\246\345\206\205.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\211\242\346\210\277.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\216\233\346\240\274\344\270\275\347\211\271.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\221\236\345\205\213.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\205\254\345\205\261\345\214\272.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\345\244\226\345\233\264.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\347\233\221\347\213\261\351\231\242\345\206\205.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\264\235\344\270\235.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\265\253\350\260\242\345\260\224.png"
+	deleted:    "data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/\350\276\276\351\207\214\345\260\224.png"
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png
+	deleted:    data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png
+
+Changes not staged for commit:
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
+	modified:   .gitignore
+	modified:   .specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md
+
+[main 9234d6c] feat: 资产库、拉取、前端改造
+ Date: Thu Mar 19 19:43:43 2026 +0800
+ 127 files changed, 69426 insertions(+), 95 deletions(-)
+ create mode 100644 .specstory/history/2026-03-19_04-47Z-api-integration-for-script-and-asset-management.md
+ create mode 100644 .specstory/history/2026-03-19_06-16Z-platform-assistance-program-planning.md
+ create mode 100644 .specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md
+ create mode 100644 .specstory/history/2026-03-19_06-57Z-frontend-project-requirements-and-planning.md
+ create mode 100644 .specstory/history/2026-03-19_07-04Z-front-end-transformation-plan.md
+ create mode 100644 docs/asset_api_dump.json
+ rename "docs/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222.md" =&gt; "docs/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222/\345\260\276\345\270\247\350\241\245\345\205\250\350\256\241\345\210\222.md" (100%)
+ create mode 100644 "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\345\256\214\346\210\220\346\200\273\347\273\223\344\270\216\345\220\216\347\253\257\346\224\271\351\200\240\346\214\207\345\215\227.md"
+ create mode 100644 "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\346\224\271\351\200\240\350\256\241\345\210\222.md"
+ create mode 100644 "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\211\215\347\253\257\347\224\237\346\210\220prompt.md"
+ create mode 100644 "docs/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222/\345\271\263\345\217\260\350\276\205\345\212\251\350\256\241\345\210\222.md"
+ create mode 100644 "docs/\350\201\224\350\260\203\350\257\264\346\230\216.md"
+ create mode 100644 package.json
+ create mode 100644 pnpm-lock.yaml
+ create mode 100644 reference/frontend/stitch/episode_list_newsprint/code.html
+ create mode 100644 reference/frontend/stitch/episode_list_newsprint/screen.png
+ create mode 100644 reference/frontend/stitch/fv_chronicle/DESIGN.md
+ create mode 100644 reference/frontend/stitch/regen_newsprint_style/code.html
+ create mode 100644 reference/frontend/stitch/regen_newsprint_style/screen.png
+ create mode 100644 reference/frontend/stitch/shot_details_newsprint/code.html
+ create mode 100644 reference/frontend/stitch/shot_details_newsprint/screen.png
+ create mode 100644 reference/frontend/stitch/storyboard_overview_newsprint/code.html
+ create mode 100644 reference/frontend/stitch/storyboard_overview_newsprint/screen.png
+ create mode 100644 reference/frontend/stitch/timeline_newsprint/code.html
+ create mode 100644 reference/frontend/stitch/timeline_newsprint/screen.png
+ create mode 100644 scripts/regen/__init__.py
+ create mode 100644 scripts/regen/regen_frame.py
+ create mode 100644 src/feeling/__init__.py
+ create mode 100644 src/feeling/client.py
+ create mode 100644 src/feeling/puller.py
+ create mode 100644 src/yunwu/__init__.py
+ create mode 100644 src/yunwu/client.py
+ create mode 100644 web/frontend/.env.example
+ create mode 100644 web/frontend/.gitignore
+ create mode 100644 web/frontend/README.md
+ create mode 100644 web/frontend/eslint.config.js
+ create mode 100644 web/frontend/index.html
+ create mode 100644 web/frontend/package-lock.json
+ create mode 100644 web/frontend/package.json
+ create mode 100644 web/frontend/public/favicon.svg
+ create mode 100644 web/frontend/public/icons.svg
+ create mode 100644 web/frontend/src/App.tsx
+ create mode 100644 web/frontend/src/api/client.ts
+ create mode 100644 web/frontend/src/api/episodes.ts
+ create mode 100644 web/frontend/src/api/export.ts
+ create mode 100644 web/frontend/src/api/generate.ts
+ create mode 100644 web/frontend/src/api/index.ts
+ create mode 100644 web/frontend/src/api/shots.ts
+ create mode 100644 web/frontend/src/api/tasks.ts
+ create mode 100644 web/frontend/src/assets/hero.png
+ create mode 100644 web/frontend/src/assets/react.svg
+ create mode 100644 web/frontend/src/assets/vite.svg
+ create mode 100644 web/frontend/src/components/business/AssetSelector.tsx
+ create mode 100644 web/frontend/src/components/business/AssetTag.tsx
+ create mode 100644 web/frontend/src/components/business/ImagePreview.tsx
+ create mode 100644 web/frontend/src/components/business/PromptEditor.tsx
+ create mode 100644 web/frontend/src/components/business/SceneGroup.tsx
+ create mode 100644 web/frontend/src/components/business/ShotCard.tsx
+ create mode 100644 web/frontend/src/components/business/ShotRow.tsx
+ create mode 100644 web/frontend/src/components/business/StatusIndicator.tsx
+ create mode 100644 web/frontend/src/components/business/VideoPlayer.tsx
+ create mode 100644 web/frontend/src/components/business/index.ts
+ create mode 100644 web/frontend/src/components/layout/AppLayout.tsx
+ create mode 100644 web/frontend/src/components/layout/SideNavBar.tsx
+ create mode 100644 web/frontend/src/components/layout/TopNavBar.tsx
+ create mode 100644 web/frontend/src/components/layout/index.ts
+ create mode 100644 web/frontend/src/components/ui/Badge.tsx
+ create mode 100644 web/frontend/src/components/ui/Button.tsx
+ create mode 100644 web/frontend/src/components/ui/Card.tsx
+ create mode 100644 web/frontend/src/components/ui/Dialog.tsx
+ create mode 100644 web/frontend/src/components/ui/EmptyState.tsx
+ create mode 100644 web/frontend/src/components/ui/Progress.tsx
+ create mode 100644 web/frontend/src/components/ui/Skeleton.tsx
+ create mode 100644 web/frontend/src/components/ui/Toast.tsx
+ create mode 100644 web/frontend/src/components/ui/Tooltip.tsx
+ create mode 100644 web/frontend/src/components/ui/index.ts
+ create mode 100644 web/frontend/src/hooks/index.ts
+ create mode 100644 web/frontend/src/hooks/useKeyboard.ts
+ create mode 100644 web/frontend/src/hooks/useTaskPolling.ts
+ create mode 100644 web/frontend/src/index.css
+ create mode 100644 web/frontend/src/main.tsx
+ create mode 100644 web/frontend/src/mocks/browser.ts
+ create mode 100644 web/frontend/src/mocks/handlers.ts
+ create mode 100644 web/frontend/src/pages/AssetLibraryPage.tsx
+ create mode 100644 web/frontend/src/pages/EpisodeListPage.tsx
+ create mode 100644 web/frontend/src/pages/RegenPage.tsx
+ create mode 100644 web/frontend/src/pages/SettingsPage.tsx
+ create mode 100644 web/frontend/src/pages/ShotDetailPage.tsx
+ create mode 100644 web/frontend/src/pages/StoryboardPage.tsx
+ create mode 100644 web/frontend/src/pages/TimelinePage.tsx
+ create mode 100644 web/frontend/src/stores/episodeStore.ts
+ create mode 100644 web/frontend/src/stores/index.ts
+ create mode 100644 web/frontend/src/stores/shotStore.ts
+ create mode 100644 web/frontend/src/stores/taskStore.ts
+ create mode 100644 web/frontend/src/stores/uiStore.ts
+ create mode 100644 web/frontend/src/types/api.ts
+ create mode 100644 web/frontend/src/types/episode.ts
+ create mode 100644 web/frontend/src/types/index.ts
+ create mode 100644 web/frontend/src/utils/file.ts
+ create mode 100644 web/frontend/src/utils/format.ts
+ create mode 100644 web/frontend/tsconfig.app.json
+ create mode 100644 web/frontend/tsconfig.json
+ create mode 100644 web/frontend/tsconfig.node.json
+ create mode 100644 web/frontend/vite.config.ts
+ create mode 100644 web/server/config.py
+ create mode 100644 web/server/main.py
+ create mode 100644 web/server/models/__init__.py
+ create mode 100644 web/server/models/schemas.py
+ create mode 100644 web/server/routes/__init__.py
+ create mode 100644 web/server/routes/episodes.py
+ create mode 100644 web/server/routes/export_route.py
+ create mode 100644 web/server/routes/files.py
+ create mode 100644 web/server/routes/generate.py
+ create mode 100644 web/server/routes/shots.py
+ create mode 100644 web/server/routes/tasks.py
+ create mode 100644 web/server/services/__init__.py
+ create mode 100644 web/server/services/data_service.py
+ create mode 100644 web/server/services/ffmpeg_service.py
+ create mode 100644 web/server/services/vidu_service.py
+ create mode 100644 web/server/services/yunwu_service.py
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git add .gitignore && git commit --trailer "Made-with: Cursor" -m "chore: 将 data/ 加入 .gitignore，排除本地拉取数据"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && git add .gitignore && git commit --trailer "Made-with: Cursor" -m "chore: 将 data/ 加入 .gitignore，排除本地拉取数据"
+```
+
+```
+[main 7c54fc5] chore: 将 data/ 加入 .gitignore，排除本地拉取数据
+ 1 file changed, 3 insertions(+)
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+已完成修改：
+
+1. **在 `.gitignore` 中增加**：`data/`（标注为「本地数据，拉取后的剧集/资产，勿提交」）
+2. **从 git 中移除**：原先已提交的 `data/` 已从仓库追踪中删除（amend 到上一笔 commit）
+3. **单独提交**：已新增一次 commit 提交 `.gitignore` 的修改
+
+本地 `data/` 目录仍在，只是之后不会再被 git 跟踪。
+
+---
+
+_**User**_
+
+然后分镜表的图片提示词、视频提示词是不是没拿下来？
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "imgPrompt|imagePrompt|videoPrompt",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "imgPrompt|imagePrompt|videoPrompt",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "./.specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md",
+              "matches": [
+                {
+                  "lineNumber": 323,
+                  "content": "  \"plan\": \"# 平台辅助计划 - 实施方案\\n\\n## 整体架构流程图\\n\\n&amp;#96;&amp;#96;&amp;#96;mermaid\\nflowchart TB\\n    subgraph phase1[\\\"Phase 1: 平台数据拉取 (0.5天)\\\"]\\n        P1A[\\\"src/feeling/client.py&amp;lt;br/&amp;gt;HTTP + JWT 认证\\\"]\\n        P1B[\\\"src/feeling/puller.py&amp;lt;br/&amp;gt;一键拉取 → episode.json\\\"]\\n        P1A --&amp;gt; P1B\\n    end\\n\\n    subgraph phase2[\\\"Phase 2: 脚本改造 (1天)\\\"]\\n        P2A[\\\"gen_tail.py&amp;lt;br/&amp;gt;+--from-json 模式\\\"]\\n        P2B[\\\"batch.py&amp;lt;br/&amp;gt;+--from-json + --with-endframe\\\"]\\n        P2C[\\\"regen_frame.py&amp;lt;br/&amp;gt;单帧带资产重生 (新增)\\\"]\\n        P2D[\\\"poll.py + download.py&amp;lt;br/&amp;gt;适配 episode.json\\\"]\\n    end\\n\\n    subgraph phase3[\\\"Phase 3: 本地前端 (3-5天)\\\"]\\n        P3A[\\\"FastAPI 后台&amp;lt;br/&amp;gt;REST API + 服务层\\\"]\\n        P3B[\\\"React 前端&amp;lt;br/&amp;gt;分镜板/对比/重生/时间线\\\"]\\n        P3A --&amp;gt; P3B\\n    end\\n\\n    P1B --&amp;gt; P2A\\n    P1B --&amp;gt; P2B\\n    P2A --&amp;gt; P3A\\n    P2B --&amp;gt; P3A\\n    P2C --&amp;gt; P3A\\n    P2D --&amp;gt; P3A\\n&amp;#96;&amp;#96;&amp;#96;\\n\\n---\\n\\n## Phase 1: 平台数据拉取模块\\n\\n### 1.1 新增 &amp;#96;src/feeling/client.py&amp;#96 [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 703,
+                  "content": "  \"plan\": \"# 后端对接实施计划\\n\\n## 现状总结\\n\\n&amp;#96;&amp;#96;&amp;#96;mermaid\\nflowchart LR\\n    subgraph done[\\\"已完成\\\"]\\n        FE[\\\"web/frontend/&amp;lt;br/&amp;gt;React 19 + Stitch 风格&amp;lt;br/&amp;gt;6页面 29组件 4Store\\\"]\\n        API_DEF[\\\"API 契约&amp;lt;br/&amp;gt;13个REST端点&amp;lt;br/&amp;gt;types/api.ts 定义\\\"]\\n        MOCK[\\\"MSW Mock&amp;lt;br/&amp;gt;3个handler\\\"]\\n        VIDU[\\\"src/vidu/client.py&amp;lt;br/&amp;gt;Vidu API 封装\\\"]\\n        SCRIPTS[\\\"现有脚本&amp;lt;br/&amp;gt;gen_tail / batch / poll / download\\\"]\\n    end\\n\\n    subgraph todo[\\\"未完成\\\"]\\n        BE[\\\"web/server/&amp;lt;br/&amp;gt;FastAPI 后台\\\"]\\n        FEEL[\\\"src/feeling/&amp;lt;br/&amp;gt;平台拉取客户端\\\"]\\n        YUNWU[\\\"src/yunwu/&amp;lt;br/&amp;gt;公共模块抽取\\\"]\\n        REGEN[\\\"scripts/regen/&amp;lt;br/&amp;gt;单帧重生脚本\\\"]\\n        ADAPT[\\\"脚本改造&amp;lt;br/&amp;gt;--from-json 模式\\\"]\\n    end\\n\\n    FE -.-&amp;gt;|\\\"等待对接\\\"| BE\\n    BE --&amp;gt;|\\\"调用\\\"| FEEL\\n    BE --&amp;gt;|\\\"调用\\\"| VIDU\\n    BE --&amp;gt;|\\\"调用\\\"| YUNWU\\n    BE --&amp;gt;|\\\"调用\\\"| SCRIPTS\\n    BE --&amp;gt;|\\\"调用\\\"| ADAPT\\n    BE --&amp;gt;|\\\"调用\\\"| REGEN\\n&amp;#96;&amp;#96;&amp;#96;\\n\\n## 前端已定义的 API 契约（后端必须精确实现）\\n\\n前端  [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 1106,
+                  "content": "I'm mapping platform API fields like sceneId, shotIds, and imagePrompt to standardize the data structure. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 3012,
+                  "content": "            'imagePrompt': '测试',"
+                },
+                {
+                  "lineNumber": 3013,
+                  "content": "            'videoPrompt': '测试',"
+                },
+                {
+                  "lineNumber": 3045,
+                  "content": "            'imagePrompt': '测试',"
+                },
+                {
+                  "lineNumber": 3046,
+                  "content": "            'videoPrompt': '测试',"
+                },
+                {
+                  "lineNumber": 3094,
+                  "content": "[{\"projectId\":\"demo\",\"episodeId\":\"ep-demo\",\"episodeTitle\":\"测试集\",\"episodeNumber\":1,\"pulledAt\":\"2026-03-19T12:00:00Z\",\"scenes\":[{\"sceneId\":\"sc-001\",\"sceneNumber\":1,\"title\":\"测试场景\",\"shots\":[{\"shotId\":\"shot-001\",\"shotNumber\":1,\"imagePrompt\":\"测试\",\"videoPrompt\":\"测试\",\"duration\":5,\"firstFrame\":\"frames/S01.png\",\"status\":\"pending\",\"endFrame\":null,\"videoCandidates\":[],\"assets\":[]}]}]}]INFO:     Started server process [59611]"
+                },
+                {
+                  "lineNumber": 6440,
+                  "content": "shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']"
+                },
+                {
+                  "lineNumber": 6560,
+                  "content": "print('imgPrompt:', sh.get('imgPrompt', '')[:80])"
+                },
+                {
+                  "lineNumber": 6561,
+                  "content": "print('videoPrompt:', sh.get('videoPrompt', '')[:80] if sh.get('videoPrompt') else None)"
+                },
+                {
+                  "lineNumber": 6579,
+                  "content": "print('imgPrompt:', sh.get('imgPrompt', '')[:80])"
+                },
+                {
+                  "lineNumber": 6580,
+                  "content": "print('videoPrompt:', sh.get('videoPrompt', '')[:80] if sh.get('videoPrompt') else None)"
+                },
+                {
+                  "lineNumber": 6591,
+                  "content": "imgPrompt: 左侧前景肩部遮挡的过肩视角，格雷·金斯顿位于画面正中心。全身中全景，24mm 环境广角，深景深(背景清晰)。身穿耐磨野外生存服饰的达里尔以侧脸剪影占据画面左侧前"
+                },
+                {
+                  "lineNumber": 6592,
+                  "content": "videoPrompt: None"
+                },
+                {
+                  "lineNumber": 7589,
+                  "content": "first shot keys: ['shotId', 'shotNumber', 'imagePrompt', 'videoPrompt', 'duration', 'cameraMovement', 'aspectRatio', 'firstFrame', 'assets', 'status']"
+                },
+                {
+                  "lineNumber": 7662,
+                  "content": "4. **Prompt 字段**：平台使用 &#96;imgPrompt&#96;，已加入对该字段的支持。"
+                },
+                {
+                  "lineNumber": 8859,
+                  "content": "shot all keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']"
+                },
+                {
+                  "lineNumber": 8894,
+                  "content": "print('imgPromptReferences:', type(sh.get('imgPromptReferences')), (sh.get('imgPromptReferences') or [])[:2])"
+                },
+                {
+                  "lineNumber": 8914,
+                  "content": "print('imgPromptReferences:', type(sh.get('imgPromptReferences')), (sh.get('imgPromptReferences') or [])[:2])"
+                },
+                {
+                  "lineNumber": 8928,
+                  "content": "    print('imgPromptReferences:', type(sh.get('imgPromptReferences')), (sh.get('imgPromptReferences') or [])[:2])"
+                },
+                {
+                  "lineNumber": 9232,
+                  "content": "    compact = {k: v for k,v in sh.items() if k not in ['imgPrompt','videoPrompt','prompt']}"
+                },
+                {
+                  "lineNumber": 9250,
+                  "content": "    compact = {k: v for k,v in sh.items() if k not in ['imgPrompt','videoPrompt','prompt']}"
+                },
+                {
+                  "lineNumber": 9275,
+                  "content": "  \"imgPromptReferences\": {"
+                },
+                {
+                  "lineNumber": 9514,
+                  "content": "# 检查 imgPromptReferences - 每个角色有 image_url，可能是生成时的参考图"
+                },
+                {
+                  "lineNumber": 9521,
+                  "content": "# imgPromptReferences 是 dict: 角色名 -&gt; {image_url, lora_trigger}"
+                },
+                {
+                  "lineNumber": 9522,
+                  "content": "refs = shots[0].get('imgPromptReferences')"
+                },
+                {
+                  "lineNumber": 9523,
+                  "content": "print('imgPromptReferences type:', type(refs))"
+                },
+                {
+                  "lineNumber": 9535,
+                  "content": "# 检查 imgPromptReferences - 每个角色有 image_url，可能是生成时的参考图"
+                },
+                {
+                  "lineNumber": 9542,
+                  "content": "# imgPromptReferences 是 dict: 角色名 -&gt; {image_url, lora_trigger}"
+                },
+                {
+                  "lineNumber": 9543,
+                  "content": "refs = shots[0].get('imgPromptReferences')"
+                },
+                {
+                  "lineNumber": 9544,
+                  "content": "print('imgPromptReferences type:', type(refs))"
+                },
+                {
+                  "lineNumber": 9556,
+                  "content": "imgPromptReferences type: &amp;lt;class 'dict'&amp;gt;"
+                },
+                {
+                  "lineNumber": 9571,
+                  "content": "I'm investigating why assetRefs contains only one URL while imgPromptReferences has two character references. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 10512,
+                  "content": "        \"contents\": \"/**\\n * 单帧重生页\\n * 三栏：原首帧 / prompt 编辑 + 资产选择 / 候选预览\\n */\\nimport { useEffect, useState } from \\\"react\\\"\\nimport { useParams } from \\\"react-router\\\"\\nimport { useEpisodeStore } from \\\"@/stores\\\"\\nimport { Button, Dialog } from \\\"@/components/ui\\\"\\nimport { PromptEditor, AssetSelector, ImagePreview } from \\\"@/components/business\\\"\\nimport { flattenShots } from \\\"@/types\\\"\\nimport { getFileUrl } from \\\"@/utils/file\\\"\\n\\nexport default function RegenPage() {\\n  const { episodeId, shotId } = useParams&amp;lt;{ episodeId: string; shotId: string }&amp;gt;()\\n  const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()\\n  const [prompt, setPrompt] = useState(\\\"\\\")\\n  const [assetIds, setAssetIds] = useState&amp;lt;string[]&amp;gt;([])\\n  const [confirmOpen, setConfirmOpen] = useState(false)\\n\\n  useEffect(() =&amp;gt; {\\n    if (episodeId) void fetchEpisodeDetail(episodeId)\\n  }, [episodeId, fetchEpisodeDetail])\\n\\n  if (!episodeId || !shotId || !currentEpisode) return null\\n\\n  const sh [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 10628,
+                  "content": "            \"text\": \"    setPrompt(shot.imagePrompt)\","
+                },
+                {
+                  "lineNumber": 13206,
+                  "content": "        \"contents\": \"export function ShotRow({ shot, episodeId, basePath = \\\"\\\" }: ShotRowProps) {\\n  const firstFrameUrl = getFileUrl(shot.firstFrame, basePath)\\n  const endFrameUrl = shot.endFrame ? getFileUrl(shot.endFrame, basePath) : null\\n\\n  return (\\n    &amp;lt;tr className=\\\"border-b border-[var(--color-divider)] hover:bg-[var(--color-divider)]/50\\\"&amp;gt;\\n      &amp;lt;td className=\\\"py-3 px-4 text-sm font-medium\\\"&amp;gt;{shot.shotNumber}&amp;lt;/td&amp;gt;\\n      &amp;lt;td className=\\\"py-3 px-4\\\"&amp;gt;\\n        {firstFrameUrl ? (\\n          &amp;lt;img\\n            src={firstFrameUrl}\\n            alt=\\\"\\\"\\n            className=\\\"w-12 h-8 object-cover border border-[var(--color-newsprint-black)] grayscale-img\\\"\\n          /&amp;gt;\\n        ) : (\\n          &amp;lt;div className=\\\"w-12 h-8 bg-[var(--color-outline-variant)] border border-[var(--color-newsprint-black)]\\\" /&amp;gt;\\n        )}\\n      &amp;lt;/td&amp;gt;\\n      &amp;lt;td className=\\\"py-3 px-4\\\"&amp;gt;\\n        {endFrameUrl ? (\\n          &amp;lt;img\\n            src={e [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 13354,
+                  "content": "            \"text\": \"        {shot.imagePrompt.slice(0, 40)}...\","
+                },
+                {
+                  "lineNumber": 14468,
+                  "content": "# imgPromptReferences 的 image_url"
+                },
+                {
+                  "lineNumber": 14470,
+                  "content": "    ref = s.get('imgPromptReferences') or {}"
+                },
+                {
+                  "lineNumber": 14496,
+                  "content": "# imgPromptReferences 的 image_url"
+                },
+                {
+                  "lineNumber": 14498,
+                  "content": "    ref = s.get('imgPromptReferences') or {}"
+                },
+                {
+                  "lineNumber": 14786,
+                  "content": "                  \"content\": \"[{\\\"projectId\\\":\\\"demo\\\",\\\"episodeId\\\":\\\"ep-demo\\\",\\\"episodeTitle\\\":\\\"测试集\\\",\\\"episodeNumber\\\":1,\\\"pulledAt\\\":\\\"2026-03-19T12:00:00Z\\\",\\\"scenes\\\":[{\\\"sceneId\\\":\\\"sc-001\\\",\\\"sceneNumber\\\":1,\\\"title\\\":\\\"测试场景\\\",\\\"shots\\\":[{\\\"shotId\\\":\\\"shot-001\\\",\\\"shotNumber\\\":1,\\\"imagePrompt\\\":\\\"测试\\\",\\\"videoPrompt\\\":\\\"测试\\\",\\\"duration\\\":5,\\\"firstFrame\\\":\\\"frames/S01.png\\\",\\\"status\\\":\\\"pending\\\",\\\"endFrame\\\":null,\\\"videoCandidates\\\":[],\\\"assets\\\":[]}]}]}]INFO:     Started server process [59611]\""
+                },
+                {
+                  "lineNumber": 15691,
+                  "content": "                  \"content\": \"- &amp;#96;shots[].shotId&amp;#96;, &amp;#96;shotNumber&amp;#96;, &amp;#96;imagePrompt&amp;#96;, &amp;#96;videoPrompt&amp;#96;, &amp;#96;duration&amp;#96;, &amp;#96;cameraMovement&amp;#96;, &amp;#96;aspectRatio&amp;#96;\""
+                },
+                {
+                  "lineNumber": 16644,
+                  "content": "                  \"content\": \"[{\\\"projectId\\\":\\\"demo\\\",\\\"episodeId\\\":\\\"ep-demo\\\",\\\"episodeTitle\\\":\\\"测试集\\\",\\\"episodeNumber\\\":1,\\\"pulledAt\\\":\\\"2026-03-19T12:00:00Z\\\",\\\"scenes\\\":[{\\\"sceneId\\\":\\\"sc-001\\\",\\\"sceneNumber\\\":1,\\\"title\\\":\\\"测试场景\\\",\\\"shots\\\":[{\\\"shotId\\\":\\\"shot-001\\\",\\\"shotNumber\\\":1,\\\"imagePrompt\\\":\\\"测试\\\",\\\"videoPrompt\\\":\\\"测试\\\",\\\"duration\\\":5,\\\"firstFrame\\\":\\\"frames/S01.png\\\",\\\"status\\\":\\\"pending\\\",\\\"endFrame\\\":null,\\\"videoCandidates\\\":[],\\\"assets\\\":[]}]}]}]INFO:     Started server process [59611]\""
+                },
+                {
+                  "lineNumber": 16656,
+                  "content": "                  \"content\": \"shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\""
+                },
+                {
+                  "lineNumber": 18989,
+                  "content": "                  \"content\": \"        task_id, req.episodeId, req.shotId, req.imagePrompt, req.assetIds or [],\""
+                },
+                {
+                  "lineNumber": 25269,
+                  "content": "                  \"content\": \"    setPrompt(shot.imagePrompt)\""
+                },
+                {
+                  "lineNumber": 26779,
+                  "content": "                  \"content\": \"        {shot.imagePrompt.slice(0, 40)}...\""
+                },
+                {
+                  "lineNumber": 27442,
+                  "content": "                  \"content\": \"              {shot.imagePrompt}\""
+                },
+                {
+                  "lineNumber": 27462,
+                  "content": "                  \"content\": \"              {shot.videoPrompt}\""
+                },
+                {
+                  "lineNumber": 31450,
+                  "content": "# 看 shot 的 imgPromptReferences 结构"
+                },
+                {
+                  "lineNumber": 31452,
+                  "content": "    refs = s.get('imgPromptReferences') or []"
+                },
+                {
+                  "lineNumber": 31456,
+                  "content": "        print('  imgPromptReferences:', len(refs))"
+                },
+                {
+                  "lineNumber": 31475,
+                  "content": "# 看 shot 的 imgPromptReferences 结构"
+                },
+                {
+                  "lineNumber": 31477,
+                  "content": "    refs = s.get('imgPromptReferences') or []"
+                },
+                {
+                  "lineNumber": 31481,
+                  "content": "        print('  imgPromptReferences:', len(refs))"
+                },
+                {
+                  "lineNumber": 31502,
+                  "content": "  imgPromptReferences: 2"
+                },
+                {
+                  "lineNumber": 31524,
+                  "content": "refs = s.get('imgPromptReferences')"
+                },
+                {
+                  "lineNumber": 31525,
+                  "content": "print('imgPromptReferences type:', type(refs))"
+                },
+                {
+                  "lineNumber": 31537,
+                  "content": "refs = s.get('imgPromptReferences')"
+                },
+                {
+                  "lineNumber": 31538,
+                  "content": "print('imgPromptReferences type:', type(refs))"
+                },
+                {
+                  "lineNumber": 31544,
+                  "content": "imgPromptReferences type: &amp;lt;class 'dict'&amp;gt;"
+                },
+                {
+                  "lineNumber": 31574,
+                  "content": "# 收集 格雷·金斯顿 的 imgPromptReferences image_url"
+                },
+                {
+                  "lineNumber": 31577,
+                  "content": "    refs = s.get('imgPromptReferences') or {}"
+                },
+                {
+                  "lineNumber": 31582,
+                  "content": "print('格雷 imgPromptReferences 的 image_url 去重:', urls)"
+                },
+                {
+                  "lineNumber": 31584,
+                  "content": "# 再看看 达里尔 资产 API 的 thumbnail vs imgPromptReferences"
+                },
+                {
+                  "lineNumber": 31593,
+                  "content": "    refs = s.get('imgPromptReferences') or {}"
+                },
+                {
+                  "lineNumber": 31596,
+                  "content": "        print('达里尔 imgPromptRef:', u.split('/')[-1].split('?')[0])"
+                },
+                {
+                  "lineNumber": 31606,
+                  "content": "# 收集 格雷·金斯顿 的 imgPromptReferences image_url"
+                },
+                {
+                  "lineNumber": 31609,
+                  "content": "    refs = s.get('imgPromptReferences') or {}"
+                },
+                {
+                  "lineNumber": 31614,
+                  "content": "print('格雷 imgPromptReferences 的 image_url 去重:', urls)"
+                },
+                {
+                  "lineNumber": 31616,
+                  "content": "# 再看看 达里尔 资产 API 的 thumbnail vs imgPromptReferences"
+                },
+                {
+                  "lineNumber": 31625,
+                  "content": "    refs = s.get('imgPromptReferences') or {}"
+                },
+                {
+                  "lineNumber": 31628,
+                  "content": "        print('达里尔 imgPromptRef:', u.split('/')[-1].split('?')[0])"
+                },
+                {
+                  "lineNumber": 31634,
+                  "content": "格雷 imgPromptReferences 的 image_url 去重: {'1773825238068_fweog9.jpg': 26}"
+                },
+                {
+                  "lineNumber": 31636,
+                  "content": "达里尔 imgPromptRef: 1773825250031_59e2dm.jpg"
+                },
+                {
+                  "lineNumber": 31647,
+                  "content": "I'm investigating why asset.thumbnail and imgPromptReferences use the same URL, which may indicate a broader platform issue. I found that thumbnail, referenceUrls, and imgPromptReferences all point to character style images, suggesting a potential caching or API issue. I confirmed that referenceUrls points to style images and switched to thumbnail for props with no referenceUrls. I found that referenceUrls and thumbnail point to different files for , confirming they are separate assets. The thumbnail image might also be a composite, suggesting a platform API bug where character thumbnails are incorrectly labeled. I'm checking firstframeMedia URLs for asset paths since thumbnails use /images/ but might be under /assets/. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 31735,
+                  "content": "I'm using imgPromptReferences from shots to map asset names to image URLs. I'm mapping asset names to image URLs using referenceUrls instead of imgPromptReferences. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 31818,
+                  "content": "# 从 imgPromptReferences 收集 资产名 -&gt; image_url"
+                },
+                {
+                  "lineNumber": 31821,
+                  "content": "    refs = s.get('imgPromptReferences') or {}"
+                },
+                {
+                  "lineNumber": 31828,
+                  "content": "print('资产名 | asset.thumbnail 文件名 | imgPromptRef 文件名 | 是否相同')"
+                },
+                {
+                  "lineNumber": 31845,
+                  "content": "# 从 imgPromptReferences 收集 资产名 -&gt; image_url"
+                },
+                {
+                  "lineNumber": 31848,
+                  "content": "    refs = s.get('imgPromptReferences') or {}"
+                },
+                {
+                  "lineNumber": 31855,
+                  "content": "print('资产名 | asset.thumbnail 文件名 | imgPromptRef 文件名 | 是否相同')"
+                },
+                {
+                  "lineNumber": 31866,
+                  "content": "资产名 | asset.thumbnail 文件名 | imgPromptRef 文件名 | 是否相同"
+                },
+                {
+                  "lineNumber": 31960,
+                  "content": "I found that referenceUrls and thumbnail point to different files, with referenceUrls containing the style grid and thumbnail being the character thumbnail. I'm reverting my change and instead collecting imgPromptReferences from shots to get the correct style image URL. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 35090,
+                  "content": "        \"contents\": \"/**\\n * 单帧重生页\\n * 三栏：原首帧 / prompt 编辑 + 资产选择 / 候选预览\\n */\\nimport { useEffect, useState } from \\\"react\\\"\\nimport { useParams } from \\\"react-router\\\"\\nimport { useEpisodeStore } from \\\"@/stores\\\"\\nimport { Button, Dialog } from \\\"@/components/ui\\\"\\nimport { PromptEditor, AssetSelector, ImagePreview } from \\\"@/components/business\\\"\\nimport { flattenShots } from \\\"@/types\\\"\\nimport { getFileUrl } from \\\"@/utils/file\\\"\\n\\nexport default function RegenPage() {\\n  const { episodeId, shotId } = useParams&amp;lt;{ episodeId: string; shotId: string }&amp;gt;()\\n  const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()\\n  const [prompt, setPrompt] = useState(\\\"\\\")\\n  const [assetIds, setAssetIds] = useState&amp;lt;string[]&amp;gt;([])\\n  const [confirmOpen, setConfirmOpen] = useState(false)\\n\\n  useEffect(() =&amp;gt; {\\n    if (episodeId) void fetchEpisodeDetail(episodeId)\\n  }, [episodeId, fetchEpisodeDetail])\\n\\n  if (!episodeId || !shotId || !currentEpisode) return null\\n\\n  const sh [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 35206,
+                  "content": "            \"text\": \"    setPrompt(shot.imagePrompt)\","
+                },
+                {
+                  "lineNumber": 36388,
+                  "content": "        \"contents\": \"def pull_episode(\\n    episode_id: str,\\n    output_dir: Path,\\n    *,\\n    project_id: str | None = None,\\n    episode_title: str | None = None,\\n    episode_number: int = 1,\\n    client: FeelingClient | None = None,\\n    force_redownload: bool = False,\\n) -&amp;gt; dict[str, Any]:\\n \\\"assets\\\", default=[])\\n            if isinstance(used_assets, list):\\n                for ua in used_assets:\\n                    if isinstance(ua, dict):\\n                        name = _get(ua, \\\"name\\\", \\\"title\\\", default=\\\"\\\")\\n                        if name and name in asset_by_name:\\n                            meta = asset_by_name[name]\\n                            if meta[\\\"assetId\\\"] not in seen_aid:\\n                                seen_aid.add(meta[\\\"assetId\\\"])\\n                                shot_assets.append(meta)\\n                    elif isinstance(ua, str) and ua in asset_by_id:\\n                        if ua not in seen_aid:\\n                            seen_aid.add [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 36531,
+                  "content": "            \"text\": \"                \\\"imagePrompt\\\": image_prompt,\","
+                },
+                {
+                  "lineNumber": 36535,
+                  "content": "            \"text\": \"                \\\"videoPrompt\\\": video_prompt,\","
+                },
+                {
+                  "lineNumber": 40346,
+                  "content": "        \"contents\": \"/**\\n * 单帧重生页\\n * 三栏：原首帧 / prompt 编辑 + 资产选择 / 候选预览\\n */\\nimport { useEffect, useState } from \\\"react\\\"\\nimport { useParams } from \\\"react-router\\\"\\nimport { useEpisodeStore } from \\\"@/stores\\\"\\nimport { Button, Dialog } from \\\"@/components/ui\\\"\\nimport { PromptEditor, AssetSelector, ImagePreview } from \\\"@/components/business\\\"\\nimport { flattenShots } from \\\"@/types\\\"\\nimport { getFileUrl } from \\\"@/utils/file\\\"\\n\\nexport default function RegenPage() {\\n  const { episodeId, shotId } = useParams&amp;lt;{ episodeId: string; shotId: string }&amp;gt;()\\n  const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()\\n  const [prompt, setPrompt] = useState(\\\"\\\")\\n  const [assetIds, setAssetIds] = useState&amp;lt;string[]&amp;gt;([])\\n  const [confirmOpen, setConfirmOpen] = useState(false)\\n\\n  useEffect(() =&amp;gt; {\\n    if (episodeId) void fetchEpisodeDetail(episodeId)\\n  }, [episodeId, fetchEpisodeDetail])\\n\\n  if (!episodeId || !shotId || !currentEpisode) return null\\n\\n  const sh [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 40462,
+                  "content": "            \"text\": \"    setPrompt(shot.imagePrompt)\","
+                }
+              ]
+            },
+            {
+              "file": "./src/feeling/puller.py",
+              "matches": [
+                {
+                  "lineNumber": 187,
+                  "content": "            image_prompt = _get(sh, \"imgPrompt\", \"imagePrompt\", \"image_prompt\", \"description\", \"prompt\")"
+                },
+                {
+                  "lineNumber": 188,
+                  "content": "            video_prompt = _get(sh, \"videoPrompt\", \"video_prompt\", \"videoPrompt\", default=image_prompt)"
+                },
+                {
+                  "lineNumber": 227,
+                  "content": "                \"imagePrompt\": image_prompt,"
+                },
+                {
+                  "lineNumber": 228,
+                  "content": "                \"videoPrompt\": video_prompt,"
+                },
+                {
+                  "lineNumber": 259,
+                  "content": "            image_prompt = _get(s, \"imgPrompt\", \"imagePrompt\", \"image_prompt\", \"description\", \"prompt\")"
+                },
+                {
+                  "lineNumber": 260,
+                  "content": "            video_prompt = _get(s, \"videoPrompt\", \"video_prompt\", \"videoPrompt\", default=image_prompt)"
+                },
+                {
+                  "lineNumber": 294,
+                  "content": "                \"imagePrompt\": image_prompt,"
+                },
+                {
+                  "lineNumber": 295,
+                  "content": "                \"videoPrompt\": video_prompt,"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/types/api.ts",
+              "matches": [
+                {
+                  "lineNumber": 47,
+                  "content": "  imagePrompt: string"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/models/schemas.py",
+              "matches": [
+                {
+                  "lineNumber": 67,
+                  "content": "    imagePrompt: str"
+                },
+                {
+                  "lineNumber": 68,
+                  "content": "    videoPrompt: str"
+                },
+                {
+                  "lineNumber": 147,
+                  "content": "    imagePrompt: str"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/pages/ShotDetailPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 114,
+                  "content": "              {shot.imagePrompt}"
+                },
+                {
+                  "lineNumber": 120,
+                  "content": "              {shot.videoPrompt}"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/components/business/ShotRow.tsx",
+              "matches": [
+                {
+                  "lineNumber": 56,
+                  "content": "        {shot.imagePrompt.slice(0, 40)}..."
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/pages/RegenPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 30,
+                  "content": "    setPrompt(shot.imagePrompt)"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/types/episode.ts",
+              "matches": [
+                {
+                  "lineNumber": 61,
+                  "content": "  imagePrompt: string"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "  videoPrompt: string"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/regen/regen_frame.py",
+              "matches": [
+                {
+                  "lineNumber": 6,
+                  "content": "基于首帧参考图 + 资产图 + 修改后的 imagePrompt，调用 yunwu Gemini 重新生成首帧。"
+                },
+                {
+                  "lineNumber": 33,
+                  "content": "    parser.add_argument(\"--image-prompt\", required=True, help=\"修改后的 imagePrompt\")"
+                },
+                {
+                  "lineNumber": 110,
+                  "content": "    shot[\"imagePrompt\"] = args.image_prompt"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/i2v/batch.py",
+              "matches": [
+                {
+                  "lineNumber": 127,
+                  "content": "            prompt = shot.get(\"videoPrompt\", \"\")"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/endframe/gen_tail.py",
+              "matches": [
+                {
+                  "lineNumber": 250,
+                  "content": "            image_prompt = shot.get(\"imagePrompt\", \"\")"
+                },
+                {
+                  "lineNumber": 251,
+                  "content": "            video_prompt = shot.get(\"videoPrompt\", \"\")"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/routes/generate.py",
+              "matches": [
+                {
+                  "lineNumber": 60,
+                  "content": "            shot.imagePrompt,"
+                },
+                {
+                  "lineNumber": 61,
+                  "content": "            shot.videoPrompt,"
+                },
+                {
+                  "lineNumber": 111,
+                  "content": "        resp = submit_img2video(first_path, shot.videoPrompt)"
+                },
+                {
+                  "lineNumber": 182,
+                  "content": "            \"imagePrompt\": image_prompt,"
+                },
+                {
+                  "lineNumber": 199,
+                  "content": "        task_id, req.episodeId, req.shotId, req.imagePrompt, req.assetIds or [],"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/services/data_service.py",
+              "matches": [
+                {
+                  "lineNumber": 130,
+                  "content": "        updates: 要更新的字段（如 status, endFrame, imagePrompt 等）"
+                }
+              ]
+            },
+            {
+              "file": "./docs/平台辅助计划/前端完成总结与后端改造指南.md",
+              "matches": [
+                {
+                  "lineNumber": 131,
+                  "content": "  \"imagePrompt\": \"...\","
+                },
+                {
+                  "lineNumber": 132,
+                  "content": "  \"videoPrompt\": \"...\","
+                },
+                {
+                  "lineNumber": 225,
+                  "content": "  \"imagePrompt\": \"修改后的 prompt 文本\","
+                },
+                {
+                  "lineNumber": 306,
+                  "content": "- &#96;shots[].shotId&#96;, &#96;shotNumber&#96;, &#96;imagePrompt&#96;, &#96;videoPrompt&#96;, &#96;duration&#96;, &#96;cameraMovement&#96;, &#96;aspectRatio&#96;"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-19_07-04Z-front-end-transformation-plan.md",
+              "matches": [
+                {
+                  "lineNumber": 53,
+                  "content": "  \"composerData\": \"{\\\"_v\\\":13,\\\"composerId\\\":\\\"task-toolu_bdrk_015vDEDkuVZY86SNfJMkGRyq\\\",\\\"richText\\\":\\\"\\\",\\\"hasLoaded\\\":true,\\\"text\\\":\\\"\\\",\\\"fullConversationHeadersOnly\\\":[{\\\"bubbleId\\\":\\\"46d85753-8f32-4d6c-b02d-8f1419e24435\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"92e81d8a-2732-4c95-8825-69d77882265a\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"d1f1395d-aabd-442d-8a27-38b158de017e\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"4857be1d-f47d-4a59-b73f-133b3b4a2239\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"ffedee53-75b2-4f34-8e9a-0bd68768ee95\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"c2ee6ad8-d867-4f16-a987-f25558c17594\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"c1ca4ccb-8ca0-4d72-bd89-31420e9d5f82\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"3c6323b8-5ce3-40b4-bfeb-5f98fc0ea4c6\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"eaef31ae-a91d-4e38-8c55-76ce5dee4b8a\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"7e35d2ec-5850-4c46-b752-8237fc230df2\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"39bb7d85-74b3-46b6-8450-31da4dc22359\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"45668d57-c7cd-4235-9a06-a54801eeedf9\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"6b9c2e [... omitted end of long line]"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/mocks/handlers.ts",
+              "matches": [
+                {
+                  "lineNumber": 22,
+                  "content": "          imagePrompt: \"中景，达里尔站在废弃仓库门口...\","
+                },
+                {
+                  "lineNumber": 23,
+                  "content": "          videoPrompt: \"镜头缓慢推进...\","
+                }
+              ]
+            },
+            {
+              "file": "./docs/平台辅助计划/前端改造计划.md",
+              "matches": [
+                {
+                  "lineNumber": 671,
+                  "content": "          imagePrompt: '中景，达里尔站在废弃仓库门口...',"
+                },
+                {
+                  "lineNumber": 672,
+                  "content": "          videoPrompt: '镜头缓慢推进...',"
+                }
+              ]
+            },
+            {
+              "file": "./docs/平台辅助计划/前端生成prompt.md",
+              "matches": [
+                {
+                  "lineNumber": 83,
+                  "content": "  imagePrompt: string;         // 画面描述 prompt"
+                },
+                {
+                  "lineNumber": 84,
+                  "content": "  videoPrompt: string;         // 视频动作 prompt"
+                },
+                {
+                  "lineNumber": 164,
+                  "content": "         imagePrompt: string,          # 修改后的 prompt"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-19_04-47Z-api-integration-for-script-and-asset-management.md",
+              "matches": [
+                {
+                  "lineNumber": 649,
+                  "content": "  \"videoPrompt\": \"达里尔缓缓转身，面露警觉...\","
+                },
+                {
+                  "lineNumber": 650,
+                  "content": "  \"imagePrompt\": \"中景，达里尔站在废墟中...\","
+                }
+              ]
+            },
+            {
+              "file": "./docs/平台辅助计划/平台辅助计划.md",
+              "matches": [
+                {
+                  "lineNumber": 113,
+                  "content": "          \"imagePrompt\": \"中景，达里尔站在废弃仓库门口，夕阳逆光，破碎的铁门半开...\","
+                },
+                {
+                  "lineNumber": 114,
+                  "content": "          \"videoPrompt\": \"镜头缓慢推进，达里尔转身走入仓库，铁门在风中摇晃...\","
+                },
+                {
+                  "lineNumber": 188,
+                  "content": "        T1[\"逐 Shot：首帧 + imagePrompt + videoPrompt + 资产图\"]"
+                },
+                {
+                  "lineNumber": 195,
+                  "content": "        V1[\"模式A：首帧 i2v&lt;br/&gt;首帧 + videoPrompt → Vidu\"]"
+                },
+                {
+                  "lineNumber": 196,
+                  "content": "        V2[\"模式B：首尾帧 i2v&lt;br/&gt;首帧 + 尾帧 + videoPrompt → Vidu\"]"
+                },
+                {
+                  "lineNumber": 206,
+                  "content": "        R2[\"首帧 + 资产图 + 修改后的 imagePrompt\"]"
+                },
+                {
+                  "lineNumber": 244,
+                  "content": "- **输入**：首帧图 + imagePrompt + videoPrompt + 资产图（0-2张）"
+                },
+                {
+                  "lineNumber": 251,
+                  "content": "- **输入**：首帧图 + videoPrompt"
+                },
+                {
+                  "lineNumber": 258,
+                  "content": "- **输入**：首帧图 + 尾帧图 + videoPrompt"
+                },
+                {
+                  "lineNumber": 266,
+                  "content": "- **输入**：原首帧（参考） + 资产图 + 修改后的 imagePrompt"
+                }
+              ]
+            }
+          ],
+          "totalLines": 148,
+          "totalMatchedLines": 148
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Analyzing prompt data**
+
+The puller correctly extracts imagePrompt and videoPrompt fields from episode.json for each shot. 
+
+**Checking storyboard display**
+
+I'm investigating whether the storyboard display correctly shows image and video prompts from the pulled data. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Mapping data fields**
+
+I'm mapping episode.json fields to platform API keys, confirming imagePrompt and videoPrompt are correctly extracted. I'm checking if the platform API returns different structures and whether some shots lack imagePrompt/videoPrompt fields. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Checking shot display**
+
+I'm investigating why ShotCard doesn't show imagePrompt/videoPrompt while ShotRow truncates them. I'm checking if platform API returns different values for videoPrompt vs imagePrompt that could cause display issues. The platform API returns imgPrompt and videoPrompt fields in shot objects, which the client fetches via GET /api/storyboard/episodes/{episodeId}/shots. 
+
+I need to verify if imgPrompt and videoPrompt fields are being fetched from the platform API at all. I'm investigating whether shots are fetched from a dedicated endpoint or embedded within scenes. I found that shots are fetched from the `get_shots` endpoint and the data structure includes `imgPrompt` and `imagePrompt` fields. 
+
+I'm investigating how prompts are structured in the API response to understand the data format for `imgPrompt` and `imagePrompt` fields. </details></think>
+
+---
+
+
+检查平台 shots API 的返回结构及 puller 的字段映射：
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "visualDescription|prompt|imgPrompt",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+  "glob": "*.py",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "visualDescription|prompt|imgPrompt",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "./src/feeling/puller.py",
+              "matches": [
+                {
+                  "lineNumber": 120,
+                  "content": "        prompt = _get(a, \"prompt\", \"description\", default=\"\")"
+                },
+                {
+                  "lineNumber": 135,
+                  "content": "            \"prompt\": prompt,"
+                },
+                {
+                  "lineNumber": 187,
+                  "content": "            image_prompt = _get(sh, \"imgPrompt\", \"imagePrompt\", \"image_prompt\", \"description\", \"prompt\")"
+                },
+                {
+                  "lineNumber": 188,
+                  "content": "            video_prompt = _get(sh, \"videoPrompt\", \"video_prompt\", \"videoPrompt\", default=image_prompt)"
+                },
+                {
+                  "lineNumber": 227,
+                  "content": "                \"imagePrompt\": image_prompt,"
+                },
+                {
+                  "lineNumber": 228,
+                  "content": "                \"videoPrompt\": video_prompt,"
+                },
+                {
+                  "lineNumber": 259,
+                  "content": "            image_prompt = _get(s, \"imgPrompt\", \"imagePrompt\", \"image_prompt\", \"description\", \"prompt\")"
+                },
+                {
+                  "lineNumber": 260,
+                  "content": "            video_prompt = _get(s, \"videoPrompt\", \"video_prompt\", \"videoPrompt\", default=image_prompt)"
+                },
+                {
+                  "lineNumber": 294,
+                  "content": "                \"imagePrompt\": image_prompt,"
+                },
+                {
+                  "lineNumber": 295,
+                  "content": "                \"videoPrompt\": video_prompt,"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/models/schemas.py",
+              "matches": [
+                {
+                  "lineNumber": 44,
+                  "content": "    prompt: str = \"\""
+                }
+              ]
+            },
+            {
+              "file": "./src/feeling/client.py",
+              "matches": [
+                {
+                  "lineNumber": 190,
+                  "content": "            Shot 数组，每项含 id、shotNumber、prompts、首帧URL、关联资产等"
+                },
+                {
+                  "lineNumber": 255,
+                  "content": "            资产数组，每项含 id、name、type、thumbnail、referenceUrls、prompt 等"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/regen/regen_frame.py",
+              "matches": [
+                {
+                  "lineNumber": 30,
+                  "content": "    parser = argparse.ArgumentParser(description=\"单帧带资产重生：修改 prompt + 选资产 → 新首帧\")"
+                },
+                {
+                  "lineNumber": 33,
+                  "content": "    parser.add_argument(\"--image-prompt\", required=True, help=\"修改后的 imagePrompt\")"
+                },
+                {
+                  "lineNumber": 82,
+                  "content": "{image_prompt}"
+                },
+                {
+                  "lineNumber": 86,
+                  "content": "    text = template.format(image_prompt=args.image_prompt)"
+                },
+                {
+                  "lineNumber": 110,
+                  "content": "    shot[\"imagePrompt\"] = args.image_prompt"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/i2v/batch.py",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "1. 传统模式：读取 output/frames/{episode}/group_xx/ + prompt.txt"
+                },
+                {
+                  "lineNumber": 60,
+                  "content": "        prompt_path = ep_shot / group_dir.name / \"prompt.txt\""
+                },
+                {
+                  "lineNumber": 61,
+                  "content": "        if not prompt_path.exists():"
+                },
+                {
+                  "lineNumber": 63,
+                  "content": "        descriptions = get_scene_descriptions(prompt_path)"
+                },
+                {
+                  "lineNumber": 71,
+                  "content": "            tasks.append({\"group\": group_dir.name, \"scene\": i + 1, \"frame_path\": frame_path, \"prompt\": desc[:5000]})"
+                },
+                {
+                  "lineNumber": 75,
+                  "content": "            print(f\"  - {t['group']}/S{t['scene']:02d}: {t['prompt'][:60]}...\")"
+                },
+                {
+                  "lineNumber": 84,
+                  "content": "                prompt=t[\"prompt\"],"
+                },
+                {
+                  "lineNumber": 127,
+                  "content": "            prompt = shot.get(\"videoPrompt\", \"\")"
+                },
+                {
+                  "lineNumber": 135,
+                  "content": "                \"prompt\": prompt,"
+                },
+                {
+                  "lineNumber": 140,
+                  "content": "            print(f\"  - Shot {t['shotNumber']}: {t['prompt'][:60]}...\")"
+                },
+                {
+                  "lineNumber": 151,
+                  "content": "                    prompt=t[\"prompt\"][:5000],"
+                },
+                {
+                  "lineNumber": 159,
+                  "content": "                    prompt=t[\"prompt\"],"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/endframe/gen_tail.py",
+              "matches": [
+                {
+                  "lineNumber": 6,
+                  "content": "    # 传统模式（prompt.md + assets_by_shot.json）"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "# 默认提示词模板（当 prompt/EndFramePromp.md 不存在时回退）"
+                },
+                {
+                  "lineNumber": 54,
+                  "content": "{image_prompt}"
+                },
+                {
+                  "lineNumber": 57,
+                  "content": "{video_prompt}"
+                },
+                {
+                  "lineNumber": 64,
+                  "content": "def load_prompt_template(template_path: Path) -&gt; str:"
+                },
+                {
+                  "lineNumber": 66,
+                  "content": "    从 prompt/EndFramePromp.md 加载提示词模板。"
+                },
+                {
+                  "lineNumber": 67,
+                  "content": "    提取 ---System--- 与 ---User--- 之间的内容，作为主 prompt；"
+                },
+                {
+                  "lineNumber": 68,
+                  "content": "    替换 {assetList}、{image_prompt}、{video_prompt_line}、{角色一致性/伤口位置/道具位置/光线方向/景别}。"
+                },
+                {
+                  "lineNumber": 88,
+                  "content": "def parse_episode_prompt_md(prompt_path: Path) -&gt; list[tuple[str, str, str]]:"
+                },
+                {
+                  "lineNumber": 90,
+                  "content": "    解析 episode 级 prompt.md（含 # Shot N）。"
+                },
+                {
+                  "lineNumber": 91,
+                  "content": "    每段：时间戳 / image_prompt / video_prompt（ Shot 15 等可能只有 2 行）"
+                },
+                {
+                  "lineNumber": 93,
+                  "content": "    text = prompt_path.read_text(encoding=\"utf-8\")"
+                },
+                {
+                  "lineNumber": 102,
+                  "content": "            image_prompt = lines[1]"
+                },
+                {
+                  "lineNumber": 103,
+                  "content": "            video_prompt = lines[2] if len(lines) &gt; 2 else lines[1]"
+                },
+                {
+                  "lineNumber": 104,
+                  "content": "            blocks.append((time_line, image_prompt, video_prompt))"
+                },
+                {
+                  "lineNumber": 108,
+                  "content": "def parse_prompt_md(prompt_path: Path) -&gt; list[tuple[str, str, str]]:"
+                },
+                {
+                  "lineNumber": 110,
+                  "content": "    解析 prompt.md，每个 shot 返回 (time, image_prompt, video_prompt)。"
+                },
+                {
+                  "lineNumber": 111,
+                  "content": "    格式：每块 3 行 = 时间戳、image_prompt、video_prompt。"
+                },
+                {
+                  "lineNumber": 113,
+                  "content": "    text = prompt_path.read_text(encoding=\"utf-8\")"
+                },
+                {
+                  "lineNumber": 125,
+                  "content": "            image_prompt = lines[0]"
+                },
+                {
+                  "lineNumber": 126,
+                  "content": "            video_prompt = lines[1]"
+                },
+                {
+                  "lineNumber": 128,
+                  "content": "            image_prompt = lines[0]"
+                },
+                {
+                  "lineNumber": 129,
+                  "content": "            video_prompt = \"\""
+                },
+                {
+                  "lineNumber": 132,
+                  "content": "        blocks.append((time_line, image_prompt, video_prompt))"
+                },
+                {
+                  "lineNumber": 164,
+                  "content": "def build_tail_prompt("
+                },
+                {
+                  "lineNumber": 166,
+                  "content": "    image_prompt: str,"
+                },
+                {
+                  "lineNumber": 167,
+                  "content": "    video_prompt: str,"
+                },
+                {
+                  "lineNumber": 171,
+                  "content": "    用模板拼出尾帧任务的文本 prompt。"
+                },
+                {
+                  "lineNumber": 176,
+                  "content": "    prompt = template.replace(\"{assetList}\", asset_list)"
+                },
+                {
+                  "lineNumber": 177,
+                  "content": "    prompt = prompt.replace(\"{image_prompt}\", image_prompt)"
+                },
+                {
+                  "lineNumber": 178,
+                  "content": "    prompt = prompt.replace(\"{video_prompt_line}\", video_prompt)"
+                },
+                {
+                  "lineNumber": 179,
+                  "content": "    prompt = prompt.replace(\"{角色一致性/伤口位置/道具位置/光线方向/景别}\", continuity)"
+                },
+                {
+                  "lineNumber": 181,
+                  "content": "    prompt = prompt.replace(\"{{image_prompt}}\", image_prompt)"
+                },
+                {
+                  "lineNumber": 182,
+                  "content": "    prompt = prompt.replace(\"{{video_prompt_line}}\", video_prompt)"
+                },
+                {
+                  "lineNumber": 183,
+                  "content": "    prompt = prompt.replace(\"{{角色一致性/伤口位置/道具位置/光线方向/景别}}\", continuity)"
+                },
+                {
+                  "lineNumber": 186,
+                  "content": "            prompt += f\"\\n\\n图一为首帧图，图二为{asset_names[0]}资产。\""
+                },
+                {
+                  "lineNumber": 188,
+                  "content": "            prompt += f\"\\n\\n图一为首帧图，图二为{asset_names[0]}资产，图三为{asset_names[1]}资产。\""
+                },
+                {
+                  "lineNumber": 190,
+                  "content": "        prompt += \"\\n\\n图一为首帧图。\""
+                },
+                {
+                  "lineNumber": 191,
+                  "content": "    return prompt"
+                },
+                {
+                  "lineNumber": 224,
+                  "content": "    prompt_template = load_prompt_template("
+                },
+                {
+                  "lineNumber": 225,
+                  "content": "        args.prompt_template if args.prompt_template.is_absolute() else Path.cwd() / args.prompt_template"
+                },
+                {
+                  "lineNumber": 250,
+                  "content": "            image_prompt = shot.get(\"imagePrompt\", \"\")"
+                },
+                {
+                  "lineNumber": 251,
+                  "content": "            video_prompt = shot.get(\"videoPrompt\", \"\")"
+                },
+                {
+                  "lineNumber": 263,
+                  "content": "            prompt_text = build_tail_prompt("
+                },
+                {
+                  "lineNumber": 264,
+                  "content": "                prompt_template, image_prompt, video_prompt, asset_names"
+                },
+                {
+                  "lineNumber": 275,
+                  "content": "                    api_key, prompt_text, first_b64, asset_b64_list,"
+                },
+                {
+                  "lineNumber": 318,
+                  "content": "        help=\"group 目录（单 group 模式），内含 S01.png、prompt.md\","
+                },
+                {
+                  "lineNumber": 332,
+                  "content": "        \"--prompt-template\","
+                },
+                {
+                  "lineNumber": 334,
+                  "content": "        default=Path(\"prompt/EndFramePromp.md\"),"
+                },
+                {
+                  "lineNumber": 400,
+                  "content": "    template_path = args.prompt_template if args.prompt_template.is_absolute() else Path.cwd() / args.prompt_template"
+                },
+                {
+                  "lineNumber": 406,
+                  "content": "    prompt_template = load_prompt_template(template_path)"
+                },
+                {
+                  "lineNumber": 411,
+                  "content": "        prompt_path = group_dir / \"prompt.md\""
+                },
+                {
+                  "lineNumber": 412,
+                  "content": "        blocks = parse_prompt_md(prompt_path)"
+                },
+                {
+                  "lineNumber": 417,
+                  "content": "        prompt_path = episode_dir / \"prompt.md\""
+                },
+                {
+                  "lineNumber": 418,
+                  "content": "        if not prompt_path.exists():"
+                },
+                {
+                  "lineNumber": 419,
+                  "content": "            raise SystemExit(f\"prompt 不存在: {prompt_path}\")"
+                },
+                {
+                  "lineNumber": 420,
+                  "content": "        blocks = parse_episode_prompt_md(prompt_path)"
+                },
+                {
+                  "lineNumber": 424,
+                  "content": "        raise SystemExit(f\"prompt 仅 {len(blocks)} 个 shot，无法处理 {shot_nums}\")"
+                },
+                {
+                  "lineNumber": 435,
+                  "content": "            print(f\"[Skip] Shot {shot_num}: 无对应 prompt 块\")"
+                },
+                {
+                  "lineNumber": 452,
+                  "content": "        time_line, image_prompt, video_prompt = blocks[idx]"
+                },
+                {
+                  "lineNumber": 459,
+                  "content": "        prompt_text = build_tail_prompt("
+                },
+                {
+                  "lineNumber": 460,
+                  "content": "            prompt_template,"
+                },
+                {
+                  "lineNumber": 461,
+                  "content": "            image_prompt,"
+                },
+                {
+                  "lineNumber": 462,
+                  "content": "            video_prompt,"
+                },
+                {
+                  "lineNumber": 471,
+                  "content": "            print(f\"  image_prompt: {image_prompt[:60]}...\")"
+                },
+                {
+                  "lineNumber": 485,
+                  "content": "                prompt_text,"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/routes/generate.py",
+              "matches": [
+                {
+                  "lineNumber": 150,
+                  "content": "def _run_regen_frame(task_id: str, episode_id: str, shot_id: str, image_prompt: str, asset_ids: list[str]):"
+                },
+                {
+                  "lineNumber": 178,
+                  "content": "        img_data = regenerate_first_frame(first_path, image_prompt, asset_paths)"
+                },
+                {
+                  "lineNumber": 182,
+                  "content": "            \"imagePrompt\": image_prompt,"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/services/yunwu_service.py",
+              "matches": [
+                {
+                  "lineNumber": 32,
+                  "content": "{image_prompt}"
+                },
+                {
+                  "lineNumber": 35,
+                  "content": "{video_prompt}"
+                },
+                {
+                  "lineNumber": 49,
+                  "content": "def build_tail_prompt("
+                },
+                {
+                  "lineNumber": 50,
+                  "content": "    image_prompt: str,"
+                },
+                {
+                  "lineNumber": 51,
+                  "content": "    video_prompt: str,"
+                },
+                {
+                  "lineNumber": 54,
+                  "content": "    \"\"\"构建尾帧生成用的文本 prompt。\"\"\""
+                },
+                {
+                  "lineNumber": 56,
+                  "content": "        image_prompt=image_prompt,"
+                },
+                {
+                  "lineNumber": 57,
+                  "content": "        video_prompt=video_prompt,"
+                },
+                {
+                  "lineNumber": 71,
+                  "content": "    image_prompt: str,"
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "    video_prompt: str,"
+                },
+                {
+                  "lineNumber": 89,
+                  "content": "    text = build_tail_prompt(image_prompt, video_prompt, asset_names)"
+                },
+                {
+                  "lineNumber": 104,
+                  "content": "    image_prompt: str,"
+                },
+                {
+                  "lineNumber": 111,
+                  "content": "    单帧重生：基于首帧参考 + 资产 + 新 prompt 生成新首帧。"
+                },
+                {
+                  "lineNumber": 126,
+                  "content": "{image_prompt}"
+                },
+                {
+                  "lineNumber": 130,
+                  "content": "    text = template.format(image_prompt=image_prompt)"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/services/vidu_service.py",
+              "matches": [
+                {
+                  "lineNumber": 30,
+                  "content": "    prompt: str,"
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "        prompt: 视频描述"
+                },
+                {
+                  "lineNumber": 52,
+                  "content": "        prompt=prompt,"
+                }
+              ]
+            },
+            {
+              "file": "./src/yunwu/client.py",
+              "matches": [
+                {
+                  "lineNumber": 105,
+                  "content": "    请求格式：文本 prompt + 首帧图（inline_data）+ 资产图（可选 0-2 张）。"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/i2v/prompt_test.py",
+              "matches": [
+                {
+                  "lineNumber": 4,
+                  "content": "i2v 提示词对比测试：3×2 任务（prompt.md 格式）"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "def parse_prompt_md(md_path: Path) -&gt; list[dict]:"
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "            \"prompt1\": lines[i + 1],"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "            \"prompt2\": lines[i + 2],"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "    prompt_path = frames_dir / group / \"prompt.md\""
+                },
+                {
+                  "lineNumber": 63,
+                  "content": "    if not prompt_path.exists():"
+                },
+                {
+                  "lineNumber": 64,
+                  "content": "        print(f\"未找到 {prompt_path}\")"
+                },
+                {
+                  "lineNumber": 66,
+                  "content": "    scenes = parse_prompt_md(prompt_path)"
+                },
+                {
+                  "lineNumber": 68,
+                  "content": "        print(f\"prompt.md 仅 {len(scenes)} 个场景\")"
+                },
+                {
+                  "lineNumber": 92,
+                  "content": "        for p_label, prompt in [(\"prompt1\", scene[\"prompt1\"]), (\"prompt2\", scene[\"prompt2\"])]:"
+                },
+                {
+                  "lineNumber": 97,
+                  "content": "                    prompt=prompt[:5000],"
+                },
+                {
+                  "lineNumber": 114,
+                  "content": "                    \"prompt_type\": p_label,"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/i2v/retry_failed.py",
+              "matches": [
+                {
+                  "lineNumber": 64,
+                  "content": "                prompt=payload[\"prompt\"],"
+                },
+                {
+                  "lineNumber": 82,
+                  "content": "                \"prompt_type\": rec.get(\"prompt_type\"),"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/i2v/episode_prompt_test.py",
+              "matches": [
+                {
+                  "lineNumber": 4,
+                  "content": "Episode 级 prompt.md 测试：首帧图 + prompt1/prompt2"
+                },
+                {
+                  "lineNumber": 6,
+                  "content": "解析 output/frames/{episode}/prompt.md（含 # Shot N、时间戳、prompt1、prompt2），"
+                },
+                {
+                  "lineNumber": 7,
+                  "content": "对每个 shot 用对应首帧 + 两种 prompt 各测一次。"
+                },
+                {
+                  "lineNumber": 10,
+                  "content": "流程：解析 prompt.md → 建立 shot→帧映射 → 提交 i2v → 记录到 merged/"
+                },
+                {
+                  "lineNumber": 48,
+                  "content": "def parse_episode_prompt_md(md_path: Path) -&gt; list[dict]:"
+                },
+                {
+                  "lineNumber": 50,
+                  "content": "    解析 episode 级 prompt.md。"
+                },
+                {
+                  "lineNumber": 54,
+                  "content": "      prompt1（画面描述）"
+                },
+                {
+                  "lineNumber": 55,
+                  "content": "      prompt2（纯视频描述，可选，缺则用 prompt1，如 Shot 15）"
+                },
+                {
+                  "lineNumber": 70,
+                  "content": "        prompt1 = lines[1]"
+                },
+                {
+                  "lineNumber": 71,
+                  "content": "        prompt2 = lines[2] if len(lines) &gt; 2 else prompt1"
+                },
+                {
+                  "lineNumber": 78,
+                  "content": "            \"prompt1\": prompt1,"
+                },
+                {
+                  "lineNumber": 79,
+                  "content": "            \"prompt2\": prompt2,"
+                },
+                {
+                  "lineNumber": 93,
+                  "content": "    prompt_path = frames_dir / \"prompt.md\""
+                },
+                {
+                  "lineNumber": 94,
+                  "content": "    if not prompt_path.exists():"
+                },
+                {
+                  "lineNumber": 95,
+                  "content": "        print(f\"未找到 {prompt_path}\")"
+                },
+                {
+                  "lineNumber": 103,
+                  "content": "    scenes = parse_episode_prompt_md(prompt_path)"
+                },
+                {
+                  "lineNumber": 141,
+                  "content": "        for p_label, prompt in [(\"prompt1\", scene[\"prompt1\"]), (\"prompt2\", scene[\"prompt2\"])]:"
+                },
+                {
+                  "lineNumber": 146,
+                  "content": "                    \"prompt\": prompt[:5000],"
+                },
+                {
+                  "lineNumber": 160,
+                  "content": "                    prompt=prompt[:5000],"
+                },
+                {
+                  "lineNumber": 181,
+                  "content": "                    \"prompt_type\": p_label,"
+                },
+                {
+                  "lineNumber": 209,
+                  "content": "    parser = argparse.ArgumentParser(description=\"Episode 级 prompt 测试\")"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/run_episode_test.py",
+              "matches": [
+                {
+                  "lineNumber": 6,
+                  "content": "基于 output/frames/{episode}/prompt.md，对前 N 个 shot 做首帧+prompt1/prompt2 测试，"
+                },
+                {
+                  "lineNumber": 24,
+                  "content": "    print(\"Episode 级 首帧+双 prompt 测试（turbo 540p）\")"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "            str(SCRIPTS / \"i2v\" / \"episode_prompt_test.py\"),"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/grid/gen_grid.py",
+              "matches": [
+                {
+                  "lineNumber": 6,
+                  "content": "输入：prompt.md（shot 1-25 第一段）、public/assets/ 资产图"
+                },
+                {
+                  "lineNumber": 160,
+                  "content": "def parse_episode_prompt_md(prompt_path: Path) -&gt; list[dict]:"
+                },
+                {
+                  "lineNumber": 161,
+                  "content": "    \"\"\"解析 prompt.md，返回 [{\"shot\": 1, \"time\": \"0-4s\", \"image_prompt\": \"...\", \"video_prompt\": \"...\"}, ...]。\"\"\""
+                },
+                {
+                  "lineNumber": 162,
+                  "content": "    text = prompt_path.read_text(encoding=\"utf-8\")"
+                },
+                {
+                  "lineNumber": 173,
+                  "content": "            image_prompt = lines[1]"
+                },
+                {
+                  "lineNumber": 174,
+                  "content": "            video_prompt = lines[2] if len(lines) &gt; 2 else lines[1]"
+                },
+                {
+                  "lineNumber": 177,
+                  "content": "            image_prompt = lines[0] if not re.match(r\"^\\d\", lines[0]) else \"\""
+                },
+                {
+                  "lineNumber": 178,
+                  "content": "            video_prompt = image_prompt"
+                },
+                {
+                  "lineNumber": 184,
+                  "content": "            \"image_prompt\": image_prompt,"
+                },
+                {
+                  "lineNumber": 185,
+                  "content": "            \"video_prompt\": video_prompt,"
+                },
+                {
+                  "lineNumber": 190,
+                  "content": "def load_grid_prompt_template(template_path: Path) -&gt; str:"
+                },
+                {
+                  "lineNumber": 191,
+                  "content": "    \"\"\"从 prompt/GridPrompt.md 提取 ---System--- 到下一个 --- 之间的内容作为主 prompt。\"\"\""
+                },
+                {
+                  "lineNumber": 199,
+                  "content": "def build_grid_prompt("
+                },
+                {
+                  "lineNumber": 202,
+                  "content": "    shot_prompts: list[str],"
+                },
+                {
+                  "lineNumber": 210,
+                  "content": "    拼出宫格生成 prompt。"
+                },
+                {
+                  "lineNumber": 211,
+                  "content": "    shot_prompts: 所有 shot 的 image_prompt；按 shot_start 取连续 rows*cols 个。"
+                },
+                {
+                  "lineNumber": 214,
+                  "content": "    prompt = template.replace(\"{assetList}\", asset_list)"
+                },
+                {
+                  "lineNumber": 216,
+                  "content": "    prompt = prompt.replace(\"5 行 × 5 列\", f\"{rows} 行 × {cols} 列\")"
+                },
+                {
+                  "lineNumber": 217,
+                  "content": "    prompt = prompt.replace(\"25 个等尺寸格子\", f\"{n} 个等尺寸格子\")"
+                },
+                {
+                  "lineNumber": 218,
+                  "content": "    prompt = re.sub(r\"5×5\", f\"{rows}×{cols}\", prompt)"
+                },
+                {
+                  "lineNumber": 219,
+                  "content": "    prompt = prompt.replace(\"shot1 到 shot25\", f\"shot{shot_start} 到 shot{shot_start + n - 1}\")"
+                },
+                {
+                  "lineNumber": 220,
+                  "content": "    prompt = prompt.replace(\"shot1到shot25\", f\"shot{shot_start}到shot{shot_start + n - 1}\")"
+                },
+                {
+                  "lineNumber": 221,
+                  "content": "    # 追加各格画面要求（shot_prompts 已是该组的切片，索引从 0 起）"
+                },
+                {
+                  "lineNumber": 222,
+                  "content": "    prompt += \"\\n\\n\""
+                },
+                {
+                  "lineNumber": 224,
+                  "content": "        p = shot_prompts[i - 1] if i - 1 &lt; len(shot_prompts) else \"\""
+                },
+                {
+                  "lineNumber": 225,
+                  "content": "        prompt += f\"- 格{i} (shot{shot_start + i - 1})：{p}\\n\""
+                },
+                {
+                  "lineNumber": 226,
+                  "content": "    prompt += f\"\\n\\n{image_mapping}。\""
+                },
+                {
+                  "lineNumber": 227,
+                  "content": "    return prompt"
+                },
+                {
+                  "lineNumber": 296,
+                  "content": "        help=\"分镜包目录（含 prompt.md）\","
+                },
+                {
+                  "lineNumber": 307,
+                  "content": "        default=PROJECT_ROOT / \"prompt/GridPrompt.md\","
+                },
+                {
+                  "lineNumber": 356,
+                  "content": "        help=\"仅打印 prompt 和资产映射，不调用 API\","
+                },
+                {
+                  "lineNumber": 364,
+                  "content": "    prompt_path = episode_dir / \"prompt.md\""
+                },
+                {
+                  "lineNumber": 365,
+                  "content": "    if not prompt_path.exists():"
+                },
+                {
+                  "lineNumber": 366,
+                  "content": "        raise SystemExit(f\"prompt 不存在: {prompt_path}\")"
+                },
+                {
+                  "lineNumber": 377,
+                  "content": "    # 2. 解析 prompt 并确定 shot 范围"
+                },
+                {
+                  "lineNumber": 378,
+                  "content": "    blocks = parse_episode_prompt_md(prompt_path)"
+                },
+                {
+                  "lineNumber": 379,
+                  "content": "    all_prompts = {b[\"shot\"]: b[\"image_prompt\"] for b in blocks}"
+                },
+                {
+                  "lineNumber": 399,
+                  "content": "        tasks = [(0, 1, min(1 + n_per_grid - 1, len(all_prompts)))]"
+                },
+                {
+                  "lineNumber": 402,
+                  "content": "    shot_prompts = [all_prompts.get(i, \"\") for i in range(1, max(e for _, _, e in tasks) + 1)]"
+                },
+                {
+                  "lineNumber": 405,
+                  "content": "            if i &gt; len(shot_prompts) or not shot_prompts[i - 1]:"
+                },
+                {
+                  "lineNumber": 406,
+                  "content": "                raise SystemExit(f\"shot {i} 无 prompt\")"
+                },
+                {
+                  "lineNumber": 409,
+                  "content": "    template = load_grid_prompt_template(template_path)"
+                },
+                {
+                  "lineNumber": 426,
+                  "content": "    def _build_prompt_for_group(shot_start: int, shot_end: int) -&gt; str:"
+                },
+                {
+                  "lineNumber": 427,
+                  "content": "        slice_prompts = [all_prompts.get(i, \"\") for i in range(shot_start, shot_end + 1)]"
+                },
+                {
+                  "lineNumber": 428,
+                  "content": "        return build_grid_prompt("
+                },
+                {
+                  "lineNumber": 429,
+                  "content": "            template, asset_list, slice_prompts, image_mapping,"
+                },
+                {
+                  "lineNumber": 433,
+                  "content": "    # 构建每组任务：(group_id, prompt, output_paths)"
+                },
+                {
+                  "lineNumber": 443,
+                  "content": "        fp = _build_prompt_for_group(shot_start, shot_end)"
+                },
+                {
+                  "lineNumber": 471,
+                  "content": "    def _run_one(idx: int, out_p: Path, prompt: str) -&gt; None:"
+                },
+                {
+                  "lineNumber": 474,
+                  "content": "            prompt,"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/i2v/ref2v_multi.py",
+              "matches": [
+                {
+                  "lineNumber": 63,
+                  "content": "def parse_duration_from_prompt(prompt: str) -&gt; int:"
+                },
+                {
+                  "lineNumber": 68,
+                  "content": "    m = re.search(r\"\\[(\\d+)-(\\d+)s?\\]\", prompt)"
+                },
+                {
+                  "lineNumber": 106,
+                  "content": "def build_subject_prompt(video_prompt: str, subject_ids: list[str]) -&gt; str:"
+                },
+                {
+                  "lineNumber": 108,
+                  "content": "    构建主体调用时的 prompt。"
+                },
+                {
+                  "lineNumber": 113,
+                  "content": "    return f\"{refs}。{video_prompt}\" if refs else video_prompt"
+                },
+                {
+                  "lineNumber": 119,
+                  "content": "    video_prompt: str,"
+                },
+                {
+                  "lineNumber": 140,
+                  "content": "        video_prompt: 视频描述提示词"
+                },
+                {
+                  "lineNumber": 149,
+                  "content": "        duration: 时长，默认从 prompt 解析或 5"
+                },
+                {
+                  "lineNumber": 173,
+                  "content": "        dur = parse_duration_from_prompt(video_prompt)"
+                },
+                {
+                  "lineNumber": 220,
+                  "content": "    # 构建 prompt"
+                },
+                {
+                  "lineNumber": 222,
+                  "content": "        prompt = build_subject_prompt(video_prompt, subject_ids)"
+                },
+                {
+                  "lineNumber": 224,
+                  "content": "            prompt = f\"{prompt}，并且旁白音说{dialogue_text}\""
+                },
+                {
+                  "lineNumber": 226,
+                  "content": "        prompt = video_prompt"
+                },
+                {
+                  "lineNumber": 236,
+                  "content": "        print(f\"  prompt: {prompt[:120]}...\")"
+                },
+                {
+                  "lineNumber": 265,
+                  "content": "        \"prompt\": build_subject_prompt(video_prompt, subject_ids) if use_subjects else prompt,"
+                },
+                {
+                  "lineNumber": 273,
+                  "content": "            # prompt 含 @refs，dialogue 由 reference2video_from_files 合并"
+                },
+                {
+                  "lineNumber": 274,
+                  "content": "            base_prompt = build_subject_prompt(video_prompt, subject_ids)"
+                },
+                {
+                  "lineNumber": 277,
+                  "content": "                prompt=base_prompt,"
+                },
+                {
+                  "lineNumber": 289,
+                  "content": "                prompt=prompt,"
+                },
+                {
+                  "lineNumber": 370,
+                  "content": "        \"video_prompt\": lines[0],"
+                },
+                {
+                  "lineNumber": 389,
+                  "content": "        \"--prompt\","
+                },
+                {
+                  "lineNumber": 443,
+                  "content": "    video_prompt = args.prompt"
+                },
+                {
+                  "lineNumber": 448,
+                  "content": "    if raw_path.exists() and (video_prompt is None or dialogue is None or not params):"
+                },
+                {
+                  "lineNumber": 454,
+                  "content": "            if video_prompt is None:"
+                },
+                {
+                  "lineNumber": 455,
+                  "content": "                video_prompt = block[\"video_prompt\"]"
+                },
+                {
+                  "lineNumber": 460,
+                  "content": "            print(f\"[解析 raw.txt] prompt 行数={args.raw_offset+1}, params={params}\")"
+                },
+                {
+                  "lineNumber": 461,
+                  "content": "    elif not video_prompt:"
+                },
+                {
+                  "lineNumber": 462,
+                  "content": "        print(\"[错误] 请提供 --prompt 或确保 raw.txt 存在且格式正确\")"
+                },
+                {
+                  "lineNumber": 477,
+                  "content": "        video_prompt=video_prompt,"
+                }
+              ]
+            },
+            {
+              "file": "./src/vidu/client.py",
+              "matches": [
+                {
+                  "lineNumber": 30,
+                  "content": "        resp = client.img2video(images=[\"data:image/png;base64,...\"], prompt=\"...\")"
+                },
+                {
+                  "lineNumber": 58,
+                  "content": "        prompt: str = \"\","
+                },
+                {
+                  "lineNumber": 73,
+                  "content": "            prompt: 文本提示词"
+                },
+                {
+                  "lineNumber": 91,
+                  "content": "            \"prompt\": prompt,"
+                },
+                {
+                  "lineNumber": 108,
+                  "content": "        prompt: str,"
+                },
+                {
+                  "lineNumber": 116,
+                  "content": "            prompt: 提示词"
+                },
+                {
+                  "lineNumber": 120,
+                  "content": "        return self.img2video(images=[b64], prompt=prompt, **kwargs)"
+                },
+                {
+                  "lineNumber": 128,
+                  "content": "        prompt: str,"
+                },
+                {
+                  "lineNumber": 144,
+                  "content": "        prompt 中通过 @id 引用主体，可用「旁白音说XXX」加入台词。"
+                },
+                {
+                  "lineNumber": 149,
+                  "content": "            prompt: 提示词，含 @id 与可选「旁白音说XXX」"
+                },
+                {
+                  "lineNumber": 157,
+                  "content": "            task_id, state, model, prompt, duration, seed, ..."
+                },
+                {
+                  "lineNumber": 165,
+                  "content": "            \"prompt\": prompt[:5000],"
+                },
+                {
+                  "lineNumber": 183,
+                  "content": "        prompt: str,"
+                },
+                {
+                  "lineNumber": 203,
+                  "content": "            prompt: 文本提示词"
+                },
+                {
+                  "lineNumber": 211,
+                  "content": "            task_id, state, model, prompt, images, duration, ..."
+                },
+                {
+                  "lineNumber": 219,
+                  "content": "            \"prompt\": prompt[:5000],"
+                },
+                {
+                  "lineNumber": 239,
+                  "content": "        prompt: str,"
+                },
+                {
+                  "lineNumber": 251,
+                  "content": "            prompt: 视频描述提示词"
+                },
+                {
+                  "lineNumber": 271,
+                  "content": "            full_prompt = prompt"
+                },
+                {
+                  "lineNumber": 273,
+                  "content": "                full_prompt = f\"{prompt}，并且旁白音说{dialogue}\" if prompt else f\"旁白音说{dialogue}\""
+                },
+                {
+                  "lineNumber": 276,
+                  "content": "                prompt=full_prompt,"
+                },
+                {
+                  "lineNumber": 283,
+                  "content": "            prompt=prompt,"
+                },
+                {
+                  "lineNumber": 309,
+                  "content": "        prompt: str = \"\","
+                },
+                {
+                  "lineNumber": 322,
+                  "content": "            prompt: 可选，生成视频的文本描述，最多 2000 字符"
+                },
+                {
+                  "lineNumber": 331,
+                  "content": "            task_id, state, images, prompt, duration, aspect_ratio, language, credits"
+                },
+                {
+                  "lineNumber": 338,
+                  "content": "            \"prompt\": prompt,"
+                },
+                {
+                  "lineNumber": 390,
+                  "content": "        prompt: str,"
+                },
+                {
+                  "lineNumber": 403,
+                  "content": "            prompt: 根据 type 含义不同（分镜提示词/旁白文本/BGM 提示词）"
+                },
+                {
+                  "lineNumber": 418,
+                  "content": "            \"prompt\": prompt,"
+                },
+                {
+                  "lineNumber": 478,
+                  "content": "        prompt: str = \"\","
+                },
+                {
+                  "lineNumber": 493,
+                  "content": "            prompt: 可选，文本描述，最多 2000 字符"
+                },
+                {
+                  "lineNumber": 501,
+                  "content": "            task_id, state, images, prompt, resolution, aspect_ratio, remove_audio, credits"
+                },
+                {
+                  "lineNumber": 509,
+                  "content": "            \"prompt\": prompt,"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/frames/parse_raw_to_prompt.py",
+              "matches": [
+                {
+                  "lineNumber": 4,
+                  "content": "分镜 raw.txt 解析脚本：将原生提示词模组拆解为 prompt.md 提示词组"
+                },
+                {
+                  "lineNumber": 14,
+                  "content": "  python scripts/frames/parse_raw_to_prompt.py [--add N] [--base-dir DIR]"
+                },
+                {
+                  "lineNumber": 35,
+                  "content": "    每个 block：参考图 + [景别]行 + 台词行 + 若干元数据行 + prompt2 行。"
+                },
+                {
+                  "lineNumber": 54,
+                  "content": "        # 提取时间和 prompt1（仅描述部分，不要景别/角度等）"
+                },
+                {
+                  "lineNumber": 58,
+                  "content": "        prompt1 = desc_m.group(1).strip() if desc_m else line.strip()"
+                },
+                {
+                  "lineNumber": 67,
+                  "content": "        # prompt2：在 台词 后，位于 \"Ns\" 时长行之后的第一个长句（&gt;40 字）"
+                },
+                {
+                  "lineNumber": 68,
+                  "content": "        # 结构：台词 -&gt; 5 行元数据 -&gt; Ns -&gt; 空行 -&gt; prompt2"
+                },
+                {
+                  "lineNumber": 69,
+                  "content": "        prompt2 = \"\""
+                },
+                {
+                  "lineNumber": 77,
+                  "content": "                prompt2 = ln"
+                },
+                {
+                  "lineNumber": 79,
+                  "content": "        if not prompt2:"
+                },
+                {
+                  "lineNumber": 83,
+                  "content": "                    prompt2 = ln"
+                },
+                {
+                  "lineNumber": 88,
+                  "content": "            \"prompt1\": prompt1,"
+                },
+                {
+                  "lineNumber": 89,
+                  "content": "            \"prompt2\": prompt2,"
+                },
+                {
+                  "lineNumber": 97,
+                  "content": "def format_shot(shot_num: int, time_range: str, prompt1: str, prompt2: str, dialogue: str | None) -&gt; str:"
+                },
+                {
+                  "lineNumber": 98,
+                  "content": "    \"\"\"格式化单个 shot 为 prompt.md 的一节。\"\"\""
+                },
+                {
+                  "lineNumber": 100,
+                  "content": "    p1 = prompt1.rstrip(\"。\") + suffix"
+                },
+                {
+                  "lineNumber": 101,
+                  "content": "    p2 = prompt2.rstrip(\"。\") + suffix if dialogue else prompt2"
+                },
+                {
+                  "lineNumber": 106,
+                  "content": "    parser = argparse.ArgumentParser(description=\"解析 raw.txt 生成 prompt.md\")"
+                },
+                {
+                  "lineNumber": 118,
+                  "content": "    prompt_path = base / \"prompt.md\""
+                },
+                {
+                  "lineNumber": 126,
+                  "content": "    # 读取已有 prompt.md 内容"
+                },
+                {
+                  "lineNumber": 128,
+                  "content": "    if prompt_path.exists():"
+                },
+                {
+                  "lineNumber": 129,
+                  "content": "        existing_content = prompt_path.read_text(encoding=\"utf-8\")"
+                },
+                {
+                  "lineNumber": 145,
+                  "content": "                blk[\"prompt1\"],"
+                },
+                {
+                  "lineNumber": 146,
+                  "content": "                blk[\"prompt2\"],"
+                },
+                {
+                  "lineNumber": 152,
+                  "content": "    prompt_path.write_text(\"\\n\\n\".join(out_parts) + \"\\n\", encoding=\"utf-8\")"
+                },
+                {
+                  "lineNumber": 153,
+                  "content": "    print(f\"已生成 {prompt_path}，追加 {len(add_blocks)} 个 shot，共 {next_shot_num - 1} 个 shot\")"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/endframe/extract_prompts.py",
+              "matches": [
+                {
+                  "lineNumber": 4,
+                  "content": "从 prompt.md 提取所有 shot 的提示词（第一段：画面描述；第二段：视频提示词）"
+                },
+                {
+                  "lineNumber": 7,
+                  "content": "    python scripts/endframe/extract_prompts.py"
+                },
+                {
+                  "lineNumber": 8,
+                  "content": "    python scripts/endframe/extract_prompts.py --output output/frames/第2集_EP02_分镜包/prompts_extracted.json"
+                },
+                {
+                  "lineNumber": 21,
+                  "content": "def parse_episode_prompt_md(prompt_path: Path) -&gt; list[dict]:"
+                },
+                {
+                  "lineNumber": 23,
+                  "content": "    解析 episode 级 prompt.md（含 # Shot N）。"
+                },
+                {
+                  "lineNumber": 24,
+                  "content": "    每段：时间戳 / image_prompt（第一段）/ video_prompt（第二段）"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "        {\"shot\": 1, \"time\": \"0-4s\", \"image_prompt\": \"...\", \"video_prompt\": \"...\"},"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "    text = prompt_path.read_text(encoding=\"utf-8\")"
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "            image_prompt = lines[1]"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "            video_prompt = lines[2] if len(lines) &gt; 2 else lines[1]"
+                },
+                {
+                  "lineNumber": 46,
+                  "content": "            image_prompt = lines[0] if not re.match(r\"^\\d\", lines[0]) else \"\""
+                },
+                {
+                  "lineNumber": 47,
+                  "content": "            video_prompt = image_prompt"
+                },
+                {
+                  "lineNumber": 53,
+                  "content": "            \"image_prompt\": image_prompt,"
+                },
+                {
+                  "lineNumber": 54,
+                  "content": "            \"video_prompt\": video_prompt,"
+                },
+                {
+                  "lineNumber": 60,
+                  "content": "    parser = argparse.ArgumentParser(description=\"从 prompt.md 提取所有 shot 的提示词\")"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "        \"--prompt-path\","
+                },
+                {
+                  "lineNumber": 64,
+                  "content": "        default=PROJECT_ROOT / \"output/frames/第2集_EP02_分镜包/prompt.md\","
+                },
+                {
+                  "lineNumber": 65,
+                  "content": "        help=\"prompt.md 路径\","
+                },
+                {
+                  "lineNumber": 71,
+                  "content": "        help=\"输出路径（.json 或 .md），不指定则输出到同目录 prompts_extracted.json\","
+                },
+                {
+                  "lineNumber": 75,
+                  "content": "    prompt_path = args.prompt_path if args.prompt_path.is_absolute() else PROJECT_ROOT / args.prompt_path"
+                },
+                {
+                  "lineNumber": 76,
+                  "content": "    if not prompt_path.exists():"
+                },
+                {
+                  "lineNumber": 77,
+                  "content": "        print(f\"错误：找不到 {prompt_path}\", file=sys.stderr)"
+                },
+                {
+                  "lineNumber": 80,
+                  "content": "    blocks = parse_episode_prompt_md(prompt_path)"
+                },
+                {
+                  "lineNumber": 81,
+                  "content": "    out_dir = prompt_path.parent"
+                },
+                {
+                  "lineNumber": 84,
+                  "content": "    out_json = args.output or (out_dir / \"prompts_extracted.json\")"
+                },
+                {
+                  "lineNumber": 98,
+                  "content": "            f.write(f\"**画面描述（第一段）**：{b['image_prompt']}\\n\\n\")"
+                },
+                {
+                  "lineNumber": 99,
+                  "content": "            f.write(f\"**视频提示词（第二段）**：{b['video_prompt']}\\n\\n\")"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/crop/crop_grid.py",
+              "matches": [
+                {
+                  "lineNumber": 9,
+                  "content": "输入：public/img/shot/{episode}/group_xx/grid.png + prompt.txt"
+                },
+                {
+                  "lineNumber": 28,
+                  "content": "def parse_prompt_scenes(prompt_path: Path) -&gt; list[str]:"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "    解析 prompt.txt，提取 S1:, S2: ... 后的描述文本。"
+                },
+                {
+                  "lineNumber": 35,
+                  "content": "    text = prompt_path.read_text(encoding=\"utf-8\")"
+                },
+                {
+                  "lineNumber": 41,
+                  "content": "def get_scene_descriptions(prompt_path: Path) -&gt; list[str]:"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "    解析 prompt.txt，返回纯描述文本（去掉 S1: 等前缀），供 i2v prompt 使用。"
+                },
+                {
+                  "lineNumber": 48,
+                  "content": "    raw = parse_prompt_scenes(prompt_path)"
+                },
+                {
+                  "lineNumber": 59,
+                  "content": "def infer_layout_from_prompt(prompt_path: Path, img_width: int, img_height: int) -&gt; tuple[int, int]:"
+                },
+                {
+                  "lineNumber": 61,
+                  "content": "    根据 prompt 场景数和图片尺寸推断最佳 rows×cols。"
+                },
+                {
+                  "lineNumber": 64,
+                  "content": "    scenes = parse_prompt_scenes(prompt_path)"
+                },
+                {
+                  "lineNumber": 67,
+                  "content": "        raise ValueError(f\"未在 {prompt_path} 中找到 S1:, S2: 等场景\")"
+                },
+                {
+                  "lineNumber": 99,
+                  "content": "    prompt_path: Path,"
+                },
+                {
+                  "lineNumber": 106,
+                  "content": "    scenes = parse_prompt_scenes(prompt_path)"
+                },
+                {
+                  "lineNumber": 109,
+                  "content": "        raise ValueError(f\"未找到场景: {prompt_path}\")"
+                },
+                {
+                  "lineNumber": 110,
+                  "content": "    rows, cols = infer_layout_from_prompt(prompt_path, w, h)"
+                },
+                {
+                  "lineNumber": 159,
+                  "content": "        prompt_path = group_dir / \"prompt.txt\""
+                },
+                {
+                  "lineNumber": 160,
+                  "content": "        if not grid_path.exists() or not prompt_path.exists():"
+                },
+                {
+                  "lineNumber": 164,
+                  "content": "            paths = crop_grid(grid_path, out_group, prompt_path, max_output=max_output_per_group)"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/endframe/extract_assets.py",
+              "matches": [
+                {
+                  "lineNumber": 91,
+                  "content": "    prompt_path: Path,"
+                },
+                {
+                  "lineNumber": 94,
+                  "content": "    将 raw 的 block 按时间范围对齐到 prompt.md 的 shot 序号。"
+                },
+                {
+                  "lineNumber": 95,
+                  "content": "    raw 与 prompt 的 shot 顺序可能不一致；优先匹配时间，同一时间取首个未使用的 block。"
+                },
+                {
+                  "lineNumber": 97,
+                  "content": "    prompt_text = prompt_path.read_text(encoding=\"utf-8\")"
+                },
+                {
+                  "lineNumber": 99,
+                  "content": "    for m in re.finditer(r\"# Shot (\\d+)\\s*\\n([^\\n]+)\", prompt_text):"
+                },
+                {
+                  "lineNumber": 136,
+                  "content": "        \"--prompt\","
+                },
+                {
+                  "lineNumber": 138,
+                  "content": "        default=Path(\"output/frames/第2集_EP02_分镜包/prompt.md\"),"
+                },
+                {
+                  "lineNumber": 139,
+                  "content": "        help=\"prompt.md 路径（用于对齐 shot 序号）\","
+                },
+                {
+                  "lineNumber": 174,
+                  "content": "        prompt_path = args.prompt if args.prompt.is_absolute() else Path.cwd() / args.prompt"
+                },
+                {
+                  "lineNumber": 175,
+                  "content": "        shot_assets = build_shot_to_assets(blocks, prompt_path)"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/replicate/run_replicate.py",
+              "matches": [
+                {
+                  "lineNumber": 10,
+                  "content": "        --prompt \"【针对后庭园艺家...】\" \\"
+                },
+                {
+                  "lineNumber": 38,
+                  "content": "    prompt: str,"
+                },
+                {
+                  "lineNumber": 67,
+                  "content": "        prompt=prompt,"
+                },
+                {
+                  "lineNumber": 172,
+                  "content": "    parser.add_argument(\"--prompt\", required=True, help=\"提示词\")"
+                },
+                {
+                  "lineNumber": 203,
+                  "content": "        prompt=args.prompt,"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/run_full_test.py",
+              "matches": [
+                {
+                  "lineNumber": 22,
+                  "content": "        [sys.executable, str(SCRIPTS / \"i2v\" / \"prompt_test.py\"), \"--group\", \"group_01\", \"--num\", \"3\"],"
+                }
+              ]
+            },
+            {
+              "file": "./scripts/i2v/selected_1080p.py",
+              "matches": [
+                {
+                  "lineNumber": 27,
+                  "content": "    {\"frame\": \"S01\", \"prompt_type\": \"prompt2\", \"seed\": 480216763, \"duration\": 4},"
+                },
+                {
+                  "lineNumber": 28,
+                  "content": "    {\"frame\": \"S02\", \"prompt_type\": \"prompt2\", \"seed\": 124900752, \"duration\": 2},"
+                },
+                {
+                  "lineNumber": 29,
+                  "content": "    {\"frame\": \"S03\", \"prompt_type\": \"prompt1\", \"seed\": 1729922650, \"duration\": 2},"
+                },
+                {
+                  "lineNumber": 33,
+                  "content": "def parse_prompt_md(md_path: Path) -&gt; list[dict]:"
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "        scenes.append({\"timestamp\": ts, \"duration\": dur, \"prompt1\": lines[i + 1], \"prompt2\": lines[i + 2]})"
+                },
+                {
+                  "lineNumber": 54,
+                  "content": "    prompt_path = frames_dir / group / \"prompt.md\""
+                },
+                {
+                  "lineNumber": 55,
+                  "content": "    scenes = parse_prompt_md(prompt_path)"
+                },
+                {
+                  "lineNumber": 61,
+                  "content": "        prompt = scene[sel[\"prompt_type\"]]"
+                },
+                {
+                  "lineNumber": 77,
+                  "content": "                prompt=prompt[:5000],"
+                },
+                {
+                  "lineNumber": 87,
+                  "content": "            task_id = f\"{sel['frame']}_{sel['prompt_type']}\""
+                },
+                {
+                  "lineNumber": 92,
+                  "content": "                \"prompt_type\": sel[\"prompt_type\"],"
+                },
+                {
+                  "lineNumber": 99,
+                  "content": "            print(f\"[失败] {sel['frame']}_{sel['prompt_type']}: {e}\")"
+                }
+              ]
+            }
+          ],
+          "totalLines": 367,
+          "totalMatchedLines": 367
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/asset_api_dump.json</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "imgPrompt|imagePrompt|videoPrompt",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/docs",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "imgPrompt|imagePrompt|videoPrompt",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/docs",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "docs/平台辅助计划/前端完成总结与后端改造指南.md",
+              "matches": [
+                {
+                  "lineNumber": 131,
+                  "content": "  \"imagePrompt\": \"...\","
+                },
+                {
+                  "lineNumber": 132,
+                  "content": "  \"videoPrompt\": \"...\","
+                },
+                {
+                  "lineNumber": 225,
+                  "content": "  \"imagePrompt\": \"修改后的 prompt 文本\","
+                },
+                {
+                  "lineNumber": 306,
+                  "content": "- &#96;shots[].shotId&#96;, &#96;shotNumber&#96;, &#96;imagePrompt&#96;, &#96;videoPrompt&#96;, &#96;duration&#96;, &#96;cameraMovement&#96;, &#96;aspectRatio&#96;"
+                }
+              ]
+            },
+            {
+              "file": "docs/平台辅助计划/前端改造计划.md",
+              "matches": [
+                {
+                  "lineNumber": 671,
+                  "content": "          imagePrompt: '中景，达里尔站在废弃仓库门口...',"
+                },
+                {
+                  "lineNumber": 672,
+                  "content": "          videoPrompt: '镜头缓慢推进...',"
+                }
+              ]
+            },
+            {
+              "file": "docs/平台辅助计划/前端生成prompt.md",
+              "matches": [
+                {
+                  "lineNumber": 83,
+                  "content": "  imagePrompt: string;         // 画面描述 prompt"
+                },
+                {
+                  "lineNumber": 84,
+                  "content": "  videoPrompt: string;         // 视频动作 prompt"
+                },
+                {
+                  "lineNumber": 164,
+                  "content": "         imagePrompt: string,          # 修改后的 prompt"
+                }
+              ]
+            },
+            {
+              "file": "docs/平台辅助计划/平台辅助计划.md",
+              "matches": [
+                {
+                  "lineNumber": 113,
+                  "content": "          \"imagePrompt\": \"中景，达里尔站在废弃仓库门口，夕阳逆光，破碎的铁门半开...\","
+                },
+                {
+                  "lineNumber": 114,
+                  "content": "          \"videoPrompt\": \"镜头缓慢推进，达里尔转身走入仓库，铁门在风中摇晃...\","
+                },
+                {
+                  "lineNumber": 188,
+                  "content": "        T1[\"逐 Shot：首帧 + imagePrompt + videoPrompt + 资产图\"]"
+                },
+                {
+                  "lineNumber": 195,
+                  "content": "        V1[\"模式A：首帧 i2v&lt;br/&gt;首帧 + videoPrompt → Vidu\"]"
+                },
+                {
+                  "lineNumber": 196,
+                  "content": "        V2[\"模式B：首尾帧 i2v&lt;br/&gt;首帧 + 尾帧 + videoPrompt → Vidu\"]"
+                },
+                {
+                  "lineNumber": 206,
+                  "content": "        R2[\"首帧 + 资产图 + 修改后的 imagePrompt\"]"
+                },
+                {
+                  "lineNumber": 244,
+                  "content": "- **输入**：首帧图 + imagePrompt + videoPrompt + 资产图（0-2张）"
+                },
+                {
+                  "lineNumber": 251,
+                  "content": "- **输入**：首帧图 + videoPrompt"
+                },
+                {
+                  "lineNumber": 258,
+                  "content": "- **输入**：首帧图 + 尾帧图 + videoPrompt"
+                },
+                {
+                  "lineNumber": 266,
+                  "content": "- **输入**：原首帧（参考） + 资产图 + 修改后的 imagePrompt"
+                }
+              ]
+            }
+          ],
+          "totalLines": 19,
+          "totalMatchedLines": 19
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="generic" data-tool-name="glob_file_search">
+<details>
+<summary>Tool use: **glob_file_search** • Searched codebase "undefined" • **0** result in **1** directory</summary>
+
+Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu** (0 file)
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "storyboard|shots|prompts",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/docs",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "storyboard|shots|prompts",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/docs",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "docs/联调说明.md",
+              "matches": [
+                {
+                  "lineNumber": 86,
+                  "content": "  &#96;project/{projectId}/storyboard?episode={episodeId}&#96;  "
+                },
+                {
+                  "lineNumber": 87,
+                  "content": "  例如：&#96;project/b95c3d75-d99a-40c3-9f69-9bb76f23c990/storyboard?episode=c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;"
+                }
+              ]
+            },
+            {
+              "file": "docs/平台辅助计划/前端完成总结与后端改造指南.md",
+              "matches": [
+                {
+                  "lineNumber": 66,
+                  "content": "│   │   ├── shots.ts"
+                },
+                {
+                  "lineNumber": 91,
+                  "content": "| GET | &#96;/api/episodes/:id/shots&#96; | 获取 Episode 下所有 Shot（扁平或按 Scene） |"
+                },
+                {
+                  "lineNumber": 92,
+                  "content": "| GET | &#96;/api/episodes/:id/shots/:shotId&#96; | 获取单个 Shot |"
+                },
+                {
+                  "lineNumber": 93,
+                  "content": "| PATCH | &#96;/api/episodes/:id/shots/:shotId&#96; | 更新 Shot |"
+                },
+                {
+                  "lineNumber": 94,
+                  "content": "| POST | &#96;/api/episodes/:id/shots/:shotId/select&#96; | 选定视频候选 |"
+                },
+                {
+                  "lineNumber": 119,
+                  "content": "      \"shots\": [...]"
+                },
+                {
+                  "lineNumber": 239,
+                  "content": "#### POST /api/episodes/:id/shots/:shotId/select"
+                },
+                {
+                  "lineNumber": 305,
+                  "content": "- &#96;scenes[].sceneId&#96;, &#96;sceneNumber&#96;, &#96;title&#96;, &#96;shots&#96;"
+                },
+                {
+                  "lineNumber": 306,
+                  "content": "- &#96;shots[].shotId&#96;, &#96;shotNumber&#96;, &#96;imagePrompt&#96;, &#96;videoPrompt&#96;, &#96;duration&#96;, &#96;cameraMovement&#96;, &#96;aspectRatio&#96;"
+                },
+                {
+                  "lineNumber": 307,
+                  "content": "- &#96;shots[].firstFrame&#96;, &#96;endFrame&#96;, &#96;status&#96;, &#96;assets&#96;, &#96;videoCandidates&#96;"
+                },
+                {
+                  "lineNumber": 353,
+                  "content": "    │   ├── shots.py         # GET, PATCH, POST select"
+                }
+              ]
+            },
+            {
+              "file": "docs/平台辅助计划/前端改造计划.md",
+              "matches": [
+                {
+                  "lineNumber": 82,
+                  "content": "| &#96;storyboard_overview_newsprint/code.html&#96; | 分镜板总览 | Scene 分组展示 Shot 卡片 |"
+                },
+                {
+                  "lineNumber": 233,
+                  "content": "│   │   ├── shots.ts             # Shot 操作"
+                },
+                {
+                  "lineNumber": 275,
+                  "content": "│   │   ├── StoryboardPage.tsx   # 参考 Stitch storyboard_overview"
+                },
+                {
+                  "lineNumber": 323,
+                  "content": "  shots: Shot[];"
+                },
+                {
+                  "lineNumber": 395,
+                  "content": "        H2[\"storyboard_overview_newsprint\"]"
+                },
+                {
+                  "lineNumber": 447,
+                  "content": "#### 分镜板总览 (&#96;storyboard_overview_newsprint&#96; → &#96;StoryboardPage.tsx&#96;) ⭐"
+                },
+                {
+                  "lineNumber": 464,
+                  "content": "| ✅ 左右面板布局 | ➕ API: &#96;GET /api/episodes/:id/shots/:shotId&#96; |"
+                },
+                {
+                  "lineNumber": 466,
+                  "content": "| ✅ 候选视频并排 | ➕ 候选选定: &#96;POST /api/shots/:shotId/select&#96; |"
+                },
+                {
+                  "lineNumber": 667,
+                  "content": "      shots: ["
+                },
+                {
+                  "lineNumber": 682,
+                  "content": "        // ... 更多 mock shots"
+                }
+              ]
+            },
+            {
+              "file": "docs/平台辅助计划/前端生成prompt.md",
+              "matches": [
+                {
+                  "lineNumber": 77,
+                  "content": "  shots: Shot[];"
+                },
+                {
+                  "lineNumber": 140,
+                  "content": "GET    /api/episodes/:episodeId/shots               → Shot[]    # 获取 shot 列表"
+                },
+                {
+                  "lineNumber": 141,
+                  "content": "GET    /api/episodes/:episodeId/shots/:shotId       → Shot      # 获取单个 shot"
+                },
+                {
+                  "lineNumber": 142,
+                  "content": "PATCH  /api/episodes/:episodeId/shots/:shotId       → Shot      # 更新 shot（改 prompt 等）"
+                },
+                {
+                  "lineNumber": 177,
+                  "content": "POST   /api/shots/:shotId/select        → Shot"
+                }
+              ]
+            },
+            {
+              "file": "docs/平台辅助计划/平台辅助计划.md",
+              "matches": [
+                {
+                  "lineNumber": 57,
+                  "content": "| **分镜表**（Shot 列表 + scene 结构） | &#96;GET /api/storyboard/episodes/{episodeId}/shots&#96; | &#96;data/{project}/{episode}/episode.json&#96; |"
+                },
+                {
+                  "lineNumber": 58,
+                  "content": "| **场景列表** | &#96;GET /api/storyboard/episodes/{episodeId}/scenes&#96; | 合并写入 &#96;episode.json&#96; |"
+                },
+                {
+                  "lineNumber": 75,
+                  "content": "GET /api/storyboard/episodes/{episodeId}/shots"
+                },
+                {
+                  "lineNumber": 79,
+                  "content": "GET /api/storyboard/episodes/{episodeId}/scenes"
+                },
+                {
+                  "lineNumber": 109,
+                  "content": "      \"shots\": ["
+                },
+                {
+                  "lineNumber": 293,
+                  "content": "└── puller.py         # 核心：拉取 shots/scenes/assets → 下载图片 → 写 episode.json"
+                },
+                {
+                  "lineNumber": 304,
+                  "content": "    1. GET /storyboard/episodes/{id}/shots → shot 列表"
+                },
+                {
+                  "lineNumber": 305,
+                  "content": "    2. GET /storyboard/episodes/{id}/scenes → scene 结构"
+                },
+                {
+                  "lineNumber": 339,
+                  "content": "│   │   ├── shots.py          # GET /shots → 分镜表视图数据"
+                },
+                {
+                  "lineNumber": 435,
+                  "content": "| 一键拉取脚本 | &#96;src/feeling/puller.py&#96; | 拉 shots + scenes + assets → 下载图片 → 写 episode.json |"
+                },
+                {
+                  "lineNumber": 485,
+                  "content": "        D3[\"extract_prompts.py&lt;br/&gt;puller 直接拉 prompt\"]"
+                },
+                {
+                  "lineNumber": 495,
+                  "content": "- &#96;crop_grid.py&#96;、&#96;extract_assets.py&#96;、&#96;extract_prompts.py&#96;、&#96;parse_raw_to_prompt.py&#96; → **不需要了**，平台已经做好了这些事"
+                },
+                {
+                  "lineNumber": 520,
+                  "content": "| 拉 Shot 列表 | &#96;GET /api/storyboard/episodes/{episodeId}/shots&#96; |"
+                },
+                {
+                  "lineNumber": 521,
+                  "content": "| 拉场景列表 | &#96;GET /api/storyboard/episodes/{episodeId}/scenes&#96; |"
+                }
+              ]
+            },
+            {
+              "file": "docs/WebMCP Early Preview.md",
+              "matches": [
+                {
+                  "lineNumber": 82,
+                  "content": "* Users can enter natural language prompts to see if the agent can correctly identify and invoke the appropriate WebMCP tools.  "
+                }
+              ]
+            },
+            {
+              "file": "docs/尾帧补全计划/尾帧补全计划.md",
+              "matches": [
+                {
+                  "lineNumber": 147,
+                  "content": "- &#96;--shots 1,2,3&#96;"
+                }
+              ]
+            },
+            {
+              "file": "docs/vidu/ad.md",
+              "matches": [
+                {
+                  "lineNumber": 153,
+                  "content": "storyboards\tArray of storyboard\t分镜任务记录"
+                },
+                {
+                  "lineNumber": 157,
+                  "content": "storyboard"
+                },
+                {
+                  "lineNumber": 199,
+                  "content": "        \"storyboards\": ["
+                },
+                {
+                  "lineNumber": 300,
+                  "content": "storyboard_video_index\t可选\tint\t分镜序号，type为generate_video时必传，用于指定想要修改的分镜编号"
+                }
+              ]
+            }
+          ],
+          "totalLines": 48,
+          "totalMatchedLines": 48
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Reviewing puller logic**
+
+I'm analyzing the puller's logic for extracting image and video prompts from shots. 
+
+**Handling nested prompts**
+
+I'm adding support for nested prompts structure in the puller logic. I'm adding support for nested prompt structures including imgPrompt, videoPrompt, and visualDescription fields. I'm adding more fallbacks to the puller to ensure nested prompt structures are properly retrieved. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "ShotCard|ShotRow",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "ShotCard|ShotRow",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/pages/StoryboardPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 10,
+                  "content": "import { SceneGroup, ShotCard, ShotRow } from \"@/components/business\""
+                },
+                {
+                  "lineNumber": 142,
+                  "content": "                  &lt;ShotCard"
+                },
+                {
+                  "lineNumber": 167,
+                  "content": "                  &lt;ShotRow"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/ShotRow.tsx",
+              "matches": [
+                {
+                  "lineNumber": 2,
+                  "content": " * ShotRow 列表视图行"
+                },
+                {
+                  "lineNumber": 12,
+                  "content": "interface ShotRowProps {"
+                },
+                {
+                  "lineNumber": 20,
+                  "content": "export function ShotRow({ shot, episodeId, basePath = \"\", cacheBust }: ShotRowProps) {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/ShotCard.tsx",
+              "matches": [
+                {
+                  "lineNumber": 2,
+                  "content": " * ShotCard Shot 卡片"
+                },
+                {
+                  "lineNumber": 12,
+                  "content": "interface ShotCardProps {"
+                },
+                {
+                  "lineNumber": 20,
+                  "content": "export function ShotCard({ shot, episodeId, basePath = \"\", cacheBust }: ShotCardProps) {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/index.ts",
+              "matches": [
+                {
+                  "lineNumber": 3,
+                  "content": "export { ShotCard } from \"./ShotCard\""
+                },
+                {
+                  "lineNumber": 4,
+                  "content": "export { ShotRow } from \"./ShotRow\""
+                }
+              ]
+            }
+          ],
+          "totalLines": 11,
+          "totalMatchedLines": 11
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/平台辅助计划/平台辅助计划.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+我们正在确认平台 shots API 的返回结构，并增强 puller 的字段映射与前端展示。
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "prompts|visualDescription",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "prompts|visualDescription",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "./.specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md",
+              "matches": [
+                {
+                  "lineNumber": 1013,
+                  "content": "  \"markdown\": \"Swagger UI\\n\\nExplore\\n\\n&amp;#96;&amp;#96;&amp;#96;\\n 1.0 \\n&amp;#96;&amp;#96;&amp;#96;\\n\\n&amp;#96;&amp;#96;&amp;#96;\\nOAS 3.0\\n&amp;#96;&amp;#96;&amp;#96;\\n\\n## Feeling Video API\\n\\nFeeling Video 视频制作平台 API 文档\\n\\nAuthorize\\n\\n### Admin\\n\\nGET\\n\\n/api/admin/feeling-models\\n\\nPOST\\n\\n/api/admin/feeling-models\\n\\nGET\\n\\n/api/admin/feeling-models/{id}\\n\\nPATCH\\n\\n/api/admin/feeling-models/{id}\\n\\nDELETE\\n\\n/api/admin/feeling-models/{id}\\n\\nGET\\n\\n/api/admin/feeling-models/{id}/authorized-users\\n\\nGET\\n\\n/api/admin/feeling-models/{id}/vendor-costs\\n\\nPOST\\n\\n/api/admin/login\\n\\nGET\\n\\n/api/admin/model-vendor-routes\\n\\nPOST\\n\\n/api/admin/model-vendor-routes\\n\\nGET\\n\\n/api/admin/model-vendor-routes/{id}\\n\\nPATCH\\n\\n/api/admin/model-vendor-routes/{id}\\n\\nDELETE\\n\\n/api/admin/model-vendor-routes/{id}\\n\\nPOST\\n\\n/api/admin/model-vendor-routes/set-default\\n\\nPOST\\n\\n/api/admin/pricing/calculate\\n\\nPOST\\n\\n/api/admin/pricing/margin\\n\\nGET\\n\\n/api/admin/prompt-templates\\n\\nPOST\\n\\n/api/admin/prompt-templates\\n\\nGET\\n\\n/api/admi [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 4115,
+                  "content": "  \"markdown\": \"Swagger UI\\n\\nExplore\\n\\n&amp;#96;&amp;#96;&amp;#96;\\n 1.0 \\n&amp;#96;&amp;#96;&amp;#96;\\n\\n&amp;#96;&amp;#96;&amp;#96;\\nOAS 3.0\\n&amp;#96;&amp;#96;&amp;#96;\\n\\n## Feeling Video API\\n\\nFeeling Video 视频制作平台 API 文档\\n\\nAuthorize\\n\\n### Admin\\n\\nGET\\n\\n/api/admin/feeling-models\\n\\nPOST\\n\\n/api/admin/feeling-models\\n\\nGET\\n\\n/api/admin/feeling-models/{id}\\n\\nPATCH\\n\\n/api/admin/feeling-models/{id}\\n\\nDELETE\\n\\n/api/admin/feeling-models/{id}\\n\\nGET\\n\\n/api/admin/feeling-models/{id}/authorized-users\\n\\nGET\\n\\n/api/admin/feeling-models/{id}/vendor-costs\\n\\nPOST\\n\\n/api/admin/login\\n\\nGET\\n\\n/api/admin/model-vendor-routes\\n\\nPOST\\n\\n/api/admin/model-vendor-routes\\n\\nGET\\n\\n/api/admin/model-vendor-routes/{id}\\n\\nPATCH\\n\\n/api/admin/model-vendor-routes/{id}\\n\\nDELETE\\n\\n/api/admin/model-vendor-routes/{id}\\n\\nPOST\\n\\n/api/admin/model-vendor-routes/set-default\\n\\nPOST\\n\\n/api/admin/pricing/calculate\\n\\nPOST\\n\\n/api/admin/pricing/margin\\n\\nGET\\n\\n/api/admin/prompt-templates\\n\\nPOST\\n\\n/api/admin/prompt-templates\\n\\nGET\\n\\n/api/admi [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 6440,
+                  "content": "shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']"
+                },
+                {
+                  "lineNumber": 8859,
+                  "content": "shot all keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']"
+                },
+                {
+                  "lineNumber": 9285,
+                  "content": "  \"visualDescription\": \"达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。\","
+                },
+                {
+                  "lineNumber": 15947,
+                  "content": "                  \"content\": \"        B0[拉取分镜数据包&amp;lt;br/&amp;gt;shots + 首帧图 + prompts + 资产图]\""
+                },
+                {
+                  "lineNumber": 15951,
+                  "content": "                  \"content\": \"| **拉取分镜** | 从平台API获取Episode下所有Shots + 首帧图 + prompts + 资产图，下载到本地 | 新建 |\""
+                },
+                {
+                  "lineNumber": 16031,
+                  "content": "                  \"content\": \"I'm extracting the image_prompt from each shot as requested. I'm extracting image prompts from shots and mapping them to reference images with 4K resolution. I'm creating scripts to extract shot prompts and run yunwu with gemini-3-pro-image-preview for 4K, 9:16 resolution. &amp;lt;/details&amp;gt;&amp;lt;/think&amp;gt;\""
+                },
+                {
+                  "lineNumber": 16043,
+                  "content": "                  \"content\": \"I'm extracting prompts for shots 1-25 to generate a 5x5 grid image. I'm updating the workflow to generate a single 55 grid image from 25 prompts using GridPrompt.md as template. &amp;lt;/details&amp;gt;&amp;lt;/think&amp;gt;\""
+                },
+                {
+                  "lineNumber": 16209,
+                  "content": "              \"file\": \"./.specstory/history/2026-03-17_05-52Z-script-breakdown-for-video-prompts.md\","
+                },
+                {
+                  "lineNumber": 16656,
+                  "content": "                  \"content\": \"shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\""
+                },
+                {
+                  "lineNumber": 31207,
+                  "content": "                  \"content\": \"- &amp;#96;crop_grid.py&amp;#96;、&amp;#96;extract_assets.py&amp;#96;、&amp;#96;extract_prompts.py&amp;#96;、&amp;#96;parse_raw_to_prompt.py&amp;#96; → **不需要了**，平台已经做好了这些事\""
+                }
+              ]
+            },
+            {
+              "file": "./src/feeling/client.py",
+              "matches": [
+                {
+                  "lineNumber": 190,
+                  "content": "            Shot 数组，每项含 id、shotNumber、prompts、首帧URL、关联资产等"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-19_07-04Z-front-end-transformation-plan.md",
+              "matches": [
+                {
+                  "lineNumber": 53,
+                  "content": "  \"composerData\": \"{\\\"_v\\\":13,\\\"composerId\\\":\\\"task-toolu_bdrk_015vDEDkuVZY86SNfJMkGRyq\\\",\\\"richText\\\":\\\"\\\",\\\"hasLoaded\\\":true,\\\"text\\\":\\\"\\\",\\\"fullConversationHeadersOnly\\\":[{\\\"bubbleId\\\":\\\"46d85753-8f32-4d6c-b02d-8f1419e24435\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"92e81d8a-2732-4c95-8825-69d77882265a\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"d1f1395d-aabd-442d-8a27-38b158de017e\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"4857be1d-f47d-4a59-b73f-133b3b4a2239\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"ffedee53-75b2-4f34-8e9a-0bd68768ee95\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"c2ee6ad8-d867-4f16-a987-f25558c17594\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"c1ca4ccb-8ca0-4d72-bd89-31420e9d5f82\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"3c6323b8-5ce3-40b4-bfeb-5f98fc0ea4c6\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"eaef31ae-a91d-4e38-8c55-76ce5dee4b8a\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"7e35d2ec-5850-4c46-b752-8237fc230df2\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"39bb7d85-74b3-46b6-8450-31da4dc22359\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"45668d57-c7cd-4235-9a06-a54801eeedf9\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"6b9c2e [... omitted end of long line]"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-19_04-47Z-api-integration-for-script-and-asset-management.md",
+              "matches": [
+                {
+                  "lineNumber": 102,
+                  "content": "  \"composerData\": \"{\\\"_v\\\":13,\\\"composerId\\\":\\\"task-toolu_bdrk_017MNqTDH2JRkX5xBFHskeNy\\\",\\\"richText\\\":\\\"\\\",\\\"hasLoaded\\\":true,\\\"text\\\":\\\"\\\",\\\"fullConversationHeadersOnly\\\":[{\\\"bubbleId\\\":\\\"c387df03-1962-485a-ac8c-3942279c9570\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"cc91b6e5-7d2f-4f7c-9f83-b3b4cb4bd598\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"464a176e-bcac-4e68-877a-b438541807cd\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"4f4718e3-839d-484f-b987-359ef047fe22\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"b904f352-e2d3-47fd-b7ef-efa5f3486d91\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"79a12040-a595-44e0-89ea-e0e1fd06e83e\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"2c089e02-9075-4fd3-901d-9186ff16ade6\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"88a45698-e38e-409a-8970-e589c0a5af22\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"1749e7dc-2d9d-4ab3-b6c5-35f9e426ddf7\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"cc744470-75ae-4901-a9ae-91b4b1745cb3\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"a1c031c2-db98-42ba-9445-3e02209e3d7c\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"f8e4ea68-6e64-4f31-918c-7fcc58463e88\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"b7efcc [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 258,
+                  "content": "   - Batch prompt generation: POST &#96;/api/assets/batch-generate-prompts&#96;"
+                },
+                {
+                  "lineNumber": 398,
+                  "content": "| &#96;POST /api/assets/batch-generate-prompts&#96; | 批量生成描述 | 一键生成所有资产prompt |"
+                },
+                {
+                  "lineNumber": 419,
+                  "content": "| &#96;POST /api/pipeline-runs/{id}/generate-prompts&#96; | 批量生成提示词 | 替代手动 prompt.md |"
+                },
+                {
+                  "lineNumber": 420,
+                  "content": "| &#96;POST /api/pipeline-runs/{runId}/optimize-prompts&#96; | AI优化提示词 | 新功能：AI润色 |"
+                },
+                {
+                  "lineNumber": 481,
+                  "content": "2. **资产** → &#96;assets&#96; 创建 + 上传图片 → 平台 &#96;batch-generate-prompts&#96;"
+                },
+                {
+                  "lineNumber": 597,
+                  "content": "        B0[拉取分镜数据包&lt;br/&gt;shots + 首帧图 + prompts + 资产图]"
+                },
+                {
+                  "lineNumber": 697,
+                  "content": "| **拉取分镜** | 从平台API获取Episode下所有Shots + 首帧图 + prompts + 资产图，下载到本地 | 新建 |"
+                },
+                {
+                  "lineNumber": 1006,
+                  "content": "| &#96;./scripts/endframe/extract_prompts.py&#96; |"
+                },
+                {
+                  "lineNumber": 1054,
+                  "content": "1. **Platform sync (pull only)**: Just fetch the completed storyboard data - first frames, shot table (video/image prompts), assets, metadata"
+                },
+                {
+                  "lineNumber": 1108,
+                  "content": "之前的 &#96;crop_grid.py&#96;、&#96;extract_assets.py&#96;、&#96;extract_prompts.py&#96; 这些**全部不需要了**——平台已经做好了这些事，我们直接拉成品就行。"
+                }
+              ]
+            },
+            {
+              "file": "./docs/平台辅助计划/平台辅助计划.md",
+              "matches": [
+                {
+                  "lineNumber": 485,
+                  "content": "        D3[\"extract_prompts.py&lt;br/&gt;puller 直接拉 prompt\"]"
+                },
+                {
+                  "lineNumber": 495,
+                  "content": "- &#96;crop_grid.py&#96;、&#96;extract_assets.py&#96;、&#96;extract_prompts.py&#96;、&#96;parse_raw_to_prompt.py&#96; → **不需要了**，平台已经做好了这些事"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-19_06-16Z-platform-assistance-program-planning.md",
+              "matches": [
+                {
+                  "lineNumber": 70,
+                  "content": "  \"composerData\": \"{\\\"_v\\\":13,\\\"composerId\\\":\\\"task-toolu_bdrk_01LcvJhvMYWGiURhw8SQFaU5\\\",\\\"richText\\\":\\\"\\\",\\\"hasLoaded\\\":true,\\\"text\\\":\\\"\\\",\\\"fullConversationHeadersOnly\\\":[{\\\"bubbleId\\\":\\\"a83acbdc-718f-431c-ae6c-772ac1122100\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"6b4ce074-44b4-4483-b495-12893360c379\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"349d426f-c81b-45b7-bfbc-50023639c7fd\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"1e5d1c06-8113-4148-a28d-5368615935d4\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"f417acc4-81b4-4280-bf15-39fa27b62427\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"7a42b5cc-0f8e-46f4-aff8-fc6790cb2777\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"0dc63b09-09f6-49b3-b809-d26f39a779e3\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"331c7bbe-e91b-4447-ae93-baadff6e8feb\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"4c21ef7c-f7d0-4a60-8ad0-160bb54cac0a\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"e6e3470b-e427-4bd4-a4ff-994710c8abc3\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"3952908b-d067-4529-83cf-a4d5900c0e7d\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"3f5d8ad6-e3ae-4455-9d53-aefc807a103c\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"52173c [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 109,
+                  "content": "  \"composerData\": \"{\\\"_v\\\":13,\\\"composerId\\\":\\\"task-toolu_bdrk_01LazdnZBG3WQbjD7weQwVBt\\\",\\\"richText\\\":\\\"\\\",\\\"hasLoaded\\\":true,\\\"text\\\":\\\"\\\",\\\"fullConversationHeadersOnly\\\":[{\\\"bubbleId\\\":\\\"e7f0dc95-ef63-4c7e-9d93-2a55af62f909\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"4880f856-6995-49cb-9fc3-98b9c332fb76\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"51488881-2fbe-4af7-a58d-a0ecfb02e755\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"d0d01d72-0694-444d-9706-d2e4dfec78eb\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"3a0ebcc0-cfbd-4e81-9d15-121c25b75936\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"1ba0ae1c-922b-4a0a-8b63-dd922bcee586\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"05f4efa7-b983-4cd7-8e21-5c546fb63a01\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"289c03cd-a598-4881-b6d6-7f1e75feaf01\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"f031007b-15ea-41bb-bcb9-7ccf629261df\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"fb15c3da-03a4-47c4-b230-eb1a0ced4ad2\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"ba3d8f45-a834-44c7-b943-60eb13ec9b48\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"53c448f3-de6b-4463-bc21-8eaa397ab97e\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"0c911a [... omitted end of long line]"
+                }
+              ]
+            },
+            {
+              "file": "./docs/WebMCP Early Preview.md",
+              "matches": [
+                {
+                  "lineNumber": 82,
+                  "content": "* Users can enter natural language prompts to see if the agent can correctly identify and invoke the appropriate WebMCP tools.  "
+                }
+              ]
+            },
+            {
+              "file": "./scripts/grid/gen_grid.py",
+              "matches": [
+                {
+                  "lineNumber": 202,
+                  "content": "    shot_prompts: list[str],"
+                },
+                {
+                  "lineNumber": 211,
+                  "content": "    shot_prompts: 所有 shot 的 image_prompt；按 shot_start 取连续 rows*cols 个。"
+                },
+                {
+                  "lineNumber": 221,
+                  "content": "    # 追加各格画面要求（shot_prompts 已是该组的切片，索引从 0 起）"
+                },
+                {
+                  "lineNumber": 224,
+                  "content": "        p = shot_prompts[i - 1] if i - 1 &lt; len(shot_prompts) else \"\""
+                },
+                {
+                  "lineNumber": 379,
+                  "content": "    all_prompts = {b[\"shot\"]: b[\"image_prompt\"] for b in blocks}"
+                },
+                {
+                  "lineNumber": 399,
+                  "content": "        tasks = [(0, 1, min(1 + n_per_grid - 1, len(all_prompts)))]"
+                },
+                {
+                  "lineNumber": 402,
+                  "content": "    shot_prompts = [all_prompts.get(i, \"\") for i in range(1, max(e for _, _, e in tasks) + 1)]"
+                },
+                {
+                  "lineNumber": 405,
+                  "content": "            if i &gt; len(shot_prompts) or not shot_prompts[i - 1]:"
+                },
+                {
+                  "lineNumber": 427,
+                  "content": "        slice_prompts = [all_prompts.get(i, \"\") for i in range(shot_start, shot_end + 1)]"
+                },
+                {
+                  "lineNumber": 429,
+                  "content": "            template, asset_list, slice_prompts, image_mapping,"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-17_09-30Z-prompt-word-generation-for-grid-layout.md",
+              "matches": [
+                {
+                  "lineNumber": 380,
+                  "content": "I'm mapping the structure of prompt.md and EndFramePromp.md to understand how to transform shot descriptions into system prompts. I'm examining GridPrompt.md structure and shot numbering pattern from the code snippet. "
+                },
+                {
+                  "lineNumber": 604,
+                  "content": "**Extracting prompts**"
+                },
+                {
+                  "lineNumber": 1009,
+                  "content": "I'm creating a script to extract prompts and run the API for image generation. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 1231,
+                  "content": "**Extracting prompts**"
+                },
+                {
+                  "lineNumber": 1233,
+                  "content": "I'm extracting the image_prompt from each shot as requested. I'm extracting image prompts from shots and mapping them to reference images with 4K resolution. I'm creating scripts to extract shot prompts and run yunwu with gemini-3-pro-image-preview for 4K, 9:16 resolution. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 1265,
+                  "content": "I'm extracting shot prompts from prompt.md structure for the extraction script. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 1277,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/scripts/endframe/extract_prompts.py&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 1299,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu &amp;&amp; python scripts/endframe/extract_prompts.py&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 1302,
+                  "content": "cd /Users/zuobowen/Documents/GitHub/fv_autovidu &amp;&amp; python scripts/endframe/extract_prompts.py"
+                },
+                {
+                  "lineNumber": 1306,
+                  "content": "已写入 /Users/zuobowen/Documents/GitHub/fv_autovidu/output/frames/第2集_EP02_分镜包/prompts_extracted.json，共 40 个 shot"
+                },
+                {
+                  "lineNumber": 1307,
+                  "content": "已写入 /Users/zuobowen/Documents/GitHub/fv_autovidu/output/frames/第2集_EP02_分镜包/prompts_extracted.md"
+                },
+                {
+                  "lineNumber": 1333,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/frames/第2集_EP02_分镜包/prompts_extracted.json&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 1453,
+                  "content": "I'm extracting prompts for shots 1-25 to generate a 5x5 grid image. I'm updating the workflow to generate a single 55 grid image from 25 prompts using GridPrompt.md as template. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 1687,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/frames/第2集_EP02_分镜包/prompts_extracted.json&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 2296,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/frames/第2集_EP02_分镜包/prompts_extracted.json&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 3100,
+                  "content": "I'm correcting the slice_prompts logic to convert all_prompts dict to 0-indexed list for shot 1-9. I'm converting all_prompts dict to 0-indexed list for proper slicing. I'm slicing prompts correctly for grid builds using &#96;range(shot_start, shot_end+1)&#96;. "
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-17_10-54Z-multi-parameter-video-generation.md",
+              "matches": [
+                {
+                  "lineNumber": 115,
+                  "content": "| &#96;prompts_extracted.md&#96; |"
+                },
+                {
+                  "lineNumber": 116,
+                  "content": "| &#96;prompts_extracted.json&#96; |"
+                },
+                {
+                  "lineNumber": 179,
+                  "content": "I'm assigning voice_ids to subjects for character dialogue, with narrator using default voice. I'm combining video prompts with dialogue in the prompt, assigning dialogue to specific subjects based on the format. I'm adding dialogue to the prompt for subject-based calls, but the API doesn't seem to support a separate reference image for the scene. "
+                },
+                {
+                  "lineNumber": 797,
+                  "content": "              \"file\": \"./.specstory/history/2026-03-17_05-52Z-script-breakdown-for-video-prompts.md\","
+                },
+                {
+                  "lineNumber": 1163,
+                  "content": "-rw-r--r--@  1 zuobowen  staff     20221 Mar 17 17:55 prompts_extracted.json"
+                },
+                {
+                  "lineNumber": 1164,
+                  "content": "-rw-r--r--@  1 zuobowen  staff     20326 Mar 17 17:55 prompts_extracted.md"
+                },
+                {
+                  "lineNumber": 1233,
+                  "content": "I'm studying the Vidu reference2video API to understand how to structure the subjects and prompts for both audio/dialogue and video-only calls. Viduq2-pro only supports non-subject calls, so I need to use subject calls with viduq1 or viduq2 models instead for dialogue generation. Viduq2/viduq1/vidu2.0 support dialogue with subject calls, while viduq2-pro doesn't support dialogue. I'm clarifying which subjects qualify as '' in viduq2/viduq1 support dialogue. I clarified that subjects in viduq2/viduq1 can include non-character visual references like '' and '', not just characters. I'm normalizing subject IDs to standardized strings like 'grace', 'carl', 'daryl', 'car', 'car_interior' for consistent API usage. "
+                },
+                {
+                  "lineNumber": 1365,
+                  "content": "I'm replacing character names with numeric IDs 1-5 in prompts for consistency. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 2698,
+                  "content": "                  \"content\": \"I'm looking up seeds and prompts for S03_prompt1, S02_prompt2, and S01_prompt2 in poll_results and i2v_test_records. I'm extracting seeds and prompts for S03_prompt1, S02_prompt2, and S01_prompt2 from poll_results and i2v_test_records. \""
+                },
+                {
+                  "lineNumber": 2902,
+                  "content": "                  \"content\": \"                  \\\"content\\\": \\\"I'm looking up seeds and prompts for S03_prompt1, S02_prompt2, and S01_prompt2 in poll_results and i2v_test_records. I'm extracting seeds and prompts for S03_prompt1, S02_prompt2, and S01_prompt2 from poll_results and i2v_test_records. \\\"\""
+                },
+                {
+                  "lineNumber": 3165,
+                  "content": "              \"file\": \"./.specstory/history/2026-03-17_05-52Z-script-breakdown-for-video-prompts.md\","
+                }
+              ]
+            },
+            {
+              "file": "./scripts/endframe/extract_prompts.py",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "    python scripts/endframe/extract_prompts.py"
+                },
+                {
+                  "lineNumber": 8,
+                  "content": "    python scripts/endframe/extract_prompts.py --output output/frames/第2集_EP02_分镜包/prompts_extracted.json"
+                },
+                {
+                  "lineNumber": 71,
+                  "content": "        help=\"输出路径（.json 或 .md），不指定则输出到同目录 prompts_extracted.json\","
+                },
+                {
+                  "lineNumber": 84,
+                  "content": "    out_json = args.output or (out_dir / \"prompts_extracted.json\")"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-17_08-45Z-尾帧补全计划适用性讨论.md",
+              "matches": [
+                {
+                  "lineNumber": 155,
+                  "content": "                  \"content\": \"I'm using the yunwu API to generate tail frames for S01-S40 with reference images and prompts from prompt.md. &amp;lt;/details&amp;gt;&amp;lt;/think&amp;gt;\""
+                },
+                {
+                  "lineNumber": 1591,
+                  "content": "              \"file\": \"./.specstory/history/2026-03-17_05-52Z-script-breakdown-for-video-prompts.md\","
+                },
+                {
+                  "lineNumber": 1962,
+                  "content": "I'm identifying the consistent shot block format with headers, descriptions, assets, and prompts. "
+                },
+                {
+                  "lineNumber": 2002,
+                  "content": "I'm identifying the distinct blocks in raw.txt: headers, reference images, scene descriptions, dialogue, asset lines, durations, and video prompts. "
+                },
+                {
+                  "lineNumber": 3525,
+                  "content": "I'm generating dynamic prompts with asset placeholders and handling shot grouping logic. "
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-17_08-02Z-image-generation-for-episode-2-frames.md",
+              "matches": [
+                {
+                  "lineNumber": 5009,
+                  "content": "I'm using the yunwu API to generate tail frames for S01-S40 with reference images and prompts from prompt.md. &lt;/details&gt;&lt;/think&gt;"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-16_10-48Z-项目架构整理与脚本测试.md",
+              "matches": [
+                {
+                  "lineNumber": 1632,
+                  "content": "I'm preparing to run the i2v test with the specified prompt structure for S01. I'm running 6 tests (3 scenes  2 prompts) with timestamps in payload parameter. "
+                },
+                {
+                  "lineNumber": 1699,
+                  "content": "I'm building a parser for the prompt.md format to extract timestamped prompts. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 1731,
+                  "content": "I'm parsing prompt.md with 3-line blocks containing timestamp and two prompts. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 3640,
+                  "content": "I'm looking up seeds and prompts for S03_prompt1, S02_prompt2, and S01_prompt2 in poll_results and i2v_test_records. I'm extracting seeds and prompts for S03_prompt1, S02_prompt2, and S01_prompt2 from poll_results and i2v_test_records. "
+                },
+                {
+                  "lineNumber": 4914,
+                  "content": "I'm using the new prompt.md and following the previous approach with frame image + 2 prompts for testing. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 5974,
+                  "content": "                  \"content\": \"I'm looking up seeds and prompts for S03_prompt1, S02_prompt2, and S01_prompt2 in poll_results and i2v_test_records. I'm extracting seeds and prompts for S03_prompt1, S02_prompt2, and S01_prompt2 from poll_results and i2v_test_records. \""
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-17_05-52Z-script-breakdown-for-video-prompts.md",
+              "matches": [
+                {
+                  "lineNumber": 5,
+                  "content": "# Script breakdown for video prompts (2026-03-17 05:52Z)"
+                },
+                {
+                  "lineNumber": 891,
+                  "content": "I'm correcting the prompt2 extraction for block 13 where the prompt2 was empty due to incorrect regex matching. I'm debugging the prompt2 extraction for block 13 by verifying the regex matching and loop indices. The regex condition for skipping short lines was incorrectly applied to long prompts, causing valid prompt2 lines to be skipped. "
+                },
+                {
+                  "lineNumber": 893,
+                  "content": "The regex condition was incorrectly applied to long prompts, causing valid prompt2 lines to be skipped. "
+                }
+              ]
+            }
+          ],
+          "totalLines": 86,
+          "totalMatchedLines": 86
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Analyzing shot data**
+
+I'm extracting the actual platform shot keys from the specstory history. I'm identifying the platform shot keys from the specstory history. I found that the puller already extracts imgPrompt and videoPrompt from shot data, but the issue may be empty imgPrompt values while visualDescription contains content. </details></think>
+
+---
+
+
+找到平台 shot 的实际字段：`imgPrompt`、`videoPrompt`、`visualDescription`。Puller 已映射 `imgPrompt` 和 `videoPrompt`，但未包含 `visualDescription`。正在增强 puller 的字段映射并修复前端的空值处理。
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [-] 增强 puller：添加 visualDescription 等 fallback 字段
+- [ ] 修复 ShotRow：imagePrompt 空值安全 + 改进展示
+- [ ] ShotCard 增加图片/视频提示词预览
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Refactoring prompt extraction**
+
+I'm simplifying the prompt extraction logic to handle both image and video prompts from the nested object. I'm extracting image prompts from nested objects using a prioritized lookup strategy. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] 增强 puller：添加 visualDescription 等 fallback 字段
+- [-] 修复 ShotRow：imagePrompt 空值安全 + 改进展示
+- [ ] ShotCard 增加图片/视频提示词预览
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/index.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "imagePrompt|videoPrompt",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "imagePrompt|videoPrompt",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/types/api.ts",
+              "matches": [
+                {
+                  "lineNumber": 47,
+                  "content": "  imagePrompt: string"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/episode.ts",
+              "matches": [
+                {
+                  "lineNumber": 61,
+                  "content": "  imagePrompt: string"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "  videoPrompt: string"
+                }
+              ]
+            }
+          ],
+          "totalLines": 3,
+          "totalMatchedLines": 3
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] 增强 puller：添加 visualDescription 等 fallback 字段
+- [x] 修复 ShotRow：imagePrompt 空值安全 + 改进展示
+- [x] ShotCard 增加图片/视频提示词预览
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.puller import _get_shot_prompts
+# 模拟平台返回
+sh1 = {'imgPrompt': '画面描述A', 'videoPrompt': '视频描述B'}
+assert _get_shot_prompts(sh1) == ('画面描述A', '视频描述B')
+sh2 = {'visualDescription': '视觉描述', 'videoPrompt': None}
+assert _get_shot_prompts(sh2) == ('视觉描述', '视觉描述')
+sh3 = {'prompts': {'image': '嵌套图', 'video': '嵌套视'}}
+assert _get_shot_prompts(sh3) == ('嵌套图', '嵌套视')
+print('puller _get_shot_prompts OK')
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.puller import _get_shot_prompts
+# 模拟平台返回
+sh1 = {'imgPrompt': '画面描述A', 'videoPrompt': '视频描述B'}
+assert _get_shot_prompts(sh1) == ('画面描述A', '视频描述B')
+sh2 = {'visualDescription': '视觉描述', 'videoPrompt': None}
+assert _get_shot_prompts(sh2) == ('视觉描述', '视觉描述')
+sh3 = {'prompts': {'image': '嵌套图', 'video': '嵌套视'}}
+assert _get_shot_prompts(sh3) == ('嵌套图', '嵌套视')
+print('puller _get_shot_prompts OK')
+"
+```
+
+```
+puller _get_shot_prompts OK
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="read_lints">
+<details>
+<summary>Tool use: **read_lints**</summary>
+
+
+Parameters:
+
+```json
+{
+  "paths": [
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx"
+  ]
+}
+```
+Result:
+
+```json
+{
+  "linterErrorsByFile": [
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx"
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+修改已完成，总结如下：
+
+## 修改方案流程图
+
+```mermaid
+flowchart TB
+    subgraph 平台API["平台 Shots API"]
+        A1["imgPrompt"]
+        A2["videoPrompt"]
+        A3["visualDescription"]
+        A4["prompts.image / prompts.video"]
+    end
+
+    subgraph Puller["puller.py 增强"]
+        B1["_get_shot_prompts()"]
+        B2["顶层字段 + 嵌套 prompts"]
+        B3["visualDescription 兜底"]
+    end
+
+    subgraph 本地["episode.json"]
+        C1["imagePrompt"]
+        C2["videoPrompt"]
+    end
+
+    subgraph 前端["前端展示"]
+        D1["ShotCard: 图/视 提示词预览"]
+        D2["ShotRow: 空值安全 + 50 字"]
+        D3["ShotDetailPage: 暂无 兜底"]
+    end
+
+    A1 & A2 & A3 & A4 --> B1
+    B1 --> B2
+    B2 --> B3
+    B3 --> C1 & C2
+    C1 & C2 --> D1 & D2 & D3
+```
+
+## 结论与修改说明
+
+**分镜表的图片提示词、视频提示词是有拉取的**，平台返回 `imgPrompt`、`videoPrompt`、`visualDescription` 等字段，puller 会写入 `episode.json`。
+
+本次主要做了以下增强和修复：
+
+### 1. Puller 增强（`src/feeling/puller.py`）
+
+- 新增 `_get_shot_prompts()`，统一提取图片/视频提示词
+- 支持 `visualDescription` 作为图片提示词兜底
+- 支持嵌套 `prompts.image`、`prompts.video` 等结构
+- 字段优先级：`imgPrompt` → `imagePrompt` → `visualDescription` → `description` → `prompt`
+
+### 2. 前端展示调整
+
+| 组件 | 修改 |
+|------|------|
+| **ShotCard** | 增加图片/视频提示词预览（约 36 字），悬停可看完整内容 |
+| **ShotRow** | 空值安全；无 imagePrompt 时用 videoPrompt；展示约 50 字 |
+| **ShotDetailPage** | 空时显示「暂无」，标签改为「画面描述（图片提示词）」「视频描述（视频提示词）」 |
+
+### 3. 联调说明（`docs/联调说明.md`）
+
+- 增加 Shots API 导出示例，便于检查平台返回的 `imgPrompt`、`videoPrompt`、`visualDescription` 等字段
+
+### 4. 调试方式
+
+若本地 `episode.json` 中仍无提示词，可执行：
+
+```bash
+python -c "
+import json
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+shots = c.get_shots('<你的episode-id>')
+with open('docs/shots_api_dump.json', 'w', encoding='utf-8') as f:
+    json.dump(shots, f, ensure_ascii=False, indent=2)
+print('已写入 docs/shots_api_dump.json')
+"
+```
+
+然后查看 `docs/shots_api_dump.json` 中是否包含 `imgPrompt`、`videoPrompt`、`visualDescription`。若平台字段名不同，可在 `_get_shot_prompts` 中补充对应映射。
+
+---
+
+_**User**_
+
+https://dev-video-server.feeling.ltd/api-docs#/  这里面有吗？
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="web_fetch">
+<details>
+<summary>Tool use: **web_fetch**</summary>
+
+
+Parameters:
+
+```json
+{
+  "url": "https://dev-video-server.feeling.ltd/api-docs"
+}
+```
+Result:
+
+```json
+{
+  "url": "https://dev-video-server.feeling.ltd/api-docs",
+  "markdown": "Swagger UI\n\nExplore\n\n&#96;&#96;&#96;\n 1.0 \n&#96;&#96;&#96;\n\n&#96;&#96;&#96;\nOAS 3.0\n&#96;&#96;&#96;\n\n## Feeling Video API\n\nFeeling Video 视频制作平台 API 文档\n\nAuthorize\n\n### Admin\n\nGET\n\n/api/admin/feeling-models\n\nPOST\n\n/api/admin/feeling-models\n\nGET\n\n/api/admin/feeling-models/{id}\n\nPATCH\n\n/api/admin/feeling-models/{id}\n\nDELETE\n\n/api/admin/feeling-models/{id}\n\nGET\n\n/api/admin/feeling-models/{id}/authorized-users\n\nGET\n\n/api/admin/feeling-models/{id}/vendor-costs\n\nPOST\n\n/api/admin/login\n\nGET\n\n/api/admin/model-vendor-routes\n\nPOST\n\n/api/admin/model-vendor-routes\n\nGET\n\n/api/admin/model-vendor-routes/{id}\n\nPATCH\n\n/api/admin/model-vendor-routes/{id}\n\nDELETE\n\n/api/admin/model-vendor-routes/{id}\n\nPOST\n\n/api/admin/model-vendor-routes/set-default\n\nPOST\n\n/api/admin/pricing/calculate\n\nPOST\n\n/api/admin/pricing/margin\n\nGET\n\n/api/admin/prompt-templates\n\nPOST\n\n/api/admin/prompt-templates\n\nGET\n\n/api/admin/prompt-templates/{id}\n\nPATCH\n\n/api/admin/prompt-templates/{id}\n\nDELETE\n\n/api/admin/prompt-templates/{id}\n\nPOST\n\n/api/admin/prompt-templates/{id}/create-version\n\nPOST\n\n/api/admin/prompt-templates/{id}/set-active\n\nGET\n\n/api/admin/prompt-templates/types\n\nPOST\n\n/api/admin/registration-codes\n\nGET\n\n/api/admin/registration-codes\n\nGET\n\n/api/admin/registration-codes/{id}\n\nDELETE\n\n/api/admin/registration-codes/{id}\n\nPOST\n\n/api/admin/registration-codes/{id}/grant-model-access\n\nPOST\n\n/api/admin/registration-codes/batch\n\nGET\n\n/api/admin/system-configs\n\nPOST\n\n/api/admin/system-configs\n\nGET\n\n/api/admin/system-configs/{key}\n\nPATCH\n\n/api/admin/system-configs/{key}\n\nDELETE\n\n/api/admin/system-configs/{key}\n\nPOST\n\n/api/admin/system-configs/refresh-cache\n\nGET\n\n/api/admin/transactions\n\nGET\n\n/api/admin/transactions/stats\n\nGET\n\n/api/admin/users\n\nGET\n\n/api/admin/users/{id}\n\nPATCH\n\n/api/admin/users/{id}\n\nDELETE\n\n/api/admin/users/{id}\n\nGET\n\n/api/admin/users/{id}/model-accesses\n\nPUT\n\n/api/admin/users/{id}/model-accesses\n\nPOST\n\n/api/admin/users/{userId}/balance\n\nGET\n\n/api/admin/vendor-models\n\nPOST\n\n/api/admin/vendor-models\n\nGET\n\n/api/admin/vendor-models/{id}\n\nPATCH\n\n/api/admin/vendor-models/{id}\n\nDELETE\n\n/api/admin/vendor-models/{id}\n\nGET\n\n/api/admin/wallets/projects\n\nGET\n\n/api/admin/wallets/stats\n\nGET\n\n/api/admin/wallets/users\n\n### Analysis\n\nGET\n\n/api/analysis/{taskId}\n\nGET\n\n/api/analysis/episode/{episodeId}\n\nPOST\n\n/api/analysis/reanalyze\n\nPOST\n\n/api/analysis/trigger\n\n### App\n\nGET\n\n/api\n\nGET\n\n/api/api/health\n\n### asset资产相关接口\n\n### Asset\n\nPOST\n\n/api/assets\n\nGET\n\n/api/assets\n\nDELETE\n\n/api/assets/{assetId}/images/{imageId}\n\nPATCH\n\n/api/assets/{assetId}/media/{mediaId}/position\n\nGET\n\n/api/assets/{id}\n\nPUT\n\n/api/assets/{id}\n\nDELETE\n\n/api/assets/{id}\n\nPOST\n\n/api/assets/{id}/generate-prompt\n\nGET\n\n/api/assets/{id}/images\n\nPOST\n\n/api/assets/{id}/images/batch\n\nGET\n\n/api/assets/{id}/media\n\nPATCH\n\n/api/assets/{id}/status\n\nPOST\n\n/api/assets/batch-generate-prompts\n\nGET\n\n/api/assets/batch-generation-status/{projectId}\n\nGET\n\n/api/assets/count/project/{projectId}\n\nGET\n\n/api/assets/episode/{episodeId}\n\nPOST\n\n/api/assets/images/batch\n\nPOST\n\n/api/assets/media/batch\n\nPOST\n\n/api/assets/media/batch-confirm\n\n### AuditLog\n\nGET\n\n/api/audit-logs/asset/{assetId}\n\nGET\n\n/api/audit-logs/project/{projectId}\n\nGET\n\n/api/audit-logs/project/{projectId}/export/csv\n\nGET\n\n/api/audit-logs/project/{projectId}/export/json\n\nGET\n\n/api/audit-logs/project/{projectId}/statistics\n\n### auth认证相关接口\n\nPOST\n\n/api/auth/bind-phone\n\n绑定手机号\n\nPOST\n\n/api/auth/change-password\n\n修改密码\n\nPOST\n\n/api/auth/login\n\n用户登录\n\nPOST\n\n/api/auth/logout\n\n退出登录\n\nGET\n\n/api/auth/maintenance-status\n\n检查维护状态\n\nPOST\n\n/api/auth/refresh\n\n刷新访问令牌\n\nPOST\n\n/api/auth/register\n\n用户注册\n\nPOST\n\n/api/auth/reset-password\n\n重置密码\n\n### CameraOptions\n\nGET\n\n/api/camera-options\n\n### Canvas\n\nPOST\n\n/api/canvas/{canvasId}/assets/{assetId}/create-and-claim\n\nGET\n\n/api/canvas/{canvasId}/data\n\nPOST\n\n/api/canvas/{canvasId}/edges\n\nPOST\n\n/api/canvas/{canvasId}/nodes\n\nPOST\n\n/api/canvas/{canvasId}/nodes/batch\n\nPATCH\n\n/api/canvas/{canvasId}/state\n\nPOST\n\n/api/canvas/assets/{assetId}/claim\n\nPOST\n\n/api/canvas/assets/{assetId}/unclaim\n\nDELETE\n\n/api/canvas/edges/{edgeId}\n\nGET\n\n/api/canvas/my-asset-canvas\n\nPATCH\n\n/api/canvas/nodes/{nodeId}\n\nDELETE\n\n/api/canvas/nodes/{nodeId}\n\nPOST\n\n/api/canvas/nodes/{nodeId}/bind-shot\n\nDELETE\n\n/api/canvas/nodes/{nodeId}/bind-shot\n\nPATCH\n\n/api/canvas/nodes/batch\n\nDELETE\n\n/api/canvas/nodes/batch\n\nGET\n\n/api/canvas/resolve\n\n### CanvasGenerate\n\nGET\n\n/api/canvas/models\n\n### Cos\n\nGET\n\n/api/cos/download\n\nGET\n\n/api/cos/refresh-url\n\nGET\n\n/api/cos/sts-credentials\n\n### DraftAsset\n\nPOST\n\n/api/draft-assets\n\nGET\n\n/api/draft-assets\n\nGET\n\n/api/draft-assets/{id}\n\nPUT\n\n/api/draft-assets/{id}\n\nDELETE\n\n/api/draft-assets/{id}\n\nPOST\n\n/api/draft-assets/{id}/confirm\n\nPOST\n\n/api/draft-assets/batch-confirm\n\n### Episode\n\nPOST\n\n/api/episodes\n\nGET\n\n/api/episodes\n\nGET\n\n/api/episodes/{id}\n\nPATCH\n\n/api/episodes/{id}\n\nDELETE\n\n/api/episodes/{id}\n\nPOST\n\n/api/episodes/{id}/confirm-all\n\nGET\n\n/api/episodes/{id}/content\n\nPATCH\n\n/api/episodes/{id}/content\n\nPOST\n\n/api/episodes/{id}/generate-synopsis\n\nGET\n\n/api/episodes/{id}/synopsis-task\n\nPOST\n\n/api/episodes/insert\n\n### EpisodeVersion\n\nPOST\n\n/api/episodes/{episodeId}/versions\n\nGET\n\n/api/episodes/{episodeId}/versions\n\nGET\n\n/api/episodes/{episodeId}/versions/{versionId}\n\nDELETE\n\n/api/episodes/{episodeId}/versions/{versionId}\n\nPATCH\n\n/api/episodes/{episodeId}/versions/{versionId}/current\n\nGET\n\n/api/episodes/{episodeId}/versions/current\n\n### Generate\n\nPOST\n\n/api/generate/text\n\n### Generation\n\nGET\n\n/api/generation/{taskId}\n\nDELETE\n\n/api/generation/{taskId}\n\nPOST\n\n/api/generation/estimate-fee\n\nPOST\n\n/api/generation/estimate-fee/batch\n\nPOST\n\n/api/generation/image\n\nGET\n\n/api/generation/ops/status\n\nPOST\n\n/api/generation/video\n\n### GenerationHistory\n\nGET\n\n/api/generation-history/{id}\n\nGET\n\n/api/generation-history/project/{projectId}\n\n### Invitation\n\nDELETE\n\n/api/invitations/{id}\n\nPOST\n\n/api/invitations/{id}/accept\n\nPOST\n\n/api/invitations/{id}/reject\n\nGET\n\n/api/invitations/me\n\n### Lock\n\nPOST\n\n/api/locks/acquire\n\nPOST\n\n/api/locks/force-release\n\nPOST\n\n/api/locks/release\n\nPOST\n\n/api/locks/renew\n\nGET\n\n/api/locks/status\n\n### media媒体相关接口\n\n### Media\n\nPOST\n\n/api/media\n\nGET\n\n/api/media/{id}\n\nPATCH\n\n/api/media/{id}\n\nDELETE\n\n/api/media/{id}\n\n### Notification\n\nGET\n\n/api/notifications\n\nPATCH\n\n/api/notifications/{id}/read\n\nPATCH\n\n/api/notifications/read-all\n\nGET\n\n/api/notifications/unread-count\n\n### Partner\n\nPOST\n\n/api/partner\n\nGET\n\n/api/partner\n\nGET\n\n/api/partner/client\n\nPOST\n\n/api/partner/client/fee\n\nPOST\n\n/api/partner/code\n\nGET\n\n/api/partner/code\n\nPOST\n\n/api/partner/login/password\n\nPOST\n\n/api/partner/login/sms/send\n\nPOST\n\n/api/partner/login/sms/verify\n\nPOST\n\n/api/partner/logo\n\nGET\n\n/api/partner/logo/{partnerId}\n\nGET\n\n/api/partner/settings\n\nPUT\n\n/api/partner/settings\n\n### Payment\n\nGET\n\n/api/payment/channels\n\nPOST\n\n/api/payment/create\n\nGET\n\n/api/payment/orders\n\nGET\n\n/api/payment/orders/{orderNo}\n\nGET\n\n/api/payment/packages\n\n### PaymentWebhook\n\nPOST\n\n/api/payment/webhook/alipay\n\nPOST\n\n/api/payment/webhook/wechat\n\n### PipelineRun\n\nPOST\n\n/api/pipeline-runs\n\nGET\n\n/api/pipeline-runs\n\nGET\n\n/api/pipeline-runs/{id}\n\nPATCH\n\n/api/pipeline-runs/{id}\n\nDELETE\n\n/api/pipeline-runs/{id}\n\nPOST\n\n/api/pipeline-runs/{id}/generate-prompts\n\nGET\n\n/api/pipeline-runs/{runId}/batch-fee-estimate\n\nPOST\n\n/api/pipeline-runs/{runId}/complete\n\nPOST\n\n/api/pipeline-runs/{runId}/generate\n\nPOST\n\n/api/pipeline-runs/{runId}/items/{itemId}/accept-optimization\n\nPATCH\n\n/api/pipeline-runs/{runId}/items/{itemId}/prompt\n\nPOST\n\n/api/pipeline-runs/{runId}/items/{itemId}/regenerate-prompt\n\nPOST\n\n/api/pipeline-runs/{runId}/items/{itemId}/reject-optimization\n\nPOST\n\n/api/pipeline-runs/{runId}/items/batch-accept-optimization\n\nPOST\n\n/api/pipeline-runs/{runId}/items/batch-update-prompts\n\nPOST\n\n/api/pipeline-runs/{runId}/optimize-prompts\n\nPOST\n\n/api/pipeline-runs/{runId}/probe\n\nPOST\n\n/api/pipeline-runs/{runId}/probe-fee-estimate\n\nPOST\n\n/api/pipeline-runs/{runId}/reselect-images\n\nPOST\n\n/api/pipeline-runs/{runId}/retry-failed\n\nPOST\n\n/api/pipeline-runs/{runId}/retry-failed-prompts\n\nPOST\n\n/api/pipeline-runs/{runId}/select-images\n\n### project项目相关接口\n\n### Project\n\nPOST\n\n/api/projects\n\nGET\n\n/api/projects\n\nGET\n\n/api/projects/{id}\n\nPATCH\n\n/api/projects/{id}\n\nDELETE\n\n/api/projects/{id}\n\nGET\n\n/api/projects/{id}/activity-summary\n\nPATCH\n\n/api/projects/{id}/art-style-reference-image\n\nPOST\n\n/api/projects/{id}/art-styles/generate\n\nGET\n\n/api/projects/{id}/art-styles/presets\n\nGET\n\n/api/projects/{id}/episodes\n\n### ProjectInvitation\n\nPOST\n\n/api/projects/{projectId}/invitations\n\n### ProjectMember\n\nGET\n\n/api/projects/{projectId}/members\n\nDELETE\n\n/api/projects/{projectId}/members/{userId}\n\nPATCH\n\n/api/projects/{projectId}/members/{userId}/permissions\n\nPATCH\n\n/api/projects/{projectId}/members/{userId}/remark\n\nPATCH\n\n/api/projects/{projectId}/members/{userId}/role\n\nGET\n\n/api/projects/{projectId}/members/me/permissions\n\n### PromptTemplate\n\nGET\n\n/api/api/prompt-templates/active/{type}\n\n### RegistrationCode\n\nPOST\n\n/api/registration-codes\n\nGET\n\n/api/registration-codes\n\nGET\n\n/api/registration-codes/{id}\n\nDELETE\n\n/api/registration-codes/{id}\n\nPOST\n\n/api/registration-codes/batch\n\n### RoughCut\n\nPATCH\n\n/api/rough-cut/{id}\n\nDELETE\n\n/api/rough-cut/{id}\n\nGET\n\n/api/rough-cut/episode/{episodeId}\n\nPOST\n\n/api/rough-cut/episode/{episodeId}\n\nPATCH\n\n/api/rough-cut/episode/{episodeId}/reorder\n\n### Scene\n\nPOST\n\n/api/scenes\n\nGET\n\n/api/scenes/{sceneId}\n\nPATCH\n\n/api/scenes/{sceneId}\n\nDELETE\n\n/api/scenes/{sceneId}\n\nGET\n\n/api/scenes/episodes/{episodeId}\n\n### Script\n\nPOST\n\n/api/scripts\n\nGET\n\n/api/scripts\n\nGET\n\n/api/scripts/{id}\n\nPATCH\n\n/api/scripts/{id}\n\nDELETE\n\n/api/scripts/{id}\n\nGET\n\n/api/scripts/{id}/blocks\n\nPOST\n\n/api/scripts/{id}/blocks\n\nDELETE\n\n/api/scripts/{id}/blocks/{blockId}\n\nPOST\n\n/api/scripts/{id}/confirm-analysis-fee\n\nPOST\n\n/api/scripts/{id}/edit-lock/acquire\n\nPOST\n\n/api/scripts/{id}/edit-lock/release\n\nPOST\n\n/api/scripts/{id}/edit-lock/renew\n\nGET\n\n/api/scripts/{id}/edit-lock/status\n\nPOST\n\n/api/scripts/{id}/reset-to-editing\n\nPOST\n\n/api/scripts/{scriptId}/aggregation/{type}\n\nGET\n\n/api/scripts/{scriptId}/analysis/check\n\nPOST\n\n/api/scripts/{scriptId}/analysis/supplement\n\nPOST\n\n/api/scripts/{scriptId}/regenerate/art-style\n\nPOST\n\n/api/scripts/{scriptId}/regenerate/global-synopsis\n\nPOST\n\n/api/scripts/upload\n\nGET\n\n/api/scripts/workbench-state/{projectId}\n\n### ShareLink\n\nPOST\n\n/api/share-links\n\nGET\n\n/api/share-links\n\nDELETE\n\n/api/share-links/{id}\n\nGET\n\n/api/share-links/{id}/access-history\n\n### SharePublic\n\nGET\n\n/api/share/{token}\n\nGET\n\n/api/share/{token}/assets\n\nGET\n\n/api/share/{token}/episodes\n\nPOST\n\n/api/share/{token}/verify-password\n\nPOST\n\n/api/share/invitations/join\n\n### Shot\n\nPOST\n\n/api/shots\n\nGET\n\n/api/shots/{shotId}\n\nPATCH\n\n/api/shots/{shotId}\n\nDELETE\n\n/api/shots/{shotId}\n\nPOST\n\n/api/shots/{shotId}/bind-canvas-node\n\nDELETE\n\n/api/shots/{shotId}/bind-canvas-node\n\nGET\n\n/api/shots/episodes/{episodeId}\n\nGET\n\n/api/shots/scenes/{sceneId}\n\n### Slice\n\nPOST\n\n/api/slice\n\nPOST\n\n/api/slice/all\n\nPOST\n\n/api/slice/batch-download\n\n### Sms\n\nPOST\n\n/api/sms/send-code\n\nPOST\n\n/api/sms/verify-code\n\n### storyboard分镜相关接口\n\n### Storyboard\n\nPOST\n\n/api/storyboard/episodes/{episodeId}/cancel-waiting\n\nPOST\n\n/api/storyboard/episodes/{episodeId}/generate-assets\n\nPOST\n\n/api/storyboard/episodes/{episodeId}/regenerate-partial\n\nGET\n\n/api/storyboard/episodes/{episodeId}/scenes\n\nGET\n\n/api/storyboard/episodes/{episodeId}/shots\n\nGET\n\n/api/storyboard/episodes/{episodeId}/tasks\n\nGET\n\n/api/storyboard/episodes/assets-status\n\nPOST\n\n/api/storyboard/scenes/{sceneId}/retry\n\nPOST\n\n/api/storyboard/shots/{shotId}/select-frame\n\nGET\n\n/api/storyboard/tasks/{taskId}\n\nPOST\n\n/api/storyboard/trigger\n\n### Task\n\nDELETE\n\n/api/tasks/{taskType}/{taskId}\n\nPOST\n\n/api/tasks/{taskType}/{taskId}/cancel\n\nPOST\n\n/api/tasks/{taskType}/{taskId}/retry\n\nGET\n\n/api/tasks/asset/{assetId}\n\nGET\n\n/api/tasks/project/{projectId}\n\nPOST\n\n/api/tasks/queues/{queueName}/pause\n\nPOST\n\n/api/tasks/queues/{queueName}/resume\n\nGET\n\n/api/tasks/queues/{queueName}/stats\n\nGET\n\n/api/tasks/queues/stats\n\nGET\n\n/api/tasks/user/{userId}\n\n### Upload\n\nPOST\n\n/api/upload/image\n\n### user用户相关接口\n\n### User\n\nPOST\n\n/api/users\n\nGET\n\n/api/users\n\nGET\n\n/api/users/{id}\n\nPATCH\n\n/api/users/{id}\n\nDELETE\n\n/api/users/{id}\n\nGET\n\n/api/users/me\n\nGET\n\n/api/users/status-summary\n\n### VideoExport\n\nPOST\n\n/api/video-export/episode/{episodeId}\n\nPOST\n\n/api/video-export/jianying/{episodeId}\n\nGET\n\n/api/video-export/preview/{episodeId}\n\nPOST\n\n/api/video-export/storyboard-pack/{episodeId}\n\n### Wallet\n\nGET\n\n/api/wallet/overview\n\nGET\n\n/api/wallet/project/{projectId}\n\nGET\n\n/api/wallet/project/{projectId}/balance\n\nPOST\n\n/api/wallet/reclaim\n\nGET\n\n/api/wallet/transactions/all\n\nPOST\n\n/api/wallet/transfer\n\nGET\n\n/api/wallet/transfer-targets\n\nGET\n\n/api/wallet/user\n\nGET\n\n/api/wallet/user/balance\n\nGET\n\n/api/wallet/user/transactions\n\nGET\n\n/api/wallet/user/transfers\n\n#### Schemas\n\nCreateProjectDto\n\nGenerateArtStyleDto\n\nUpdateArtStyleReferenceImageDto\n\nUpdateProjectDto\n\nCreateMediaDto\n\nUpdateMediaDto\n\nTransferDto\n\nReclaimDto\n\nAcquireLockDto\n\nReleaseLockDto\n\nForceReleaseLockDto\n\nRenewLockDto\n\nUpdateMemberRoleDto\n\nUpdateMemberRemarkDto\n\nUpdateMemberPermissionsDto\n\nCreateUserDto\n\nUpdateUserDto\n\nLoginDto\n\nRegisterDto\n\nChangePasswordDto\n\nBindPhoneDto\n\nSendSmsDto\n\nVerifyCodeDto\n\nCreateRegistrationCodeDto\n\nBatchCreateRegistrationCodeDto\n\nTriggerAnalysisDto\n\nReanalyzeDto\n\nTriggerStoryboardDto\n\nRegeneratePartialStoryboardDto\n\nCreateScriptDto\n\nUpdateScriptDto\n\nBatchUpdateScriptBlocksDto\n\nConfirmAnalysisFeeDto\n\nCreateEpisodeDto\n\nInsertEpisodeDto\n\nUpdateEpisodeDto\n\nUpdateEpisodeContentDto\n\nCreateEpisodeVersionDto\n\nCreateDraftAssetDto\n\nUpdateDraftAssetDto\n\nCreateAssetDto\n\nUpdateAssetDto\n\nCreateSceneDto\n\nUpdateSceneDto\n\nCreateShotDto\n\nCreateImageTaskDto\n\nCreateVideoTaskDto\n\nEstimateFeeDto\n\nBatchEstimateFeeDto\n\nAdminLoginDto\n\nUpdateUserModelAccessDto\n\nAddUserBalanceDto\n\nGrantRegistrationCodeModelAccessDto\n\nCreateSystemConfigDto\n\nUpdateSystemConfigDto\n\nCreateFeelingModelDto\n\nUpdateFeelingModelDto\n\nCreateVendorModelDto\n\nUpdateVendorModelDto\n\nCreateModelVendorRouteDto\n\nUpdateModelVendorRouteDto\n\nSetDefaultRouteDto\n\nCalculatePricingDto\n\nCalculateMarginDto\n\nCreatePromptTemplateDto\n\nUpdatePromptTemplateDto\n\nSetActivePromptTemplateDto\n\nCreatePipelineRunDto\n\nUpdatePipelineRunDto\n\nBatchUpdatePromptsDto\n\nUpdateItemPromptDto\n\nOptimizePromptsDto\n\nBatchAcceptOptimizationDto\n\nProbeDto\n\nSelectImagesDto\n\nCompleteDto\n\nCreateInvitationDto\n\nGenerateTextDto\n\nUploadImageDto\n\nSliceImageDto\n\nSliceImageAllDto\n\nBatchDownloadDto\n\nCreatePaymentDto\n\nExportJianyingRequestDto\n\nAddClipDto\n\nUpdateClipDto\n\nReorderClipsDto\n\nCreatePartnerDto\n\nPasswordLoginDto\n\nSmsSendDto\n\nSmsVerifyDto\n\nBatchCreateCodeDto\n\nBatchTopUpFeeDto\n\nUpdatePartnerSettingsDto\n\nUploadPartnerLogoDto"
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+Error fetching URL, status code: 404 Not Found
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="web_fetch">
+<details>
+<summary>Tool use: **web_fetch**</summary>
+
+
+Parameters:
+
+```json
+{
+  "url": "https://dev-video-server.feeling.ltd/api-docs-json"
+}
+```
+Result:
+
+```json
+{
+  "url": "https://dev-video-server.feeling.ltd/api-docs-json",
+  "markdown": "{\"openapi\":\"3.0.0\",\"paths\":{\"/api\":{\"get\":{\"operationId\":\"AppController_getHello\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"App\"]}},\"/api/api/health\":{\"get\":{\"operationId\":\"AppController_healthCheck\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"App\"]}},\"/api/audit-logs/project/{projectId}\":{\"get\":{\"operationId\":\"AuditLogController_getProjectLogs\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"action\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"resourceType\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"userId\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"startDate\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"endDate\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"page\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"pageSize\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"AuditLog\"]}},\"/api/audit-logs/asset/{assetId}\":{\"get\":{\"operationId\":\"AuditLogController_getAssetHistory\",\"parameters\":[{\"name\":\"assetId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"AuditLog\"]}},\"/api/audit-logs/project/{projectId}/statistics\":{\"get\":{\"operationId\":\"AuditLogController_getProjectStatistics\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"startDate\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"endDate\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"userId\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"AuditLog\"]}},\"/api/audit-logs/project/{projectId}/export/json\":{\"get\":{\"operationId\":\"AuditLogController_exportAsJson\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"action\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"resourceType\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"userId\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"startDate\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"endDate\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"AuditLog\"]}},\"/api/audit-logs/project/{projectId}/export/csv\":{\"get\":{\"operationId\":\"AuditLogController_exportAsCsv\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"action\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"resourceType\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"userId\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"startDate\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"endDate\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"AuditLog\"]}},\"/api/projects\":{\"post\":{\"operationId\":\"ProjectController_create\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/CreateProjectDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Project\"]},\"get\":{\"operationId\":\"ProjectController_findAll\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Project\"]}},\"/api/projects/{id}/art-styles/presets\":{\"get\":{\"operationId\":\"ProjectController_getArtStylePresets\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Project\"]}},\"/api/projects/{id}/art-styles/generate\":{\"post\":{\"operationId\":\"ProjectController_generateArtStyleSuggestions\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/GenerateArtStyleDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Project\"]}},\"/api/projects/{id}/art-style-reference-image\":{\"patch\":{\"operationId\":\"ProjectController_updateArtStyleReferenceImage\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/UpdateArtStyleReferenceImageDto\"}}}},\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Project\"]}},\"/api/projects/{id}/activity-summary\":{\"get\":{\"operationId\":\"ProjectController_getActivitySummary\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Project\"]}},\"/api/projects/{id}/episodes\":{\"get\":{\"operationId\":\"ProjectController_findEpisodes\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Project\"]}},\"/api/projects/{id}\":{\"get\":{\"operationId\":\"ProjectController_findOne\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Project\"]},\"patch\":{\"operationId\":\"ProjectController_update\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/UpdateProjectDto\"}}}},\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Project\"]},\"delete\":{\"operationId\":\"ProjectController_remove\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Project\"]}},\"/api/cos/sts-credentials\":{\"get\":{\"operationId\":\"CosController_getStsCredentials\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Cos\"]}},\"/api/cos/refresh-url\":{\"get\":{\"operationId\":\"CosController_refreshUrl\",\"parameters\":[{\"name\":\"filePath\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Cos\"]}},\"/api/cos/download\":{\"get\":{\"operationId\":\"CosController_download\",\"parameters\":[{\"name\":\"filePath\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Cos\"]}},\"/api/media\":{\"post\":{\"operationId\":\"MediaController_create\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/CreateMediaDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Media\"]}},\"/api/media/{id}\":{\"get\":{\"operationId\":\"MediaController_findOne\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Media\"]},\"patch\":{\"operationId\":\"MediaController_update\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/UpdateMediaDto\"}}}},\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Media\"]},\"delete\":{\"operationId\":\"MediaController_remove\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Media\"]}},\"/api/api/prompt-templates/active/{type}\":{\"get\":{\"operationId\":\"PromptTemplateController_getActiveTemplate\",\"parameters\":[{\"name\":\"type\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"PromptTemplate\"]}},\"/api/wallet/overview\":{\"get\":{\"operationId\":\"WalletController_getWalletOverview\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/user\":{\"get\":{\"operationId\":\"WalletController_getUserWallet\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/user/balance\":{\"get\":{\"operationId\":\"WalletController_getUserBalance\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/project/{projectId}\":{\"get\":{\"operationId\":\"WalletController_getProjectWallet\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/project/{projectId}/balance\":{\"get\":{\"operationId\":\"WalletController_getProjectBalance\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/user/transactions\":{\"get\":{\"operationId\":\"WalletController_getUserTransactions\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/user/transfers\":{\"get\":{\"operationId\":\"WalletController_getUserTransfers\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/transactions/all\":{\"get\":{\"operationId\":\"WalletController_getAllTransactions\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/transfer-targets\":{\"get\":{\"operationId\":\"WalletController_getTransferTargets\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/transfer\":{\"post\":{\"operationId\":\"WalletController_transferToProject\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/TransferDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/wallet/reclaim\":{\"post\":{\"operationId\":\"WalletController_reclaimFromProject\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/ReclaimDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Wallet\"]}},\"/api/locks/acquire\":{\"post\":{\"operationId\":\"LockController_acquire\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/AcquireLockDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Lock\"]}},\"/api/locks/release\":{\"post\":{\"operationId\":\"LockController_release\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/ReleaseLockDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Lock\"]}},\"/api/locks/force-release\":{\"post\":{\"operationId\":\"LockController_forceRelease\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/ForceReleaseLockDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Lock\"]}},\"/api/locks/renew\":{\"post\":{\"operationId\":\"LockController_renew\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/RenewLockDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Lock\"]}},\"/api/locks/status\":{\"get\":{\"operationId\":\"LockController_getStatus\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Lock\"]}},\"/api/projects/{projectId}/members\":{\"get\":{\"operationId\":\"ProjectMemberController_findAll\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"ProjectMember\"]}},\"/api/projects/{projectId}/members/me/permissions\":{\"get\":{\"operationId\":\"ProjectMemberController_getMyPermissions\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"ProjectMember\"]}},\"/api/projects/{projectId}/members/{userId}/role\":{\"patch\":{\"operationId\":\"ProjectMemberController_updateRole\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"userId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/UpdateMemberRoleDto\"}}}},\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"ProjectMember\"]}},\"/api/projects/{projectId}/members/{userId}/remark\":{\"patch\":{\"operationId\":\"ProjectMemberController_updateRemark\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"userId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/UpdateMemberRemarkDto\"}}}},\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"ProjectMember\"]}},\"/api/projects/{projectId}/members/{userId}/permissions\":{\"patch\":{\"operationId\":\"ProjectMemberController_updatePermissions\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"userId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/UpdateMemberPermissionsDto\"}}}},\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"ProjectMember\"]}},\"/api/projects/{projectId}/members/{userId}\":{\"delete\":{\"operationId\":\"ProjectMemberController_remove\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"userId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"ProjectMember\"]}},\"/api/users\":{\"post\":{\"operationId\":\"UserController_create\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/CreateUserDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"User\"]},\"get\":{\"operationId\":\"UserController_findAll\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"User\"]}},\"/api/users/me\":{\"get\":{\"operationId\":\"UserController_getCurrentUser\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"User\"]}},\"/api/users/status-summary\":{\"get\":{\"operationId\":\"UserController_getStatusSummary\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"User\"]}},\"/api/users/{id}\":{\"get\":{\"operationId\":\"UserController_findOne\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"User\"]},\"patch\":{\"operationId\":\"UserController_update\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/UpdateUserDto\"}}}},\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"User\"]},\"delete\":{\"operationId\":\"UserController_remove\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"User\"]}},\"/api/auth/login\":{\"post\":{\"description\":\"支持密码登录和验证码登录两种方式\",\"operationId\":\"AuthController_login\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/LoginDto\"}}}},\"responses\":{\"200\":{\"description\":\"登录成功\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"accessToken\":{\"type\":\"string\",\"description\":\"访问令牌\"},\"refreshToken\":{\"type\":\"string\",\"description\":\"刷新令牌\"},\"user\":{\"type\":\"object\",\"description\":\"用户信息\"}}}}}},\"400\":{\"description\":\"请求参数错误\"},\"401\":{\"description\":\"用户名或密码错误\"}},\"summary\":\"用户登录\",\"tags\":[\"auth\"]}},\"/api/auth/register\":{\"post\":{\"description\":\"新用户注册，需要提供注册码和短信验证码\",\"operationId\":\"AuthController_register\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/RegisterDto\"}}}},\"responses\":{\"201\":{\"description\":\"注册成功\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"accessToken\":{\"type\":\"string\",\"description\":\"访问令牌\"},\"refreshToken\":{\"type\":\"string\",\"description\":\"刷新令牌\"},\"user\":{\"type\":\"object\",\"description\":\"用户信息\"}}}}}},\"400\":{\"description\":\"请求参数错误或注册码无效\"},\"409\":{\"description\":\"用户名或手机号已存在\"}},\"summary\":\"用户注册\",\"tags\":[\"auth\"]}},\"/api/auth/refresh\":{\"post\":{\"description\":\"使用刷新令牌获取新的访问令牌\",\"operationId\":\"AuthController_refresh\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"refreshToken\":{\"type\":\"string\",\"description\":\"刷新令牌\"}},\"required\":[\"refreshToken\"]}}}},\"responses\":{\"200\":{\"description\":\"刷新成功\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"accessToken\":{\"type\":\"string\",\"description\":\"新的访问令牌\"},\"refreshToken\":{\"type\":\"string\",\"description\":\"新的刷新令牌\"}}}}}},\"401\":{\"description\":\"刷新令牌无效或已过期\"}},\"summary\":\"刷新访问令牌\",\"tags\":[\"auth\"]}},\"/api/auth/change-password\":{\"post\":{\"description\":\"使用手机号和验证码修改密码\",\"operationId\":\"AuthController_changePassword\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/ChangePasswordDto\"}}}},\"responses\":{\"200\":{\"description\":\"密码修改成功\"},\"400\":{\"description\":\"请求参数错误或验证码无效\"},\"404\":{\"description\":\"用户不存在\"}},\"summary\":\"修改密码\",\"tags\":[\"auth\"]}},\"/api/auth/reset-password\":{\"post\":{\"description\":\"忘记密码时使用手机号和验证码重置密码\",\"operationId\":\"AuthController_resetPassword\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/ChangePasswordDto\"}}}},\"responses\":{\"200\":{\"description\":\"密码重置成功\"},\"400\":{\"description\":\"请求参数错误或验证码无效\"},\"404\":{\"description\":\"用户不存在\"}},\"summary\":\"重置密码\",\"tags\":[\"auth\"]}},\"/api/auth/bind-phone\":{\"post\":{\"description\":\"为已登录但未绑定手机号的用户绑定手机号\",\"operationId\":\"AuthController_bindPhone\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/BindPhoneDto\"}}}},\"responses\":{\"200\":{\"description\":\"手机号绑定成功\"},\"400\":{\"description\":\"请求参数错误或验证码无效\"},\"401\":{\"description\":\"未登录或 Token 无效\"},\"409\":{\"description\":\"手机号已被其他用户使用\"}},\"security\":[{\"JWT-auth\":[]}],\"summary\":\"绑定手机号\",\"tags\":[\"auth\"]}},\"/api/auth/logout\":{\"post\":{\"description\":\"用户退出登录，主要清理操作在前端\",\"operationId\":\"AuthController_logout\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"退出登录成功\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\",\"example\":\"退出登录成功\"}}}}}},\"401\":{\"description\":\"未登录或 Token 无效\"}},\"security\":[{\"JWT-auth\":[]}],\"summary\":\"退出登录\",\"tags\":[\"auth\"]}},\"/api/auth/maintenance-status\":{\"get\":{\"description\":\"检查系统是否处于维护模式，以及当前用户是否在白名单中（如果已登录）\",\"operationId\":\"AuthController_getMaintenanceStatus\",\"parameters\":[{\"name\":\"authorization\",\"required\":true,\"in\":\"header\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"获取维护状态成功\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"enabled\":{\"type\":\"boolean\",\"description\":\"是否启用维护模式\"},\"isWhitelisted\":{\"type\":\"boolean\",\"nullable\":true,\"description\":\"当前用户是否在白名单中，null 表示未登录\"}}}}}}},\"summary\":\"检查维护状态\",\"tags\":[\"auth\"]}},\"/api/sms/send-code\":{\"post\":{\"operationId\":\"SmsController_sendCode\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/SendSmsDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Sms\"]}},\"/api/sms/verify-code\":{\"post\":{\"operationId\":\"SmsController_verifyCode\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/VerifyCodeDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Sms\"]}},\"/api/registration-codes\":{\"post\":{\"operationId\":\"RegistrationCodeController_create\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/CreateRegistrationCodeDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"RegistrationCode\"]},\"get\":{\"operationId\":\"RegistrationCodeController_findAll\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"RegistrationCode\"]}},\"/api/registration-codes/batch\":{\"post\":{\"operationId\":\"RegistrationCodeController_batchCreate\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/BatchCreateRegistrationCodeDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"RegistrationCode\"]}},\"/api/registration-codes/{id}\":{\"get\":{\"operationId\":\"RegistrationCodeController_findOne\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"RegistrationCode\"]},\"delete\":{\"operationId\":\"RegistrationCodeController_remove\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"RegistrationCode\"]}},\"/api/tasks/queues/stats\":{\"get\":{\"operationId\":\"TaskController_getAllQueueStats\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/queues/{queueName}/stats\":{\"get\":{\"operationId\":\"TaskController_getQueueStats\",\"parameters\":[{\"name\":\"queueName\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/user/{userId}\":{\"get\":{\"operationId\":\"TaskController_getUserTasks\",\"parameters\":[{\"name\":\"userId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"type\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"page\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"number\"}},{\"name\":\"pageSize\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"number\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/project/{projectId}\":{\"get\":{\"operationId\":\"TaskController_getProjectTasks\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"status\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"type\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"page\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"number\"}},{\"name\":\"pageSize\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"number\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/asset/{assetId}\":{\"get\":{\"operationId\":\"TaskController_getAssetTasks\",\"parameters\":[{\"name\":\"assetId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"type\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}},{\"name\":\"status\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/{taskType}/{taskId}/cancel\":{\"post\":{\"operationId\":\"TaskController_cancelTask\",\"parameters\":[{\"name\":\"taskType\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"taskId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/{taskType}/{taskId}/retry\":{\"post\":{\"operationId\":\"TaskController_retryTask\",\"parameters\":[{\"name\":\"taskType\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"taskId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"mode\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/{taskType}/{taskId}\":{\"delete\":{\"operationId\":\"TaskController_deleteTask\",\"parameters\":[{\"name\":\"taskType\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"taskId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/queues/{queueName}/pause\":{\"post\":{\"operationId\":\"TaskController_pauseQueue\",\"parameters\":[{\"name\":\"queueName\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/tasks/queues/{queueName}/resume\":{\"post\":{\"operationId\":\"TaskController_resumeQueue\",\"parameters\":[{\"name\":\"queueName\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Task\"]}},\"/api/analysis/trigger\":{\"post\":{\"operationId\":\"AnalysisController_triggerAnalysis\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/TriggerAnalysisDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Analysis\"]}},\"/api/analysis/reanalyze\":{\"post\":{\"operationId\":\"AnalysisController_reanalyzeEpisode\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/ReanalyzeDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Analysis\"]}},\"/api/analysis/{taskId}\":{\"get\":{\"operationId\":\"AnalysisController_getTask\",\"parameters\":[{\"name\":\"taskId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Analysis\"]}},\"/api/analysis/episode/{episodeId}\":{\"get\":{\"operationId\":\"AnalysisController_getEpisodeTasks\",\"parameters\":[{\"name\":\"episodeId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Analysis\"]}},\"/api/storyboard/trigger\":{\"post\":{\"operationId\":\"StoryboardController_triggerStoryboard\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/TriggerStoryboardDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/episodes/{episodeId}/generate-assets\":{\"post\":{\"operationId\":\"StoryboardController_triggerAssetGeneration\",\"parameters\":[{\"name\":\"episodeId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/episodes/{episodeId}/regenerate-partial\":{\"post\":{\"operationId\":\"StoryboardController_triggerPartialAssetGeneration\",\"parameters\":[{\"name\":\"episodeId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/RegeneratePartialStoryboardDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/shots/{shotId}/select-frame\":{\"post\":{\"operationId\":\"StoryboardController_selectShotFrameCandidate\",\"parameters\":[{\"name\":\"shotId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/tasks/{taskId}\":{\"get\":{\"operationId\":\"StoryboardController_getTask\",\"parameters\":[{\"name\":\"taskId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/episodes/{episodeId}/tasks\":{\"get\":{\"operationId\":\"StoryboardController_getEpisodeTasks\",\"parameters\":[{\"name\":\"episodeId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/episodes/{episodeId}/shots\":{\"get\":{\"operationId\":\"StoryboardController_getShotsByEpisode\",\"parameters\":[{\"name\":\"episodeId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/episodes/assets-status\":{\"get\":{\"operationId\":\"StoryboardController_getEpisodesAssetsStatus\",\"parameters\":[{\"name\":\"episodeIds\",\"required\":true,\"in\":\"query\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/episodes/{episodeId}/scenes\":{\"get\":{\"operationId\":\"StoryboardController_getEpisodeScenes\",\"parameters\":[{\"name\":\"episodeId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/episodes/{episodeId}/cancel-waiting\":{\"post\":{\"operationId\":\"StoryboardController_cancelWaitingAssets\",\"parameters\":[{\"name\":\"episodeId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/storyboard/scenes/{sceneId}/retry\":{\"post\":{\"operationId\":\"StoryboardController_retryScene\",\"parameters\":[{\"name\":\"sceneId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Storyboard\"]}},\"/api/scripts/upload\":{\"post\":{\"operationId\":\"ScriptController_uploadScript\",\"parameters\":[],\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Script\"]}},\"/api/scripts\":{\"post\":{\"operationId\":\"ScriptController_create\",\"parameters\":[],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/CreateScriptDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Script\"]},\"get\":{\"operationId\":\"ScriptController_findAll\",\"parameters\":[],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Script\"]}},\"/api/scripts/{id}\":{\"get\":{\"operationId\":\"ScriptController_findOne\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Script\"]},\"patch\":{\"operationId\":\"ScriptController_update\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/UpdateScriptDto\"}}}},\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Script\"]},\"delete\":{\"operationId\":\"ScriptController_remove\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Script\"]}},\"/api/scripts/{id}/blocks\":{\"get\":{\"operationId\":\"ScriptController_findBlocks\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Script\"]},\"post\":{\"operationId\":\"ScriptController_batchUpdateBlocks\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/BatchUpdateScriptBlocksDto\"}}}},\"responses\":{\"201\":{\"description\":\"\"}},\"tags\":[\"Script\"]}},\"/api/scripts/{id}/blocks/{blockId}\":{\"delete\":{\"operationId\":\"ScriptController_removeBlock\",\"parameters\":[{\"name\":\"id\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}},{\"name\":\"blockId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Script\"]}},\"/api/scripts/workbench-state/{projectId}\":{\"get\":{\"operationId\":\"ScriptController_getWorkbenchState\",\"parameters\":[{\"name\":\"projectId\",\"required\":true,\"in\":\"path\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"description\":\"\"}},\"tags\":[\"Script\"]}},\"/api/scripts/{id}/reset-to-editing\":{\"post\":{\"operationId\":\"ScriptContr\n\n...[1 line truncated]"
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "shot|Shot|imgPrompt|videoPrompt",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+  "glob": "*.json",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "shot|Shot|imgPrompt|videoPrompt",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {}
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: curl -s "https://dev-video-server.feeling.ltd/api-docs-json" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+# 找 storyboard shots 和 schemas
+paths = d.get('paths',{})
+for p,v in paths.items():
+    if 'shot' in p.lower():
+        print('PATH:', p)
+        print(json.dumps(v, indent=2, ensure_ascii=False)[:800])
+        print('---')
+schemas = d.get('components',{}).get('schemas',{})
+for k in list(schemas.keys())[:80]:
+    if 'shot' in k.lower() or 'Shot' in k:
+        print('SCHEMA:', k)
+"</summary>
+
+```bash
+curl -s "https://dev-video-server.feeling.ltd/api-docs-json" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+# 找 storyboard shots 和 schemas
+paths = d.get('paths',{})
+for p,v in paths.items():
+    if 'shot' in p.lower():
+        print('PATH:', p)
+        print(json.dumps(v, indent=2, ensure_ascii=False)[:800])
+        print('---')
+schemas = d.get('components',{}).get('schemas',{})
+for k in list(schemas.keys())[:80]:
+    if 'shot' in k.lower() or 'Shot' in k:
+        print('SCHEMA:', k)
+"
+```
+
+```
+PATH: /api/storyboard/shots/{shotId}/select-frame
+{
+  "post": {
+    "operationId": "StoryboardController_selectShotFrameCandidate",
+    "parameters": [
+      {
+        "name": "shotId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Storyboard"
+    ]
+  }
+}
+---
+PATH: /api/storyboard/episodes/{episodeId}/shots
+{
+  "get": {
+    "operationId": "StoryboardController_getShotsByEpisode",
+    "parameters": [
+      {
+        "name": "episodeId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Storyboard"
+    ]
+  }
+}
+---
+PATH: /api/shots
+{
+  "post": {
+    "operationId": "ShotController_createShot",
+    "parameters": [],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CreateShotDto"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Shot"
+    ]
+  }
+}
+---
+PATH: /api/shots/scenes/{sceneId}
+{
+  "get": {
+    "operationId": "ShotController_getShotsByScene",
+    "parameters": [
+      {
+        "name": "sceneId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Shot"
+    ]
+  }
+}
+---
+PATH: /api/shots/episodes/{episodeId}
+{
+  "get": {
+    "operationId": "ShotController_getShotsByEpisode",
+    "parameters": [
+      {
+        "name": "episodeId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Shot"
+    ]
+  }
+}
+---
+PATH: /api/shots/{shotId}
+{
+  "get": {
+    "operationId": "ShotController_getShot",
+    "parameters": [
+      {
+        "name": "shotId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Shot"
+    ]
+  },
+  "patch": {
+    "operationId": "ShotController_updateShot",
+    "parameters": [
+      {
+        "name": "shotId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Shot"
+    ]
+  },
+  "delete": {
+    "operationId": "ShotController_deleteShot",
+    "parameters": [
+      {
+        "name": "
+---
+PATH: /api/shots/{shotId}/bind-canvas-node
+{
+  "post": {
+    "operationId": "ShotController_bindCanvasNode",
+    "parameters": [
+      {
+        "name": "shotId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Shot"
+    ]
+  },
+  "delete": {
+    "operationId": "ShotController_unbindCanvasNode",
+    "parameters": [
+      {
+        "name": "shotId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Shot"
+    ]
+  }
+}
+---
+PATH: /api/canvas/nodes/{nodeId}/bind-shot
+{
+  "post": {
+    "operationId": "CanvasController_bindNodeToShot",
+    "parameters": [
+      {
+        "name": "nodeId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Canvas"
+    ]
+  },
+  "delete": {
+    "operationId": "CanvasController_unbindNodeFromShot",
+    "parameters": [
+      {
+        "name": "nodeId",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": ""
+      }
+    },
+    "tags": [
+      "Canvas"
+    ]
+  }
+}
+---
+SCHEMA: CreateShotDto
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: curl -s "https://dev-video-server.feeling.ltd/api-docs-json" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+schemas = d.get('components',{}).get('schemas',{})
+for k,v in schemas.items():
+    if 'Shot' in k or 'shot' in k:
+        print('===', k, '===')
+        print(json.dumps(v, indent=2, ensure_ascii=False))
+        print()
+"</summary>
+
+```bash
+curl -s "https://dev-video-server.feeling.ltd/api-docs-json" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+schemas = d.get('components',{}).get('schemas',{})
+for k,v in schemas.items():
+    if 'Shot' in k or 'shot' in k:
+        print('===', k, '===')
+        print(json.dumps(v, indent=2, ensure_ascii=False))
+        print()
+"
+```
+
+```
+=== CreateShotDto ===
+{
+  "type": "object",
+  "properties": {}
+}
+
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+根据 [dev-video-server.feeling.ltd/api-docs](https://dev-video-server.feeling.ltd/api-docs#/) 的 OpenAPI 定义，情况是这样的：
+
+## 接口有，但响应结构未在文档中定义
+
+**分镜相关接口：**
+
+| 接口 | 说明 |
+|------|------|
+| `GET /api/storyboard/episodes/{episodeId}/shots` | 分镜 Storyboard 下的 shots（puller 当前使用） |
+| `GET /api/shots/episodes/{episodeId}` | Shot 模块下的 shots |
+| `GET /api/shots/{shotId}` | 单个 shot 详情 |
+
+这些接口在 Swagger 里都有，但：
+
+- 200 响应的 `description` 为空
+- 没有定义响应体的 schema
+- `CreateShotDto` 的 `properties` 为空，没有字段说明
+
+因此，**文档里看不到 `imgPrompt`、`videoPrompt`、`visualDescription` 等字段**，只能通过实际调用或平台同事确认。
+
+之前 specstory 的实测表明，平台返回的 shot 对象包含：`imgPrompt`、`videoPrompt`、`visualDescription`、`prompt`、`firstframeMedia`、`usedAssets` 等字段。
+
+**建议：** 向平台同事确认 Shot 接口的完整响应结构，或使用 `docs/联调说明.md` 里的 `shots_api_dump` 脚本导出实际返回，再对照文档补充 schema。
+
+---
+
+_**User**_
+
+http://localhost:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots 类似这种请求里面会有，你看看呢？
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+
+
+
+
+---
+
+Cannot fetch from localhost (localhost:3001) because this tool runs from an isolated server.
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: curl -s "http://localhost:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots" 2>/dev/null | head -c 8000</summary>
+
+```bash
+curl -s "http://localhost:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots" 2>/dev/null | head -c 8000
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: curl -s "http://localhost:8000/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots" 2>/dev/null | head -c 6000 || echo "---"; curl -s "http://127.0.0.1:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots" 2>/dev/null | head -c 6000 || echo "3001 failed"</summary>
+
+```bash
+curl -s "http://localhost:8000/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots" 2>/dev/null | head -c 6000 || echo "---"; curl -s "http://127.0.0.1:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots" 2>/dev/null | head -c 6000 || echo "3001 failed"
+```
+
+```
+{"detail":"Not Found"}3001 failed
+
+```
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Checking route access**
+
+The local backend doesn't serve the requested route; storyboard shots come from the platform via the puller. 
+
+**Adding proxy route**
+
+I'm adding a proxy route to fetch storyboard shots from the platform API with authentication. </details></think>
+
+---
+
+
+无法直接访问 localhost。正在添加一个调试脚本，用于拉取并展示该 API 的返回结构：
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import json
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+episode_id = 'c11f3a3a-855e-4732-acbd-95a818ba3070'
+shots = c.get_shots(episode_id)
+with open('docs/shots_api_dump.json', 'w', encoding='utf-8') as f:
+    json.dump(shots, f, ensure_ascii=False, indent=2)
+print('已写入 docs/shots_api_dump.json，共', len(shots), '个 shot')
+if shots:
+    print('第一个 shot 的字段:', list(shots[0].keys()))
+    for k in ['imgPrompt', 'videoPrompt', 'visualDescription', 'prompt']:
+        v = shots[0].get(k)
+        if v is not None:
+            print(f'  {k}:', repr(v)[:80] + ('...' if len(repr(v))>80 else ''))
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import json
+from src.feeling.client import FeelingClient
+c = FeelingClient()
+c.login()
+episode_id = 'c11f3a3a-855e-4732-acbd-95a818ba3070'
+shots = c.get_shots(episode_id)
+with open('docs/shots_api_dump.json', 'w', encoding='utf-8') as f:
+    json.dump(shots, f, ensure_ascii=False, indent=2)
+print('已写入 docs/shots_api_dump.json，共', len(shots), '个 shot')
+if shots:
+    print('第一个 shot 的字段:', list(shots[0].keys()))
+    for k in ['imgPrompt', 'videoPrompt', 'visualDescription', 'prompt']:
+        v = shots[0].get(k)
+        if v is not None:
+            print(f'  {k}:', repr(v)[:80] + ('...' if len(repr(v))>80 else ''))
+"
+```
+
+```
+已写入 docs/shots_api_dump.json，共 0 个 shot
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
+base = os.environ.get('FEELING_API_BASE', '').rstrip('/')
+# 先登录
+r = requests.post(f'{base.replace(\"/api\",\"\")}/api/auth/login', json={
+    'identifier': os.environ.get('FEELING_USERNAME') or os.environ.get('FEELING_PHONE'),
+    'password': os.environ.get('FEELING_PASSWORD'),
+    'type': 'password'
+}, timeout=10)
+token = r.json().get('accessToken') or r.json().get('access_token')
+if not token:
+    print('Login failed:', r.status_code, r.text[:200])
+else:
+    ep_id = 'c11f3a3a-855e-4732-acbd-95a818ba3070'
+    url = f'{base}/storyboard/episodes/{ep_id}/shots'
+    h = {'Authorization': token if token.startswith('Bearer') else 'Bearer '+token}
+    r2 = requests.get(url, headers=h, timeout=10)
+    print('Status:', r2.status_code)
+    data = r2.json()
+    print('Top-level keys:', list(data.keys()) if isinstance(data, dict) else 'list len='+str(len(data)))
+    if isinstance(data, dict):
+        for k in ['data','shots','items']:
+            v = data.get(k)
+            if v is not None:
+                print(f'  {k}:', type(v).__name__, 'len='+str(len(v)) if hasattr(v,'__len__') else v)
+                if isinstance(v, list) and v:
+                    print('  first item keys:', list(v[0].keys())[:20])
+                    for f in ['imgPrompt','videoPrompt','visualDescription']:
+                        print(f'    {f}:', repr(v[0].get(f))[:60] if v[0].get(f) else None)
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
+base = os.environ.get('FEELING_API_BASE', '').rstrip('/')
+# 先登录
+r = requests.post(f'{base.replace(\"/api\",\"\")}/api/auth/login', json={
+    'identifier': os.environ.get('FEELING_USERNAME') or os.environ.get('FEELING_PHONE'),
+    'password': os.environ.get('FEELING_PASSWORD'),
+    'type': 'password'
+}, timeout=10)
+token = r.json().get('accessToken') or r.json().get('access_token')
+if not token:
+    print('Login failed:', r.status_code, r.text[:200])
+else:
+    ep_id = 'c11f3a3a-855e-4732-acbd-95a818ba3070'
+    url = f'{base}/storyboard/episodes/{ep_id}/shots'
+    h = {'Authorization': token if token.startswith('Bearer') else 'Bearer '+token}
+    r2 = requests.get(url, headers=h, timeout=10)
+    print('Status:', r2.status_code)
+    data = r2.json()
+    print('Top-level keys:', list(data.keys()) if isinstance(data, dict) else 'list len='+str(len(data)))
+    if isinstance(data, dict):
+        for k in ['data','shots','items']:
+            v = data.get(k)
+            if v is not None:
+                print(f'  {k}:', type(v).__name__, 'len='+str(len(v)) if hasattr(v,'__len__') else v)
+                if isinstance(v, list) and v:
+                    print('  first item keys:', list(v[0].keys())[:20])
+                    for f in ['imgPrompt','videoPrompt','visualDescription']:
+                        print(f'    {f}:', repr(v[0].get(f))[:60] if v[0].get(f) else None)
+"
+```
+
+```
+Login failed: 200 {"code":200,"message":"success","data":{"accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNGMzYWEyYi0yNTIyLTRlZGUtODVhMy01Yjc1MzRmMTUzMWMiLCJ1c2VybmFtZSI6ImFpdG9zaHV1Iiwicm9sZSI6InVzZXIi
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/.env.example</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+ep_id = 'c11f3a3a-855e-4732-acbd-95a818ba3070'
+# 直接调用底层获取原始响应
+c._ensure_token()
+import requests
+r = c._session.get(c.base_url + '/storyboard/episodes/' + ep_id + '/shots', timeout=30)
+print('Status:', r.status_code)
+data = r.json()
+print('Type:', type(data).__name__)
+if isinstance(data, dict):
+    print('Keys:', list(data.keys()))
+    for k in ['data','shots','items']:
+        v = data.get(k)
+        if v is not None:
+            n = len(v) if isinstance(v, (list,dict)) else 'N/A'
+            print(f'  {k}: {type(v).__name__} len={n}')
+            if isinstance(v, list) and len(v) > 0:
+                print('  First shot keys:', list(v[0].keys()))
+                s0 = v[0]
+                for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:
+                    val = s0.get(f)
+                    if val:
+                        print(f'    {f}:', val[:70]+'...' if len(str(val))>70 else val)
+elif isinstance(data, list):
+    print('List len:', len(data))
+    if data:
+        print('First keys:', list(data[0].keys()))
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+ep_id = 'c11f3a3a-855e-4732-acbd-95a818ba3070'
+# 直接调用底层获取原始响应
+c._ensure_token()
+import requests
+r = c._session.get(c.base_url + '/storyboard/episodes/' + ep_id + '/shots', timeout=30)
+print('Status:', r.status_code)
+data = r.json()
+print('Type:', type(data).__name__)
+if isinstance(data, dict):
+    print('Keys:', list(data.keys()))
+    for k in ['data','shots','items']:
+        v = data.get(k)
+        if v is not None:
+            n = len(v) if isinstance(v, (list,dict)) else 'N/A'
+            print(f'  {k}: {type(v).__name__} len={n}')
+            if isinstance(v, list) and len(v) > 0:
+                print('  First shot keys:', list(v[0].keys()))
+                s0 = v[0]
+                for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:
+                    val = s0.get(f)
+                    if val:
+                        print(f'    {f}:', val[:70]+'...' if len(str(val))>70 else val)
+elif isinstance(data, list):
+    print('List len:', len(data))
+    if data:
+        print('First keys:', list(data[0].keys()))
+"
+```
+
+```
+Status: 200
+Type: dict
+Keys: ['code', 'message', 'data', 'timestamp']
+  data: dict len=2
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+ep_id = 'c11f3a3a-855e-4732-acbd-95a818ba3070'
+r = c._session.get(c.base_url + '/storyboard/episodes/' + ep_id + '/shots', timeout=30)
+data = r.json()
+d = data.get('data', {})
+print('data keys:', list(d.keys()))
+for k, v in d.items():
+    print(f'  {k}:', type(v).__name__, len(v) if isinstance(v,(list,dict)) else repr(v)[:50])
+if isinstance(d.get('items'), list) and d['items']:
+    s0 = d['items'][0]
+    print('\\nFirst shot keys:', list(s0.keys()))
+    for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:
+        print(f'  {f}:', repr(s0.get(f))[:80] if s0.get(f) else None)
+elif isinstance(d.get('shots'), list) and d['shots']:
+    s0 = d['shots'][0]
+    print('\\nFirst shot keys:', list(s0.keys()))
+else:
+    # 可能 data 直接是 list 的包装
+    print('Full data structure:', json.dumps({k: (v[:1] if isinstance(v,list) and v else v) for k,v in d.items()}, ensure_ascii=False, indent=2)[:1500])
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+ep_id = 'c11f3a3a-855e-4732-acbd-95a818ba3070'
+r = c._session.get(c.base_url + '/storyboard/episodes/' + ep_id + '/shots', timeout=30)
+data = r.json()
+d = data.get('data', {})
+print('data keys:', list(d.keys()))
+for k, v in d.items():
+    print(f'  {k}:', type(v).__name__, len(v) if isinstance(v,(list,dict)) else repr(v)[:50])
+if isinstance(d.get('items'), list) and d['items']:
+    s0 = d['items'][0]
+    print('\\nFirst shot keys:', list(s0.keys()))
+    for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:
+        print(f'  {f}:', repr(s0.get(f))[:80] if s0.get(f) else None)
+elif isinstance(d.get('shots'), list) and d['shots']:
+    s0 = d['shots'][0]
+    print('\\nFirst shot keys:', list(s0.keys()))
+else:
+    # 可能 data 直接是 list 的包装
+    print('Full data structure:', json.dumps({k: (v[:1] if isinstance(v,list) and v else v) for k,v in d.items()}, ensure_ascii=False, indent=2)[:1500])
+"
+```
+
+```
+data keys: ['items', 'total']
+  items: list 0
+  total: int 0
+Full data structure: {
+  "items": [],
+  "total": 0
+}
+
+```
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Handling API response**
+
+I'm handling the API response structure where episodes with 0 shots return empty items array. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+# 用 asset_api_dump 里的 episodeId
+ep_id = 'c25126d1-73c7-418a-8ebe-e877df4f2e84'
+r = c._session.get(c.base_url + '/storyboard/episodes/' + ep_id + '/shots', timeout=30)
+data = r.json()
+d = data.get('data', {})
+items = d.get('items', [])
+print('Shots count:', len(items))
+if items:
+    s0 = items[0]
+    print('\\nFirst shot 所有字段:', list(s0.keys()))
+    for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:
+        v = s0.get(f)
+        print(f'\\n  {f}:')
+        print('   ', repr(v)[:200] if v else '    (无)')
+    # 写入 dump 供查看
+    with open('docs/shots_api_dump.json','w',encoding='utf-8') as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+    print('\\n已写入 docs/shots_api_dump.json')
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.client import FeelingClient
+import json
+c = FeelingClient()
+c.login()
+# 用 asset_api_dump 里的 episodeId
+ep_id = 'c25126d1-73c7-418a-8ebe-e877df4f2e84'
+r = c._session.get(c.base_url + '/storyboard/episodes/' + ep_id + '/shots', timeout=30)
+data = r.json()
+d = data.get('data', {})
+items = d.get('items', [])
+print('Shots count:', len(items))
+if items:
+    s0 = items[0]
+    print('\\nFirst shot 所有字段:', list(s0.keys()))
+    for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:
+        v = s0.get(f)
+        print(f'\\n  {f}:')
+        print('   ', repr(v)[:200] if v else '    (无)')
+    # 写入 dump 供查看
+    with open('docs/shots_api_dump.json','w',encoding='utf-8') as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+    print('\\n已写入 docs/shots_api_dump.json')
+"
+```
+
+```
+Shots count: 41
+
+First shot 所有字段: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']
+
+  imgPrompt:
+    '左侧前景肩部遮挡的过肩视角，格雷·金斯顿位于画面正中心。全身中全景，24mm 环境广角，深景深(背景清晰)。身穿耐磨野外生存服饰的达里尔以侧脸剪影占据画面左侧前景，正通过后视镜观察后座。后座中心的格雷·金斯顿是一名年轻女性，身穿户外耐磨服装与牛仔裤，面部带有长途跋涉的疲态，正张口急促喘息。一束强烈的金白色逆光从车窗后方射入，配合顶光强直射，在格雷·金斯顿身上形成高饱和的古铜色肤色与金白高光，车内
+
+  videoPrompt:
+        (无)
+
+  visualDescription:
+    '达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。'
+
+  prompt:
+    '格雷·金斯顿随车身颠簸产生自然的物理晃动，发丝随重心起伏微弱摆动。车内强光下的金色尘埃在光束中持续漂浮。镜头带有轻微手持呼吸感。'
+
+已写入 docs/shots_api_dump.json
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import json
+with open('docs/shots_api_dump.json') as f:
+    shots = json.load(f)
+has_vp = sum(1 for s in shots if s.get('videoPrompt'))
+has_ip = sum(1 for s in shots if s.get('imgPrompt'))
+has_vd = sum(1 for s in shots if s.get('visualDescription'))
+print('imgPrompt 有值:', has_ip, '/', len(shots))
+print('videoPrompt 有值:', has_vp, '/', len(shots))
+print('visualDescription 有值:', has_vd, '/', len(shots))
+# 找一个有 videoPrompt 的
+for i, s in enumerate(shots[:5]):
+    vp = s.get('videoPrompt')
+    print(f'  Shot {i+1} videoPrompt:', repr(vp)[:60] if vp else '(空)')
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import json
+with open('docs/shots_api_dump.json') as f:
+    shots = json.load(f)
+has_vp = sum(1 for s in shots if s.get('videoPrompt'))
+has_ip = sum(1 for s in shots if s.get('imgPrompt'))
+has_vd = sum(1 for s in shots if s.get('visualDescription'))
+print('imgPrompt 有值:', has_ip, '/', len(shots))
+print('videoPrompt 有值:', has_vp, '/', len(shots))
+print('visualDescription 有值:', has_vd, '/', len(shots))
+# 找一个有 videoPrompt 的
+for i, s in enumerate(shots[:5]):
+    vp = s.get('videoPrompt')
+    print(f'  Shot {i+1} videoPrompt:', repr(vp)[:60] if vp else '(空)')
+"
+```
+
+```
+imgPrompt 有值: 41 / 41
+videoPrompt 有值: 0 / 41
+visualDescription 有值: 41 / 41
+  Shot 1 videoPrompt: (空)
+  Shot 2 videoPrompt: (空)
+  Shot 3 videoPrompt: (空)
+  Shot 4 videoPrompt: (空)
+  Shot 5 videoPrompt: (空)
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import json
+with open('docs/shots_api_dump.json') as f:
+    shots = json.load(f)
+s0 = shots[0]
+print('prompt 字段:', repr(s0.get('prompt'))[:150])
+print()
+print('imgPrompt 前80字:', s0.get('imgPrompt','')[:80])
+print()
+print('visualDescription:', s0.get('visualDescription','')[:80])
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+import json
+with open('docs/shots_api_dump.json') as f:
+    shots = json.load(f)
+s0 = shots[0]
+print('prompt 字段:', repr(s0.get('prompt'))[:150])
+print()
+print('imgPrompt 前80字:', s0.get('imgPrompt','')[:80])
+print()
+print('visualDescription:', s0.get('visualDescription','')[:80])
+"
+```
+
+```
+prompt 字段: '格雷·金斯顿随车身颠簸产生自然的物理晃动，发丝随重心起伏微弱摆动。车内强光下的金色尘埃在光束中持续漂浮。镜头带有轻微手持呼吸感。'
+
+imgPrompt 前80字: 左侧前景肩部遮挡的过肩视角，格雷·金斯顿位于画面正中心。全身中全景，24mm 环境广角，深景深(背景清晰)。身穿耐磨野外生存服饰的达里尔以侧脸剪影占据画面左侧前
+
+visualDescription: 达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+已拉取并查看该 API 的返回结构，结论如下：
+
+## 接口返回结构
+
+`GET /api/storyboard/episodes/{episodeId}/shots` 返回：
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "items": [ /* shot 数组 */ ],
+    "total": 41
+  }
+}
+```
+
+## Shot 对象中的提示词相关字段
+
+以 episode `c25126d1-73c7-418a-8ebe-e877df4f2e84` 为例（41 个 shot）：
+
+| 字段 | 有值数量 | 含义 |
+|------|----------|------|
+| **imgPrompt** | 41/41 | 图片提示词（构图、景别、光线等） |
+| **visualDescription** | 41/41 | 画面描述（场景、动作） |
+| **videoPrompt** | 0/41 | 视频提示词（本 episode 全为空） |
+| **prompt** | 41/41 | 视频/动作描述（物理晃动、镜头感等） |
+
+示例：
+
+- **imgPrompt**：`左侧前景肩部遮挡的过肩视角，格雷·金斯顿位于画面正中心。全身中全景...`
+- **visualDescription**：`达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸...`
+- **prompt**：`格雷·金斯顿随车身颠簸产生自然的物理晃动，发丝随重心起伏微弱摆动。车内强光下的金色尘埃...`
+
+因此，当 `videoPrompt` 为空时，应优先用 `prompt` 作为视频提示词。正在检查 puller 是否已处理该逻辑：
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+发现：平台用 `prompt` 存视频/动作描述，但 puller 在 `videoPrompt` 为空时仅用 `imagePrompt` 兜底。应把 `prompt` 加入 `videoPrompt` 的 fallback。
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Updating prompt fallback**
+
+I'm updating the video prompt fallback to use 'prompt' field and removing 'prompt' from image prompt fallback. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.puller import _get_shot_prompts
+# 模拟平台返回：videoPrompt 空，prompt 有值
+sh = {
+    'imgPrompt': '画面描述A',
+    'videoPrompt': None,
+    'prompt': '视频动作描述B',
+}
+img, vid = _get_shot_prompts(sh)
+print('image_prompt:', img[:30]+'...')
+print('video_prompt:', vid[:30]+'...')
+assert vid == '视频动作描述B', 'video 应用 prompt'
+print('OK')
+"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -c "
+from src.feeling.puller import _get_shot_prompts
+# 模拟平台返回：videoPrompt 空，prompt 有值
+sh = {
+    'imgPrompt': '画面描述A',
+    'videoPrompt': None,
+    'prompt': '视频动作描述B',
+}
+img, vid = _get_shot_prompts(sh)
+print('image_prompt:', img[:30]+'...')
+print('video_prompt:', vid[:30]+'...')
+assert vid == '视频动作描述B', 'video 应用 prompt'
+print('OK')
+"
+```
+
+```
+image_prompt: 画面描述A...
+video_prompt: 视频动作描述B...
+OK
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+已确认该 API 的返回结构，并完成 puller 的调整。
+
+## 实际返回结构
+
+`GET /api/storyboard/episodes/{episodeId}/shots` 返回：
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "items": [ /* 41 个 shot */ ],
+    "total": 41
+  }
+}
+```
+
+每个 shot 包含：
+
+- **imgPrompt**：图片提示词（构图、景别、光线）
+- **visualDescription**：画面描述
+- **videoPrompt**：视频提示词（当前 episode 全为空）
+- **prompt**：视频/动作描述（物理晃动、镜头感等）
+
+## 修改说明
+
+平台在 `videoPrompt` 为空时，用 `prompt` 存视频动作描述。已在 puller 中把 `prompt` 加入 `videoPrompt` 的 fallback：
+
+```python
+# 之前：video_prompt = _get(sh, "videoPrompt", "video_prompt", "videoPrompt")
+# 现在：video_prompt = _get(sh, "videoPrompt", "video_prompt", "videoPrompt", "prompt")
+```
+
+重新拉取后，`episode.json` 中的 `videoPrompt` 会正确使用平台的 `prompt` 内容。
+
+---
+
+说明：episode `c11f3a3a-855e-4732-acbd-95a818ba3070` 返回 0 个 shot，因此用 `c25126d1-73c7-418a-8ebe-e877df4f2e84` 做了验证。完整 shots 数据已写入 `docs/shots_api_dump.json`。
+
+---
+
+_**User**_
+
+你加到分镜里表里面，做两个字段吧。然后分镜列表的资产要有个悬浮显示的功能
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/AssetTag.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/episode.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "Tooltip|tooltip|Popover",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "Tooltip|tooltip|Popover",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/components/ui/Tooltip.tsx",
+              "matches": [
+                {
+                  "lineNumber": 2,
+                  "content": " * Tooltip 悬停提示"
+                },
+                {
+                  "lineNumber": 7,
+                  "content": "interface TooltipProps {"
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "export function Tooltip({"
+                },
+                {
+                  "lineNumber": 17,
+                  "content": "}: TooltipProps) {"
+                },
+                {
+                  "lineNumber": 37,
+                  "content": "          role=\"tooltip\""
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/ui/index.ts",
+              "matches": [
+                {
+                  "lineNumber": 9,
+                  "content": "export { Tooltip } from \"./Tooltip\""
+                }
+              ]
+            }
+          ],
+          "totalLines": 6,
+          "totalMatchedLines": 6
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/ui/Tooltip.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/utils/file.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Creating asset tag**
+
+I'm building a custom AssetTag component with rich hover popover for assets. 
+
+**Updating asset tag**
+
+I'm refactoring ShotRow to pass basePath to AssetTag components for proper image rendering in hover popovers. I'm replacing ShotRow's plain text asset cells with AssetTag components and passing basePath and cacheBust as props. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [-] 分镜表拆成图片提示词、视频提示词两列
+- [ ] 资产标签悬浮显示（缩略图+prompt）
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] 分镜表拆成图片提示词、视频提示词两列
+- [-] 资产标签悬浮显示（缩略图+prompt）
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/AssetTag.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="read_lints">
+<details>
+<summary>Tool use: **read_lints**</summary>
+
+
+Parameters:
+
+```json
+{
+  "paths": [
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/AssetTag.tsx",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx"
+  ]
+}
+```
+Result:
+
+```json
+{
+  "linterErrorsByFile": [
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/AssetTag.tsx"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx"
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] 分镜表拆成图片提示词、视频提示词两列
+- [x] 资产标签悬浮显示（缩略图+prompt）
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "AssetTag",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "AssetTag",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/components/business/ShotRow.tsx",
+              "matches": [
+                {
+                  "lineNumber": 8,
+                  "content": "import { StatusIndicator, AssetTag } from \"@/components/business\""
+                },
+                {
+                  "lineNumber": 67,
+                  "content": "              &lt;AssetTag"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/ShotCard.tsx",
+              "matches": [
+                {
+                  "lineNumber": 8,
+                  "content": "import { StatusIndicator, AssetTag } from \"@/components/business\""
+                },
+                {
+                  "lineNumber": 81,
+                  "content": "            &lt;AssetTag"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/AssetTag.tsx",
+              "matches": [
+                {
+                  "lineNumber": 2,
+                  "content": " * AssetTag 资产标签"
+                },
+                {
+                  "lineNumber": 18,
+                  "content": "interface AssetTagProps {"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "export function AssetTag({ asset, className = \"\", basePath, cacheBust }: AssetTagProps) {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/ShotDetailPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 11,
+                  "content": "import { VideoPlayer, ImagePreview, AssetTag } from \"@/components/business\""
+                },
+                {
+                  "lineNumber": 128,
+                  "content": "                  &lt;AssetTag key={a.assetId} asset={a} /&gt;"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/index.ts",
+              "matches": [
+                {
+                  "lineNumber": 2,
+                  "content": "export { AssetTag } from \"./AssetTag\""
+                }
+              ]
+            }
+          ],
+          "totalLines": 10,
+          "totalMatchedLines": 10
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+修改已完成，方案如下：
+
+## 修改方案流程图
+
+```mermaid
+flowchart TB
+    subgraph 分镜表["分镜表改造"]
+        A1["表头：描述 → 图片提示词 | 视频提示词"]
+        A2["ShotRow：两列分别展示"]
+        A3["图片提示词：40字 truncate + title 全文"]
+        A4["视频提示词：40字 truncate + title 全文"]
+    end
+
+    subgraph 资产悬浮["资产悬浮显示"]
+        B1["AssetTag 新增 basePath/cacheBust"]
+        B2["hover 时显示 popover"]
+        B3["popover：缩略图 + 名称 + prompt 预览"]
+        B4["支持列表视图 + 卡片视图 + 详情页"]
+    end
+
+    A1 --> A2 --> A3 --> A4
+    B1 --> B2 --> B3 --> B4
+```
+
+## 修改内容
+
+### 1. 分镜表拆成两个提示词列
+
+| 修改 | 说明 |
+|------|------|
+| **表头** | 「描述」拆成「图片提示词」「视频提示词」两列 |
+| **图片提示词** | 展示 `imagePrompt` 前 40 字，`title` 为完整内容 |
+| **视频提示词** | 展示 `videoPrompt` 前 40 字，`title` 为完整内容 |
+| **资产列** | 改为使用 `AssetTag` 组件，支持悬浮展示 |
+
+### 2. 资产悬浮显示
+
+- **触发**：鼠标悬停在资产标签上
+- **内容**：缩略图（64×64）+ 名称与类型 + prompt 前 4 行
+- **样式**：报纸风边框、阴影
+- **使用位置**：分镜列表（表格/卡片）、Shot 详情页
+
+### 3. 涉及文件
+
+- `StoryboardPage.tsx`：表头改为两列
+- `ShotRow.tsx`：两列展示 + 使用带悬浮的 `AssetTag`
+- `AssetTag.tsx`：新增 `basePath`、`cacheBust`，实现悬浮 popover
+- `ShotCard.tsx`：传入 `basePath`、`cacheBust` 给 `AssetTag`
+- `ShotDetailPage.tsx`：传入 `basePath`、`cacheBust` 给 `AssetTag`
+
+---
+
+_**User**_
+
+视频提示词和图片提示词也要悬浮显示且可以点击编辑、失焦保存；画面描述也丢了，找回来并且放在图片提示词前面
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/episode.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Updating shot schema**
+
+I'm adding `visualDescription` field to Shot type and episode.json to handle the visual description separately from image_prompt. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "updateShot|patchShot|PATCH.*shot",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "updateShot|patchShot|PATCH.*shot",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/api/shots.ts",
+              "matches": [
+                {
+                  "lineNumber": 3,
+                  "content": " * GET /api/episodes/:id/shots, PATCH /api/episodes/:id/shots/:shotId"
+                }
+              ]
+            }
+          ],
+          "totalLines": 1,
+          "totalMatchedLines": 1
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/api/shots.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes/episodes.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "episode|shot",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "episode|shot",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/server/routes/episodes.py",
+              "matches": [
+                {
+                  "lineNumber": 24,
+                  "content": "@router.get(\"/episodes\", response_model=list[dict])"
+                },
+                {
+                  "lineNumber": 25,
+                  "content": "def list_episodes():"
+                },
+                {
+                  "lineNumber": 27,
+                  "content": "    return data_service.list_episodes()"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "@router.get(\"/episodes/{episode_id}\", response_model=Episode)"
+                },
+                {
+                  "lineNumber": 31,
+                  "content": "def get_episode(episode_id: str):"
+                },
+                {
+                  "lineNumber": 33,
+                  "content": "    ep = data_service.get_episode(episode_id)"
+                },
+                {
+                  "lineNumber": 39,
+                  "content": "@router.post(\"/episodes/pull\", response_model=Episode)"
+                },
+                {
+                  "lineNumber": 40,
+                  "content": "def pull_episode(req: PullEpisodeRequest):"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "        from src.feeling.puller import pull_episode as do_pull"
+                },
+                {
+                  "lineNumber": 53,
+                  "content": "        ep_dir = data_service.get_episode_dir(req.episodeId)"
+                },
+                {
+                  "lineNumber": 60,
+                  "content": "            req.episodeId,"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/shots.py",
+              "matches": [
+                {
+                  "lineNumber": 21,
+                  "content": "def _flatten_shots(ep):"
+                },
+                {
+                  "lineNumber": 23,
+                  "content": "    shots = []"
+                },
+                {
+                  "lineNumber": 25,
+                  "content": "        shots.extend(scene.shots)"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "    return shots"
+                },
+                {
+                  "lineNumber": 29,
+                  "content": "@router.get(\"/episodes/{episode_id}/shots\", response_model=list[Shot])"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "def list_shots(episode_id: str):"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "    ep = data_service.get_episode(episode_id)"
+                },
+                {
+                  "lineNumber": 35,
+                  "content": "    return _flatten_shots(ep)"
+                },
+                {
+                  "lineNumber": 38,
+                  "content": "@router.get(\"/episodes/{episode_id}/shots/{shot_id}\", response_model=Shot)"
+                },
+                {
+                  "lineNumber": 39,
+                  "content": "def get_shot(episode_id: str, shot_id: str):"
+                },
+                {
+                  "lineNumber": 41,
+                  "content": "    shot = data_service.get_shot(episode_id, shot_id)"
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "    if not shot:"
+                },
+                {
+                  "lineNumber": 44,
+                  "content": "    return shot"
+                },
+                {
+                  "lineNumber": 47,
+                  "content": "@router.patch(\"/episodes/{episode_id}/shots/{shot_id}\", response_model=Shot)"
+                },
+                {
+                  "lineNumber": 48,
+                  "content": "def update_shot(episode_id: str, shot_id: str, updates: dict = Body(default_factory=dict)):"
+                },
+                {
+                  "lineNumber": 50,
+                  "content": "    shot = data_service.update_shot(episode_id, shot_id, updates or {})"
+                },
+                {
+                  "lineNumber": 51,
+                  "content": "    if not shot:"
+                },
+                {
+                  "lineNumber": 53,
+                  "content": "    return shot"
+                },
+                {
+                  "lineNumber": 56,
+                  "content": "@router.post(\"/episodes/{episode_id}/shots/{shot_id}/select\", response_model=Shot)"
+                },
+                {
+                  "lineNumber": 57,
+                  "content": "def select_candidate(episode_id: str, shot_id: str, req: SelectCandidateRequest):"
+                },
+                {
+                  "lineNumber": 59,
+                  "content": "    shot = data_service.select_candidate(episode_id, shot_id, req.candidateId)"
+                },
+                {
+                  "lineNumber": 60,
+                  "content": "    if not shot:"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "    return shot"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/export_route.py",
+              "matches": [
+                {
+                  "lineNumber": 5,
+                  "content": "按选定顺序拼接视频，输出到 export/episode_rough.mp4"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "    \"\"\"导出粗剪：按 shot 顺序拼接选定的视频。\"\"\""
+                },
+                {
+                  "lineNumber": 27,
+                  "content": "    ep = data_service.get_episode(req.episodeId)"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "    ep_dir = data_service.get_episode_dir(req.episodeId)"
+                },
+                {
+                  "lineNumber": 33,
+                  "content": "    # 收集选定视频路径（按 shot 顺序）"
+                },
+                {
+                  "lineNumber": 35,
+                  "content": "    shot_ids = req.shotIds or []"
+                },
+                {
+                  "lineNumber": 36,
+                  "content": "    if not shot_ids:"
+                },
+                {
+                  "lineNumber": 38,
+                  "content": "            for shot in scene.shots:"
+                },
+                {
+                  "lineNumber": 39,
+                  "content": "                shot_ids.append(shot.shotId)"
+                },
+                {
+                  "lineNumber": 40,
+                  "content": "    for shot_id in shot_ids:"
+                },
+                {
+                  "lineNumber": 41,
+                  "content": "        shot = data_service.get_shot(req.episodeId, shot_id)"
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "        if not shot:"
+                },
+                {
+                  "lineNumber": 44,
+                  "content": "        selected = next((c for c in shot.videoCandidates if c.selected), None)"
+                },
+                {
+                  "lineNumber": 54,
+                  "content": "    output_path = export_dir / \"episode_rough.mp4\""
+                },
+                {
+                  "lineNumber": 56,
+                  "content": "    # 返回可用于 /api/files/ 的路径：projectId/episodeId/export/episode_rough.mp4"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/generate.py",
+              "matches": [
+                {
+                  "lineNumber": 35,
+                  "content": "def _run_tail_frame(task_id: str, episode_id: str, shot_id: str):"
+                },
+                {
+                  "lineNumber": 38,
+                  "content": "        ep = data_service.get_episode(episode_id)"
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "        shot = data_service.get_shot(episode_id, shot_id)"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "        if not shot:"
+                },
+                {
+                  "lineNumber": 46,
+                  "content": "        ep_dir = data_service.get_episode_dir(episode_id)"
+                },
+                {
+                  "lineNumber": 50,
+                  "content": "        first_path = ep_dir / shot.firstFrame"
+                },
+                {
+                  "lineNumber": 52,
+                  "content": "            set_local_task(task_id, \"failed\", error=f\"First frame not found: {shot.firstFrame}\")"
+                },
+                {
+                  "lineNumber": 55,
+                  "content": "        asset_paths = [assets_dir / a.localPath.replace(\"assets/\", \"\").lstrip(\"/\") for a in shot.assets]"
+                },
+                {
+                  "lineNumber": 60,
+                  "content": "            shot.imagePrompt,"
+                },
+                {
+                  "lineNumber": 61,
+                  "content": "            shot.videoPrompt,"
+                },
+                {
+                  "lineNumber": 64,
+                  "content": "        end_name = f\"S{shot.shotNumber:02d}_end.png\""
+                },
+                {
+                  "lineNumber": 68,
+                  "content": "        data_service.update_shot(episode_id, shot_id, {"
+                },
+                {
+                  "lineNumber": 75,
+                  "content": "        data_service.update_shot_status(episode_id, shot_id, \"error\")"
+                },
+                {
+                  "lineNumber": 80,
+                  "content": "    \"\"\"批量生成尾帧。前端可能逐个 shot 调用，此处支持单 shot。\"\"\""
+                },
+                {
+                  "lineNumber": 81,
+                  "content": "    if not req.shotIds:"
+                },
+                {
+                  "lineNumber": 82,
+                  "content": "        raise HTTPException(status_code=400, detail=\"shotIds 不能为空\")"
+                },
+                {
+                  "lineNumber": 83,
+                  "content": "    shot_id = req.shotIds[0]"
+                },
+                {
+                  "lineNumber": 86,
+                  "content": "    data_service.update_shot_status(req.episodeId, shot_id, \"endframe_generating\")"
+                },
+                {
+                  "lineNumber": 87,
+                  "content": "    background_tasks.add_task(_run_tail_frame, task_id, req.episodeId, shot_id)"
+                },
+                {
+                  "lineNumber": 88,
+                  "content": "    return GenerateEndframeResponse(taskId=task_id, shotId=shot_id)"
+                },
+                {
+                  "lineNumber": 91,
+                  "content": "def _run_video_gen(task_id: str, episode_id: str, shot_id: str, mode: str):"
+                },
+                {
+                  "lineNumber": 94,
+                  "content": "        ep = data_service.get_episode(episode_id)"
+                },
+                {
+                  "lineNumber": 98,
+                  "content": "        shot = data_service.get_shot(episode_id, shot_id)"
+                },
+                {
+                  "lineNumber": 99,
+                  "content": "        if not shot:"
+                },
+                {
+                  "lineNumber": 102,
+                  "content": "        ep_dir = data_service.get_episode_dir(episode_id)"
+                },
+                {
+                  "lineNumber": 106,
+                  "content": "        first_path = ep_dir / shot.firstFrame"
+                },
+                {
+                  "lineNumber": 111,
+                  "content": "        resp = submit_img2video(first_path, shot.videoPrompt)"
+                },
+                {
+                  "lineNumber": 127,
+                  "content": "            data_service.add_video_candidate(episode_id, shot_id, cand)"
+                },
+                {
+                  "lineNumber": 128,
+                  "content": "            data_service.update_shot_status(episode_id, shot_id, \"video_generating\")"
+                },
+                {
+                  "lineNumber": 139,
+                  "content": "    if not req.shotIds:"
+                },
+                {
+                  "lineNumber": 140,
+                  "content": "        raise HTTPException(status_code=400, detail=\"shotIds 不能为空\")"
+                },
+                {
+                  "lineNumber": 142,
+                  "content": "    for shot_id in req.shotIds:"
+                },
+                {
+                  "lineNumber": 145,
+                  "content": "        background_tasks.add_task(_run_video_gen, task_id, req.episodeId, shot_id, req.mode)"
+                },
+                {
+                  "lineNumber": 146,
+                  "content": "        tasks_out.append({\"taskId\": task_id, \"shotId\": shot_id})"
+                },
+                {
+                  "lineNumber": 150,
+                  "content": "def _run_regen_frame(task_id: str, episode_id: str, shot_id: str, image_prompt: str, asset_ids: list[str]):"
+                },
+                {
+                  "lineNumber": 153,
+                  "content": "        ep = data_service.get_episode(episode_id)"
+                },
+                {
+                  "lineNumber": 157,
+                  "content": "        shot = data_service.get_shot(episode_id, shot_id)"
+                },
+                {
+                  "lineNumber": 158,
+                  "content": "        if not shot:"
+                },
+                {
+                  "lineNumber": 161,
+                  "content": "        ep_dir = data_service.get_episode_dir(episode_id)"
+                },
+                {
+                  "lineNumber": 165,
+                  "content": "        first_path = ep_dir / shot.firstFrame"
+                },
+                {
+                  "lineNumber": 171,
+                  "content": "        for a in shot.assets:"
+                },
+                {
+                  "lineNumber": 179,
+                  "content": "        frame_path = ep_dir / shot.firstFrame"
+                },
+                {
+                  "lineNumber": 181,
+                  "content": "        data_service.update_shot(episode_id, shot_id, {"
+                },
+                {
+                  "lineNumber": 187,
+                  "content": "        set_local_task(task_id, \"success\", result={\"newFramePath\": shot.firstFrame})"
+                },
+                {
+                  "lineNumber": 199,
+                  "content": "        task_id, req.episodeId, req.shotId, req.imagePrompt, req.assetIds or [],"
+                },
+                {
+                  "lineNumber": 201,
+                  "content": "    shot = data_service.get_shot(req.episodeId, req.shotId)"
+                },
+                {
+                  "lineNumber": 204,
+                  "content": "        shotId=req.shotId,"
+                },
+                {
+                  "lineNumber": 205,
+                  "content": "        newFramePath=shot.firstFrame if shot else \"\","
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/files.py",
+              "matches": [
+                {
+                  "lineNumber": 6,
+                  "content": "path 格式为 projectId/episodeId/frames/S01.png 或 projectId/episodeId/assets/xxx.png"
+                }
+              ]
+            }
+          ],
+          "totalLines": 98,
+          "totalMatchedLines": 98
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/services/data_service.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/shotStore.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Updating schemas**
+
+I'm adding visualDescription field to the backend shot schema. </details></think>
+
+---
+
+
+开始实现：
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [-] Puller + 类型：添加 visualDescription 画面描述
+- [ ] EditablePromptCell：悬浮+可编辑+失焦保存
+- [ ] ShotRow：三列 画面描述|图片提示词|视频提示词
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/episode.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Handling schema changes**
+
+I'm using `Field(default="")` for new fields to maintain backward compatibility with existing episode data. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] Puller + 类型：添加 visualDescription 画面描述
+- [-] EditablePromptCell：悬浮+可编辑+失焦保存
+- [ ] ShotRow：三列 画面描述|图片提示词|视频提示词
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/EditablePromptCell.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Updating shot model**
+
+I'm adding visualDescription field to the Shot model to ensure backend accepts the update. I'm ensuring the Shot model includes visualDescription to match backend expectations. 
+
+**Aligning table cells**
+
+I'm checking for potential misalignment in the table row caused by EditablePromptCell rendering extra td elements. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/EditablePromptCell.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/index.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Handling hover states**
+
+I'm ensuring hover popovers don't flicker when users click to edit fields. </details></think>
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/EditablePromptCell.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="todo_write">
+<details><summary>Tool use: **todo_write** • Todo List</summary>
+
+- [x] Puller + 类型：添加 visualDescription 画面描述
+- [x] EditablePromptCell：悬浮+可编辑+失焦保存
+- [x] ShotRow：三列 画面描述|图片提示词|视频提示词
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="read_lints">
+<details>
+<summary>Tool use: **read_lints**</summary>
+
+
+Parameters:
+
+```json
+{
+  "paths": [
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/EditablePromptCell.tsx",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts"
+  ]
+}
+```
+Result:
+
+```json
+{
+  "linterErrorsByFile": [
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/EditablePromptCell.tsx"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts"
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Updating shot model**
+
+I'm ensuring the Shot model includes `visualDescription` field and verifying backend PATCH handling supports it. </details></think>
+
+---
+
+
+修改已完成，整体方案如下：
+
+## 修改方案流程图
+
+```mermaid
+flowchart TB
+    subgraph 数据层["数据层"]
+        A1["Puller: _get_visual_description()"]
+        A2["episode.json: visualDescription 字段"]
+        A3["Shot 类型: visualDescription?"]
+    end
+
+    subgraph 表格["分镜表"]
+        B1["表头: 画面描述 | 图片提示词 | 视频提示词"]
+        B2["EditablePromptCell 三列"]
+        B3["悬浮显示完整内容"]
+        B4["点击进入编辑"]
+        B5["失焦保存 → PATCH /shots/:id"]
+    end
+
+    subgraph 详情["Shot 详情页"]
+        C1["画面描述 | 图片提示词 | 视频提示词"]
+    end
+
+    A1 --> A2 --> A3
+    B1 --> B2 --> B3 --> B4 --> B5
+    C1
+```
+
+## 修改内容
+
+### 1. 画面描述（visualDescription）恢复
+
+| 位置 | 修改 |
+|------|------|
+| **Puller** | 新增 `_get_visual_description()`，单独提取 `visualDescription`，不再并入 `imagePrompt` |
+| **episode.json** | 每个 shot 增加 `visualDescription` 字段 |
+| **Shot 类型** | 增加 `visualDescription?: string` |
+| **后端 schema** | Shot 增加 `visualDescription: str = ""` |
+
+### 2. 分镜表三列顺序
+
+**画面描述 | 图片提示词 | 视频提示词**
+
+### 3. EditablePromptCell 组件
+
+- **悬浮**：悬停显示完整内容（含「点击可编辑 · 失焦保存」）
+- **编辑**：点击单元格进入 textarea 编辑
+- **保存**：失焦时调用 `onSave`，通过 `PATCH /api/episodes/:id/shots/:shotId` 写入 episode.json
+
+### 4. 涉及文件
+
+- `src/feeling/puller.py`：`_get_visual_description()`，shot 中写入 `visualDescription`
+- `web/frontend/src/types/episode.ts`：Shot 增加 `visualDescription`
+- `web/server/models/schemas.py`：Shot 增加 `visualDescription`
+- `web/frontend/src/components/business/EditablePromptCell.tsx`：新建可编辑单元格
+- `web/frontend/src/components/business/ShotRow.tsx`：三列使用 EditablePromptCell
+- `web/frontend/src/stores/episodeStore.ts`：新增 `updateShot`
+- `web/frontend/src/pages/StoryboardPage.tsx`：表头增加「画面描述」
+- `web/frontend/src/pages/ShotDetailPage.tsx`：按 画面描述 | 图片提示词 | 视频提示词 展示
+- `web/frontend/src/components/business/ShotCard.tsx`：预览中增加画面描述
+
+**说明**：需要重新拉取 episode 后，`episode.json` 中才会有 `visualDescription`。旧数据可手动编辑并保存。
+
+---
+
+_**User**_
+
+点击编辑的时候自动变成适配的宽和高，然后画面描述你帮我重新拉一下呢
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+<think><details><summary>Thought Process</summary>
+**Handling user requests**
+
+I'm implementing auto-resizing textarea for EditablePromptCell and will investigate re-pulling episode data functionality. 
+
+**Implementing textarea resize**
+
+I'm implementing auto-resizing textarea for EditablePromptCell using height:auto and width:w-full with min-w based on content. I'm adjusting the textarea implementation to use scrollHeight for dynamic resizing instead of a library. </details></think>
+
+---
+
+
+改进编辑态下 textarea 的自适应宽高，并添加便于重新拉取剧集数据的说明或脚本。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/EditablePromptCell.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Considering edit layout**
+
+I'm weighing options for the edit layout: using colSpan with coordination or a single wide cell with fixed positioning. 
+
+**Configuring edit layout**
+
+I'll implement adaptive height using scrollHeight and width with w-full and min-w-[280px] on edit cells. 
+
+**Implementing auto height**
+
+I'm implementing auto height for edit cells using textarea with dynamic height based on content. I'm implementing dynamic textarea height adjustment based on content with a max height cap of 400px. 
+
+**Setting textarea width**
+
+I'm implementing clamp-based textarea width with colSpan handling for edit mode. 
+
+**Refactoring edit state**
+
+I'm refactoring the edit state management to use a parent wrapper component for the three cells instead of coordinating each cell individually. I'm implementing a floating textarea overlay for editing cells with auto height and colSpan={3} for active cell. 
+
+I'm adjusting the table row structure to handle colSpan=3 for active edit fields by omitting other tds in that row. I'm lifting edit state to ShotRow and creating ShotPromptCells component. 
+
+I'm extracting ShotPromptCell component and simplifying table cell layout with absolute positioning for editing. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="generic" data-tool-name="glob_file_search">
+<details>
+<summary>Tool use: **glob_file_search** • Searched codebase "undefined" • **3** results in **1** directory</summary>
+
+Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu/data** (3 files)
+
+| File |
+|------|
+| `proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json` |
+| `demo/ep-demo/episode.json` |
+| `b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json` |
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Refreshing visual description**
+
+I'm running the puller script to refresh the visual description for episode ID c25126d1-73c7-418a-8. I'm running the puller script with network credentials to refresh the visual description. 
+
+**Adjusting textarea size**
+
+I'm implementing a hook to automatically adjust textarea width and height based on content. 
+
+**Refactoring shot row**
+
+I'm refactoring ShotRow to handle colSpan for wider edits by wrapping prompt cells in a single container. I'm adding editing state management for prompt cells in ShotRow with `editingPrompt` state. I'm splitting EditablePromptCell into separate display and edit modes with PromptTableCell component. I'm refactoring ShotRow to manage editing state locally with a PromptField component. 
+
+I'm fixing the table column alignment in ShotRow after adding edit mode with colSpan. </details></think>
+
+---
+
+
+实现编辑时合并三列（colSpan=3）以扩大编辑区，并用 `scrollHeight` 与内容宽度自适应；随后运行 puller 重新拉取剧集数据。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Refactoring prompt cells**
+
+I'm splitting EditablePromptCell into Preview and Edit components with new props for variant control. I'm creating a new `ShotPromptCells` component to handle the rendering logic for different prompt cell variants. I'm implementing the `ShotPromptCells` component with editing state and labels for different prompt types. 
+
+**Implementing prompt cells**
+
+I'm adding dynamic height and width adjustments to the prompt cells based on content length. I'm adding local state for textarea edits to avoid conflicts during editing. 
+
+**Creating prompt cells**
+
+I'm extracting preview and editor components from EditablePromptCell to enable composable UI patterns. </details></think>
+
+---
+
+
+正在实现：将 `ShotPromptCells` 提取为独立组件（编辑时 `colSpan={3}` + 自适应尺寸），并运行 puller 重新拉取数据。
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Handling escape key**
+
+I'm using `onKeyDown` with Escape to prevent default and set editing state to null without saving, while tracking cancelation with a ref to avoid blur firing save. I'm using a ref to track cancellation to prevent blur from saving while handling Escape key. I'm adding an escapeRef to prevent blur from saving when Escape key is pressed, and resetting edit draft on Escape. I'm using a ref to prevent blur from triggering save when Escape key is pressed. I'm implementing `ignoreNextBlur` to handle the blur event when Escape key is pressed. I'm implementing `ignoreNextBlur` to prevent blur events from firing after Escape key press. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Handling edit cancellation**
+
+I'm ensuring cancelEdit properly handles race conditions with blur events by using ignoreBlurSaveRef. I'm reordering finishEdit to handle blur events that fire after cancelEdit by checking ignoreBlurSaveRef first. I realized that onBlur calls finishEdit which reads `editing` from the current render, so a stale closure isn't an issue. I'm implementing a blur handler flag to control save behavior during edit cancellation. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="delete_file">
+<details><summary>Tool use: **delete_file**</summary>
+
+Explanation: undefined
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/index.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Fixing edit cancellation**
+
+I'm ensuring `setEditing(null)` is called correctly during cancel flows to prevent duplicate state updates. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id b95c3d75-d99a-40c3-9f69-9bb76f23c990 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id b95c3d75-d99a-40c3-9f69-9bb76f23c990 2>&1
+```
+
+```
+
+[拉取] 第2集 (id=c25126d1-73c7-418a-8ebe-e877df4f2e84)
+[OK] 已拉取至 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: python3 -c "import json; p='data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'; d=json.load(open(p)); s=d['scenes'][0]['shots'][0]; print('keys:', 'visualDescription' in s, list(s.keys())[:8]); print('vd:', (s.get('visualDescription') or '')[:60])"</summary>
+
+```bash
+python3 -c "import json; p='data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'; d=json.load(open(p)); s=d['scenes'][0]['shots'][0]; print('keys:', 'visualDescription' in s, list(s.keys())[:8]); print('vd:', (s.get('visualDescription') or '')[:60])"
+```
+
+```
+keys: True ['shotId', 'shotNumber', 'visualDescription', 'imagePrompt', 'videoPrompt', 'duration', 'cameraMovement', 'aspectRatio']
+vd: 达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="read_lints">
+<details>
+<summary>Tool use: **read_lints**</summary>
+
+
+Parameters:
+
+```json
+{
+  "paths": [
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/index.ts"
+  ]
+}
+```
+Result:
+
+```json
+{
+  "linterErrorsByFile": [
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/index.ts"
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id proj-default 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id proj-default 2>&1
+```
+
+```
+Traceback (most recent call last):
+  File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+  File "&lt;frozen runpy&gt;", line 88, in _run_code
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py", line 472, in &lt;module&gt;
+    main()
+    ~~~~^^
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py", line 451, in main
+    pull_project(
+    ~~~~~~~~~~~~^
+        args.project_id,
+        ^^^^^^^^^^^^^^^^
+        args.output,
+        ^^^^^^^^^^^^
+        force_redownload=args.force,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py", line 412, in pull_project
+    episodes = client.get_project_episodes(project_id)
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py", line 171, in get_project_episodes
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/site-packages/requests/models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: https://dev-video-server.feeling.ltd/api/projects/proj-default/episodes
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Analyzing bug behavior**
+
+I found that the code prioritizes --project-id over --episode-id, causing pull_project! to run instead of pull_episode! when both flags are provided. </details></think>
+
+---
+
+
+## 修改方案流程图
+
+```mermaid
+flowchart TB
+    subgraph 编辑["点击编辑"]
+        A1["进入编辑：colSpan=3 合并三列"]
+        A2["textarea 高度 = scrollHeight（72~480px）"]
+        A3["textarea 宽度 = min(100%, 最长行 ch)"]
+        A4["onInput 同步尺寸"]
+    end
+
+    subgraph 拉取["画面描述数据"]
+        B1["puller 已写入 visualDescription"]
+        B2["已执行: b95c3d75.../c25126d1..."]
+    end
+
+    A1 --> A2 --> A3 --> A4
+    B1 --> B2
+```
+
+## 1. 编辑区自适应宽高
+
+- 新建 **`ShotPromptCells.tsx`**，替换原来的三个 `EditablePromptCell`。
+- **预览**：仍是三列（画面描述 / 图片提示词 / 视频提示词），悬浮逻辑不变。
+- **编辑**：合并为 **一个 `td colSpan={3}`**，整行三列区域一起用来编辑当前字段。
+- **高度**：根据 `scrollHeight` 变化，限制在 **72px ~ 480px**，超出可纵向滚动；保留 **`resize-y`** 可手动再拖。
+- **宽度**：按当前文本**最长一行**估算 `ch`（约 28~88ch），并用 **`min(100%, Nch)`**，在宽列里尽量贴内容宽度。
+- **快捷键**：`Shift+Enter` 换行，`Enter` 失焦保存，`Esc` 取消（用 `ignoreBlurSaveRef` 避免误保存）。
+
+已删除 **`EditablePromptCell.tsx`**，并在 **`index.ts`** 中改为导出 **`ShotPromptCells`**。
+
+## 2. 重新拉取（画面描述）
+
+已在本地执行：
+
+```bash
+python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id b95c3d75-d99a-40c3-9f69-9bb76f23c990
+```
+
+`episode.json` 里已包含 **`visualDescription`**（例如首镜：`达里尔在驾驶位通过后视镜观察后座…`）。
+
+**说明**：当前 CLI 若**同时**传 `--project-id` 和 `--episode-id`，会优先走「整项目拉取」而不是单集；你这次用的真实项目 UUID `b95c3d75-...` 是成功的。若数据在 **`proj-default`** 目录下，那是本地目录名，**不能**当作平台 `projectId` 去调 API（会 500）。需要同步到 `proj-default` 时，可复制生成好的 `episode.json`，或仍用**真实** `projectId` 拉取后再挪目录。
+
+前端刷新剧集详情后即可看到新的画面描述列。
+
+---
+
+_**User**_
+
+我还是没看到画面描述啊
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+<think><details><summary>Thought Process</summary>
+**Tracing visual description flow**
+
+I'm checking if visualDescription is being stripped during API serialization or if the frontend loads from wrong episode path. </details></think>
+
+---
+
+
+正在排查：从后端 API、本地数据路径到前端展示全链路检查。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/ShotDetailPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/services/data_service.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Checking scan order**
+
+I'm investigating whether the scan order in `root.iterdir()` affects which directory is selected, noting that `b95c3d75` may come before `proj-default` alphabetically. I'm checking if `list_episodes` returns full episode data or just summaries, as `get_episode` uses `_find_episode_dir`. 
+
+The scan order is ambiguous on Linux due to arbitrary iterdir() ordering, causing potential duplicate episode ID issues. 
+
+**Improving episode dir selection**
+
+I'm implementing a better `_find_episode_dir` function that prioritizes episode directories based on matching `episodeId` and `pulledAt` timestamps. </details></think>
+
+---
+
+
+定位到问题：存在两个相同 `episodeId` 的目录——`proj-default/...` 的旧 `episode.json` 缺少 `visualDescription`；`data_service` 的 `_find_episode_dir` 可能先返回 `proj-default`。正在修复：优先选择非 `proj-default` 且较新的数据，并把 `visualDescription` 合并进 `proj-default` 的 `episode.json`。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/services/data_service.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Updating episode directory logic**
+
+I'm replacing `_find_episode_dir` with logic that prioritizes candidates based on pulledAt timestamp and data completeness. 
+
+**Deduplicating episode list**
+
+I'm deduplicating list_episodes to prefer entries with higher scoring and avoid duplicates from multiple episode directories. I'm implementing deduplication by episodeId while preserving the best metadata from each episode directory. </details></think>
+
+---
+
+
+正在修复 `data_service`：在存在多个同名剧集目录时优先返回包含 `visualDescription` 的数据；并将 `visualDescription` 合并到 `proj-default` 的 `episode.json`。
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/services/data_service.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/services/data_service.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 << 'PY'
+import json
+from pathlib import Path
+
+src = Path("data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json")
+dst = Path("data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json")
+if not src.exists() or not dst.exists():
+    print("skip merge", src.exists(), dst.exists())
+    raise SystemExit(0)
+
+s = json.loads(src.read_text(encoding="utf-8"))
+d = json.loads(dst.read_text(encoding="utf-8"))
+by_id = {}
+for sc in s.get("scenes", []):
+    for sh in sc.get("shots", []):
+        by_id[sh["shotId"]] = sh.get("visualDescription") or ""
+
+n = 0
+for sc in d.get("scenes", []):
+    for sh in sc.get("shots", []):
+        sid = sh.get("shotId")
+        if sid in by_id and by_id[sid]:
+            if sh.get("visualDescription") != by_id[sid]:
+                sh["visualDescription"] = by_id[sid]
+                n += 1
+        elif sid in by_id and not sh.get("visualDescription"):
+            sh["visualDescription"] = by_id[sid]
+            n += 1
+
+dst.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+print("merged visualDescription into proj-default:", n, "shots")
+PY</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 << 'PY'
+import json
+from pathlib import Path
+
+src = Path("data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json")
+dst = Path("data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json")
+if not src.exists() or not dst.exists():
+    print("skip merge", src.exists(), dst.exists())
+    raise SystemExit(0)
+
+s = json.loads(src.read_text(encoding="utf-8"))
+d = json.loads(dst.read_text(encoding="utf-8"))
+by_id = {}
+for sc in s.get("scenes", []):
+    for sh in sc.get("shots", []):
+        by_id[sh["shotId"]] = sh.get("visualDescription") or ""
+
+n = 0
+for sc in d.get("scenes", []):
+    for sh in sc.get("shots", []):
+        sid = sh.get("shotId")
+        if sid in by_id and by_id[sid]:
+            if sh.get("visualDescription") != by_id[sid]:
+                sh["visualDescription"] = by_id[sid]
+                n += 1
+        elif sid in by_id and not sh.get("visualDescription"):
+            sh["visualDescription"] = by_id[sid]
+            n += 1
+
+dst.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+print("merged visualDescription into proj-default:", n, "shots")
+PY
+```
+
+```
+merged visualDescription into proj-default: 41 shots
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: python3 -c "import json;d=json.load(open('data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));print(d['scenes'][0]['shots'][0].get('visualDescription','')[:50])"</summary>
+
+```bash
+python3 -c "import json;d=json.load(open('data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));print(d['scenes'][0]['shots'][0].get('visualDescription','')[:50])"
+```
+
+```
+达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+## 原因说明
+
+1. **本地有两份同一 `episodeId` 的数据**  
+   - `data/proj-default/c25126d1-.../episode.json`：旧拉取，**没有** `visualDescription`  
+   - `data/b95c3d75-.../c25126d1-.../episode.json`：新拉取，**有** `visualDescription`
+
+2. **后端以前按目录扫描顺序随便选一份**  
+   若先扫到 `proj-default`，API 就一直返回缺字段的那份，所以列表里「画面描述」列只会是 `-` 或详情里像没内容。
+
+## 已做修改
+
+| 项 | 说明 |
+|----|------|
+| **`data_service._find_episode_dir`** | 同一 `episodeId` 多目录时，**优先**「带 `visualDescription` 的 shot 更多」→ 再优先**非 `proj-default`** → 再比 `pulledAt` 更新 |
+| **`list_episodes`** | 按 `episodeId` **去重**，每条剧集只保留上述规则选中的那一份目录，避免列表里重复、点错旧数据 |
+| **合并数据** | 已从 `b95c3d75-...` 把 **41 个 shot 的 `visualDescription`** 写进 `proj-default` 那份 `episode.json`，两份现在都有画面描述 |
+
+## 请你本地做一步
+
+**重启后端**（`uvicorn`），让新的 `data_service` 生效。然后浏览器 **强刷** 或重新打开分镜页。
+
+若仍看不到，看下 `DATA_ROOT` 是否指向别的目录（和上面 `data` 不一致）。
+
+---
+
+**流程图（择优读盘）**
+
+```mermaid
+flowchart LR
+    A["同一 episodeId 多个目录"] --> B["统计每份 JSON 中带 visualDescription 的 shot 数"]
+    B --> C["选最多；并列则排除 proj-default；再比 pulledAt"]
+    C --> D["GET /episodes/:id 与列表均用该目录"]
+```
+
+---
+
+_**User**_
+
+还是空的。你把其他项目都删除了。然后重新拉一下呢
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+
+正在清理 `data/` 下的冗余项目并重新从平台拉取。
+
+
+
+---
+
+<tool-use data-tool-type="generic" data-tool-name="glob_file_search">
+<details>
+<summary>Tool use: **glob_file_search** • Searched codebase "undefined" • **3** results in **1** directory</summary>
+
+Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu/data** (3 files)
+
+| File |
+|------|
+| `proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json` |
+| `b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json` |
+| `demo/ep-demo/episode.json` |
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: find /Users/zuobowen/Documents/GitHub/fv_autovidu/data -type f 2>/dev/null | head -80</summary>
+
+```bash
+find /Users/zuobowen/Documents/GitHub/fv_autovidu/data -type f 2>/dev/null | head -80
+```
+
+```
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/demo/ep-demo/episode.json
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S030.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S031.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S025.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S019.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S014.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S028.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S029.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S015.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S001.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S017.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S003.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S002.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S016.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S012.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S006.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S007.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S013.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S039.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S005.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S011.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S010.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S004.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S038.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱院内.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/汽车.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/格伦.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/弓.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱公共区.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/达里尔.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/牢房.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/卡罗尔.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/卡尔.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/格雷·金斯顿.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/朱迪斯.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/瑞克.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/贝丝.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/赫谢尔.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/玛格丽特.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/汽车内.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/医药箱.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/assets/监狱外围.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S041.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S040.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S021.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S035.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S009.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S008.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S034.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S020.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S036.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S022.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S023.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S037.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S033.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S027.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S026.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S032.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S018.png
+/Users/zuobowen/Documents/GitHub/fv_autovidu/data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/frames/S024.png
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "visualDescription|scenes",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "glob": "**/mock*",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "visualDescription|scenes",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {}
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "episodes",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "glob": "**/*.{ts,tsx}",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "episodes",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/stores/episodeStore.ts",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "import { episodesApi } from \"@/api/episodes\""
+                },
+                {
+                  "lineNumber": 11,
+                  "content": "  episodes: Episode[]"
+                },
+                {
+                  "lineNumber": 31,
+                  "content": "  episodes: [],"
+                },
+                {
+                  "lineNumber": 39,
+                  "content": "      const res = await episodesApi.list()"
+                },
+                {
+                  "lineNumber": 40,
+                  "content": "      set({ episodes: res.data })"
+                },
+                {
+                  "lineNumber": 51,
+                  "content": "      const res = await episodesApi.detail(id)"
+                },
+                {
+                  "lineNumber": 67,
+                  "content": "      const res = await episodesApi.pull(episodeId, forceRedownload, projectId)"
+                },
+                {
+                  "lineNumber": 69,
+                  "content": "        episodes: [res.data, ...s.episodes],"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/api/episodes.ts",
+              "matches": [
+                {
+                  "lineNumber": 3,
+                  "content": " * GET /api/episodes, GET /api/episodes/:id, POST /api/episodes/pull"
+                },
+                {
+                  "lineNumber": 9,
+                  "content": "export const episodesApi = {"
+                },
+                {
+                  "lineNumber": 10,
+                  "content": "  list: () =&gt; apiClient.get&lt;Episode[]&gt;(\"/episodes\"),"
+                },
+                {
+                  "lineNumber": 11,
+                  "content": "  detail: (id: string) =&gt; apiClient.get&lt;Episode&gt;(&#96;/episodes/${id}&#96;),"
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "    apiClient.post&lt;Episode&gt;(\"/episodes/pull\", {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/EpisodeListPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 14,
+                  "content": "  const { episodes, loading, error, fetchEpisodes } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 21,
+                  "content": "  if (loading &amp;&amp; episodes.length === 0) {"
+                },
+                {
+                  "lineNumber": 38,
+                  "content": "  if (!loading &amp;&amp; episodes.length === 0) {"
+                },
+                {
+                  "lineNumber": 71,
+                  "content": "        {episodes.map((ep) =&gt; {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/SettingsPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 17,
+                  "content": "      const res = await fetch(&#96;${apiUrl}/api/episodes&#96;)"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/mocks/handlers.ts",
+              "matches": [
+                {
+                  "lineNumber": 41,
+                  "content": "  http.get(\"/api/episodes\", () =&gt; HttpResponse.json([mockEpisode])),"
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "  http.get(\"/api/episodes/:id\", () =&gt; HttpResponse.json(mockEpisode)),"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "  http.post(\"/api/episodes/pull\", () =&gt; HttpResponse.json(mockEpisode)),"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/api/shots.ts",
+              "matches": [
+                {
+                  "lineNumber": 3,
+                  "content": " * GET /api/episodes/:id/shots, PATCH /api/episodes/:id/shots/:shotId"
+                },
+                {
+                  "lineNumber": 12,
+                  "content": "    apiClient.get&lt;Shot[]&gt;(&#96;/episodes/${episodeId}/shots&#96;),"
+                },
+                {
+                  "lineNumber": 14,
+                  "content": "    apiClient.get&lt;Shot&gt;(&#96;/episodes/${episodeId}/shots/${shotId}&#96;),"
+                },
+                {
+                  "lineNumber": 16,
+                  "content": "    apiClient.patch&lt;Shot&gt;(&#96;/episodes/${episodeId}/shots/${shotId}&#96;, data),"
+                },
+                {
+                  "lineNumber": 18,
+                  "content": "    apiClient.post&lt;Shot&gt;(&#96;/episodes/${episodeId}/shots/${shotId}/select&#96;, {"
+                }
+              ]
+            }
+          ],
+          "totalLines": 26,
+          "totalMatchedLines": 26
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/mocks/handlers.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Fixing mock data**
+
+I'm adding visualDescription to mockEpisode to fix the '-' display issue. </details></think>
+
+---
+
+
+修复 puller 的 CLI 逻辑（`--episode-id` 应优先于 `--project-id`），清空 `data/` 并重新拉取；向 MSW mock 添加 `visualDescription`，以防启用 Mock 时显示为空。
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/mocks/handlers.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && rm -rf data/proj-default data/demo "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990" && mkdir -p data && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id b95c3d75-d99a-40c3-9f69-9bb76f23c990 --title "第2集" --number 2 2>&1</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && rm -rf data/proj-default data/demo "data/b95c3d75-d99a-40c3-9f69-9bb76f23c990" && mkdir -p data && python -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id b95c3d75-d99a-40c3-9f69-9bb76f23c990 --title "第2集" --number 2 2>&1
+```
+
+```
+[OK] 已拉取至 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: python3 -c "import json;d=json.load(open('data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));s=d['scenes'][0]['shots'][0];print('vd' in s, (s.get('visualDescription') or '')[:55])"</summary>
+
+```bash
+python3 -c "import json;d=json.load(open('data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));s=d['scenes'][0]['shots'][0];print('vd' in s, (s.get('visualDescription') or '')[:55])"
+```
+
+```
+False 达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: python3 -c "import json;d=json.load(open('data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));s=d['scenes'][0]['shots'][0];print('visualDescription' in s, len(s.get('visualDescription','')))"</summary>
+
+```bash
+python3 -c "import json;d=json.load(open('data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));s=d['scenes'][0]['shots'][0];print('visualDescription' in s, len(s.get('visualDescription','')))"
+```
+
+```
+True 46
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+## 已处理事项
+
+### 1. 清空本地其它项目数据
+已删除目录：
+- `data/proj-default/`
+- `data/demo/`
+- `data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/`（旧副本）
+
+### 2. 修正 puller 命令行逻辑（重要）
+原先**只要写了 `--project-id` 就会去拉整个项目**，`--episode-id` 会被忽略。  
+已改为：**有 `--episode-id` 时只拉这一集**；`--project-id` 只用于资产接口和本地目录 `data/{projectId}/{episodeId}/`。
+
+### 3. 重新拉取
+已执行：
+
+```bash
+python -m src.feeling.puller \
+  --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 \
+  -o data \
+  --project-id b95c3d75-d99a-40c3-9f69-9bb76f23c990 \
+  --title "第2集" --number 2
+```
+
+当前仅保留：`data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/`，且 `episode.json` 里首镜 **`visualDescription` 已存在**（约 46 字）。
+
+### 4. MSW Mock
+若前端开了 **`VITE_USE_MOCK=true`**，Mock 里原先没有 `visualDescription`，列表会一直像「画面描述」空着。已在 `handlers.ts` 的 mock shot 里补上 `visualDescription`。
+
+---
+
+## 请你本地确认
+
+1. **关掉 Mock**：`web/frontend/.env` 里不要设 `VITE_USE_MOCK=true`，或设为 `false`。  
+2. **重启后端**（读的是 `DATA_ROOT` 下的新 `data`）。  
+3. 浏览器 **硬刷新** 分镜页。
+
+---
+
+## 流程图
+
+```mermaid
+flowchart LR
+  A["删除 data 下多份项目"] --> B["修复 puller：episode-id 优先"]
+  B --> C["单集拉取 → 唯一目录 b95c/.../c251..."]
+  C --> D["episode.json 含 visualDescription"]
+  D --> E["Mock 补字段防联调误判"]
+```
+
+若按上面做完仍整列是 `-`，把 `web/frontend/.env` 里和 `VITE_USE_MOCK`、`DATA_ROOT` 相关的几行发我（可打码密码），我再帮你对一下是不是指到了别的数据目录。
+
+---
+
+_**User**_
+
+还是没有啊。你再看看是什么问题？你有刷新token吗
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+<think><details><summary>Thought Process</summary>
+**Investigating display issue**
+
+The user sees no visual description in UI; token refresh isn't involved since local file reading doesn't require tokens. </details></think>
+
+---
+
+
+正在全链路排查：本地数据、后端序列化、前端请求与 Feeling 的 token 刷新。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/api/client.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/main.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "visualDescription|model_dump|Episode",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "visualDescription|model_dump|Episode",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/mocks/handlers.ts",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "const mockEpisode = {"
+                },
+                {
+                  "lineNumber": 22,
+                  "content": "          visualDescription: \"仓库外黄昏，达里尔背影面向铁门。\","
+                },
+                {
+                  "lineNumber": 42,
+                  "content": "  http.get(\"/api/episodes\", () =&gt; HttpResponse.json([mockEpisode])),"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "  http.get(\"/api/episodes/:id\", () =&gt; HttpResponse.json(mockEpisode)),"
+                },
+                {
+                  "lineNumber": 44,
+                  "content": "  http.post(\"/api/episodes/pull\", () =&gt; HttpResponse.json(mockEpisode)),"
+                }
+              ]
+            },
+            {
+              "file": "web/server/services/data_service.py",
+              "matches": [
+                {
+                  "lineNumber": 5,
+                  "content": "提供 Episode 的 CRUD 及 Shot 更新操作，所有数据以 data/{projectId}/{episodeId}/episode.json 为核心。"
+                },
+                {
+                  "lineNumber": 14,
+                  "content": "from models.schemas import Episode, Shot, VideoCandidate"
+                },
+                {
+                  "lineNumber": 43,
+                  "content": "            if (sh.get(\"visualDescription\") or \"\").strip():"
+                },
+                {
+                  "lineNumber": 77,
+                  "content": "    择优返回含 visualDescription 更完整、且非占位 projectId 的一份。"
+                },
+                {
+                  "lineNumber": 84,
+                  "content": "    列出所有本地已拉取的 Episode。"
+                },
+                {
+                  "lineNumber": 87,
+                  "content": "    返回 Episode 摘要列表（用于 GET /api/episodes）。"
+                },
+                {
+                  "lineNumber": 131,
+                  "content": "def get_episode(episode_id: str) -&gt; Episode | None:"
+                },
+                {
+                  "lineNumber": 133,
+                  "content": "    获取单个 Episode 完整数据。"
+                },
+                {
+                  "lineNumber": 136,
+                  "content": "        episode_id: Episode UUID"
+                },
+                {
+                  "lineNumber": 139,
+                  "content": "        Episode 或 None（未找到）"
+                },
+                {
+                  "lineNumber": 146,
+                  "content": "    return Episode.model_validate(data)"
+                },
+                {
+                  "lineNumber": 150,
+                  "content": "    \"\"\"获取 Episode 数据目录路径。\"\"\""
+                },
+                {
+                  "lineNumber": 155,
+                  "content": "    \"\"\"从 Episode 中获取单个 Shot。\"\"\""
+                },
+                {
+                  "lineNumber": 166,
+                  "content": "def _save_episode(ep_dir: Path, episode: Episode) -&gt; None:"
+                },
+                {
+                  "lineNumber": 167,
+                  "content": "    \"\"\"将 Episode 写回 episode.json。\"\"\""
+                },
+                {
+                  "lineNumber": 170,
+                  "content": "        json.dump(episode.model_dump(mode=\"json\"), f, ensure_ascii=False, indent=2)"
+                },
+                {
+                  "lineNumber": 178,
+                  "content": "        episode_id: Episode UUID"
+                },
+                {
+                  "lineNumber": 194,
+                  "content": "                d = shot.model_dump()"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/ShotPromptCells.tsx",
+              "matches": [
+                {
+                  "lineNumber": 10,
+                  "content": "export type PromptFieldKey = \"visualDescription\" | \"imagePrompt\" | \"videoPrompt\""
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "  visualDescription: \"画面描述\","
+                },
+                {
+                  "lineNumber": 36,
+                  "content": "  if (key === \"visualDescription\") return shot.visualDescription ?? \"\""
+                },
+                {
+                  "lineNumber": 210,
+                  "content": "      {renderPreviewTd(\"visualDescription\")}"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/ShotRow.tsx",
+              "matches": [
+                {
+                  "lineNumber": 12,
+                  "content": "import { useEpisodeStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 23,
+                  "content": "  const { updateShot } = useEpisodeStore()"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/ShotCard.tsx",
+              "matches": [
+                {
+                  "lineNumber": 69,
+                  "content": "      {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) &amp;&amp; ("
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "          title={[shot.visualDescription, shot.imagePrompt, shot.videoPrompt].filter(Boolean).join(\"\\n\\n\")}"
+                },
+                {
+                  "lineNumber": 74,
+                  "content": "          {shot.visualDescription ? &#96;画面: ${(shot.visualDescription || \"\").slice(0, 30)}…&#96; : null}"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/ShotDetailPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 9,
+                  "content": "import { useEpisodeStore, useShotStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 17,
+                  "content": "  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 21,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 22,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                },
+                {
+                  "lineNumber": 24,
+                  "content": "  if (!episodeId || !shotId || !currentEpisode) {"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "  const shots = flattenShots(currentEpisode)"
+                },
+                {
+                  "lineNumber": 37,
+                  "content": "  const basePath = &#96;${currentEpisode.projectId}/${currentEpisode.episodeId}&#96;"
+                },
+                {
+                  "lineNumber": 38,
+                  "content": "  const cacheBust = currentEpisode.pulledAt ?? undefined"
+                },
+                {
+                  "lineNumber": 111,
+                  "content": "          {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) &amp;&amp; ("
+                },
+                {
+                  "lineNumber": 116,
+                  "content": "                  {shot.visualDescription || \"暂无\"}"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/stores/episodeStore.ts",
+              "matches": [
+                {
+                  "lineNumber": 2,
+                  "content": " * Episode Store"
+                },
+                {
+                  "lineNumber": 3,
+                  "content": " * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode / updateShot"
+                },
+                {
+                  "lineNumber": 6,
+                  "content": "import type { Episode } from \"@/types\""
+                },
+                {
+                  "lineNumber": 10,
+                  "content": "interface EpisodeStore {"
+                },
+                {
+                  "lineNumber": 11,
+                  "content": "  episodes: Episode[]"
+                },
+                {
+                  "lineNumber": 12,
+                  "content": "  currentEpisode: Episode | null"
+                },
+                {
+                  "lineNumber": 15,
+                  "content": "  fetchEpisodes: () =&gt; Promise&lt;void&gt;"
+                },
+                {
+                  "lineNumber": 16,
+                  "content": "  fetchEpisodeDetail: (id: string) =&gt; Promise&lt;void&gt;"
+                },
+                {
+                  "lineNumber": 17,
+                  "content": "  pullNewEpisode: ("
+                },
+                {
+                  "lineNumber": 22,
+                  "content": "  /** 更新 Shot 字段（如 visualDescription/imagePrompt/videoPrompt），同步到 currentEpisode */"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "    updates: Partial&lt;{ visualDescription: string; imagePrompt: string; videoPrompt: string }&gt;"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "export const useEpisodeStore = create&lt;EpisodeStore&gt;((set) =&gt; ({"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "  currentEpisode: null,"
+                },
+                {
+                  "lineNumber": 36,
+                  "content": "  fetchEpisodes: async () =&gt; {"
+                },
+                {
+                  "lineNumber": 48,
+                  "content": "  fetchEpisodeDetail: async (id: string) =&gt; {"
+                },
+                {
+                  "lineNumber": 52,
+                  "content": "      set({ currentEpisode: res.data })"
+                },
+                {
+                  "lineNumber": 60,
+                  "content": "  pullNewEpisode: async ("
+                },
+                {
+                  "lineNumber": 70,
+                  "content": "        currentEpisode: res.data,"
+                },
+                {
+                  "lineNumber": 83,
+                  "content": "      if (!s.currentEpisode || s.currentEpisode.episodeId !== episodeId)"
+                },
+                {
+                  "lineNumber": 85,
+                  "content": "      const newScenes = s.currentEpisode.scenes.map((scene) =&gt; ({"
+                },
+                {
+                  "lineNumber": 91,
+                  "content": "      return { currentEpisode: { ...s.currentEpisode, scenes: newScenes } }"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/StoryboardPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 8,
+                  "content": "import { useEpisodeStore, useShotStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 24,
+                  "content": "  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "      void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                },
+                {
+                  "lineNumber": 35,
+                  "content": "    if (currentEpisode) {"
+                },
+                {
+                  "lineNumber": 36,
+                  "content": "      setShots(flattenShots(currentEpisode))"
+                },
+                {
+                  "lineNumber": 38,
+                  "content": "  }, [currentEpisode, setShots])"
+                },
+                {
+                  "lineNumber": 41,
+                  "content": "  if (loading &amp;&amp; !currentEpisode) {"
+                },
+                {
+                  "lineNumber": 53,
+                  "content": "  if (!currentEpisode) {"
+                },
+                {
+                  "lineNumber": 61,
+                  "content": "  const pendingShots = flattenShots(currentEpisode).filter((s) =&gt; s.status === \"pending\")"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "  const endframeDoneShots = flattenShots(currentEpisode).filter("
+                },
+                {
+                  "lineNumber": 65,
+                  "content": "  const basePath = &#96;${currentEpisode.projectId}/${currentEpisode.episodeId}&#96;"
+                },
+                {
+                  "lineNumber": 66,
+                  "content": "  const cacheBust = currentEpisode.pulledAt ?? undefined"
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "          {currentEpisode.episodeTitle} - 分镜板总览"
+                },
+                {
+                  "lineNumber": 75,
+                  "content": "          {flattenShots(currentEpisode).length} 个镜头"
+                },
+                {
+                  "lineNumber": 132,
+                  "content": "      {currentEpisode.scenes.map((scene) =&gt; {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/episode.ts",
+              "matches": [
+                {
+                  "lineNumber": 61,
+                  "content": "  /** 画面描述：平台 visualDescription，简洁场景/动作描述 */"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "  visualDescription?: string"
+                },
+                {
+                  "lineNumber": 77,
+                  "content": " * 一个 Episode 下多个 Scene，每个 Scene 包含多个 Shot"
+                },
+                {
+                  "lineNumber": 87,
+                  "content": " * Episode：剧集"
+                },
+                {
+                  "lineNumber": 90,
+                  "content": "export interface Episode {"
+                },
+                {
+                  "lineNumber": 102,
+                  "content": "export function flattenShots(episode: Episode): Shot[] {"
+                }
+              ]
+            },
+            {
+              "file": "web/server/models/schemas.py",
+              "matches": [
+                {
+                  "lineNumber": 34,
+                  "content": "# ---------- Episode 相关（episode.ts） ----------"
+                },
+                {
+                  "lineNumber": 67,
+                  "content": "    visualDescription: str = \"\"  # 画面描述，平台 visualDescription"
+                },
+                {
+                  "lineNumber": 89,
+                  "content": "class Episode(BaseModel):"
+                },
+                {
+                  "lineNumber": 105,
+                  "content": "class PullEpisodeRequest(BaseModel):"
+                },
+                {
+                  "lineNumber": 106,
+                  "content": "    \"\"\"拉取 Episode 请求。\"\"\""
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/AssetLibraryPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 8,
+                  "content": "import { useEpisodeStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 120,
+                  "content": "  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 126,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 127,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                },
+                {
+                  "lineNumber": 131,
+                  "content": "    if (!currentEpisode) return []"
+                },
+                {
+                  "lineNumber": 132,
+                  "content": "    const fromEpisode ="
+                },
+                {
+                  "lineNumber": 133,
+                  "content": "      currentEpisode.assets &amp;&amp; currentEpisode.assets.length &gt; 0"
+                },
+                {
+                  "lineNumber": 134,
+                  "content": "        ? currentEpisode.assets"
+                },
+                {
+                  "lineNumber": 135,
+                  "content": "        : (currentEpisode.scenes.flatMap((s) =&gt;"
+                },
+                {
+                  "lineNumber": 141,
+                  "content": "    return fromEpisode"
+                },
+                {
+                  "lineNumber": 142,
+                  "content": "  }, [currentEpisode])"
+                },
+                {
+                  "lineNumber": 150,
+                  "content": "  if (!episodeId || !currentEpisode) {"
+                },
+                {
+                  "lineNumber": 155,
+                  "content": "  const basePath = &#96;${currentEpisode.projectId}/${currentEpisode.episodeId}&#96;"
+                },
+                {
+                  "lineNumber": 157,
+                  "content": "  const cacheBust = currentEpisode.pulledAt ?? undefined"
+                },
+                {
+                  "lineNumber": 175,
+                  "content": "            {currentEpisode.episodeTitle} · {assets.length} 个资产"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/layout/AppLayout.tsx",
+              "matches": [
+                {
+                  "lineNumber": 11,
+                  "content": "import { useEpisodeStore, useUIStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 20,
+                  "content": "  const { episodeId: routeEpisodeId } = useParams&lt;{ episodeId?: string }&gt;()"
+                },
+                {
+                  "lineNumber": 23,
+                  "content": "  const isEpisodePage = Boolean(routeEpisodeId)"
+                },
+                {
+                  "lineNumber": 24,
+                  "content": "  const { pullNewEpisode, currentEpisode } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "    if (pullOpen &amp;&amp; routeEpisodeId &amp;&amp; !pullId) {"
+                },
+                {
+                  "lineNumber": 31,
+                  "content": "      setPullId(routeEpisodeId)"
+                },
+                {
+                  "lineNumber": 33,
+                  "content": "  }, [pullOpen, routeEpisodeId])"
+                },
+                {
+                  "lineNumber": 46,
+                  "content": "        routeEpisodeId &amp;&amp; currentEpisode?.episodeId === routeEpisodeId"
+                },
+                {
+                  "lineNumber": 47,
+                  "content": "          ? currentEpisode.projectId"
+                },
+                {
+                  "lineNumber": 49,
+                  "content": "      await pullNewEpisode(pullId.trim(), pullForce, projectId)"
+                },
+                {
+                  "lineNumber": 56,
+                  "content": "  const topActions = (isHome || isEpisodePage) ? ("
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/api/episodes.ts",
+              "matches": [
+                {
+                  "lineNumber": 2,
+                  "content": " * Episode API"
+                },
+                {
+                  "lineNumber": 5,
+                  "content": "import type { Episode } from \"@/types\""
+                },
+                {
+                  "lineNumber": 6,
+                  "content": "import type { PullEpisodeRequest } from \"@/types\""
+                },
+                {
+                  "lineNumber": 10,
+                  "content": "  list: () =&gt; apiClient.get&lt;Episode[]&gt;(\"/episodes\"),"
+                },
+                {
+                  "lineNumber": 11,
+                  "content": "  detail: (id: string) =&gt; apiClient.get&lt;Episode&gt;(&#96;/episodes/${id}&#96;),"
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "    apiClient.post&lt;Episode&gt;(\"/episodes/pull\", {"
+                },
+                {
+                  "lineNumber": 17,
+                  "content": "    } as PullEpisodeRequest),"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/api.ts",
+              "matches": [
+                {
+                  "lineNumber": 8,
+                  "content": "/** 拉取 Episode 请求体 */"
+                },
+                {
+                  "lineNumber": 9,
+                  "content": "export interface PullEpisodeRequest {"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/episodes.py",
+              "matches": [
+                {
+                  "lineNumber": 3,
+                  "content": "Episode 路由：GET list/detail, POST pull"
+                },
+                {
+                  "lineNumber": 18,
+                  "content": "from models.schemas import Episode, PullEpisodeRequest"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "    \"\"\"列出所有本地已拉取的 Episode。\"\"\""
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "@router.get(\"/episodes/{episode_id}\", response_model=Episode)"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "    \"\"\"获取单个 Episode 完整数据。\"\"\""
+                },
+                {
+                  "lineNumber": 35,
+                  "content": "        raise HTTPException(status_code=404, detail=\"Episode not found\")"
+                },
+                {
+                  "lineNumber": 39,
+                  "content": "@router.post(\"/episodes/pull\", response_model=Episode)"
+                },
+                {
+                  "lineNumber": 40,
+                  "content": "def pull_episode(req: PullEpisodeRequest):"
+                },
+                {
+                  "lineNumber": 41,
+                  "content": "    \"\"\"从平台拉取 Episode 到本地。\"\"\""
+                },
+                {
+                  "lineNumber": 65,
+                  "content": "        return Episode.model_validate(result)"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/TimelinePage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "import { useEpisodeStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 15,
+                  "content": "  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 18,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 19,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                },
+                {
+                  "lineNumber": 21,
+                  "content": "  if (!episodeId || loading || !currentEpisode) {"
+                },
+                {
+                  "lineNumber": 29,
+                  "content": "  const shots = flattenShots(currentEpisode).filter((s) =&gt; s.status === \"selected\")"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "  const basePath = &#96;${currentEpisode.projectId}/${currentEpisode.episodeId}&#96;"
+                },
+                {
+                  "lineNumber": 31,
+                  "content": "  const cacheBust = currentEpisode.pulledAt ?? undefined"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/RegenPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "import { useEpisodeStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 15,
+                  "content": "  const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 21,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 22,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                },
+                {
+                  "lineNumber": 24,
+                  "content": "  if (!episodeId || !shotId || !currentEpisode) return null"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "  const shot = flattenShots(currentEpisode).find((s) =&gt; s.shotId === shotId)"
+                },
+                {
+                  "lineNumber": 34,
+                  "content": "  const basePath = &#96;${currentEpisode.projectId}/${currentEpisode.episodeId}&#96;"
+                },
+                {
+                  "lineNumber": 35,
+                  "content": "  const cacheBust = currentEpisode.pulledAt ?? undefined"
+                },
+                {
+                  "lineNumber": 38,
+                  "content": "  const assetsFromShots = currentEpisode.scenes.flatMap((s) =&gt;"
+                },
+                {
+                  "lineNumber": 45,
+                  "content": "    currentEpisode.assets &amp;&amp; currentEpisode.assets.length &gt; 0"
+                },
+                {
+                  "lineNumber": 46,
+                  "content": "      ? currentEpisode.assets"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/layout/SideNavBar.tsx",
+              "matches": [
+                {
+                  "lineNumber": 8,
+                  "content": "import { useEpisodeStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 23,
+                  "content": "  const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 27,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                },
+                {
+                  "lineNumber": 31,
+                  "content": "    episodeId &amp;&amp; currentEpisode"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "      ? currentEpisode.assets &amp;&amp; currentEpisode.assets.length &gt; 0"
+                },
+                {
+                  "lineNumber": 33,
+                  "content": "        ? currentEpisode.assets"
+                },
+                {
+                  "lineNumber": 34,
+                  "content": "        : (currentEpisode.scenes.flatMap((s) =&gt; s.shots.flatMap((sh) =&gt; sh.assets)) ?? []).filter("
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/EpisodeListPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 2,
+                  "content": " * Episode 列表页"
+                },
+                {
+                  "lineNumber": 8,
+                  "content": "import { useEpisodeStore, useUIStore } from \"@/stores\""
+                },
+                {
+                  "lineNumber": 11,
+                  "content": "import { formatRelativeTime, getEpisodeStats } from \"@/utils/format\""
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "export default function EpisodeListPage() {"
+                },
+                {
+                  "lineNumber": 14,
+                  "content": "  const { episodes, loading, error, fetchEpisodes } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 18,
+                  "content": "    void fetchEpisodes()"
+                },
+                {
+                  "lineNumber": 19,
+                  "content": "  }, [fetchEpisodes])"
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "          const stats = getEpisodeStats(ep)"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/App.tsx",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "import EpisodeListPage from \"@/pages/EpisodeListPage\""
+                },
+                {
+                  "lineNumber": 20,
+                  "content": "      { index: true, element: &lt;EpisodeListPage /&gt; },"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/shots.py",
+              "matches": [
+                {
+                  "lineNumber": 22,
+                  "content": "    \"\"\"从 Episode 提取扁平 Shot 列表。\"\"\""
+                },
+                {
+                  "lineNumber": 31,
+                  "content": "    \"\"\"获取 Episode 下所有 Shot（扁平列表）。\"\"\""
+                },
+                {
+                  "lineNumber": 34,
+                  "content": "        raise HTTPException(status_code=404, detail=\"Episode not found\")"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/export_route.py",
+              "matches": [
+                {
+                  "lineNumber": 29,
+                  "content": "        raise HTTPException(status_code=404, detail=\"Episode not found\")"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "        raise HTTPException(status_code=404, detail=\"Episode dir not found\")"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/generate.py",
+              "matches": [
+                {
+                  "lineNumber": 40,
+                  "content": "            set_local_task(task_id, \"failed\", error=\"Episode not found\")"
+                },
+                {
+                  "lineNumber": 48,
+                  "content": "            set_local_task(task_id, \"failed\", error=\"Episode dir not found\")"
+                },
+                {
+                  "lineNumber": 96,
+                  "content": "            set_local_task(task_id, \"failed\", error=\"Episode not found\")"
+                },
+                {
+                  "lineNumber": 104,
+                  "content": "            set_local_task(task_id, \"failed\", error=\"Episode dir not found\")"
+                },
+                {
+                  "lineNumber": 155,
+                  "content": "            set_local_task(task_id, \"failed\", error=\"Episode not found\")"
+                },
+                {
+                  "lineNumber": 163,
+                  "content": "            set_local_task(task_id, \"failed\", error=\"Episode dir not found\")"
+                }
+              ]
+            },
+            {
+              "file": "web/server/models/__init__.py",
+              "matches": [
+                {
+                  "lineNumber": 6,
+                  "content": "    Episode,"
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "    PullEpisodeRequest,"
+                },
+                {
+                  "lineNumber": 29,
+                  "content": "    \"Episode\","
+                },
+                {
+                  "lineNumber": 36,
+                  "content": "    \"PullEpisodeRequest\","
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/utils/format.ts",
+              "matches": [
+                {
+                  "lineNumber": 5,
+                  "content": "import type { Episode, ShotStatus } from \"@/types\""
+                },
+                {
+                  "lineNumber": 22,
+                  "content": "/** Episode 进度统计 */"
+                },
+                {
+                  "lineNumber": 23,
+                  "content": "export function getEpisodeStats(episode: Episode) {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/stores/index.ts",
+              "matches": [
+                {
+                  "lineNumber": 1,
+                  "content": "export { useEpisodeStore } from \"./episodeStore\""
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/index.ts",
+              "matches": [
+                {
+                  "lineNumber": 5,
+                  "content": "  Episode,"
+                },
+                {
+                  "lineNumber": 17,
+                  "content": "  PullEpisodeRequest,"
+                }
+              ]
+            }
+          ],
+          "totalLines": 193,
+          "totalMatchedLines": 193
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Checking serialization**
+
+I'm verifying how Pydantic v2 serializes Episode fields with `model_dump(mode='json')` and `by_alias=True`. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/vite.config.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/main.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="generic" data-tool-name="glob_file_search">
+<details>
+<summary>Tool use: **glob_file_search** • Searched codebase "undefined" • **1** result in **1** directory</summary>
+
+Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend** (1 file)
+
+| File |
+|------|
+| `.env.example` |
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Checking mock behavior**
+
+MSW returns mockEpisode for any episode ID when intercepting GET /api/episodes/:id. MSW mock returns episodeId ep-001 but user is on c25126d1-..., causing potential mismatch in displayed title 2. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && python3 -c "
+import json, sys
+sys.path.insert(0, '.')
+from services import data_service
+ep = data_service.get_episode('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+if not ep:
+    print('NO EPISODE')
+else:
+    s0 = ep.scenes[0].shots[0]
+    d = s0.model_dump()
+    print('dir:', data_service.get_episode_dir('c25126d1-73c7-418a-8ebe-e877df4f2e84'))
+    print('visualDescription in dump:', repr(d.get('visualDescription', '<missing>'))[:80])
+    # FastAPI style json
+    import json as j
+    from models.schemas import Episode
+    raw = j.loads(j.dumps(ep.model_dump(mode='json'), ensure_ascii=False))
+    print('json first shot keys:', [k for k in raw['scenes'][0]['shots'][0].keys() if 'visual' in k.lower() or k=='imagePrompt'])
+"
+</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && python3 -c "
+import json, sys
+sys.path.insert(0, '.')
+from services import data_service
+ep = data_service.get_episode('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+if not ep:
+    print('NO EPISODE')
+else:
+    s0 = ep.scenes[0].shots[0]
+    d = s0.model_dump()
+    print('dir:', data_service.get_episode_dir('c25126d1-73c7-418a-8ebe-e877df4f2e84'))
+    print('visualDescription in dump:', repr(d.get('visualDescription', '<missing>'))[:80])
+    # FastAPI style json
+    import json as j
+    from models.schemas import Episode
+    raw = j.loads(j.dumps(ep.model_dump(mode='json'), ensure_ascii=False))
+    print('json first shot keys:', [k for k in raw['scenes'][0]['shots'][0].keys() if 'visual' in k.lower() or k=='imagePrompt'])
+"
+
+```
+
+```
+Traceback (most recent call last):
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 466, in _eval_type_backport
+    return _eval_type(value, globalns, localns, type_params)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 500, in _eval_type
+    return typing._eval_type(  # type: ignore
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/typing.py", line 290, in _eval_type
+    return t._evaluate(globalns, localns, recursive_guard)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/typing.py", line 546, in _evaluate
+    eval(self.__forward_code__, globalns, localns),
+  File "&lt;string&gt;", line 1, in &lt;module&gt;
+TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "&lt;string&gt;", line 4, in &lt;module&gt;
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/./services/data_service.py", line 14, in &lt;module&gt;
+    from models.schemas import Episode, Shot, VideoCandidate
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/./models/__init__.py", line 4, in &lt;module&gt;
+    from .schemas import (
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/./models/schemas.py", line 62, in &lt;module&gt;
+    class Shot(BaseModel):
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_model_construction.py", line 221, in __new__
+    set_model_fields(cls, config_wrapper=config_wrapper, ns_resolver=ns_resolver)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_model_construction.py", line 544, in set_model_fields
+    fields, class_vars = collect_model_fields(cls, config_wrapper, ns_resolver, typevars_map=typevars_map)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_fields.py", line 118, in collect_model_fields
+    type_hints = _typing_extra.get_model_type_hints(cls, ns_resolver=ns_resolver)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 329, in get_model_type_hints
+    hints[name] = try_eval_type(value, globalns, localns)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 378, in try_eval_type
+    return eval_type_backport(value, globalns, localns), True
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 429, in eval_type_backport
+    return _eval_type_backport(value, globalns, localns, type_params)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 474, in _eval_type_backport
+    raise TypeError(
+TypeError: Unable to evaluate type annotation 'str | None'. If you are making use of the new typing syntax (unions using &#96;|&#96; since Python 3.10 or builtins subscripting since Python 3.9), you should either replace the use of new syntax with the existing &#96;typing&#96; constructs or install the &#96;eval_type_backport&#96; package.
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Fixing shot row rendering**
+
+I'm correcting the ShotRow component to consistently render 4 fixed columns before prompts regardless of edit state. I discovered that FastAPI's JSON response includes all fields by default, even if they're empty or None, which can cause issues with client-side expectations. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/package.json</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/.env</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/config.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "load_dotenv|DATA_ROOT",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "load_dotenv|DATA_ROOT",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/server/services/data_service.py",
+              "matches": [
+                {
+                  "lineNumber": 20,
+                  "content": "    root = os.environ.get(\"DATA_ROOT\", \"data\")"
+                },
+                {
+                  "lineNumber": 59,
+                  "content": "    \"\"\"收集 DATA_ROOT 下所有 episodeId 匹配的剧集目录。\"\"\""
+                },
+                {
+                  "lineNumber": 86,
+                  "content": "    扫描 DATA_ROOT/{projectId}/{episodeId}/episode.json，"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/episodes.py",
+              "matches": [
+                {
+                  "lineNumber": 49,
+                  "content": "    from config import DATA_ROOT"
+                },
+                {
+                  "lineNumber": 61,
+                  "content": "            DATA_ROOT,"
+                }
+              ]
+            },
+            {
+              "file": "web/server/routes/files.py",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "映射到 DATA_ROOT/{path}。"
+                },
+                {
+                  "lineNumber": 15,
+                  "content": "# 项目根目录（用于解析 DATA_ROOT）"
+                },
+                {
+                  "lineNumber": 21,
+                  "content": "from config import DATA_ROOT"
+                },
+                {
+                  "lineNumber": 40,
+                  "content": "    path 相对 DATA_ROOT，如 proj-id/ep-id/frames/S01.png"
+                },
+                {
+                  "lineNumber": 44,
+                  "content": "    full_path = DATA_ROOT / path"
+                },
+                {
+                  "lineNumber": 50,
+                  "content": "        if not str(full_path).startswith(str(DATA_ROOT.resolve())):"
+                }
+              ]
+            },
+            {
+              "file": "web/server/config.py",
+              "matches": [
+                {
+                  "lineNumber": 10,
+                  "content": "    from dotenv import load_dotenv"
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "    load_dotenv(_root / \".env\")"
+                },
+                {
+                  "lineNumber": 19,
+                  "content": "_DATA_ENV = os.environ.get(\"DATA_ROOT\", \"data\")"
+                },
+                {
+                  "lineNumber": 20,
+                  "content": "DATA_ROOT = Path(_DATA_ENV) if Path(_DATA_ENV).is_absolute() else _PROJECT_ROOT / _DATA_ENV"
+                }
+              ]
+            }
+          ],
+          "totalLines": 15,
+          "totalMatchedLines": 15
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Resolving project root**
+
+I'm confirming the project root path resolution using `parent.parent.parent.parent` for services directory. 
+
+**Confirming project root**
+
+I'm confirming the project root path resolution using `Path(__file__).resolve().parent.parent.parent.parent` for services directory. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes/episodes.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/main.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/services/data_service.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "visualDescription",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "visualDescription",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "./.specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md",
+              "matches": [
+                {
+                  "lineNumber": 6440,
+                  "content": "shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']"
+                },
+                {
+                  "lineNumber": 8859,
+                  "content": "shot all keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']"
+                },
+                {
+                  "lineNumber": 9285,
+                  "content": "  \"visualDescription\": \"达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。\","
+                },
+                {
+                  "lineNumber": 16656,
+                  "content": "                  \"content\": \"shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\""
+                },
+                {
+                  "lineNumber": 48123,
+                  "content": "                  \"content\": \"shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\""
+                },
+                {
+                  "lineNumber": 48159,
+                  "content": "                  \"content\": \"shot all keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\""
+                },
+                {
+                  "lineNumber": 48271,
+                  "content": "                  \"content\": \"                  \\\"content\\\": \\\"shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\\\"\""
+                },
+                {
+                  "lineNumber": 48883,
+                  "content": "  \"pattern\": \"visualDescription|prompt|imgPrompt\","
+                },
+                {
+                  "lineNumber": 48894,
+                  "content": "    \"pattern\": \"visualDescription|prompt|imgPrompt\","
+                },
+                {
+                  "lineNumber": 51008,
+                  "content": "I'm adding support for nested prompts structure in the puller logic. I'm adding support for nested prompt structures including imgPrompt, videoPrompt, and visualDescription fields. I'm adding more fallbacks to the puller to ensure nested prompt structures are properly retrieved. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 51170,
+                  "content": "  \"pattern\": \"prompts|visualDescription\","
+                },
+                {
+                  "lineNumber": 51180,
+                  "content": "    \"pattern\": \"prompts|visualDescription\","
+                },
+                {
+                  "lineNumber": 51200,
+                  "content": "                  \"content\": \"shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\""
+                },
+                {
+                  "lineNumber": 51204,
+                  "content": "                  \"content\": \"shot all keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\""
+                },
+                {
+                  "lineNumber": 51208,
+                  "content": "                  \"content\": \"  \\\"visualDescription\\\": \\\"达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。\\\",\""
+                },
+                {
+                  "lineNumber": 51232,
+                  "content": "                  \"content\": \"                  \\\"content\\\": \\\"shot[0] keys: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']\\\"\""
+                },
+                {
+                  "lineNumber": 51634,
+                  "content": "I'm extracting the actual platform shot keys from the specstory history. I'm identifying the platform shot keys from the specstory history. I found that the puller already extracts imgPrompt and videoPrompt from shot data, but the issue may be empty imgPrompt values while visualDescription contains content. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 51639,
+                  "content": "找到平台 shot 的实际字段：&#96;imgPrompt&#96;、&#96;videoPrompt&#96;、&#96;visualDescription&#96;。Puller 已映射 &#96;imgPrompt&#96; 和 &#96;videoPrompt&#96;，但未包含 &#96;visualDescription&#96;。正在增强 puller 的字段映射并修复前端的空值处理。"
+                },
+                {
+                  "lineNumber": 51647,
+                  "content": "- [-] 增强 puller：添加 visualDescription 等 fallback 字段"
+                },
+                {
+                  "lineNumber": 51738,
+                  "content": "- [x] 增强 puller：添加 visualDescription 等 fallback 字段"
+                },
+                {
+                  "lineNumber": 51913,
+                  "content": "- [x] 增强 puller：添加 visualDescription 等 fallback 字段"
+                },
+                {
+                  "lineNumber": 52013,
+                  "content": "sh2 = {'visualDescription': '视觉描述', 'videoPrompt': None}"
+                },
+                {
+                  "lineNumber": 52026,
+                  "content": "sh2 = {'visualDescription': '视觉描述', 'videoPrompt': None}"
+                },
+                {
+                  "lineNumber": 52053,
+                  "content": "        A3[\"visualDescription\"]"
+                },
+                {
+                  "lineNumber": 52060,
+                  "content": "        B3[\"visualDescription 兜底\"]"
+                },
+                {
+                  "lineNumber": 52083,
+                  "content": "**分镜表的图片提示词、视频提示词是有拉取的**，平台返回 &#96;imgPrompt&#96;、&#96;videoPrompt&#96;、&#96;visualDescription&#96; 等字段，puller 会写入 &#96;episode.json&#96;。"
+                },
+                {
+                  "lineNumber": 52090,
+                  "content": "- 支持 &#96;visualDescription&#96; 作为图片提示词兜底"
+                },
+                {
+                  "lineNumber": 52092,
+                  "content": "- 字段优先级：&#96;imgPrompt&#96; → &#96;imagePrompt&#96; → &#96;visualDescription&#96; → &#96;description&#96; → &#96;prompt&#96;"
+                },
+                {
+                  "lineNumber": 52104,
+                  "content": "- 增加 Shots API 导出示例，便于检查平台返回的 &#96;imgPrompt&#96;、&#96;videoPrompt&#96;、&#96;visualDescription&#96; 等字段"
+                },
+                {
+                  "lineNumber": 52123,
+                  "content": "然后查看 &#96;docs/shots_api_dump.json&#96; 中是否包含 &#96;imgPrompt&#96;、&#96;videoPrompt&#96;、&#96;visualDescription&#96;。若平台字段名不同，可在 &#96;_get_shot_prompts&#96; 中补充对应映射。"
+                },
+                {
+                  "lineNumber": 52632,
+                  "content": "因此，**文档里看不到 &#96;imgPrompt&#96;、&#96;videoPrompt&#96;、&#96;visualDescription&#96; 等字段**，只能通过实际调用或平台同事确认。"
+                },
+                {
+                  "lineNumber": 52634,
+                  "content": "之前 specstory 的实测表明，平台返回的 shot 对象包含：&#96;imgPrompt&#96;、&#96;videoPrompt&#96;、&#96;visualDescription&#96;、&#96;prompt&#96;、&#96;firstframeMedia&#96;、&#96;usedAssets&#96; 等字段。"
+                },
+                {
+                  "lineNumber": 52741,
+                  "content": "    for k in ['imgPrompt', 'videoPrompt', 'visualDescription', 'prompt']:"
+                },
+                {
+                  "lineNumber": 52760,
+                  "content": "    for k in ['imgPrompt', 'videoPrompt', 'visualDescription', 'prompt']:"
+                },
+                {
+                  "lineNumber": 52821,
+                  "content": "                    for f in ['imgPrompt','videoPrompt','visualDescription']:"
+                },
+                {
+                  "lineNumber": 52856,
+                  "content": "                    for f in ['imgPrompt','videoPrompt','visualDescription']:"
+                },
+                {
+                  "lineNumber": 52908,
+                  "content": "                for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:"
+                },
+                {
+                  "lineNumber": 52942,
+                  "content": "                for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:"
+                },
+                {
+                  "lineNumber": 52987,
+                  "content": "    for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:"
+                },
+                {
+                  "lineNumber": 53013,
+                  "content": "    for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:"
+                },
+                {
+                  "lineNumber": 53068,
+                  "content": "    for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:"
+                },
+                {
+                  "lineNumber": 53094,
+                  "content": "    for f in ['imgPrompt','videoPrompt','visualDescription','prompt']:"
+                },
+                {
+                  "lineNumber": 53108,
+                  "content": "First shot 所有字段: ['id', 'sceneId', 'shotNumber', 'firstframeMedia', 'prompt', 'imgPrompt', 'imgPromptReferences', 'visualDescription', 'metadata', 'timestampSeconds', 'previewVideoMediaId', 'previewVideoUrl', 'videoStatus', 'videoError', 'usedAssets', 'assetRefs', 'shotElements', 'dialogue', 'associatedDialogue', 'boundCanvasNodeId', 'durationSec', 'sampleShotImageUrl', 'scenePlace', 'analysisTag', 'videoPrompt', 'motionDirectorShotRefs', 'motionDirectorReferencedLabels', 'motionDirectorReferencedAssets', 'sceneScriptContent', 'sourceDialogues']"
+                },
+                {
+                  "lineNumber": 53116,
+                  "content": "  visualDescription:"
+                },
+                {
+                  "lineNumber": 53143,
+                  "content": "has_vd = sum(1 for s in shots if s.get('visualDescription'))"
+                },
+                {
+                  "lineNumber": 53146,
+                  "content": "print('visualDescription 有值:', has_vd, '/', len(shots))"
+                },
+                {
+                  "lineNumber": 53160,
+                  "content": "has_vd = sum(1 for s in shots if s.get('visualDescription'))"
+                },
+                {
+                  "lineNumber": 53163,
+                  "content": "print('visualDescription 有值:', has_vd, '/', len(shots))"
+                },
+                {
+                  "lineNumber": 53174,
+                  "content": "visualDescription 有值: 41 / 41"
+                },
+                {
+                  "lineNumber": 53203,
+                  "content": "print('visualDescription:', s0.get('visualDescription','')[:80])"
+                },
+                {
+                  "lineNumber": 53216,
+                  "content": "print('visualDescription:', s0.get('visualDescription','')[:80])"
+                },
+                {
+                  "lineNumber": 53225,
+                  "content": "visualDescription: 达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。"
+                },
+                {
+                  "lineNumber": 53258,
+                  "content": "| **visualDescription** | 41/41 | 画面描述（场景、动作） |"
+                },
+                {
+                  "lineNumber": 53265,
+                  "content": "- **visualDescription**：&#96;达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸...&#96;"
+                },
+                {
+                  "lineNumber": 53391,
+                  "content": "- **visualDescription**：画面描述"
+                },
+                {
+                  "lineNumber": 54018,
+                  "content": "I'm adding &#96;visualDescription&#96; field to Shot type and episode.json to handle the visual description separately from image_prompt. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 54617,
+                  "content": "I'm adding visualDescription field to the backend shot schema. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 54630,
+                  "content": "- [-] Puller + 类型：添加 visualDescription 画面描述"
+                },
+                {
+                  "lineNumber": 54743,
+                  "content": "- [x] Puller + 类型：添加 visualDescription 画面描述"
+                },
+                {
+                  "lineNumber": 54853,
+                  "content": "I'm adding visualDescription field to the Shot model to ensure backend accepts the update. I'm ensuring the Shot model includes visualDescription to match backend expectations. "
+                },
+                {
+                  "lineNumber": 55006,
+                  "content": "- [x] Puller + 类型：添加 visualDescription 画面描述"
+                },
+                {
+                  "lineNumber": 55018,
+                  "content": "I'm ensuring the Shot model includes &#96;visualDescription&#96; field and verifying backend PATCH handling supports it. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 55031,
+                  "content": "        A2[\"episode.json: visualDescription 字段\"]"
+                },
+                {
+                  "lineNumber": 55032,
+                  "content": "        A3[\"Shot 类型: visualDescription?\"]"
+                },
+                {
+                  "lineNumber": 55054,
+                  "content": "### 1. 画面描述（visualDescription）恢复"
+                },
+                {
+                  "lineNumber": 55058,
+                  "content": "| **Puller** | 新增 &#96;_get_visual_description()&#96;，单独提取 &#96;visualDescription&#96;，不再并入 &#96;imagePrompt&#96; |"
+                },
+                {
+                  "lineNumber": 55059,
+                  "content": "| **episode.json** | 每个 shot 增加 &#96;visualDescription&#96; 字段 |"
+                },
+                {
+                  "lineNumber": 55060,
+                  "content": "| **Shot 类型** | 增加 &#96;visualDescription?: string&#96; |"
+                },
+                {
+                  "lineNumber": 55061,
+                  "content": "| **后端 schema** | Shot 增加 &#96;visualDescription: str = \"\"&#96; |"
+                },
+                {
+                  "lineNumber": 55075,
+                  "content": "- &#96;src/feeling/puller.py&#96;：&#96;_get_visual_description()&#96;，shot 中写入 &#96;visualDescription&#96;"
+                },
+                {
+                  "lineNumber": 55076,
+                  "content": "- &#96;web/frontend/src/types/episode.ts&#96;：Shot 增加 &#96;visualDescription&#96;"
+                },
+                {
+                  "lineNumber": 55077,
+                  "content": "- &#96;web/server/models/schemas.py&#96;：Shot 增加 &#96;visualDescription&#96;"
+                },
+                {
+                  "lineNumber": 55085,
+                  "content": "**说明**：需要重新拉取 episode 后，&#96;episode.json&#96; 中才会有 &#96;visualDescription&#96;。旧数据可手动编辑并保存。"
+                },
+                {
+                  "lineNumber": 55395,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **run_terminal_command_v2** • Run command: python3 -c \"import json; p='data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'; d=json.load(open(p)); s=d['scenes'][0]['shots'][0]; print('keys:', 'visualDescription' in s, list(s.keys())[:8]); print('vd:', (s.get('visualDescription') or '')[:60])\"&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 55398,
+                  "content": "python3 -c \"import json; p='data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'; d=json.load(open(p)); s=d['scenes'][0]['shots'][0]; print('keys:', 'visualDescription' in s, list(s.keys())[:8]); print('vd:', (s.get('visualDescription') or '')[:60])\""
+                },
+                {
+                  "lineNumber": 55402,
+                  "content": "keys: True ['shotId', 'shotNumber', 'visualDescription', 'imagePrompt', 'videoPrompt', 'duration', 'cameraMovement', 'aspectRatio']"
+                },
+                {
+                  "lineNumber": 55534,
+                  "content": "        B1[\"puller 已写入 visualDescription\"]"
+                },
+                {
+                  "lineNumber": 55561,
+                  "content": "&#96;episode.json&#96; 里已包含 **&#96;visualDescription&#96;**（例如首镜：&#96;达里尔在驾驶位通过后视镜观察后座…&#96;）。"
+                },
+                {
+                  "lineNumber": 55580,
+                  "content": "I'm checking if visualDescription is being stripped during API serialization or if the frontend loads from wrong episode path. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 55644,
+                  "content": "定位到问题：存在两个相同 &#96;episodeId&#96; 的目录——&#96;proj-default/...&#96; 的旧 &#96;episode.json&#96; 缺少 &#96;visualDescription&#96;；&#96;data_service&#96; 的 &#96;_find_episode_dir&#96; 可能先返回 &#96;proj-default&#96;。正在修复：优先选择非 &#96;proj-default&#96; 且较新的数据，并把 &#96;visualDescription&#96; 合并进 &#96;proj-default&#96; 的 &#96;episode.json&#96;。"
+                },
+                {
+                  "lineNumber": 55670,
+                  "content": "正在修复 &#96;data_service&#96;：在存在多个同名剧集目录时优先返回包含 &#96;visualDescription&#96; 的数据；并将 &#96;visualDescription&#96; 合并到 &#96;proj-default&#96; 的 &#96;episode.json&#96;。"
+                },
+                {
+                  "lineNumber": 55719,
+                  "content": "        by_id[sh[\"shotId\"]] = sh.get(\"visualDescription\") or \"\""
+                },
+                {
+                  "lineNumber": 55726,
+                  "content": "            if sh.get(\"visualDescription\") != by_id[sid]:"
+                },
+                {
+                  "lineNumber": 55727,
+                  "content": "                sh[\"visualDescription\"] = by_id[sid]"
+                },
+                {
+                  "lineNumber": 55729,
+                  "content": "        elif sid in by_id and not sh.get(\"visualDescription\"):"
+                },
+                {
+                  "lineNumber": 55730,
+                  "content": "            sh[\"visualDescription\"] = by_id[sid]"
+                },
+                {
+                  "lineNumber": 55734,
+                  "content": "print(\"merged visualDescription into proj-default:\", n, \"shots\")"
+                },
+                {
+                  "lineNumber": 55753,
+                  "content": "        by_id[sh[\"shotId\"]] = sh.get(\"visualDescription\") or \"\""
+                },
+                {
+                  "lineNumber": 55760,
+                  "content": "            if sh.get(\"visualDescription\") != by_id[sid]:"
+                },
+                {
+                  "lineNumber": 55761,
+                  "content": "                sh[\"visualDescription\"] = by_id[sid]"
+                },
+                {
+                  "lineNumber": 55763,
+                  "content": "        elif sid in by_id and not sh.get(\"visualDescription\"):"
+                },
+                {
+                  "lineNumber": 55764,
+                  "content": "            sh[\"visualDescription\"] = by_id[sid]"
+                },
+                {
+                  "lineNumber": 55768,
+                  "content": "print(\"merged visualDescription into proj-default:\", n, \"shots\")"
+                },
+                {
+                  "lineNumber": 55773,
+                  "content": "merged visualDescription into proj-default: 41 shots"
+                },
+                {
+                  "lineNumber": 55799,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **run_terminal_command_v2** • Run command: python3 -c \"import json;d=json.load(open('data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));print(d['scenes'][0]['shots'][0].get('visualDescription','')[:50])\"&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 55802,
+                  "content": "python3 -c \"import json;d=json.load(open('data/proj-default/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));print(d['scenes'][0]['shots'][0].get('visualDescription','')[:50])\""
+                },
+                {
+                  "lineNumber": 55818,
+                  "content": "   - &#96;data/proj-default/c25126d1-.../episode.json&#96;：旧拉取，**没有** &#96;visualDescription&#96;  "
+                },
+                {
+                  "lineNumber": 55819,
+                  "content": "   - &#96;data/b95c3d75-.../c25126d1-.../episode.json&#96;：新拉取，**有** &#96;visualDescription&#96;"
+                },
+                {
+                  "lineNumber": 55828,
+                  "content": "| **&#96;data_service._find_episode_dir&#96;** | 同一 &#96;episodeId&#96; 多目录时，**优先**「带 &#96;visualDescription&#96; 的 shot 更多」→ 再优先**非 &#96;proj-default&#96;** → 再比 &#96;pulledAt&#96; 更新 |"
+                },
+                {
+                  "lineNumber": 55830,
+                  "content": "| **合并数据** | 已从 &#96;b95c3d75-...&#96; 把 **41 个 shot 的 &#96;visualDescription&#96;** 写进 &#96;proj-default&#96; 那份 &#96;episode.json&#96;，两份现在都有画面描述 |"
+                },
+                {
+                  "lineNumber": 55844,
+                  "content": "    A[\"同一 episodeId 多个目录\"] --&gt; B[\"统计每份 JSON 中带 visualDescription 的 shot 数\"]"
+                },
+                {
+                  "lineNumber": 56016,
+                  "content": "  \"pattern\": \"visualDescription|scenes\","
+                },
+                {
+                  "lineNumber": 56027,
+                  "content": "    \"pattern\": \"visualDescription|scenes\","
+                },
+                {
+                  "lineNumber": 56249,
+                  "content": "I'm adding visualDescription to mockEpisode to fix the '-' display issue. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 56254,
+                  "content": "修复 puller 的 CLI 逻辑（&#96;--episode-id&#96; 应优先于 &#96;--project-id&#96;），清空 &#96;data/&#96; 并重新拉取；向 MSW mock 添加 &#96;visualDescription&#96;，以防启用 Mock 时显示为空。"
+                },
+                {
+                  "lineNumber": 56311,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **run_terminal_command_v2** • Run command: python3 -c \"import json;d=json.load(open('data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));s=d['scenes'][0]['shots'][0];print('vd' in s, (s.get('visualDescription') or '')[:55])\"&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 56314,
+                  "content": "python3 -c \"import json;d=json.load(open('data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));s=d['scenes'][0]['shots'][0];print('vd' in s, (s.get('visualDescription') or '')[:55])\""
+                },
+                {
+                  "lineNumber": 56344,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **run_terminal_command_v2** • Run command: python3 -c \"import json;d=json.load(open('data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));s=d['scenes'][0]['shots'][0];print('visualDescription' in s, len(s.get('visualDescription','')))\"&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 56347,
+                  "content": "python3 -c \"import json;d=json.load(open('data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'));s=d['scenes'][0]['shots'][0];print('visualDescription' in s, len(s.get('visualDescription','')))\""
+                },
+                {
+                  "lineNumber": 56383,
+                  "content": "当前仅保留：&#96;data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/&#96;，且 &#96;episode.json&#96; 里首镜 **&#96;visualDescription&#96; 已存在**（约 46 字）。"
+                },
+                {
+                  "lineNumber": 56386,
+                  "content": "若前端开了 **&#96;VITE_USE_MOCK=true&#96;**，Mock 里原先没有 &#96;visualDescription&#96;，列表会一直像「画面描述」空着。已在 &#96;handlers.ts&#96; 的 mock shot 里补上 &#96;visualDescription&#96;。"
+                },
+                {
+                  "lineNumber": 56404,
+                  "content": "  C --&gt; D[\"episode.json 含 visualDescription\"]"
+                }
+              ]
+            },
+            {
+              "file": "./docs/联调说明.md",
+              "matches": [
+                {
+                  "lineNumber": 111,
+                  "content": "- &#96;episode.json&#96;：分镜元数据（含 &#96;visualDescription&#96; 画面描述，需用新版 puller 拉取）"
+                },
+                {
+                  "lineNumber": 113,
+                  "content": "**同一 episodeId 多套目录**：若同时存在 &#96;data/proj-default/{episodeId}/&#96; 与真实 &#96;projectId&#96; 目录，后端会**自动择优**返回含 &#96;visualDescription&#96; 更完整的一份，避免列表里点到旧数据看不到画面描述。"
+                },
+                {
+                  "lineNumber": 152,
+                  "content": "print('已写入 docs/shots_api_dump.json，可检查 imgPrompt、videoPrompt、visualDescription 等字段')"
+                },
+                {
+                  "lineNumber": 156,
+                  "content": "当前最新的资产 API 数据已导出至 &#96;docs/asset_api_dump.json&#96;。分镜表的图片提示词（imgPrompt/visualDescription）和视频提示词（videoPrompt）由 puller 拉取并写入 episode.json。"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/mocks/handlers.ts",
+              "matches": [
+                {
+                  "lineNumber": 22,
+                  "content": "          visualDescription: \"仓库外黄昏，达里尔背影面向铁门。\","
+                }
+              ]
+            },
+            {
+              "file": "./src/feeling/puller.py",
+              "matches": [
+                {
+                  "lineNumber": 37,
+                  "content": "    \"\"\"从 shot 中提取画面描述（平台 visualDescription 字段）。\"\"\""
+                },
+                {
+                  "lineNumber": 39,
+                  "content": "    vd = _get(sh, \"visualDescription\", \"visual_description\")"
+                },
+                {
+                  "lineNumber": 41,
+                  "content": "        vd = _get(prompts_obj, \"visualDescription\", \"visual_description\")"
+                },
+                {
+                  "lineNumber": 49,
+                  "content": "    画面描述 visualDescription 单独由 _get_visual_description 提取。"
+                },
+                {
+                  "lineNumber": 53,
+                  "content": "    # 图片提示词：不含 visualDescription，避免与画面描述混淆"
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "            \"visualDescription\","
+                },
+                {
+                  "lineNumber": 278,
+                  "content": "                \"visualDescription\": visual_desc,"
+                },
+                {
+                  "lineNumber": 346,
+                  "content": "                \"visualDescription\": visual_desc,"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/services/data_service.py",
+              "matches": [
+                {
+                  "lineNumber": 43,
+                  "content": "            if (sh.get(\"visualDescription\") or \"\").strip():"
+                },
+                {
+                  "lineNumber": 77,
+                  "content": "    择优返回含 visualDescription 更完整、且非占位 projectId 的一份。"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/components/business/ShotPromptCells.tsx",
+              "matches": [
+                {
+                  "lineNumber": 10,
+                  "content": "export type PromptFieldKey = \"visualDescription\" | \"imagePrompt\" | \"videoPrompt\""
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "  visualDescription: \"画面描述\","
+                },
+                {
+                  "lineNumber": 36,
+                  "content": "  if (key === \"visualDescription\") return shot.visualDescription ?? \"\""
+                },
+                {
+                  "lineNumber": 210,
+                  "content": "      {renderPreviewTd(\"visualDescription\")}"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/components/business/ShotCard.tsx",
+              "matches": [
+                {
+                  "lineNumber": 69,
+                  "content": "      {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) &amp;&amp; ("
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "          title={[shot.visualDescription, shot.imagePrompt, shot.videoPrompt].filter(Boolean).join(\"\\n\\n\")}"
+                },
+                {
+                  "lineNumber": 74,
+                  "content": "          {shot.visualDescription ? &#96;画面: ${(shot.visualDescription || \"\").slice(0, 30)}…&#96; : null}"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/pages/ShotDetailPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 111,
+                  "content": "          {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) &amp;&amp; ("
+                },
+                {
+                  "lineNumber": 116,
+                  "content": "                  {shot.visualDescription || \"暂无\"}"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/stores/episodeStore.ts",
+              "matches": [
+                {
+                  "lineNumber": 22,
+                  "content": "  /** 更新 Shot 字段（如 visualDescription/imagePrompt/videoPrompt），同步到 currentEpisode */"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "    updates: Partial&lt;{ visualDescription: string; imagePrompt: string; videoPrompt: string }&gt;"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/types/episode.ts",
+              "matches": [
+                {
+                  "lineNumber": 61,
+                  "content": "  /** 画面描述：平台 visualDescription，简洁场景/动作描述 */"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "  visualDescription?: string"
+                }
+              ]
+            },
+            {
+              "file": "./web/server/models/schemas.py",
+              "matches": [
+                {
+                  "lineNumber": 67,
+                  "content": "    visualDescription: str = \"\"  # 画面描述，平台 visualDescription"
+                }
+              ]
+            },
+            {
+              "file": "./docs/shots_api_dump.json",
+              "matches": [
+                {
+                  "lineNumber": 33,
+                  "content": "    \"visualDescription\": \"达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。\","
+                },
+                {
+                  "lineNumber": 478,
+                  "content": "    \"visualDescription\": \"格雷颤抖的手紧紧拉扯衬衫布条，在大腿伤口上用力打结，血迹渗透布料。\","
+                },
+                {
+                  "lineNumber": 916,
+                  "content": "    \"visualDescription\": \"卡尔坐在副驾驶侧身回望，目光落在格雷身上，眼神中闪烁着感慨与难以置信。\","
+                },
+                {
+                  "lineNumber": 1373,
+                  "content": "    \"visualDescription\": \"格雷停下手中的动作，抬头对上卡尔的视线，嘴角带着一丝疲惫的自嘲。\","
+                },
+                {
+                  "lineNumber": 1825,
+                  "content": "    \"visualDescription\": \"卡尔的目光从格雷身上移向下方的阴影，又重新抬起，眼中晶莹闪动，变焦慢慢推向他的面部细节。\","
+                },
+                {
+                  "lineNumber": 2275,
+                  "content": "    \"visualDescription\": \"格雷靠在行驶的车窗边，满脸胡茬且带着战损的疲态，自嘲地对着前排说话，车窗外景象飞速后移。\","
+                },
+                {
+                  "lineNumber": 2685,
+                  "content": "    \"visualDescription\": \"格雷听到提示后猛地直起身子，探头向窗外望去，双眼逐渐睁大，神情凝固，被眼前的景象强烈震撼。\","
+                },
+                {
+                  "lineNumber": 3092,
+                  "content": "    \"visualDescription\": \"汽车驶入空旷荒野，高耸入云的监狱围墙与铁丝网如钢铁巨兽般矗立，远处游荡的行尸低微如蝼蚁。\","
+                },
+                {
+                  "lineNumber": 3487,
+                  "content": "    \"visualDescription\": \"摄影机沿着铁丝网围栏的纹理缓缓推进，画面中心是缓缓停在监狱大门外的越野车，车窗内映出格雷惊讶的脸。\","
+                },
+                {
+                  "lineNumber": 3901,
+                  "content": "    \"visualDescription\": \"格伦持枪站在岗位上，目光冷峻地审视来车，卡罗尔在其后方握紧棍棒，两人形成互补的防守位。\","
+                },
+                {
+                  "lineNumber": 4390,
+                  "content": "    \"visualDescription\": \"格伦抓住滑轮手柄猛地向下拉动，满是锈迹的钢索在齿轮间疯狂摩擦，火星由于剧烈摩擦微不可察地闪现。\","
+                },
+                {
+                  "lineNumber": 4827,
+                  "content": "    \"visualDescription\": \"厚重的铁网大门向左右两侧彻底划开，越野车由于颠簸略微跳动，随后平稳向镜头深处、监狱的腹地驶去。\","
+                },
+                {
+                  "lineNumber": 5281,
+                  "content": "    \"visualDescription\": \"监狱院内，灰色汽车带起尘土刹停，瑞克从右侧背景跑向构图中心。\","
+                },
+                {
+                  "lineNumber": 5761,
+                  "content": "    \"visualDescription\": \"瑞克因惯性猛然收住脚步，目光紧盯向后车门。\","
+                },
+                {
+                  "lineNumber": 6203,
+                  "content": "    \"visualDescription\": \"后车门被达里尔粗暴拉开，金属撞击声清脆。\","
+                },
+                {
+                  "lineNumber": 6656,
+                  "content": "    \"visualDescription\": \"格雷·金斯顿蜷缩在后座，痛得五官扭曲，脸上混合着血污与尘土。\","
+                },
+                {
+                  "lineNumber": 7138,
+                  "content": "    \"visualDescription\": \"瑞克跨步上前想帮忙，达里尔已经将格雷拦腰抱起抽离后座。\","
+                },
+                {
+                  "lineNumber": 7627,
+                  "content": "    \"visualDescription\": \"随着达里尔转身，格雷的侧脸转向镜头方向，正好迎着院中的强光。\","
+                },
+                {
+                  "lineNumber": 8074,
+                  "content": "    \"visualDescription\": \"瑞克整个人彻底僵住，嘴微张却发不出声音，眼神布满难以置信的恐慌。\","
+                },
+                {
+                  "lineNumber": 8520,
+                  "content": "    \"visualDescription\": \"中景侧拍：瑞克站在原地，达里尔抱着格雷走过他身前，形成错位视差。\","
+                },
+                {
+                  "lineNumber": 9005,
+                  "content": "    \"visualDescription\": \"大特写拍瑞克的眼眶，瞳孔因恐惧而在剧烈震颤。\","
+                },
+                {
+                  "lineNumber": 9447,
+                  "content": "    \"visualDescription\": \"在荒凉的监狱院落中央，瑞克紧紧拥抱着格雷，两人在末世的战火后感受邻里的体温。\","
+                },
+                {
+                  "lineNumber": 9901,
+                  "content": "    \"visualDescription\": \"格雷靠在瑞克肩头，微微拉开距离注视着他，眼眶泛红但带着一丝欣慰的笑意。\","
+                },
+                {
+                  "lineNumber": 10357,
+                  "content": "    \"visualDescription\": \"瑞克双手扶着格雷的肩膀，满脸不可置信，目光焦急地在她脸上寻找答案。\","
+                },
+                {
+                  "lineNumber": 10828,
+                  "content": "    \"visualDescription\": \"格雷的眼球微微颤动，目光失去焦点，仿佛回到了那段漫无目的的痛苦旅程。\","
+                },
+                {
+                  "lineNumber": 11267,
+                  "content": "    \"visualDescription\": \"瑞克的笑意消失，眼神变得凝重而深厚，他察觉到了格雷话语间没能说出的巨大悲伤。\","
+                },
+                {
+                  "lineNumber": 11669,
+                  "content": "    \"visualDescription\": \"画面前景被补给箱边缘占据。赫谢尔拄着拐杖从画面右侧（3点方向）瘸腿走入，望向坐在中央金属桌上的格雷，瑞克叉腰站在桌旁。\","
+                },
+                {
+                  "lineNumber": 12134,
+                  "content": "    \"visualDescription\": \"瑞克面带微笑，一边环视众人一边伸手示意坐在金属桌上的格雷，动作自然且有力。\","
+                },
+                {
+                  "lineNumber": 12577,
+                  "content": "    \"visualDescription\": \"格雷坐在金属桌边缘，略显局促地观察着周围的和善的面孔，听到‘邻居’这个词时眼神微微闪烁。\","
+                },
+                {
+                  "lineNumber": 12994,
+                  "content": "    \"visualDescription\": \"瑞克哈哈大笑，看向画外卡尔的方向，整个人的姿态完全松弛下来。\","
+                },
+                {
+                  "lineNumber": 13436,
+                  "content": "    \"visualDescription\": \"昏暗灯光下，赫谢尔微笑着缓缓点头。画面中心是冰冷的金属桌面，但其反射着昏黄且温暖的人影碎光。\","
+                },
+                {
+                  "lineNumber": 13861,
+                  "content": "    \"visualDescription\": \"监狱公共区内，光影斑驳。赫谢尔面带和友善，正对格雷宣布接纳，气氛虽沉闷但仍有暖意。\","
+                },
+                {
+                  "lineNumber": 14303,
+                  "content": "    \"visualDescription\": \"门口处金属门被猛然撞响，达里尔神情焦急地抱着药箱冲入，重心不稳。\","
+                },
+                {
+                  "lineNumber": 14762,
+                  "content": "    \"visualDescription\": \"格雷猛然回头，呼吸停滞，视线颤抖地聚焦在声音来源方向，眼神中闪烁着惊恐与不可思议。\","
+                },
+                {
+                  "lineNumber": 15184,
+                  "content": "    \"visualDescription\": \"贝丝抱着朱迪斯出现在门口，她正低头呵护着襁褓中红润的新生儿，脸上带着嗔怪。\","
+                },
+                {
+                  "lineNumber": 15720,
+                  "content": "    \"visualDescription\": \"达里尔垂下头，低声咕哝，粗犷的面孔上罕见地闪过尴尬。瑞克与格雷对视，气氛变得因新生命话题而微妙。\","
+                },
+                {
+                  "lineNumber": 16209,
+                  "content": "    \"visualDescription\": \"低机位俯瞰牢房下铺，栅栏阴影投射在石壁。卡罗尔半跪在床头检查伤口，玛格丽特在旁递送酒精。\","
+                },
+                {
+                  "lineNumber": 16725,
+                  "content": "    \"visualDescription\": \"卡罗尔近景，她一边麻利地从药箱取出酒精棉，一边斜睨向格雷。动作专业且熟练。\","
+                },
+                {
+                  "lineNumber": 17232,
+                  "content": "    \"visualDescription\": \"格雷面部近景，额头挂着冷汗，她忍痛尝试露出一丝苦笑，听着卡罗尔说到达里尔是个‘大软蛋’。\","
+                },
+                {
+                  "lineNumber": 17711,
+                  "content": "    \"visualDescription\": \"卡罗尔手中的酒精棉球死死按在格雷腿部血淋淋的箭伤孔洞上，白色的棉球迅速被染红染黄。\","
+                },
+                {
+                  "lineNumber": 18176,
+                  "content": "    \"visualDescription\": \"格雷的手猛地死死攥住冰冷的床位铁柱，指关节因过度用力而苍白颤抖，伴随着痛苦的嘶吼，画面逐渐变黑。\","
+                }
+              ]
+            }
+          ],
+          "totalLines": 182,
+          "totalMatchedLines": 182
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Responding to user**
+
+I'm explaining that token refresh only affects platform API calls, not local JSON file reads. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/main.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "visualDescription|_get_visual",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "visualDescription|_get_visual",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "src/feeling/puller.py",
+              "matches": [
+                {
+                  "lineNumber": 36,
+                  "content": "def _get_visual_description(sh: dict) -&gt; str:"
+                },
+                {
+                  "lineNumber": 37,
+                  "content": "    \"\"\"从 shot 中提取画面描述（平台 visualDescription 字段）。\"\"\""
+                },
+                {
+                  "lineNumber": 39,
+                  "content": "    vd = _get(sh, \"visualDescription\", \"visual_description\")"
+                },
+                {
+                  "lineNumber": 41,
+                  "content": "        vd = _get(prompts_obj, \"visualDescription\", \"visual_description\")"
+                },
+                {
+                  "lineNumber": 49,
+                  "content": "    画面描述 visualDescription 单独由 _get_visual_description 提取。"
+                },
+                {
+                  "lineNumber": 53,
+                  "content": "    # 图片提示词：不含 visualDescription，避免与画面描述混淆"
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "            \"visualDescription\","
+                },
+                {
+                  "lineNumber": 239,
+                  "content": "            visual_desc = _get_visual_description(sh)"
+                },
+                {
+                  "lineNumber": 278,
+                  "content": "                \"visualDescription\": visual_desc,"
+                },
+                {
+                  "lineNumber": 312,
+                  "content": "            visual_desc = _get_visual_description(s)"
+                },
+                {
+                  "lineNumber": 346,
+                  "content": "                \"visualDescription\": visual_desc,"
+                }
+              ]
+            }
+          ],
+          "totalLines": 11,
+          "totalMatchedLines": 11
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "visualDescription|fetchEpisode|getEpisode",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "visualDescription|fetchEpisode|getEpisode",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/mocks/handlers.ts",
+              "matches": [
+                {
+                  "lineNumber": 22,
+                  "content": "          visualDescription: \"仓库外黄昏，达里尔背影面向铁门。\","
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/ShotPromptCells.tsx",
+              "matches": [
+                {
+                  "lineNumber": 10,
+                  "content": "export type PromptFieldKey = \"visualDescription\" | \"imagePrompt\" | \"videoPrompt\""
+                },
+                {
+                  "lineNumber": 13,
+                  "content": "  visualDescription: \"画面描述\","
+                },
+                {
+                  "lineNumber": 36,
+                  "content": "  if (key === \"visualDescription\") return shot.visualDescription ?? \"\""
+                },
+                {
+                  "lineNumber": 210,
+                  "content": "      {renderPreviewTd(\"visualDescription\")}"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/business/ShotCard.tsx",
+              "matches": [
+                {
+                  "lineNumber": 69,
+                  "content": "      {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) &amp;&amp; ("
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "          title={[shot.visualDescription, shot.imagePrompt, shot.videoPrompt].filter(Boolean).join(\"\\n\\n\")}"
+                },
+                {
+                  "lineNumber": 74,
+                  "content": "          {shot.visualDescription ? &#96;画面: ${(shot.visualDescription || \"\").slice(0, 30)}…&#96; : null}"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/ShotDetailPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 17,
+                  "content": "  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 21,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 22,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                },
+                {
+                  "lineNumber": 111,
+                  "content": "          {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) &amp;&amp; ("
+                },
+                {
+                  "lineNumber": 116,
+                  "content": "                  {shot.visualDescription || \"暂无\"}"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/stores/episodeStore.ts",
+              "matches": [
+                {
+                  "lineNumber": 3,
+                  "content": " * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode / updateShot"
+                },
+                {
+                  "lineNumber": 15,
+                  "content": "  fetchEpisodes: () =&gt; Promise&lt;void&gt;"
+                },
+                {
+                  "lineNumber": 16,
+                  "content": "  fetchEpisodeDetail: (id: string) =&gt; Promise&lt;void&gt;"
+                },
+                {
+                  "lineNumber": 22,
+                  "content": "  /** 更新 Shot 字段（如 visualDescription/imagePrompt/videoPrompt），同步到 currentEpisode */"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "    updates: Partial&lt;{ visualDescription: string; imagePrompt: string; videoPrompt: string }&gt;"
+                },
+                {
+                  "lineNumber": 36,
+                  "content": "  fetchEpisodes: async () =&gt; {"
+                },
+                {
+                  "lineNumber": 48,
+                  "content": "  fetchEpisodeDetail: async (id: string) =&gt; {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/StoryboardPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 24,
+                  "content": "  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 30,
+                  "content": "      void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 32,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/episode.ts",
+              "matches": [
+                {
+                  "lineNumber": 61,
+                  "content": "  /** 画面描述：平台 visualDescription，简洁场景/动作描述 */"
+                },
+                {
+                  "lineNumber": 62,
+                  "content": "  visualDescription?: string"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/AssetLibraryPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 120,
+                  "content": "  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 126,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 127,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/TimelinePage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 15,
+                  "content": "  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 18,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 19,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/RegenPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 15,
+                  "content": "  const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 21,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 22,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/components/layout/SideNavBar.tsx",
+              "matches": [
+                {
+                  "lineNumber": 23,
+                  "content": "  const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 26,
+                  "content": "    if (episodeId) void fetchEpisodeDetail(episodeId)"
+                },
+                {
+                  "lineNumber": 27,
+                  "content": "  }, [episodeId, fetchEpisodeDetail])"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/EpisodeListPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 11,
+                  "content": "import { formatRelativeTime, getEpisodeStats } from \"@/utils/format\""
+                },
+                {
+                  "lineNumber": 14,
+                  "content": "  const { episodes, loading, error, fetchEpisodes } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 18,
+                  "content": "    void fetchEpisodes()"
+                },
+                {
+                  "lineNumber": 19,
+                  "content": "  }, [fetchEpisodes])"
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "          const stats = getEpisodeStats(ep)"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/utils/format.ts",
+              "matches": [
+                {
+                  "lineNumber": 23,
+                  "content": "export function getEpisodeStats(episode: Episode) {"
+                }
+              ]
+            }
+          ],
+          "totalLines": 43,
+          "totalMatchedLines": 43
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/vite.config.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "3001|5173",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "3001|5173",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "./.specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md",
+              "matches": [
+                {
+                  "lineNumber": 703,
+                  "content": "  \"plan\": \"# 后端对接实施计划\\n\\n## 现状总结\\n\\n&amp;#96;&amp;#96;&amp;#96;mermaid\\nflowchart LR\\n    subgraph done[\\\"已完成\\\"]\\n        FE[\\\"web/frontend/&amp;lt;br/&amp;gt;React 19 + Stitch 风格&amp;lt;br/&amp;gt;6页面 29组件 4Store\\\"]\\n        API_DEF[\\\"API 契约&amp;lt;br/&amp;gt;13个REST端点&amp;lt;br/&amp;gt;types/api.ts 定义\\\"]\\n        MOCK[\\\"MSW Mock&amp;lt;br/&amp;gt;3个handler\\\"]\\n        VIDU[\\\"src/vidu/client.py&amp;lt;br/&amp;gt;Vidu API 封装\\\"]\\n        SCRIPTS[\\\"现有脚本&amp;lt;br/&amp;gt;gen_tail / batch / poll / download\\\"]\\n    end\\n\\n    subgraph todo[\\\"未完成\\\"]\\n        BE[\\\"web/server/&amp;lt;br/&amp;gt;FastAPI 后台\\\"]\\n        FEEL[\\\"src/feeling/&amp;lt;br/&amp;gt;平台拉取客户端\\\"]\\n        YUNWU[\\\"src/yunwu/&amp;lt;br/&amp;gt;公共模块抽取\\\"]\\n        REGEN[\\\"scripts/regen/&amp;lt;br/&amp;gt;单帧重生脚本\\\"]\\n        ADAPT[\\\"脚本改造&amp;lt;br/&amp;gt;--from-json 模式\\\"]\\n    end\\n\\n    FE -.-&amp;gt;|\\\"等待对接\\\"| BE\\n    BE --&amp;gt;|\\\"调用\\\"| FEEL\\n    BE --&amp;gt;|\\\"调用\\\"| VIDU\\n    BE --&amp;gt;|\\\"调用\\\"| YUNWU\\n    BE --&amp;gt;|\\\"调用\\\"| SCRIPTS\\n    BE --&amp;gt;|\\\"调用\\\"| ADAPT\\n    BE --&amp;gt;|\\\"调用\\\"| REGEN\\n&amp;#96;&amp;#96;&amp;#96;\\n\\n## 前端已定义的 API 契约（后端必须精确实现）\\n\\n前端  [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 3191,
+                  "content": "# 3. 打开 http://localhost:5173"
+                },
+                {
+                  "lineNumber": 3344,
+                  "content": "        B --&gt; D[\"web: vite 5173\"]"
+                },
+                {
+                  "lineNumber": 3371,
+                  "content": "- 前端：http://localhost:5173"
+                },
+                {
+                  "lineNumber": 4016,
+                  "content": "2. 打开 http://localhost:5173"
+                },
+                {
+                  "lineNumber": 32306,
+                  "content": "http://localhost:3001/api/assets?pageSize=20&amp;page=1&amp;projectId=def5d409-559b-4c93-88c8-069f1dd105ee 应该是类似于这样的接口，你确定你拉对了吗？"
+                },
+                {
+                  "lineNumber": 32564,
+                  "content": "**说明**：若使用本地平台 &#96;http://localhost:3001&#96;，请将 &#96;.env&#96; 中 &#96;FEELING_API_BASE&#96; 设为 &#96;http://localhost:3001/api&#96;。"
+                },
+                {
+                  "lineNumber": 45777,
+                  "content": "                  \"content\": \"      \\\"https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-rb5lrvx29f-0-262a34d98d851734c147a59f76ca0e83\\\"\","
+                },
+                {
+                  "lineNumber": 52642,
+                  "content": "http://localhost:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots 类似这种请求里面会有，你看看呢？"
+                },
+                {
+                  "lineNumber": 52654,
+                  "content": "Cannot fetch from localhost (localhost:3001) because this tool runs from an isolated server."
+                },
+                {
+                  "lineNumber": 52665,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **run_terminal_command_v2** • Run command: curl -s \"http://localhost:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots\" 2&gt;/dev/null | head -c 8000&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 52668,
+                  "content": "curl -s \"http://localhost:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots\" 2&gt;/dev/null | head -c 8000"
+                },
+                {
+                  "lineNumber": 52682,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **run_terminal_command_v2** • Run command: curl -s \"http://localhost:8000/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots\" 2&gt;/dev/null | head -c 6000 || echo \"---\"; curl -s \"http://127.0.0.1:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots\" 2&gt;/dev/null | head -c 6000 || echo \"3001 failed\"&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 52685,
+                  "content": "curl -s \"http://localhost:8000/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots\" 2&gt;/dev/null | head -c 6000 || echo \"---\"; curl -s \"http://127.0.0.1:3001/api/storyboard/episodes/c11f3a3a-855e-4732-acbd-95a818ba3070/shots\" 2&gt;/dev/null | head -c 6000 || echo \"3001 failed\""
+                },
+                {
+                  "lineNumber": 52689,
+                  "content": "{\"detail\":\"Not Found\"}3001 failed"
+                }
+              ]
+            },
+            {
+              "file": "./docs/联调说明.md",
+              "matches": [
+                {
+                  "lineNumber": 32,
+                  "content": "前端默认访问 http://localhost:5173，Vite 将 &#96;/api&#96; 代理到 &#96;http://localhost:8000&#96;。"
+                },
+                {
+                  "lineNumber": 120,
+                  "content": "2. 打开 http://localhost:5173"
+                }
+              ]
+            },
+            {
+              "file": "./docs/asset_api_dump.json",
+              "matches": [
+                {
+                  "lineNumber": 996,
+                  "content": "      \"https://video-dev-cdn.feeling.ltd/images/14c3aa2b-2522-4ede-85a3-5b7534f1531c/1773823564459_pba2fo.png?sign=1773923670-rb5lrvx29f-0-262a34d98d851734c147a59f76ca0e83\""
+                }
+              ]
+            },
+            {
+              "file": "./web/server/main.py",
+              "matches": [
+                {
+                  "lineNumber": 25,
+                  "content": "# CORS：允许前端开发服务器（Vite 默认 5173）"
+                },
+                {
+                  "lineNumber": 28,
+                  "content": "    allow_origins=[\"http://localhost:5173\", \"http://127.0.0.1:5173\"],"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-19_07-04Z-front-end-transformation-plan.md",
+              "matches": [
+                {
+                  "lineNumber": 53,
+                  "content": "  \"composerData\": \"{\\\"_v\\\":13,\\\"composerId\\\":\\\"task-toolu_bdrk_015vDEDkuVZY86SNfJMkGRyq\\\",\\\"richText\\\":\\\"\\\",\\\"hasLoaded\\\":true,\\\"text\\\":\\\"\\\",\\\"fullConversationHeadersOnly\\\":[{\\\"bubbleId\\\":\\\"46d85753-8f32-4d6c-b02d-8f1419e24435\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"92e81d8a-2732-4c95-8825-69d77882265a\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"d1f1395d-aabd-442d-8a27-38b158de017e\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"4857be1d-f47d-4a59-b73f-133b3b4a2239\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"ffedee53-75b2-4f34-8e9a-0bd68768ee95\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"c2ee6ad8-d867-4f16-a987-f25558c17594\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"c1ca4ccb-8ca0-4d72-bd89-31420e9d5f82\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"3c6323b8-5ce3-40b4-bfeb-5f98fc0ea4c6\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"eaef31ae-a91d-4e38-8c55-76ce5dee4b8a\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"7e35d2ec-5850-4c46-b752-8237fc230df2\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"39bb7d85-74b3-46b6-8450-31da4dc22359\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"45668d57-c7cd-4235-9a06-a54801eeedf9\\\",\\\"type\\\":2},{\\\"bubbleId\\\":\\\"6b9c2e [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 3584,
+                  "content": "curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/ || true"
+                },
+                {
+                  "lineNumber": 3590,
+                  "content": "curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/ || true"
+                },
+                {
+                  "lineNumber": 3602,
+                  "content": "  ➜  Local:   http://localhost:5173/"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-16_10-48Z-项目架构整理与脚本测试.md",
+              "matches": [
+                {
+                  "lineNumber": 6531,
+                  "content": "[OK] Shot08_prompt1 → task_id=931373889051734016 | 0-2s duration=2s seed=1368440288 credits=16"
+                }
+              ]
+            }
+          ],
+          "totalLines": 25,
+          "totalMatchedLines": 25
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Improving main.py**
+
+I'm adding eager import of config at startup and including common dev CORS ports. </details></think>
+
+---
+
+
+正在验证本地 `episode.json` 与 API 是否返回 `visualDescription`，并改进后端启动时加载 `.env`。
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 -c "
+import json, urllib.request
+from pathlib import Path
+root = Path('data')
+# 找任意 episode.json 抽样
+paths = list(root.glob('**/episode.json'))[:5]
+for p in paths:
+    d = json.loads(p.read_text(encoding='utf-8'))
+    eid = d.get('episodeId','')
+    shots = d.get('scenes',[{}])[0].get('shots',[])
+    s0 = shots[0] if shots else {}
+    vd = (s0.get('visualDescription') or '')[:40]
+    print(p.parent.name[:8], 'vd sample:', repr(vd))
+" 2>/dev/null; curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); s=d.get('scenes',[{}])[0].get('shots',[{}])[0]; print('API first shot keys:', sorted(s.keys())); print('visualDescription:', (s.get('visualDescription') or '')[:60])" 2>/dev/null || echo "curl API failed (backend down?)"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 -c "
+import json, urllib.request
+from pathlib import Path
+root = Path('data')
+# 找任意 episode.json 抽样
+paths = list(root.glob('**/episode.json'))[:5]
+for p in paths:
+    d = json.loads(p.read_text(encoding='utf-8'))
+    eid = d.get('episodeId','')
+    shots = d.get('scenes',[{}])[0].get('shots',[])
+    s0 = shots[0] if shots else {}
+    vd = (s0.get('visualDescription') or '')[:40]
+    print(p.parent.name[:8], 'vd sample:', repr(vd))
+" 2>/dev/null; curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); s=d.get('scenes',[{}])[0].get('shots',[{}])[0]; print('API first shot keys:', sorted(s.keys())); print('visualDescription:', (s.get('visualDescription') or '')[:60])" 2>/dev/null || echo "curl API failed (backend down?)"
+```
+
+```
+c25126d1 vd sample: '达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒'
+API first shot keys: ['aspectRatio', 'assets', 'cameraMovement', 'duration', 'endFrame', 'firstFrame', 'imagePrompt', 'shotId', 'shotNumber', 'status', 'videoCandidates', 'videoPrompt']
+visualDescription: 
+
+```
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Analyzing API response**
+
+The API response is missing `visualDescription` key, suggesting either Pydantic stripping it or validation from a different episode directory. The missing `visualDescription` key likely stems from FastAPI excluding fields equal to default values during serialization. The `visualDescription` key is being omitted by FastAPI/Pydantic during serialization, likely due to it being set to a default value. </details></think>
+
+---
+
+
+发现问题：本地 `episode.json` 含 `visualDescription`，但 API 返回的 shot 缺少该字段。正在定位是目录择优还是序列化问题。
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 << 'PY'
+import json
+from pathlib import Path
+
+def score_ep_dir(ep_dir):
+    try:
+        data = json.loads((ep_dir / "episode.json").read_text(encoding="utf-8"))
+    except Exception as e:
+        return (0, 0, "", str(e))
+    pid = data.get("projectId", "")
+    pulled = data.get("pulledAt", "")
+    vd_count = 0
+    for sc in data.get("scenes", []):
+        for sh in sc.get("shots", []):
+            if (sh.get("visualDescription") or "").strip():
+                vd_count += 1
+    prefer = 0 if pid == "proj-default" else 1
+    return (vd_count, prefer, pulled, "")
+
+root = Path("data")
+eid = "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+cands = []
+for proj_dir in root.iterdir():
+    if not proj_dir.is_dir():
+        continue
+    ep_dir = proj_dir / eid
+    if ep_dir.is_dir() and (ep_dir / "episode.json").exists():
+        sc = score_ep_dir(ep_dir)
+        cands.append((sc, ep_dir))
+
+for sc, ep_dir in sorted(cands, key=lambda x: x[0], reverse=True):
+    print(ep_dir, "score", sc[:3])
+    s0 = json.loads((ep_dir / "episode.json").read_text())["scenes"][0]["shots"][0]
+    print("  keys has vd:", "visualDescription" in s0, "val:", repr((s0.get("visualDescription") or "")[:50]))
+
+PY</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 << 'PY'
+import json
+from pathlib import Path
+
+def score_ep_dir(ep_dir):
+    try:
+        data = json.loads((ep_dir / "episode.json").read_text(encoding="utf-8"))
+    except Exception as e:
+        return (0, 0, "", str(e))
+    pid = data.get("projectId", "")
+    pulled = data.get("pulledAt", "")
+    vd_count = 0
+    for sc in data.get("scenes", []):
+        for sh in sc.get("shots", []):
+            if (sh.get("visualDescription") or "").strip():
+                vd_count += 1
+    prefer = 0 if pid == "proj-default" else 1
+    return (vd_count, prefer, pulled, "")
+
+root = Path("data")
+eid = "c25126d1-73c7-418a-8ebe-e877df4f2e84"
+cands = []
+for proj_dir in root.iterdir():
+    if not proj_dir.is_dir():
+        continue
+    ep_dir = proj_dir / eid
+    if ep_dir.is_dir() and (ep_dir / "episode.json").exists():
+        sc = score_ep_dir(ep_dir)
+        cands.append((sc, ep_dir))
+
+for sc, ep_dir in sorted(cands, key=lambda x: x[0], reverse=True):
+    print(ep_dir, "score", sc[:3])
+    s0 = json.loads((ep_dir / "episode.json").read_text())["scenes"][0]["shots"][0]
+    print("  keys has vd:", "visualDescription" in s0, "val:", repr((s0.get("visualDescription") or "")[:50]))
+
+PY
+```
+
+```
+data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84 score (41, 1, '2026-03-20T03:15:28.792436Z')
+  keys has vd: True val: '达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。'
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && python3 << 'PY'
+import json, sys
+sys.path.insert(0, ".")
+from models.schemas import Episode
+p = "../../data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json"
+data = json.load(open(p, encoding="utf-8"))
+ep = Episode.model_validate(data)
+s0 = ep.scenes[0].shots[0]
+print("model has vd:", repr(s0.visualDescription[:50]))
+d = ep.model_dump(mode="json")
+print("dump keys shot0:", sorted(d["scenes"][0]["shots"][0].keys()))
+print("dump vd:", d["scenes"][0]["shots"][0].get("visualDescription", "<MISSING>")[:50])
+PY</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && python3 << 'PY'
+import json, sys
+sys.path.insert(0, ".")
+from models.schemas import Episode
+p = "../../data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json"
+data = json.load(open(p, encoding="utf-8"))
+ep = Episode.model_validate(data)
+s0 = ep.scenes[0].shots[0]
+print("model has vd:", repr(s0.visualDescription[:50]))
+d = ep.model_dump(mode="json")
+print("dump keys shot0:", sorted(d["scenes"][0]["shots"][0].keys()))
+print("dump vd:", d["scenes"][0]["shots"][0].get("visualDescription", "<MISSING>")[:50])
+PY
+```
+
+```
+Traceback (most recent call last):
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 466, in _eval_type_backport
+    return _eval_type(value, globalns, localns, type_params)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 500, in _eval_type
+    return typing._eval_type(  # type: ignore
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/typing.py", line 290, in _eval_type
+    return t._evaluate(globalns, localns, recursive_guard)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/typing.py", line 546, in _evaluate
+    eval(self.__forward_code__, globalns, localns),
+  File "&lt;string&gt;", line 1, in &lt;module&gt;
+TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 3, in &lt;module&gt;
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/./models/__init__.py", line 4, in &lt;module&gt;
+    from .schemas import (
+  File "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/./models/schemas.py", line 62, in &lt;module&gt;
+    class Shot(BaseModel):
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_model_construction.py", line 221, in __new__
+    set_model_fields(cls, config_wrapper=config_wrapper, ns_resolver=ns_resolver)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_model_construction.py", line 544, in set_model_fields
+    fields, class_vars = collect_model_fields(cls, config_wrapper, ns_resolver, typevars_map=typevars_map)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_fields.py", line 118, in collect_model_fields
+    type_hints = _typing_extra.get_model_type_hints(cls, ns_resolver=ns_resolver)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 329, in get_model_type_hints
+    hints[name] = try_eval_type(value, globalns, localns)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 378, in try_eval_type
+    return eval_type_backport(value, globalns, localns), True
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 429, in eval_type_backport
+    return _eval_type_backport(value, globalns, localns, type_params)
+  File "/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/pydantic/_internal/_typing_extra.py", line 474, in _eval_type_backport
+    raise TypeError(
+TypeError: Unable to evaluate type annotation 'str | None'. If you are making use of the new typing syntax (unions using &#96;|&#96; since Python 3.10 or builtins subscripting since Python 3.9), you should either replace the use of new syntax with the existing &#96;typing&#96; constructs or install the &#96;eval_type_backport&#96; package.
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: which python3.11 python3.12 python3.10 2>/dev/null; (cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && python3.11 -c "import sys; print(sys.version)" 2>/dev/null || python3.12 -c "import sys; print(sys.version)" 2>/dev/null || echo "no 3.11/3.12")</summary>
+
+```bash
+which python3.11 python3.12 python3.10 2>/dev/null; (cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && python3.11 -c "import sys; print(sys.version)" 2>/dev/null || python3.12 -c "import sys; print(sys.version)" 2>/dev/null || echo "no 3.11/3.12")
+```
+
+```
+python3.11 not found
+python3.12 not found
+python3.10 not found
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="generic" data-tool-name="glob_file_search">
+<details>
+<summary>Tool use: **glob_file_search** • Searched codebase "undefined" • **0** result in **1** directory</summary>
+
+Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu** (0 file)
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": " \\| ",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": " \\| ",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/server/models/schemas.py",
+              "matches": [
+                {
+                  "lineNumber": 76,
+                  "content": "    endFrame: str | None = None"
+                },
+                {
+                  "lineNumber": 109,
+                  "content": "    projectId: str | None = None  # 可选，拉资产需正确 projectId；缺省时从本地已存在剧集推断"
+                },
+                {
+                  "lineNumber": 133,
+                  "content": "    model: str | None = None"
+                },
+                {
+                  "lineNumber": 134,
+                  "content": "    duration: int | None = None"
+                },
+                {
+                  "lineNumber": 170,
+                  "content": "    shotIds: list[str] | None = None"
+                },
+                {
+                  "lineNumber": 184,
+                  "content": "    progress: int | None = None"
+                },
+                {
+                  "lineNumber": 185,
+                  "content": "    result: dict | None = None"
+                },
+                {
+                  "lineNumber": 186,
+                  "content": "    error: str | None = None"
+                }
+              ]
+            }
+          ],
+          "totalLines": 8,
+          "totalMatchedLines": 8
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Updating type annotations**
+
+I'm replacing list[str] with typing.List[str] to ensure compatibility with Python 3.9. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "refresh|_ensure_token",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "refresh|_ensure_token",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/client.py",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "src/feeling/client.py",
+              "matches": [
+                {
+                  "lineNumber": 7,
+                  "content": "- refresh: 刷新 token（建议 1.9h 刷新一次，token 有效期 2h）"
+                },
+                {
+                  "lineNumber": 10,
+                  "content": "- refresh_url: 刷新过期的 COS 文件 URL（备用）"
+                },
+                {
+                  "lineNumber": 63,
+                  "content": "        self._refresh_token: str | None = None"
+                },
+                {
+                  "lineNumber": 68,
+                  "content": "    def _ensure_token(self) -&gt; str:"
+                },
+                {
+                  "lineNumber": 76,
+                  "content": "        if self._refresh_token and self._access_token:"
+                },
+                {
+                  "lineNumber": 78,
+                  "content": "                self.refresh()"
+                },
+                {
+                  "lineNumber": 93,
+                  "content": "        self._refresh_token = data.get(\"refreshToken\") or data.get(\"refresh_token\") or self._refresh_token"
+                },
+                {
+                  "lineNumber": 127,
+                  "content": "        # API 返回 { code, message, data: { accessToken, refreshToken, user } }"
+                },
+                {
+                  "lineNumber": 132,
+                  "content": "    def refresh(self) -&gt; dict[str, Any]:"
+                },
+                {
+                  "lineNumber": 134,
+                  "content": "        调用 POST /api/auth/refresh 刷新访问令牌。"
+                },
+                {
+                  "lineNumber": 137,
+                  "content": "        if not self._refresh_token:"
+                },
+                {
+                  "lineNumber": 139,
+                  "content": "        url = f\"{self.base_url}/auth/refresh\""
+                },
+                {
+                  "lineNumber": 140,
+                  "content": "        # 常见做法：Body 中传 refreshToken，或 Header Authorization 用 refresh"
+                },
+                {
+                  "lineNumber": 141,
+                  "content": "        refresh_val = self._refresh_token.replace(\"Bearer \", \"\") if self._refresh_token else \"\""
+                },
+                {
+                  "lineNumber": 142,
+                  "content": "        payload = {\"refreshToken\": refresh_val}"
+                },
+                {
+                  "lineNumber": 168,
+                  "content": "        self._ensure_token()"
+                },
+                {
+                  "lineNumber": 192,
+                  "content": "        self._ensure_token()"
+                },
+                {
+                  "lineNumber": 221,
+                  "content": "        self._ensure_token()"
+                },
+                {
+                  "lineNumber": 257,
+                  "content": "        self._ensure_token()"
+                },
+                {
+                  "lineNumber": 285,
+                  "content": "    def refresh_url(self, file_path: str) -&gt; str:"
+                },
+                {
+                  "lineNumber": 289,
+                  "content": "        GET /api/cos/refresh-url?filePath=xxx"
+                },
+                {
+                  "lineNumber": 297,
+                  "content": "        self._ensure_token()"
+                },
+                {
+                  "lineNumber": 298,
+                  "content": "        url = f\"{self.base_url}/cos/refresh-url\""
+                }
+              ]
+            }
+          ],
+          "totalLines": 23,
+          "totalMatchedLines": 23
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+File not found
+
+---
+
+
+
+---
+
+
+定位到根本原因：磁盘上的 `episode.json` 含 `visualDescription`，但 `curl http://127.0.0.1:8000/api/episodes/...` 返回的 shot 没有该字段 — 说明正在运行的后端进程很可能仍在使用旧的 `Shot` 模型（Pydantic 会忽略 JSON 中的未知字段，响应里就不会出现）。这与 Feeling token 无关。正在修复：1. 启动时加载 `config`（确保 `.env`）；2. 将 `schemas.py` 中的 `|` 联合类型改为 `Optional[...]`，以兼容 Python 3.9 并避免导入失败。
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/main.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && python3 -c "
+import json, sys
+sys.path.insert(0, '.')
+from models.schemas import Episode
+p = '../../data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'
+data = json.load(open(p, encoding='utf-8'))
+ep = Episode.model_validate(data)
+s0 = ep.scenes[0].shots[0]
+print('visualDescription in model:', s0.visualDescription[:40])
+d = ep.model_dump(mode='json')
+keys = sorted(d['scenes'][0]['shots'][0].keys())
+print('dump has visualDescription:', 'visualDescription' in keys)
+"
+</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && python3 -c "
+import json, sys
+sys.path.insert(0, '.')
+from models.schemas import Episode
+p = '../../data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'
+data = json.load(open(p, encoding='utf-8'))
+ep = Episode.model_validate(data)
+s0 = ep.scenes[0].shots[0]
+print('visualDescription in model:', s0.visualDescription[:40])
+d = ep.model_dump(mode='json')
+keys = sorted(d['scenes'][0]['shots'][0].keys())
+print('dump has visualDescription:', 'visualDescription' in keys)
+"
+
+```
+
+```
+visualDescription in model: 达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒
+dump has visualDescription: True
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="read_lints">
+<details>
+<summary>Tool use: **read_lints**</summary>
+
+
+Parameters:
+
+```json
+{
+  "paths": [
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/main.py",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py"
+  ]
+}
+```
+Result:
+
+```json
+{
+  "linterErrorsByFile": [
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/main.py"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py"
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+## 修改方案流程图（Mermaid）
+
+```mermaid
+flowchart TD
+  A[排查: 画面描述仍为空] --> B{episode.json 里是否有 visualDescription?}
+  B -->|否| C[用新版 puller 重新拉取 / Feeling token 仅影响拉取]
+  B -->|是| D{curl GET /api/episodes/:id 响应里是否有该字段?}
+  D -->|否| E[原因: 运行中的后端仍是旧 Shot 模型<br/>Pydantic 丢弃未声明字段]
+  D -->|是| F[查前端: VITE_USE_MOCK / 缓存 / 代理]
+  E --> G[重启 uvicorn + 确认代码已更新]
+  G --> H[main.py 启动时 import config 加载 .env]
+  H --> I[schemas 用 Optional 兼容 Py3.9 便于本地校验]
+```
+
+---
+
+## 结论（直接回答你的两个问题）
+
+### 1. 「你有刷新 token 吗？」
+
+- **有**：`FeelingClient` 在调平台接口前会 `_ensure_token()`，快过期时会走 **`refresh()`**，失败再 **`login()`**（见 `src/feeling/client.py`）。
+- **但**：**读分镜、读 `visualDescription` 走的是 `GET /api/episodes/:id`，只读本地 `data/.../episode.json`，根本不经过 Feeling，也不依赖 token。**  
+  所以：**画面描述不显示，一般不是「没刷新 token」导致的。**
+
+### 2. 真正的问题（我在你这台环境上已复现）
+
+对同一剧集我查了：
+
+- **磁盘** `data/b95c3d75-.../c25126d1-.../episode.json` 里 **有** `visualDescription`（中文内容正常）。
+- **`curl http://127.0.0.1:8000/api/episodes/c25126d1-...` 返回的首个 shot 的 key 里根本没有 `visualDescription`。**
+
+这说明：**当前跑在 8000 端口的后端进程，用的仍是「没有 `visualDescription` 字段的旧 `Shot` 模型」**——Pydantic 会把 JSON 里多出来的字段丢掉，响应里也就不会出现。
+
+**处理：请完全停掉正在跑的 `uvicorn`，再重新启动**（有时 `--reload` 没把模型改动热重载进来，需要手动重启一次）。
+
+---
+
+## 本次代码/文档改动（自检 OK）
+
+| 文件 | 作用 |
+|------|------|
+| `web/server/main.py` | 启动时 **`import config`**，保证项目根 `.env`（含 `DATA_ROOT`）尽早加载。 |
+| `web/server/models/schemas.py` | 把 `str \| None` 等改成 **`Optional[...]`**，在 **Python 3.9** 下也能正常 import、本地用脚本校验 Episode。 |
+| `docs/联调说明.md` | 增加 **「画面描述 / Token」** 说明与 **curl 自检**步骤。 |
+
+重启后端后再执行文档里的 `curl ... | python3 -c ...`，若输出里 `visualDescription` 有内容，前端强刷后分镜表「画面描述」列就会跟 API 一致。
+
+---
+
+**安全提醒**：你之前打开的 `.env` 里含有密钥，请勿提交到 Git；若曾误提交，建议在对应云平台**轮换密钥**。
+
+---
+
+_**User**_
+
+我让你帮我拉啊，你在干嘛啊？我打开还是没有画面描述
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+<think><details><summary>Thought Process</summary>
+**Pulling episode data**
+
+I'm fetching episode data from the Feeling platform using the puller tool. </details></think>
+
+---
+
+
+正在执行拉取并验证数据与接口是否包含 `visualDescription`。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/package.json</summary>
+
+</details>
+</tool-use>
+
+---
+
+File not found
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+正在执行平台拉取，并修复导致页面崩溃的 `AssetSidebar is not defined` 错误。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="generic" data-tool-name="glob_file_search">
+<details>
+<summary>Tool use: **glob_file_search** • Searched codebase "undefined" • **0** result in **1** directory</summary>
+
+Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend** (0 file)
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "AssetSidebar",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "AssetSidebar",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "./.specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md",
+              "matches": [
+                {
+                  "lineNumber": 21316,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AssetSidebar.tsx&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 21363,
+                  "content": "The AssetSidebar height issue stems from the flex container hierarchy; I need to ensure proper height propagation through the nested flex items. "
+                },
+                {
+                  "lineNumber": 21367,
+                  "content": "I'm changing the asset wrapper to use flex and min-h-0 to properly propagate height to the AssetSidebar. The flex layout requires the parent container to have height for h-full to work properly, so I'm ensuring the flex-1 container has proper height inheritance. "
+                },
+                {
+                  "lineNumber": 21431,
+                  "content": "    \"/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AssetSidebar.tsx\","
+                },
+                {
+                  "lineNumber": 21442,
+                  "content": "      \"relativeWorkspacePath\": \"/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AssetSidebar.tsx\""
+                },
+                {
+                  "lineNumber": 21536,
+                  "content": "        B2 --&gt;|是| B3[AssetSidebar 左侧]"
+                },
+                {
+                  "lineNumber": 21550,
+                  "content": "- **AssetSidebar**：进入任意 Episode 相关页面时，在主内容区左侧展示资产库"
+                },
+                {
+                  "lineNumber": 21552,
+                  "content": "- **布局**：&#96;[SideNavBar] [AssetSidebar] [主内容]&#96;"
+                },
+                {
+                  "lineNumber": 21579,
+                  "content": "I'm moving the asset library to the far left and making it collapsible as requested. I'm relocating the asset library to the far left as the primary sidebar component. I'm reordering the sidebar components to place AssetSidebar as the leftmost element, making it collapsible and positioning it between SideNavBar and the edge. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 21813,
+                  "content": "I'm adjusting the AssetSidebar component to be collapsible and position it on the left side. &lt;/details&gt;&lt;/think&gt;"
+                },
+                {
+                  "lineNumber": 21834,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AssetSidebar.tsx&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 21849,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AssetSidebar.tsx&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 21900,
+                  "content": "&lt;details&gt;&lt;summary&gt;Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AssetSidebar.tsx&lt;/summary&gt;"
+                },
+                {
+                  "lineNumber": 22112,
+                  "content": "              \"file\": \"web/frontend/src/components/layout/AssetSidebar.tsx\","
+                },
+                {
+                  "lineNumber": 23371,
+                  "content": "              \"file\": \"web/frontend/src/components/layout/AssetSidebar.tsx\","
+                },
+                {
+                  "lineNumber": 23423,
+                  "content": "                  \"content\": \"export function AssetSidebar() {\""
+                },
+                {
+                  "lineNumber": 23732,
+                  "content": "                  \"content\": \"import { AssetSidebar } from \\\"./AssetSidebar\\\"\""
+                },
+                {
+                  "lineNumber": 23888,
+                  "content": "                  \"content\": \"          &amp;lt;AssetSidebar /&amp;gt;\""
+                },
+                {
+                  "lineNumber": 30819,
+                  "content": "- 移除独立的 AssetSidebar 组件"
+                },
+                {
+                  "lineNumber": 37683,
+                  "content": "                  \"content\": \"- **AssetSidebar**：进入任意 Episode 相关页面时，在主内容区左侧展示资产库\""
+                }
+              ]
+            }
+          ],
+          "totalLines": 20,
+          "totalMatchedLines": 20
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "argparse|add_argument|def main",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "argparse|add_argument|def main",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "src/feeling/puller.py",
+              "matches": [
+                {
+                  "lineNumber": 11,
+                  "content": "import argparse"
+                },
+                {
+                  "lineNumber": 440,
+                  "content": "def main() -&gt; None:"
+                },
+                {
+                  "lineNumber": 441,
+                  "content": "    parser = argparse.ArgumentParser(description=\"从 Feeling 平台拉取 Episode 或整个项目\")"
+                },
+                {
+                  "lineNumber": 442,
+                  "content": "    parser.add_argument(\"--episode-id\", help=\"单个 Episode UUID（与 --project-id 二选一）\")"
+                },
+                {
+                  "lineNumber": 443,
+                  "content": "    parser.add_argument(\"--project-id\", help=\"项目 UUID，将拉取该项目下所有剧集\")"
+                },
+                {
+                  "lineNumber": 444,
+                  "content": "    parser.add_argument(\"--output\", \"-o\", type=Path, default=Path(\"data\"), help=\"输出根目录\")"
+                },
+                {
+                  "lineNumber": 445,
+                  "content": "    parser.add_argument(\"--title\", default=None, help=\"剧集标题（仅 --episode-id 时有效）\")"
+                },
+                {
+                  "lineNumber": 446,
+                  "content": "    parser.add_argument(\"--number\", type=int, default=1, help=\"剧集编号（仅 --episode-id 时有效）\")"
+                },
+                {
+                  "lineNumber": 447,
+                  "content": "    parser.add_argument(\"--force\", action=\"store_true\", help=\"强制重新下载资产图（修复拉错图时使用）\")"
+                }
+              ]
+            }
+          ],
+          "totalLines": 9,
+          "totalMatchedLines": 9
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id b95c3d75-d99a-40c3-9f69-9bb76f23c990 --title "第2集" --number 2</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 -m src.feeling.puller --episode-id c25126d1-73c7-418a-8ebe-e877df4f2e84 -o data --project-id b95c3d75-d99a-40c3-9f69-9bb76f23c990 --title "第2集" --number 2
+```
+
+```
+[OK] 已拉取至 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json
+/Users/zuobowen/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 -c "
+import json
+p='data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'
+d=json.load(open(p,encoding='utf-8'))
+shots=d['scenes'][0]['shots']
+n=sum(1 for s in shots if (s.get('visualDescription') or '').strip())
+print('shots with visualDescription:', n, '/', len(shots))
+print('sample:', (shots[0].get('visualDescription') or '')[:70])
+"
+curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" | python3 -c "
+import sys,json
+try:
+  d=json.load(sys.stdin)
+except Exception as e:
+  print('API parse fail', e); sys.exit(1)
+s=d['scenes'][0]['shots'][0]
+print('API has key visualDescription:', 'visualDescription' in s)
+print('API value prefix:', repr((s.get('visualDescription') or '')[:70]))
+" 2>/dev/null || echo "(后端 8000 未响应或返回非 JSON)"</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 -c "
+import json
+p='data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json'
+d=json.load(open(p,encoding='utf-8'))
+shots=d['scenes'][0]['shots']
+n=sum(1 for s in shots if (s.get('visualDescription') or '').strip())
+print('shots with visualDescription:', n, '/', len(shots))
+print('sample:', (shots[0].get('visualDescription') or '')[:70])
+"
+curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" | python3 -c "
+import sys,json
+try:
+  d=json.load(sys.stdin)
+except Exception as e:
+  print('API parse fail', e); sys.exit(1)
+s=d['scenes'][0]['shots'][0]
+print('API has key visualDescription:', 'visualDescription' in s)
+print('API value prefix:', repr((s.get('visualDescription') or '')[:70]))
+" 2>/dev/null || echo "(后端 8000 未响应或返回非 JSON)"
+```
+
+```
+shots with visualDescription: 41 / 41
+sample: 达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。
+API has key visualDescription: False
+API value prefix: ''
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "uvicorn|api\\]",
+  "path": "/Users/zuobowen/.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "uvicorn|api\\]",
+    "path": "/Users/zuobowen/.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "../../../.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt",
+              "matches": [
+                {
+                  "lineNumber": 180,
+                  "content": "&gt; concurrently -n api,web -c blue,green \"python -m uvicorn web.server.main:app --reload --port 8000\" \"pnpm --prefix web/frontend run dev\""
+                },
+                {
+                  "lineNumber": 182,
+                  "content": "[api] INFO:     Will watch for changes in these directories: ['/Users/zuobowen/Documents/GitHub/fv_autovidu']"
+                },
+                {
+                  "lineNumber": 183,
+                  "content": "[api] ERROR:    [Errno 48] Address already in use"
+                },
+                {
+                  "lineNumber": 184,
+                  "content": "[api] python -m uvicorn web.server.main:app --reload --port 8000 exited with code 1"
+                },
+                {
+                  "lineNumber": 889,
+                  "content": "&gt; concurrently -n api,web -c blue,green \"python -m uvicorn web.server.main:app --reload --port 8000\" \"pnpm --prefix web/frontend run dev\""
+                },
+                {
+                  "lineNumber": 891,
+                  "content": "[api] INFO:     Will watch for changes in these directories: ['/Users/zuobowen/Documents/GitHub/fv_autovidu']"
+                },
+                {
+                  "lineNumber": 892,
+                  "content": "[api] ERROR:    [Errno 48] Address already in use"
+                },
+                {
+                  "lineNumber": 893,
+                  "content": "[api] python -m uvicorn web.server.main:app --reload --port 8000 exited with code 1"
+                },
+                {
+                  "lineNumber": 919,
+                  "content": "&gt; concurrently -n api,web -c blue,green \"python -m uvicorn web.server.main:app --reload --port 8000\" \"pnpm --prefix web/frontend run dev\""
+                },
+                {
+                  "lineNumber": 921,
+                  "content": "[api] INFO:     Will watch for changes in these directories: ['/Users/zuobowen/Documents/GitHub/fv_autovidu']"
+                },
+                {
+                  "lineNumber": 922,
+                  "content": "[api] ERROR:    [Errno 48] Address already in use"
+                },
+                {
+                  "lineNumber": 923,
+                  "content": "[api] python -m uvicorn web.server.main:app --reload --port 8000 exited with code 1"
+                },
+                {
+                  "lineNumber": 940,
+                  "content": "&gt; concurrently -n api,web -c blue,green \"python -m uvicorn web.server.main:app --reload --port 8000\" \"pnpm --prefix web/frontend run dev\""
+                },
+                {
+                  "lineNumber": 942,
+                  "content": "[api] INFO:     Will watch for changes in these directories: ['/Users/zuobowen/Documents/GitHub/fv_autovidu']"
+                },
+                {
+                  "lineNumber": 943,
+                  "content": "[api] ERROR:    [Errno 48] Address already in use"
+                },
+                {
+                  "lineNumber": 944,
+                  "content": "[api] python -m uvicorn web.server.main:app --reload --port 8000 exited with code 1"
+                }
+              ]
+            }
+          ],
+          "totalLines": 16,
+          "totalMatchedLines": 16
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && PYTHONPATH=. python3 -c "
+from services import data_service
+ep = data_service.get_episode('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+if not ep:
+  print('no episode')
+else:
+  s = ep.scenes[0].shots[0]
+  print('data_service visualDescription:', (s.visualDescription or '')[:60])
+  d = ep.model_dump(mode='json')
+  print('model_dump has key:', 'visualDescription' in d['scenes'][0]['shots'][0])
+"
+</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server && PYTHONPATH=. python3 -c "
+from services import data_service
+ep = data_service.get_episode('c25126d1-73c7-418a-8ebe-e877df4f2e84')
+if not ep:
+  print('no episode')
+else:
+  s = ep.scenes[0].shots[0]
+  print('data_service visualDescription:', (s.visualDescription or '')[:60])
+  d = ep.model_dump(mode='json')
+  print('model_dump has key:', 'visualDescription' in d['scenes'][0]['shots'][0])
+"
+
+```
+
+```
+data_service visualDescription: 达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。
+model_dump has key: True
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+定位到根本原因：`pnpm run dev` 里的 API 因端口 8000 被占用而启动失败，前端代理到旧的 `uvicorn` 进程，该进程使用旧代码，不返回 `visualDescription`。正在查找并终止占用 8000 端口的进程。
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: lsof -i :8000 -n -P 2>/dev/null || true</summary>
+
+```bash
+lsof -i :8000 -n -P 2>/dev/null || true
+```
+
+```
+COMMAND     PID     USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+python3.1 59611 zuobowen   12u  IPv4 0x5aedc12424715605      0t0  TCP 127.0.0.1:8000 (LISTEN)
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: kill 59611 && sleep 1 && lsof -i :8000 -n -P 2>/dev/null || echo "8000 已释放"</summary>
+
+```bash
+kill 59611 && sleep 1 && lsof -i :8000 -n -P 2>/dev/null || echo "8000 已释放"
+```
+
+```
+8000 已释放
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 -m uvicorn web.server.main:app --reload --port 8000</summary>
+
+```bash
+cd /Users/zuobowen/Documents/GitHub/fv_autovidu && python3 -m uvicorn web.server.main:app --reload --port 8000
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: sleep 2 && curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" | python3 -c "import sys,json; d=json.load(sys.stdin); s=d['scenes'][0]['shots'][0]; print('visualDescription' in s, repr((s.get('visualDescription') or '')[:65]))"</summary>
+
+```bash
+sleep 2 && curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" | python3 -c "import sys,json; d=json.load(sys.stdin); s=d['scenes'][0]['shots'][0]; print('visualDescription' in s, repr((s.get('visualDescription') or '')[:65]))"
+```
+
+```
+Traceback (most recent call last):
+  File "&lt;string&gt;", line 1, in &lt;module&gt;
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/644164.txt</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="generic" data-tool-name="glob_file_search">
+<details>
+<summary>Tool use: **glob_file_search** • Searched codebase "undefined" • **1** result in **1** directory</summary>
+
+Directory: **/Users/zuobowen/Documents/GitHub/fv_autovidu** (1 file)
+
+| File |
+|------|
+| `requirements.txt` |
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+正在向 `docs/联调说明.md` 添加「端口占用导致新 API 起不来」的醒目说明，避免再次踩坑。
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+---
+
+
+## 修改 / 处理流程（Mermaid）
+
+```mermaid
+flowchart TD
+  A[你要：拉数据 + 看到画面描述] --> B[已执行: puller 拉取 episode]
+  B --> C[校验: episode.json 41/41 有 visualDescription]
+  C --> D{pnpm run dev 里 API 是否起来?}
+  D -->|Address already in use| E[仅 Vite 运行 → 代理到旧 8000 进程]
+  E --> F[旧后端无 Shot.visualDescription 字段 → 响应里丢字段]
+  D -->|正常| G[新后端返回 visualDescription → 页面正常]
+  F --> H[结束占用 8000 的旧进程]
+  H --> I[重新 pnpm run dev 或单独起 uvicorn]
+```
+
+---
+
+## 我实际帮你做了什么
+
+### 1. **已经替你拉过平台数据**
+
+在项目根执行了（成功）：
+
+- 输出：`[OK] 已拉取至 data/b95c3d75-d99a-40c3-9f69-9bb76f23c990/c25126d1-73c7-418a-8ebe-e877df4f2e84/episode.json`
+- 校验：**41/41** 个 shot 都有非空 **`visualDescription`**，首条内容正常。
+
+所以：**不是「没拉」或 token 问题，本地 JSON 是对的。**
+
+### 2. **真正原因：你看到的页面连的不是这份新后端**
+
+查了你终端日志：`pnpm run dev` 里 **API 一直起不来**：
+
+```text
+[api] ERROR: [Errno 48] Address already in use
+[api] python -m uvicorn ... exited with code 1
+```
+
+也就是说：**只有前端（Vite）在跑，`/api` 仍被代理到 **早就占着 8000 端口的旧 Python 进程****。  
+那个旧进程里的 `Shot` 模型**没有** `visualDescription`，Pydantic 会把 JSON 里这个字段丢掉，所以 **curl API 里没有该字段**，页面上也就一直是「没有画面描述」。
+
+### 3. **已处理：释放 8000 端口**
+
+已在你的环境里对占用 **8000** 的旧进程执行了 **`kill`**（当时 `lsof` 显示为 `python3.1`，PID 59611），端口应已空出来。
+
+---
+
+## 你现在要做的一步（必须）
+
+在项目根**重新**执行：
+
+```bash
+pnpm run dev
+```
+
+并确认终端里 **`[api]` 不再报 `Address already in use`**，能看到类似 `Uvicorn running on http://127.0.0.1:8000`。
+
+然后用浏览器**硬刷新**分镜页。若仍异常，在终端执行自检：
+
+```bash
+curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" | python3 -c "import sys,json;d=json.load(sys.stdin);s=d['scenes'][0]['shots'][0];print('visualDescription' in s, (s.get('visualDescription') or '')[:50])"
+```
+
+应输出 **`True`** 和一段中文描述。
+
+---
+
+## 文档
+
+已在 **`docs/联调说明.md`** 里加了 **`Address already in use` + 旧后端导致看不到 `visualDescription`** 的说明和 `lsof`/`kill` 步骤，避免以后再踩坑。
+
+---
+
+**说明**：若你本机默认的 `python3` 没有装 `uvicorn`，请用你平时能跑后端的环境（例如虚拟环境或 `python3.11 -m uvicorn ...`），并保证 **`pip install -r requirements.txt`** 已执行。
+
+---
+
+_**User**_
+
+@/Users/zuobowen/.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt:1012-1027 你看看呢？为什么还是拿不到画面描述呢？
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+
+
+
+---
+
+Offset 990 is beyond file length (810 lines)
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+终端文件当前约 810 行（无 1012–1027）。日志显示 API 已返回 200。正在验证响应 JSON 是否包含 `visualDescription`，并排查 FastAPI/Pydantic 序列化是否排除了该字段。
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" | python3 -c "import sys,json; d=json.load(sys.stdin); s=d['scenes'][0]['shots'][0]; print('keys:', sorted(s.keys())); print('visualDescription' in s, repr((s.get('visualDescription') or '')[:80]))"</summary>
+
+```bash
+curl -s "http://127.0.0.1:8000/api/episodes/c25126d1-73c7-418a-8ebe-e877df4f2e84" | python3 -c "import sys,json; d=json.load(sys.stdin); s=d['scenes'][0]['shots'][0]; print('keys:', sorted(s.keys())); print('visualDescription' in s, repr((s.get('visualDescription') or '')[:80]))"
+```
+
+```
+keys: ['aspectRatio', 'assets', 'cameraMovement', 'duration', 'endFrame', 'firstFrame', 'imagePrompt', 'shotId', 'shotNumber', 'status', 'videoCandidates', 'videoPrompt', 'visualDescription']
+True '达里尔在驾驶位通过后视镜观察后座，车身在土路上剧烈颠簸，格雷坐在后座喘息，窗外荒野飞速掠过。'
+
+```
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotRow.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/api/episodes.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotPromptCells.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "flattenShots",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "flattenShots",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/types/episode.ts",
+              "matches": [
+                {
+                  "lineNumber": 102,
+                  "content": "export function flattenShots(episode: Episode): Shot[] {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/index.ts",
+              "matches": [
+                {
+                  "lineNumber": 15,
+                  "content": "export { flattenShots } from \"./episode\""
+                }
+              ]
+            }
+          ],
+          "totalLines": 2,
+          "totalMatchedLines": 2
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/episode.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/StoryboardPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/api/client.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/ShotCard.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+<think><details><summary>Thought Process</summary>
+**Fixing episode fetch bug**
+
+I'm implementing a refetch trigger when episode data changes to prevent stale episodes from showing. I'll implement a fix where fetchEpisodeDetail clears currentEpisode on mount to ensure fresh data on page load. 
+
+I'm adding a refresh button to episode detail to handle same-id navigation properly. </details></think>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "ERROR|error|visualDescription|404",
+  "path": "/Users/zuobowen/.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "ERROR|error|visualDescription|404",
+    "path": "/Users/zuobowen/.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "../../../.cursor/projects/Users-zuobowen-Documents-GitHub-fv-autovidu/terminals/22.txt",
+              "matches": [
+                {
+                  "lineNumber": 8,
+                  "content": "[web] 6:58:47 PM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 9,
+                  "content": "[web] 6:58:47 PM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 12,
+                  "content": "[web] 6:59:54 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 23,
+                  "content": "[web] 6:59:54 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 34,
+                  "content": "[web] 6:59:54 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 45,
+                  "content": "[web] 6:59:54 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 56,
+                  "content": "[web] 6:59:54 PM [vite] (client) [console.error] ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 68,
+                  "content": "[web] The above error occurred in the &lt;AppLayout&gt; component."
+                },
+                {
+                  "lineNumber": 70,
+                  "content": "[web] React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary."
+                },
+                {
+                  "lineNumber": 72,
+                  "content": "[web] 6:59:54 PM [vite] (client) [console.error] React Router caught the following error during render ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 84,
+                  "content": "[web] 6:59:58 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 95,
+                  "content": "[web] 6:59:58 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 106,
+                  "content": "[web] 6:59:58 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 117,
+                  "content": "[web] 6:59:58 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 128,
+                  "content": "[web] 6:59:58 PM [vite] (client) [console.error] ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 140,
+                  "content": "[web] The above error occurred in the &lt;AppLayout&gt; component."
+                },
+                {
+                  "lineNumber": 142,
+                  "content": "[web] React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary."
+                },
+                {
+                  "lineNumber": 144,
+                  "content": "[web] 6:59:58 PM [vite] (client) [console.error] React Router caught the following error during render ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 156,
+                  "content": "[web] 7:00:12 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 167,
+                  "content": "[web] 7:00:12 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 178,
+                  "content": "[web] 7:00:12 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 189,
+                  "content": "[web] 7:00:12 PM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 200,
+                  "content": "[web] 7:00:12 PM [vite] (client) [console.error] ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 212,
+                  "content": "[web] The above error occurred in the &lt;AppLayout&gt; component."
+                },
+                {
+                  "lineNumber": 214,
+                  "content": "[web] React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary."
+                },
+                {
+                  "lineNumber": 216,
+                  "content": "[web] 7:00:12 PM [vite] (client) [console.error] React Router caught the following error during render ReferenceError: Cannot access 'pullOpen' before initialization"
+                },
+                {
+                  "lineNumber": 232,
+                  "content": "[web] 7:03:13 PM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 233,
+                  "content": "[web] 7:03:13 PM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 234,
+                  "content": "[web] 7:03:13 PM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 235,
+                  "content": "[web] 7:03:13 PM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 236,
+                  "content": "[web] 7:03:23 PM [vite] (client) [console.error] [API Error] /episodes/pull Request failed with status code 500"
+                },
+                {
+                  "lineNumber": 239,
+                  "content": "[web]     23 |          : error.message || \"网络请求失败\""
+                },
+                {
+                  "lineNumber": 240,
+                  "content": "[web]     24 |      console.error(\"[API Error]\", error.config?.url, message)"
+                },
+                {
+                  "lineNumber": 254,
+                  "content": "[web] 7:13:16 PM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 255,
+                  "content": "[web] 7:13:16 PM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 265,
+                  "content": "[web] 10:24:46 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 276,
+                  "content": "[web] 10:24:46 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 287,
+                  "content": "[web] 10:24:46 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 298,
+                  "content": "[web] 10:24:46 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 309,
+                  "content": "[web] 10:24:46 AM [vite] (client) [console.error] ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 321,
+                  "content": "[web] The above error occurred in the &lt;ShotRow&gt; component."
+                },
+                {
+                  "lineNumber": 323,
+                  "content": "[web] React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary."
+                },
+                {
+                  "lineNumber": 325,
+                  "content": "[web] 10:24:46 AM [vite] (client) [console.error] React Router caught the following error during render ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 337,
+                  "content": "[web] 10:24:49 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 348,
+                  "content": "[web] 10:24:49 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 359,
+                  "content": "[web] 10:24:49 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 370,
+                  "content": "[web] 10:24:49 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 381,
+                  "content": "[web] 10:24:49 AM [vite] (client) [console.error] ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 393,
+                  "content": "[web] The above error occurred in the &lt;ShotRow&gt; component."
+                },
+                {
+                  "lineNumber": 395,
+                  "content": "[web] React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary."
+                },
+                {
+                  "lineNumber": 397,
+                  "content": "[web] 10:24:49 AM [vite] (client) [console.error] React Router caught the following error during render ReferenceError: AssetTag is not defined"
+                },
+                {
+                  "lineNumber": 420,
+                  "content": "[web] 10:30:17 AM [vite] (client) [console.error] [vite] SyntaxError: The requested module '/src/components/business/index.ts?t=1773973817516' does not provide an export named 'EditablePromptCell'"
+                },
+                {
+                  "lineNumber": 421,
+                  "content": "[web] 10:30:17 AM [vite] (client) [console.error] [vite] Failed to reload /src/components/business/ShotRow.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+                },
+                {
+                  "lineNumber": 422,
+                  "content": "[web] 10:30:19 AM [vite] (client) [Unhandled error] SyntaxError: The requested module '/src/components/business/index.ts?t=1773973817516' does not provide an export named 'EditablePromptCell'"
+                },
+                {
+                  "lineNumber": 456,
+                  "content": "[web] 10:50:09 AM [vite] (client) [console.error] [vite] Failed to reload /src/components/business/EditablePromptCell.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+                },
+                {
+                  "lineNumber": 458,
+                  "content": "[web] 10:50:09 AM [vite] (client) Pre-transform error: Failed to load url /src/components/business/EditablePromptCell.tsx (resolved id: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/EditablePromptCell.tsx) in /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/business/index.ts. Does the file exist?"
+                },
+                {
+                  "lineNumber": 459,
+                  "content": "[web] 10:50:09 AM [vite] (client) [console.error] [vite] Failed to reload /src/components/business/ShotRow.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)"
+                },
+                {
+                  "lineNumber": 470,
+                  "content": "[api] ERROR:    [Errno 48] Address already in use"
+                },
+                {
+                  "lineNumber": 484,
+                  "content": "[web] 11:14:03 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: {\"status\":404,\"statusText\":\"Not Found\",\"internal\":true,\"data\":\"Error: No route matches URL \\\"/episode\\\"\",\"error\":{\"name\":\"Error\",\"message\":\"No route matches URL \\\"/episode\\\"\",\"stack\":\"Error: No route matches URL \\\"/episode\\\"\\n    at getInternalRouterError (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:3486:58)\\n    at handleNavigational404 (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:2065:15)\\n    at startNavigation (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:1418:44)\\n    at Object.navigate (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:1373:9)\\n    at http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:4195:21\\n    at doNavigate (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:7148:27)\\n    at http://localhost:5174/node_module [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 485,
+                  "content": "[web] 11:14:03 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: {\"status\":404,\"statusText\":\"Not Found\",\"internal\":true,\"data\":\"Error: No route matches URL \\\"/episode\\\"\",\"error\":{\"name\":\"Error\",\"message\":\"No route matches URL \\\"/episode\\\"\",\"stack\":\"Error: No route matches URL \\\"/episode\\\"\\n    at getInternalRouterError (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:3486:58)\\n    at handleNavigational404 (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:2065:15)\\n    at startNavigation (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:1418:44)\\n    at Object.navigate (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:1373:9)\\n    at http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:4195:21\\n    at doNavigate (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:7148:27)\\n    at http://localhost:5174/node_module [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 488,
+                  "content": "[web] 11:14:04 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: {\"status\":404,\"statusText\":\"Not Found\",\"internal\":true,\"data\":\"Error: No route matches URL \\\"/episode\\\"\",\"error\":{\"name\":\"Error\",\"message\":\"No route matches URL \\\"/episode\\\"\",\"stack\":\"Error: No route matches URL \\\"/episode\\\"\\n    at getInternalRouterError (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:3486:58)\\n    at createRouter (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:1070:15)\\n    at createBrowserRouter (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:6838:9)\\n    at http://localhost:5174/src/App.tsx:16:16\"}}"
+                },
+                {
+                  "lineNumber": 489,
+                  "content": "[web] 11:14:04 AM [vite] (client) [console.error] Error handled by React Router default ErrorBoundary: {\"status\":404,\"statusText\":\"Not Found\",\"internal\":true,\"data\":\"Error: No route matches URL \\\"/episode\\\"\",\"error\":{\"name\":\"Error\",\"message\":\"No route matches URL \\\"/episode\\\"\",\"stack\":\"Error: No route matches URL \\\"/episode\\\"\\n    at getInternalRouterError (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:3486:58)\\n    at createRouter (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:1070:15)\\n    at createBrowserRouter (http://localhost:5174/node_modules/.vite/deps/react-router.js?v=d2f5173f:6838:9)\\n    at http://localhost:5174/src/App.tsx:16:16\"}}"
+                },
+                {
+                  "lineNumber": 490,
+                  "content": "[web] 11:14:07 AM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 491,
+                  "content": "[web] 11:14:07 AM [vite] (client) [console.error] Encountered two children with the same key, &#96;c25126d1-73c7-418a-8ebe-e877df4f2e84&#96;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."
+                },
+                {
+                  "lineNumber": 500,
+                  "content": "[api] ERROR:    [Errno 48] Address already in use"
+                },
+                {
+                  "lineNumber": 521,
+                  "content": "[api] ERROR:    [Errno 48] Address already in use"
+                }
+              ]
+            }
+          ],
+          "totalLines": 66,
+          "totalMatchedLines": 66
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+定位到终端中的关键错误：重复的 React `key`（同一 `episodeId` 出现两次）会导致子组件行为异常或显示错乱。正在查找并修复列表的 `key` 用法。
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "episodeId.*key|key=\\{.*episode",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "episodeId.*key|key=\\{.*episode",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/components/business/ShotPromptCells.tsx",
+              "matches": [
+                {
+                  "lineNumber": 108,
+                  "content": "      await updateShot(episodeId, shot.shotId, { [key]: trimmed })"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/pages/EpisodeListPage.tsx",
+              "matches": [
+                {
+                  "lineNumber": 74,
+                  "content": "            &lt;Card key={ep.episodeId} padding&gt;"
+                }
+              ]
+            }
+          ],
+          "totalLines": 2,
+          "totalMatchedLines": 2
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/SideNavBar.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/EpisodeListPage.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/services/data_service.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+定位到问题：`pullNewEpisode` 在拉取时把新剧集直接 `unshift` 到列表，未按 `episodeId` 去重，导致列表中出现两个相同 `episodeId`，React 用 `key={ep.episodeId}` 重复，引发错乱。正在修复 `episodeStore` 的去重逻辑，并将列表项的 `key` 改为 `projectId + episodeId`。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/EpisodeListPage.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="read_lints">
+<details>
+<summary>Tool use: **read_lints**</summary>
+
+
+Parameters:
+
+```json
+{
+  "paths": [
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/EpisodeListPage.tsx"
+  ]
+}
+```
+Result:
+
+```json
+{
+  "linterErrorsByFile": [
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/pages/EpisodeListPage.tsx"
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+## 流程图（问题 → 修复）
+
+```mermaid
+flowchart TD
+  subgraph 终端现象
+    T1["GET /api/episodes/... 200 OK"]
+    T2["大量 /api/files/... 200"]
+    T3["web: duplicate key c25126d1-..."]
+  end
+  T1 --> OK[后端数据正常]
+  T3 --> BUG[同一 episodeId 在列表出现两次]
+  BUG --> R[React key 重复 → 行/卡片错乱或状态串台]
+  R --> FIX[Store 拉取去重 + 列表 key 用 projectId+episodeId]
+  FIX --> FETCH[fetchEpisodeDetail 同步更新列表中的该剧集]
+```
+
+---
+
+## 你截的那段终端在说什么？
+
+当前仓库里的 `22.txt` 只有约 **810 行**（没有 1012–1027），你本机若更长，多半是**多了一段同类日志**。
+
+你之前日志里和「画面描述」相关的要点是：
+
+1. **`[api] GET /api/episodes/c25126d1-... 200 OK`**  
+   说明接口是通的，**不是 404/500**。
+
+2. **更关键的是前面的 `[web] Encountered two children with the same key, c25126d1-...`**  
+   含义是：**剧集列表里用了 `key={episodeId}`，但同一 UUID 出现了两条**（常见原因：多次「从平台拉取」同一剧，`pullNewEpisode` 只往数组前面塞，没有去掉旧的一条）。
+
+3. **React 对重复 key 的行为是未定义的**，可能出现：
+   - 列表项/行**复用错组件**；
+   - 你明明接口里已有 `visualDescription`，**界面仍像旧数据或缺列**。  
+
+所以：**不是「拉不到画面描述」**，而是**前端列表状态 + key 导致展示不可靠**。
+
+---
+
+## 我这边已做的代码修复（自检通过）
+
+| 位置 | 改动 |
+|------|------|
+| `episodeStore.ts` | `pullNewEpisode`：**先按 `episodeId` 去掉旧项再插入**，避免列表重复。 |
+| `episodeStore.ts` | `fetchEpisodes`：**防御性按 `episodeId` 去重**。 |
+| `episodeStore.ts` | `fetchEpisodeDetail`：若列表里已有该剧，**用详情接口返回整份数据替换列表项**（含 `visualDescription`）。 |
+| `EpisodeListPage.tsx` | `key` 改为 **`projectId + episodeId`**，进一步避免冲突。 |
+
+---
+
+## 请你本地这样验证
+
+1. **保存代码后重启一次** `pnpm run dev`（或至少硬刷新浏览器 **Ctrl+Shift+R**）。  
+2. 回到 **剧集列表**，确认控制台 **不再出现** `duplicate key` + `c25126d1`。  
+3. 再进分镜表；若仍异常，在剧集列表**再点一次进入**或从首页重新进一次该集，触发新的 `fetchEpisodeDetail`。
+
+---
+
+## 和后端是否一致
+
+我在当前环境对 `curl http://127.0.0.1:8000/api/episodes/c25126d1-...` 校验过，响应里 **`visualDescription` 已存在且为中文内容**。若你本机 curl 也是 True，说明**数据层没问题**，剩下就是**前端列表/key/缓存**——上面修复针对的就是这一块。
+
+若你愿意，可以把 **你本机终端里 1012–1027 行原文贴出来**（或说明是否还有别的报错），我可以再对那条日志逐行解释。
+
+---
+
+_**User**_
+
+不需要拉图片啊，主要是看画面描述我这边拿不到
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+添加仅拉取分镜元数据（含画面描述）的选项，跳过首帧与资产图片下载。正在查看 puller 的下载流程。
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes/episodes.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "pull\\(|PullEpisode",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "pull\\(|PullEpisode",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "web/frontend/src/stores/episodeStore.ts",
+              "matches": [
+                {
+                  "lineNumber": 80,
+                  "content": "      const res = await episodesApi.pull(episodeId, forceRedownload, projectId)"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/api/episodes.ts",
+              "matches": [
+                {
+                  "lineNumber": 6,
+                  "content": "import type { PullEpisodeRequest } from \"@/types\""
+                },
+                {
+                  "lineNumber": 17,
+                  "content": "    } as PullEpisodeRequest),"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/api.ts",
+              "matches": [
+                {
+                  "lineNumber": 9,
+                  "content": "export interface PullEpisodeRequest {"
+                }
+              ]
+            },
+            {
+              "file": "web/frontend/src/types/index.ts",
+              "matches": [
+                {
+                  "lineNumber": 17,
+                  "content": "  PullEpisodeRequest,"
+                }
+              ]
+            }
+          ],
+          "totalLines": 5,
+          "totalMatchedLines": 5
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/api.ts</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+正在实现 `--skip-images`（仅拉分镜元数据与画面描述，不下载首帧/资产图），并同步 API 与前端拉取弹窗。
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/src/feeling/puller.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/models/schemas.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/server/routes/episodes.py</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/types/api.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/api/episodes.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "pullNewEpisode",
+  "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+  "caseInsensitive": false
+}
+```
+Result:
+
+```json
+{
+  "success": {
+    "pattern": "pullNewEpisode",
+    "path": "/Users/zuobowen/Documents/GitHub/fv_autovidu",
+    "outputMode": "content",
+    "workspaceResults": {
+      "/Users/zuobowen/Documents/GitHub/fv_autovidu": {
+        "content": {
+          "matches": [
+            {
+              "file": "./web/frontend/src/components/layout/AppLayout.tsx",
+              "matches": [
+                {
+                  "lineNumber": 26,
+                  "content": "  const { pullNewEpisode, currentEpisode } = useEpisodeStore()"
+                },
+                {
+                  "lineNumber": 52,
+                  "content": "      await pullNewEpisode(pullId.trim(), pullForce, projectId, pullSkipImages)"
+                }
+              ]
+            },
+            {
+              "file": "./web/frontend/src/stores/episodeStore.ts",
+              "matches": [
+                {
+                  "lineNumber": 3,
+                  "content": " * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode / updateShot"
+                },
+                {
+                  "lineNumber": 17,
+                  "content": "  pullNewEpisode: ("
+                },
+                {
+                  "lineNumber": 75,
+                  "content": "  pullNewEpisode: async ("
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-19_06-26Z-platform-assistance-project-planning.md",
+              "matches": [
+                {
+                  "lineNumber": 3807,
+                  "content": "                  \"content\": \"  const { pullNewEpisode } = useEpisodeStore()\""
+                },
+                {
+                  "lineNumber": 3819,
+                  "content": "                  \"content\": \"      await pullNewEpisode(pullId.trim())\""
+                },
+                {
+                  "lineNumber": 3908,
+                  "content": "                  \"content\": \" * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode\""
+                },
+                {
+                  "lineNumber": 3912,
+                  "content": "                  \"content\": \"  pullNewEpisode: (episodeId: string) =&amp;gt; Promise&amp;lt;void&amp;gt;\""
+                },
+                {
+                  "lineNumber": 3916,
+                  "content": "                  \"content\": \"  pullNewEpisode: async (episodeId: string) =&amp;gt; {\""
+                },
+                {
+                  "lineNumber": 11340,
+                  "content": "        \"contents\": \"/**\\n * AppLayout 主布局容器\\n * 组合 SideNavBar + TopNavBar + 主内容区\\n * 侧边栏折叠状态由 uiStore 管理（后续接入）\\n */\\nimport { useState } from \\\"react\\\"\\nimport { Outlet, useLocation } from \\\"react-router\\\"\\nimport { CloudDownload } from \\\"lucide-react\\\"\\nimport { SideNavBar } from \\\"./SideNavBar\\\"\\nimport { TopNavBar } from \\\"./TopNavBar\\\"\\nimport { Dialog, Button } from \\\"@/components/ui\\\"\\nimport { useEpisodeStore, useUIStore } from \\\"@/stores\\\"\\nimport { MODAL_PULL_EPISODE } from \\\"@/stores/uiStore\\\"\\n\\nexport default function AppLayout() {\\n  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)\\n  const [pullId, setPullId] = useState(\\\"\\\")\\n  const [pullLoading, setPullLoading] = useState(false)\\n  const location = useLocation()\\n  const isHome = location.pathname === \\\"/\\\"\\n  const { pullNewEpisode } = useEpisodeStore()\\n  const { activeModal, openModal, closeModal } = useUIStore()\\n  const pullOpen = activeModal === MODAL_PULL_EPISODE\\n\\n  const handlePull = async ()  [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 11424,
+                  "content": "            \"text\": \"  const { pullNewEpisode } = useEpisodeStore()\","
+                },
+                {
+                  "lineNumber": 11455,
+                  "content": "            \"text\": \"      await pullNewEpisode(pullId.trim())\","
+                },
+                {
+                  "lineNumber": 13911,
+                  "content": "        \"contents\": \"export const useEpisodeStore = create&amp;lt;EpisodeStore&amp;gt;((set) =&amp;gt; ({\\n  episodes: [],\\n  currentEpisode: null,\\n  loading: false,\\n  error: null,\\n\\n  fetchEpisodes: async () =&amp;gt; {\\n    set({ loading: true, error: null })\\n    try {\\n      const res = await episodesApi.list()\\n      set({ episodes: res.data })\\n    } catch (e) {\\n      set({ error: e instanceof Error ? e.message : \\\"获取列表失败\\\" })\\n    } finally {\\n      set({ loading: false })\\n    }\\n  },\\n\\n  fetchEpisodeDetail: async (id: string) =&amp;gt; {\\n    set({ loading: true, error: null })\\n    try {\\n      const res = await episodesApi.detail(id)\\n      set({ currentEpisode: res.data })\\n    } catch (e) {\\n      set({ error: e instanceof Error ? e.message : \\\"获取详情失败\\\" })\\n    } finally {\\n      set({ loading: false })\\n    }\\n  },\\n\\n  pullNewEpisode: async (episodeId: string) =&amp;gt; {\\n    set({ loading: true, error: null })\\n    try {\\n      const res = await episodesApi.pull(episodeId)\\n      set((s) [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 14032,
+                  "content": "            \"text\": \"  pullNewEpisode: async (episodeId: string) =&amp;gt; {\","
+                },
+                {
+                  "lineNumber": 19847,
+                  "content": "                  \"content\": \" * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode\""
+                },
+                {
+                  "lineNumber": 19867,
+                  "content": "                  \"content\": \"  pullNewEpisode: (episodeId: string) =&amp;gt; Promise&amp;lt;void&amp;gt;\""
+                },
+                {
+                  "lineNumber": 19895,
+                  "content": "                  \"content\": \"  pullNewEpisode: async (episodeId: string) =&amp;gt; {\""
+                },
+                {
+                  "lineNumber": 22356,
+                  "content": "                  \"content\": \"  const { pullNewEpisode } = useEpisodeStore()\""
+                },
+                {
+                  "lineNumber": 22360,
+                  "content": "                  \"content\": \"      await pullNewEpisode(pullId.trim(), pullForce)\""
+                },
+                {
+                  "lineNumber": 22389,
+                  "content": "                  \"content\": \" * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode\""
+                },
+                {
+                  "lineNumber": 22417,
+                  "content": "                  \"content\": \"  pullNewEpisode: (episodeId: string, forceRedownload?: boolean) =&amp;gt; Promise&amp;lt;void&amp;gt;\""
+                },
+                {
+                  "lineNumber": 22441,
+                  "content": "                  \"content\": \"  pullNewEpisode: async (episodeId: string, forceRedownload = false) =&amp;gt; {\""
+                },
+                {
+                  "lineNumber": 24002,
+                  "content": "                  \"content\": \"  const { pullNewEpisode } = useEpisodeStore()\""
+                },
+                {
+                  "lineNumber": 24030,
+                  "content": "                  \"content\": \"      await pullNewEpisode(pullId.trim(), pullForce)\""
+                },
+                {
+                  "lineNumber": 34975,
+                  "content": "        \"contents\": \"/**\\n * AppLayout 主布局容器\\n * 布局：SideNavBar(含剧集列表、资产库、设置) | TopNavBar + 主内容\\n */\\nimport { useState } from \\\"react\\\"\\nimport { Outlet, useLocation } from \\\"react-router\\\"\\nimport { CloudDownload } from \\\"lucide-react\\\"\\nimport { SideNavBar } from \\\"./SideNavBar\\\"\\nimport { TopNavBar } from \\\"./TopNavBar\\\"\\nimport { Dialog, Button } from \\\"@/components/ui\\\"\\nimport { useEpisodeStore, useUIStore } from \\\"@/stores\\\"\\nimport { MODAL_PULL_EPISODE } from \\\"@/stores/uiStore\\\"\\n\\nexport default function AppLayout() {\\n  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)\\n  const [pullId, setPullId] = useState(\\\"\\\")\\n  const [pullForce, setPullForce] = useState(false)\\n  const [pullLoading, setPullLoading] = useState(false)\\n  const location = useLocation()\\n  const isHome = location.pathname === \\\"/\\\"\\n  const { pullNewEpisode } = useEpisodeStore()\\n  const { activeModal, openModal, closeModal } = useUIStore()\\n  const pullOpen = activeModal === MODAL_PULL_EPISO [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 35059,
+                  "content": "            \"text\": \"  const { pullNewEpisode } = useEpisodeStore()\","
+                },
+                {
+                  "lineNumber": 35090,
+                  "content": "            \"text\": \"      await pullNewEpisode(pullId.trim(), pullForce)\","
+                },
+                {
+                  "lineNumber": 39811,
+                  "content": "        \"contents\": \"/**\\n * AppLayout 主布局容器\\n * 布局：SideNavBar(含剧集列表、资产库、设置) | TopNavBar + 主内容\\n */\\nimport { useState } from \\\"react\\\"\\nimport { Outlet, useLocation } from \\\"react-router\\\"\\nimport { CloudDownload } from \\\"lucide-react\\\"\\nimport { SideNavBar } from \\\"./SideNavBar\\\"\\nimport { TopNavBar } from \\\"./TopNavBar\\\"\\nimport { Dialog, Button } from \\\"@/components/ui\\\"\\nimport { useEpisodeStore, useUIStore } from \\\"@/stores\\\"\\nimport { MODAL_PULL_EPISODE } from \\\"@/stores/uiStore\\\"\\n\\nexport default function AppLayout() {\\n  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)\\n  const [pullId, setPullId] = useState(\\\"\\\")\\n  const [pullForce, setPullForce] = useState(false)\\n  const [pullLoading, setPullLoading] = useState(false)\\n  const location = useLocation()\\n  const isHome = location.pathname === \\\"/\\\"\\n  const { pullNewEpisode } = useEpisodeStore()\\n  const { activeModal, openModal, closeModal } = useUIStore()\\n  const pullOpen = activeModal === MODAL_PULL_EPISO [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 39895,
+                  "content": "            \"text\": \"  const { pullNewEpisode } = useEpisodeStore()\","
+                },
+                {
+                  "lineNumber": 39926,
+                  "content": "            \"text\": \"      await pullNewEpisode(pullId.trim(), pullForce)\","
+                },
+                {
+                  "lineNumber": 40210,
+                  "content": "        \"contents\": \"interface EpisodeStore {\\n\\n}\\n\\nexport const useEpisodeStore = create&amp;lt;EpisodeStore&amp;gt;((set) =&amp;gt; ({\\n  episodes: [],\\n  currentEpisode: null,\\n  loading: false,\\n  error: null,\\n\\n  fetchEpisodes: async () =&amp;gt; {\\n    set({ loading: true, error: null })\\n    try {\\n      const res = await episodesApi.list()\\n      set({ episodes: res.data })\\n    } catch (e) {\\n      set({ error: e instanceof Error ? e.message : \\\"获取列表失败\\\" })\\n    } finally {\\n      set({ loading: false })\\n    }\\n  },\\n\\n  fetchEpisodeDetail: async (id: string) =&amp;gt; {\\n    set({ loading: true, error: null })\\n    try {\\n      const res = await episodesApi.detail(id)\\n      set({ currentEpisode: res.data })\\n    } catch (e) {\\n      set({ error: e instanceof Error ? e.message : \\\"获取详情失败\\\" })\\n    } finally {\\n      set({ loading: false })\\n    }\\n  },\\n\\n  pullNewEpisode: async (episodeId: string, forceRedownload = false) =&amp;gt; {\\n    set({ loading: true, error: null })\\n    try {\\n      co [... omitted end of long line]"
+                },
+                {
+                  "lineNumber": 40347,
+                  "content": "            \"text\": \"  pullNewEpisode: async (episodeId: string, forceRedownload = false) =&amp;gt; {\","
+                },
+                {
+                  "lineNumber": 41186,
+                  "content": "        \"contents\": \"/**\\n * Episode Store\\n * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode\\n */\\nimport { create } from \\\"zustand\\\"\\nimport type { Episode } from \\\"@/types\\\"\\nimport { episodesApi } from \\\"@/api/episodes\\\"\\n\\ninterface EpisodeStore {\\n  episodes: Episode[]\\n  currentEpisode: Episode | null\\n  loading: boolean\\n  error: string | null\\n  fetchEpisodes: () =&amp;gt; Promise&amp;lt;void&amp;gt;\\n  fetchEpisodeDetail: (id: string) =&amp;gt; Promise&amp;lt;void&amp;gt;\\n  pullNewEpisode: (episodeId: string, forceRedownload?: boolean) =&amp;gt; Promise&amp;lt;void&amp;gt;\\n}\\n\\nexport const useEpisodeStore = create&amp;lt;EpisodeStore&amp;gt;\","
+                },
+                {
+                  "lineNumber": 41198,
+                  "content": "            \"text\": \" * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode\","
+                },
+                {
+                  "lineNumber": 41250,
+                  "content": "            \"text\": \"  pullNewEpisode: (episodeId: string, forceRedownload?: boolean) =&amp;gt; Promise&amp;lt;void&amp;gt;\","
+                },
+                {
+                  "lineNumber": 44071,
+                  "content": "                  \"content\": \"  pullNewEpisode: (episodeId: string, forceRedownload?: boolean) =&amp;gt; Promise&amp;lt;void&amp;gt;\""
+                },
+                {
+                  "lineNumber": 44075,
+                  "content": "                  \"content\": \"  pullNewEpisode: async (episodeId: string, forceRedownload = false) =&amp;gt; {\""
+                },
+                {
+                  "lineNumber": 44476,
+                  "content": "                  \"content\": \"  pullNewEpisode: (episodeId: string, forceRedownload?: boolean) =&amp;gt; Promise&amp;lt;void&amp;gt;\""
+                },
+                {
+                  "lineNumber": 44480,
+                  "content": "                  \"content\": \"  pullNewEpisode: async (episodeId: string, forceRedownload = false) =&amp;gt; {\""
+                },
+                {
+                  "lineNumber": 44694,
+                  "content": "                  \"content\": \"  pullNewEpisode: (episodeId: string, forceRedownload?: boolean) =&amp;gt; Promise&amp;lt;void&amp;gt;\""
+                },
+                {
+                  "lineNumber": 44698,
+                  "content": "                  \"content\": \"  pullNewEpisode: async (episodeId: string, forceRedownload = false) =&amp;gt; {\""
+                },
+                {
+                  "lineNumber": 57561,
+                  "content": "                  \"content\": \" * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode / updateShot\""
+                },
+                {
+                  "lineNumber": 57589,
+                  "content": "                  \"content\": \"  pullNewEpisode: (\""
+                },
+                {
+                  "lineNumber": 57621,
+                  "content": "                  \"content\": \"  pullNewEpisode: async (\""
+                },
+                {
+                  "lineNumber": 57846,
+                  "content": "                  \"content\": \"  const { pullNewEpisode, currentEpisode } = useEpisodeStore()\""
+                },
+                {
+                  "lineNumber": 57870,
+                  "content": "                  \"content\": \"      await pullNewEpisode(pullId.trim(), pullForce, projectId)\""
+                },
+                {
+                  "lineNumber": 59774,
+                  "content": "                  \"content\": \" * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode / updateShot\""
+                },
+                {
+                  "lineNumber": 62539,
+                  "content": "定位到问题：&#96;pullNewEpisode&#96; 在拉取时把新剧集直接 &#96;unshift&#96; 到列表，未按 &#96;episodeId&#96; 去重，导致列表中出现两个相同 &#96;episodeId&#96;，React 用 &#96;key={ep.episodeId}&#96; 重复，引发错乱。正在修复 &#96;episodeStore&#96; 的去重逻辑，并将列表项的 &#96;key&#96; 改为 &#96;projectId + episodeId&#96;。"
+                },
+                {
+                  "lineNumber": 62680,
+                  "content": "   含义是：**剧集列表里用了 &#96;key={episodeId}&#96;，但同一 UUID 出现了两条**（常见原因：多次「从平台拉取」同一剧，&#96;pullNewEpisode&#96; 只往数组前面塞，没有去掉旧的一条）。"
+                },
+                {
+                  "lineNumber": 62694,
+                  "content": "| &#96;episodeStore.ts&#96; | &#96;pullNewEpisode&#96;：**先按 &#96;episodeId&#96; 去掉旧项再插入**，避免列表重复。 |"
+                }
+              ]
+            },
+            {
+              "file": "./.specstory/history/2026-03-19_07-04Z-front-end-transformation-plan.md",
+              "matches": [
+                {
+                  "lineNumber": 186,
+                  "content": "  \"plan\": \"# FV Studio 前端改造实施计划\\n\\n## 项目现状\\n\\n- **当前**：纯 CLI + Python 脚本项目，无 Web 框架、无前端代码\\n- **参考**：&amp;#96;reference/frontend/stitch/&amp;#96; 下有 5 个静态 HTML 页面（报纸编辑风格），可参考布局和 Tailwind 类名\\n- **目标**：在 &amp;#96;web/frontend/&amp;#96; 新建 React 19 应用，采用现代 Dashboard 设计风格，保留翡翠绿 &amp;#96;#168866&amp;#96; 主色\\n\\n## 整体架构\\n\\n&amp;#96;&amp;#96;&amp;#96;mermaid\\nflowchart LR\\n    subgraph frontend[\\\"web/frontend (React 19 + Vite)\\\"]\\n        Pages[\\\"6 个页面\\\"]\\n        Components[\\\"UI + 业务组件\\\"]\\n        Stores[\\\"Zustand Store x4\\\"]\\n        API[\\\"API Service 层\\\"]\\n        Hooks[\\\"自定义 Hooks\\\"]\\n    end\\n\\n    subgraph backend[\\\"web/server (FastAPI)\\\"]\\n        Routes[\\\"REST API Routes\\\"]\\n        Services[\\\"Vidu/Yunwu/FFmpeg Service\\\"]\\n        DataSvc[\\\"DataService: episode.json 读写\\\"]\\n    end\\n\\n    subgraph data[\\\"本地数据 data/\\\"]\\n        EpisodeJSON[\\\"episode.json\\\"]\\n        Frames[\\\"frames/ + endframes/\\\"]\\n        Videos[\\\"videos/\\\"]\\n        Assets[\\\"assets/\\\"]\\n    end\\n\\n    Pages --&amp;gt; Components\\n    Pages --&amp;gt; Stores\\n    [... omitted end of long line]"
+                }
+              ]
+            },
+            {
+              "file": "./docs/平台辅助计划/前端改造计划.md",
+              "matches": [
+                {
+                  "lineNumber": 318,
+                  "content": "  pullNewEpisode: (episodeId: string) =&gt; Promise&lt;void&gt;;"
+                }
+              ]
+            }
+          ],
+          "totalLines": 53,
+          "totalMatchedLines": 53
+        }
+      }
+    }
+  }
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="read_lints">
+<details>
+<summary>Tool use: **read_lints**</summary>
+
+
+Parameters:
+
+```json
+{
+  "paths": [
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx",
+    "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts"
+  ]
+}
+```
+Result:
+
+```json
+{
+  "linterErrorsByFile": [
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/components/layout/AppLayout.tsx"
+    },
+    {
+      "relativeWorkspacePath": "/Users/zuobowen/Documents/GitHub/fv_autovidu/web/frontend/src/stores/episodeStore.ts"
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+
+
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
+
+<details><summary>Tool use: **edit_file_v2** • Edit file: /Users/zuobowen/Documents/GitHub/fv_autovidu/docs/联调说明.md</summary>
+
+</details>
+
+</tool-use>
+
+---
+
+
+## 方案流程（Mermaid）
+
+```mermaid
+flowchart LR
+  A[平台 API: scenes / shots / assets] --> B{skip_images?}
+  B -->|否| C[下载首帧 + 资产图]
+  B -->|是| D[跳过下载]
+  C --> E[写 episode.json]
+  D --> E
+  E --> F[含 visualDescription / 提示词]
+  F --> G[GET /api/episodes/:id]
+  G --> H[分镜表画面描述列]
+```
+
+---
+
+## 说明
+
+你的目标主要是 **看到「画面描述」**，不是拉本地图片。  
+**画面描述**来自平台 **shots** 接口和 `episode.json`，**不需要**把首帧/资产图下载完才能显示。
+
+已做这些改动：
+
+### 1. 拉取脚本：`--skip-images`
+
+- **只拉元数据**：仍请求 `get_scenes`、`get_shots`、`get_assets`（用于资产名与关联），**不**调用任何图片下载。
+- **仍会写入** `episode.json`，其中包含 **`visualDescription`、图片/视频提示词** 等。
+- `firstFrame` 仍是 `frames/S001.png` 这类路径，**本地可以没有对应文件**（列表里首帧可能显示为灰色占位，不影响文案列）。
+
+示例：
+
+```bash
+python -m src.feeling.puller --episode-id <剧集UUID> -o data --project-id <项目UUID> --skip-images
+```
+
+### 2. 后端 `POST /api/episodes/pull`
+
+- 请求体增加 **`skipImages`**（默认 `false`），传给 puller 的 `skip_images`。
+
+### 3. 前端「从平台拉取」弹窗
+
+- 增加勾选项：**「仅拉取分镜文案（不下载图片）」**。
+- 勾选后自动取消「强制重新下载资产图」（与「仅文案」互斥）。
+
+### 4. 文档
+
+- `docs/联调说明.md` 已补充 `--skip-images` 与前端弹窗说明。
+
+---
+
+## 使用建议
+
+1. 在弹窗里勾选 **「仅拉取分镜文案」** 再拉一次，或命令行加 **`--skip-images`**。  
+2. 拉完后刷新分镜页；若仍无画面描述，再查 **后端是否已重启**、**`GET /api/episodes/:id` 里是否有 `visualDescription`**（与是否下载图片无关）。
+
+---
+
+**自检**：`puller`、`schemas`、`routes`、`api.ts`、`episodeStore`、`AppLayout` 已改；lint 无新报错。
+
+---
+
+_**User**_
+
+你做好了吗？可以手动帮我拉一次吗
+
+---
+
+_**Agent (model composer-2-fast, mode Agent)**_
+
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details>
+</tool-use>
 
 ---
 

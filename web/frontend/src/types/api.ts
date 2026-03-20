@@ -12,6 +12,8 @@ export interface PullEpisodeRequest {
   projectId?: string
   /** 强制重新下载资产图（修复拉成风格图时使用） */
   forceRedownload?: boolean
+  /** 为 true 时不下载首帧/资产图，只同步 episode.json（含画面描述、提示词） */
+  skipImages?: boolean
 }
 
 /** 批量生成尾帧请求体 */
