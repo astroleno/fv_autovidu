@@ -121,10 +121,23 @@ class GenerateEndframeRequest(BaseModel):
 
 
 class GenerateEndframeResponse(BaseModel):
-    """生成尾帧响应。"""
+    """生成尾帧响应（单条任务，兼容旧客户端）。"""
 
     taskId: str
     shotId: str
+
+
+class EndframeTaskItem(BaseModel):
+    """批量尾帧任务中的一项。"""
+
+    taskId: str
+    shotId: str
+
+
+class BatchEndframeResponse(BaseModel):
+    """批量生成尾帧响应：每个 shot 对应独立 taskId。"""
+
+    tasks: list[EndframeTaskItem]
 
 
 class GenerateVideoRequest(BaseModel):
@@ -135,6 +148,8 @@ class GenerateVideoRequest(BaseModel):
     mode: VideoMode = "first_frame"
     model: Optional[str] = None
     duration: Optional[int] = None
+    resolution: Optional[str] = None
+    referenceAssetIds: Optional[list[str]] = None
 
 
 class GenerateVideoResponse(BaseModel):

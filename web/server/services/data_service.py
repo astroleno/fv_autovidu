@@ -229,6 +229,51 @@ def add_video_candidate(
     return None
 
 
+def update_video_candidate(
+    episode_id: str,
+    shot_id: str,
+    candidate_id: str,
+    updates: dict[str, Any],
+) -> Shot | None:
+    """
+    更新指定 VideoCandidate 的字段（如 videoPath、taskStatus、thumbnailPath）。
+
+    Args:
+        episode_id: Episode UUID
+        shot_id: Shot UUID
+        candidate_id: 候选 id
+        updates: 要合并到候选上的字段（与 VideoCandidate 字段名一致）
+    """
+    ep_dir = _find_episode_dir(episode_id)
+    if not ep_dir:
+        return None
+    ep = get_episode(episode_id)
+    if not ep:
+        return None
+    for scene in ep.scenes:
+        for i, shot in enumerate(scene.shots):
+            if shot.shotId != shot_id:
+                continue
+            new_list: list[VideoCandidate] = []
+            found = False
+            for c in shot.videoCandidates:
+                if c.id == candidate_id:
+                    d = c.model_dump()
+                    for k, v in updates.items():
+                        if k in d:
+                            d[k] = v
+                    new_list.append(VideoCandidate.model_validate(d))
+                    found = True
+                else:
+                    new_list.append(c)
+            if not found:
+                return None
+            scene.shots[i] = shot.model_copy(update={"videoCandidates": new_list})
+            _save_episode(ep_dir, ep)
+            return scene.shots[i]
+    return None
+
+
 def select_candidate(
     episode_id: str,
     shot_id: str,
