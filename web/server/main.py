@@ -15,6 +15,9 @@ _SERVER_DIR = Path(__file__).resolve().parent
 if str(_SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(_SERVER_DIR))
 
+# 尽早加载项目根 .env（DATA_ROOT、FEELING_* 等），避免仅在被 import 的路由里才触发 load_dotenv
+import config  # noqa: F401  # pylint: disable=unused-import
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

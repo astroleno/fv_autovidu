@@ -71,7 +71,10 @@ export default function EpisodeListPage() {
         {episodes.map((ep) => {
           const stats = getEpisodeStats(ep)
           return (
-            <Card key={ep.episodeId} padding>
+            <Card
+              key={`${ep.projectId}-${ep.episodeId}`}
+              padding
+            >
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-primary)] block mb-1">

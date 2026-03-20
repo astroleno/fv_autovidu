@@ -156,7 +156,9 @@ export default function StoryboardPage() {
                     <th className="py-2 px-4">首帧</th>
                     <th className="py-2 px-4">尾帧</th>
                     <th className="py-2 px-4">状态</th>
-                    <th className="py-2 px-4">描述</th>
+                    <th className="py-2 px-4">画面描述</th>
+                    <th className="py-2 px-4">图片提示词</th>
+                    <th className="py-2 px-4">视频提示词</th>
                     <th className="py-2 px-4">资产</th>
                     <th className="py-2 px-4">候选数</th>
                     <th className="py-2 px-4">操作</th>
@@ -164,13 +166,13 @@ export default function StoryboardPage() {
                 </thead>
                 <tbody>
                   {sceneShots.map((shot) => (
-                  <ShotRow
-                    key={shot.shotId}
-                    shot={shot}
-                    episodeId={episodeId!}
-                    basePath={basePath}
-                    cacheBust={cacheBust}
-                  />
+                    <ShotRow
+                      key={shot.shotId}
+                      shot={shot}
+                      episodeId={episodeId!}
+                      basePath={basePath}
+                      cacheBust={cacheBust}
+                    />
                   ))}
                 </tbody>
               </table>
