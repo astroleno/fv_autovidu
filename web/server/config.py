@@ -32,3 +32,9 @@ VIDU_API_KEY = os.environ.get("VIDU_API_KEY") or os.environ.get("API_KEY", "")
 
 # Yunwu
 YUNWU_API_KEY = os.environ.get("YUNWU_API_KEY", "")
+
+# ElevenLabs（配音；亦可通过环境变量直接读取，见 services/elevenlabs_service）
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY") or os.environ.get(
+    "ELEVENLABS_KEY", ""
+)
+ELEVENLABS_BASE = os.environ.get("ELEVENLABS_BASE", "https://api.elevenlabs.io")

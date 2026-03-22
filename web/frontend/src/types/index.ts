@@ -11,6 +11,8 @@ export type {
   AssetType,
   VideoMode,
   TaskStatus,
+  DubStatus,
+  JianyingExportRecord,
 } from "./episode"
 export { flattenShots } from "./episode"
 export type {
@@ -26,5 +28,12 @@ export type {
   SelectCandidateRequest,
   ExportRoughCutRequest,
   ExportRoughCutResponse,
+  JianyingExportRequest,
+  JianyingExportResponse,
+  JianyingDraftPathResponse,
+  DubProcessRequest,
+  DubProcessShotRequest,
+  DubTaskItem,
+  DubProcessResponse,
   TaskStatusResponse,
 } from "./api"

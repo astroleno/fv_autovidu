@@ -59,6 +59,24 @@ class VideoCandidate(BaseModel):
     taskStatus: TaskStatus = "pending"
 
 
+class DubStatus(BaseModel):
+    """
+    分镜配音状态（仅针对当前 selected 候选；切换候选后需重新配音）。
+
+    status: pending | processing | completed | failed | stale（与 sourceCandidateId 不一致时由前端或后端标记）
+    """
+
+    status: str = "pending"
+    sourceCandidateId: Optional[str] = None
+    mode: Optional[str] = None  # sts | tts
+    voiceId: Optional[str] = None
+    audioPath: Optional[str] = None
+    originalAudioPath: Optional[str] = None
+    taskId: Optional[str] = None
+    error: Optional[str] = None
+    processedAt: Optional[str] = None
+
+
 class Shot(BaseModel):
     """单镜头。"""
 
@@ -76,6 +94,16 @@ class Shot(BaseModel):
     # 使用 Optional 而非 str | None，兼容 Python 3.9 + Pydantic 对注解的解析
     endFrame: Optional[str] = None
     videoCandidates: list[VideoCandidate] = Field(default_factory=list)
+    dub: Optional[DubStatus] = None
+
+
+class JianyingExportRecord(BaseModel):
+    """剧集级最近一次剪映草稿导出记录（非分镜级状态）。"""
+
+    lastExportedAt: str
+    draftId: str
+    zipPath: Optional[str] = None
+    draftDirRelative: Optional[str] = None
 
 
 class Scene(BaseModel):
@@ -98,6 +126,7 @@ class Episode(BaseModel):
     scenes: list[Scene] = Field(default_factory=list)
     # 剧集级全量资产库（供资产库页面 / RegenPage 展示），拉取时由 puller 填入
     assets: list[ShotAsset] = Field(default_factory=list)
+    jianyingExport: Optional[JianyingExportRecord] = None
 
 
 # ---------- API 请求/响应（api.ts） ----------
@@ -192,6 +221,67 @@ class ExportRoughCutResponse(BaseModel):
     """导出粗剪响应。"""
 
     exportPath: str
+
+
+class JianyingExportRequest(BaseModel):
+    """剪映草稿导出请求。"""
+
+    episodeId: str
+    shotIds: Optional[list[str]] = None
+    draftPath: Optional[str] = None
+    createZip: bool = True
+    canvasSize: str = "720p"  # 720p | 1080p
+
+
+class JianyingExportResponse(BaseModel):
+    """剪映草稿导出响应。"""
+
+    draftId: str
+    draftDir: str
+    zipPath: Optional[str] = None
+    exportedShots: int
+    missingShots: list[str] = Field(default_factory=list)
+    exportedAt: str
+
+
+class DubProcessRequest(BaseModel):
+    """批量配音请求。"""
+
+    episodeId: str
+    shotIds: Optional[list[str]] = None
+    voiceId: str
+    mode: str = "sts"  # sts | tts
+    concurrency: int = 2
+
+
+class DubProcessShotRequest(BaseModel):
+    """单镜头配音请求。"""
+
+    episodeId: str
+    shotId: str
+    voiceId: str
+    mode: str = "sts"
+    ttsText: Optional[str] = None  # mode=tts 时使用；缺省可用 shot.videoPrompt
+
+
+class DubTaskItem(BaseModel):
+    """配音任务列表中的一项。"""
+
+    taskId: str
+    shotId: str
+
+
+class DubProcessResponse(BaseModel):
+    """批量配音响应：每个分镜独立 taskId，供现有任务轮询使用。"""
+
+    tasks: list[DubTaskItem] = Field(default_factory=list)
+
+
+class DubEpisodeStatusResponse(BaseModel):
+    """按剧集查询各分镜配音状态。"""
+
+    episodeId: str
+    shots: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class TaskStatusResponse(BaseModel):

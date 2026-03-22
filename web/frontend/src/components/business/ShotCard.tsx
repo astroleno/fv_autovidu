@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react"
 import type { Shot, VideoMode } from "@/types"
 import { Badge } from "@/components/ui"
 import { StatusIndicator } from "./StatusIndicator"
+import { DubStatusBadge } from "./DubStatusBadge"
 import { AssetTag } from "./AssetTag"
 import { ShotFrameCompare } from "./ShotFrameCompare"
 import { shotStatusLabels } from "@/utils/format"
@@ -95,7 +96,10 @@ export function ShotCard({ shot, episodeId, basePath = "", cacheBust }: ShotCard
         <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--color-newsprint-black)] opacity-80">
           S{String(shot.shotNumber).padStart(2, "0")} | {shot.cameraMovement} | {shot.duration}s
         </span>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          {shot.videoCandidates.some((c) => c.selected) ? (
+            <DubStatusBadge dub={shot.dub} />
+          ) : null}
           <StatusIndicator status={shot.status} />
           <Badge
             status={shot.status}

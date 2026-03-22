@@ -21,7 +21,7 @@ import config  # noqa: F401  # pylint: disable=unused-import
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import episodes, export_route, files, generate, shots, tasks
+from routes import dub_route, episodes, export_route, files, generate, shots, tasks
 
 app = FastAPI(title="FV Studio API", version="1.0.0")
 
@@ -52,6 +52,7 @@ app.include_router(shots.router, prefix="/api", tags=["shots"])
 app.include_router(generate.router, prefix="/api", tags=["generate"])
 app.include_router(tasks.router, prefix="/api", tags=["tasks"])
 app.include_router(export_route.router, prefix="/api", tags=["export"])
+app.include_router(dub_route.router, prefix="/api", tags=["dub"])
 
 
 @app.get("/api/health")
