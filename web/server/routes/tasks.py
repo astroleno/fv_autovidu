@@ -24,8 +24,80 @@ from models.schemas import TaskStatusResponse
 
 router = APIRouter()
 
-# 本地任务状态缓存（内存，重启丢失；可后续改为持久化）
+# 本地任务状态缓存（内存；仅 video-* 任务镜像到 tasks_state.json）
 _local_tasks: dict[str, dict] = {}
+
+
+def set_local_task(task_id: str, status: str, **kwargs):
+    """
+    供 generate 等路由更新本地任务状态。
+
+    仅 **video-*** 任务会 debounce 落盘（弱恢复）；endframe/regen 仅驻内存，避免重启后假死。
+    """
+    _local_tasks[task_id] = {"status": status, **kwargs}
+    try:
+        from services import task_persistence
+
+        if task_persistence.is_persistable_video_task(task_id, _local_tasks[task_id]):
+            task_persistence.schedule_persist(_local_tasks)
+    except Exception:
+        pass
+
+
+def _schedule_persist_current_tasks() -> None:
+    """在直接修改 _local_tasks 后同步 debounce 落盘（仅 video 条目写入文件）。"""
+    try:
+        from services import task_persistence
+
+        task_persistence.schedule_persist(_local_tasks)
+    except Exception:
+        pass
+
+
+def restore_persisted_tasks() -> None:
+    """
+    服务启动时从磁盘恢复 video 任务，并处理历史误落盘的不完整行。
+
+    1. 对磁盘中 `video-*` 但缺少 `result.vidu_task_id` 等元数据的条目标为 **failed**（无法弱恢复）。
+    2. 对完整条目合并入内存并 `maybe_finalize` 补查 Vidu。
+    3. 刷盘一次，从文件中剔除已标失败/不可恢复的僵尸行。
+    """
+    try:
+        from services import task_persistence
+
+        raw = task_persistence.load_raw_tasks_from_disk()
+        snap = task_persistence.load_tasks_from_disk()
+    except Exception:
+        return
+
+    for tid, row in raw.items():
+        if not str(tid).startswith("video-"):
+            continue
+        if not isinstance(row, dict):
+            continue
+        if task_persistence.has_vidu_recovery_metadata(row):
+            continue
+        _local_tasks[str(tid)] = {
+            "status": "failed",
+            "error": "服务重启后无法恢复：缺少 Vidu 任务元数据（请勿在提交完成前落盘）",
+            "kind": "video",
+            "result": row.get("result") if isinstance(row.get("result"), dict) else {},
+            "episode_id": row.get("episode_id"),
+            "shot_id": row.get("shot_id"),
+            "candidate_id": row.get("candidate_id"),
+        }
+
+    for tid, row in snap.items():
+        if isinstance(row, dict):
+            _local_tasks[str(tid)] = row
+
+    for tid in list(snap.keys()):
+        maybe_finalize_video_task(tid)
+
+    try:
+        task_persistence.flush_now(_local_tasks)
+    except Exception:
+        pass
 
 
 def _get_vidu_client():
@@ -104,6 +176,7 @@ def maybe_finalize_video_task(task_id: str) -> None:
                 "candidate_id": candidate_id,
                 "kind": "video",
             }
+            _schedule_persist_current_tasks()
             return
         if state != "success":
             return
@@ -125,6 +198,7 @@ def maybe_finalize_video_task(task_id: str) -> None:
                 candidate_id,
                 {"taskStatus": "failed"},
             )
+            _schedule_persist_current_tasks()
             return
 
         ep_dir = data_service.get_episode_dir(episode_id)
@@ -135,6 +209,7 @@ def maybe_finalize_video_task(task_id: str) -> None:
                 "result": meta,
                 "kind": "video",
             }
+            _schedule_persist_current_tasks()
             return
 
         videos_dir = ep_dir / "videos"
@@ -165,6 +240,7 @@ def maybe_finalize_video_task(task_id: str) -> None:
             "candidate_id": candidate_id,
             "kind": "video",
         }
+        _schedule_persist_current_tasks()
     except Exception as e:
         _local_tasks[task_id] = {
             "status": "failed",
@@ -184,6 +260,7 @@ def maybe_finalize_video_task(task_id: str) -> None:
             )
         except Exception:
             pass
+        _schedule_persist_current_tasks()
 
 
 @router.get("/tasks/{task_id}", response_model=TaskStatusResponse)
@@ -267,8 +344,3 @@ def get_tasks_batch(ids: str = Query(default="", description="逗号分隔的 ta
         else:
             result.append(TaskStatusResponse(taskId=tid, status="pending"))
     return result
-
-
-def set_local_task(task_id: str, status: str, **kwargs):
-    """供 generate 等路由更新本地任务状态。"""
-    _local_tasks[task_id] = {"status": status, **kwargs}

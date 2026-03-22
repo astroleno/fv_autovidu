@@ -19,6 +19,8 @@ from pathlib import Path
 
 import requests
 
+from src.utils.retry import run_with_http_retry
+
 # yunwu Gemini 端点基础 URL
 YUNWU_BASE = "https://yunwu.ai/v1beta/models"
 # 默认模型与端点
@@ -157,16 +159,21 @@ def call_yunwu(
         }
 
     url = endpoint or DEFAULT_ENDPOINT
-    resp = requests.post(
-        url,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        json=payload,
-        timeout=480,
-    )
-    resp.raise_for_status()
+
+    def _post() -> requests.Response:
+        r = requests.post(
+            url,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=480,
+        )
+        r.raise_for_status()
+        return r
+
+    resp = run_with_http_retry(_post)
     data = resp.json()
 
     # 解析返回的图片：candidates[0].content.parts 中找 inline_data

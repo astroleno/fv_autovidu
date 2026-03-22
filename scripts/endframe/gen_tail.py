@@ -18,7 +18,9 @@ import argparse
 import json
 import re
 import sys
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal
 
 # 确保项目根在 path 中
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -209,43 +211,114 @@ def call_yunwu(
     )
 
 
-def run_from_json(args) -> None:
-    """从 episode.json 读取数据，批量生成尾帧。"""
-    json_path = args.from_json if args.from_json.is_absolute() else Path.cwd() / args.from_json
-    if not json_path.exists():
-        raise SystemExit(f"episode.json 不存在: {json_path}")
-    data = json.loads(json_path.read_text(encoding="utf-8"))
-    episode_dir = json_path.parent
-    assets_dir = episode_dir / "assets"
+def _parse_shot_numbers(shots_spec: str) -> list[int] | None:
+    """
+    解析 --shots 字符串。
+    返回 None 表示不限制（处理全部在 JSON 中出现的镜头编号）；
+    返回列表表示仅处理这些 shotNumber。
+    """
+    s = (shots_spec or "").strip()
+    if not s:
+        return None
+    if "-" in s and "," not in s:
+        lo, hi = map(int, s.split("-", 1))
+        return list(range(lo, hi + 1))
+    return [int(x.strip()) for x in s.split(",") if x.strip()]
+
+
+@dataclass
+class TailShotResult:
+    """单镜头尾帧生成结果（供流水线 / CLI 汇总）。"""
+
+    shot_number: int
+    shot_id: str
+    ok: bool
+    stage: Literal["skip", "dry_run", "tail", "error"]
+    message: str = ""
+
+
+@dataclass
+class TailFromJsonResult:
+    """episode.json 模式批量尾帧的整体结果。"""
+
+    json_path: Path
+    results: list[TailShotResult] = field(default_factory=list)
+
+    @property
+    def ok_count(self) -> int:
+        return sum(1 for r in self.results if r.ok)
+
+    @property
+    def fail_count(self) -> int:
+        return sum(1 for r in self.results if not r.ok)
+
+
+def run_tail_from_json_episode(
+    *,
+    json_path: Path,
+    shots_spec: str = "",
+    prompt_template: Path | None = None,
+    model: str = "gemini-3.1-flash-image-preview",
+    image_size: str = "2K",
+    dry_run: bool = False,
+    retry: bool = False,
+    fail_fast: bool = False,
+    quiet: bool = False,
+) -> TailFromJsonResult:
+    """
+    从 episode.json 批量生成尾帧（可导入，供 full_pipeline / 测试复用）。
+
+    Args:
+        json_path: episode.json 绝对路径或相对 cwd 的路径。
+        shots_spec: 与 CLI --shots 相同，如 "1,2,3" 或 "1-10"；空字符串表示全部镜头。
+        prompt_template: 尾帧模板路径；默认 prompt/EndFramePromp.md 相对 cwd。
+        其余参数与 CLI 一致。
+        quiet: 为 True 时不 print，仅返回结果结构。
+
+    Returns:
+        TailFromJsonResult：含每镜结果列表，便于流水线汇总与验收。
+    """
+    jp = json_path if json_path.is_absolute() else Path.cwd() / json_path
+    if not jp.exists():
+        raise FileNotFoundError(f"episode.json 不存在: {jp}")
+    tpl = prompt_template
+    if tpl is None:
+        tpl = Path.cwd() / "prompt/EndFramePromp.md"
+    elif not tpl.is_absolute():
+        tpl = Path.cwd() / tpl
+
+    data = json.loads(jp.read_text(encoding="utf-8"))
+    episode_dir = jp.parent
     endframes_dir = episode_dir / "endframes"
     endframes_dir.mkdir(parents=True, exist_ok=True)
     api_key = load_env_key()
     call_fn, read_img, _, _ = _get_yunwu()
-    prompt_template = load_prompt_template(
-        args.prompt_template if args.prompt_template.is_absolute() else Path.cwd() / args.prompt_template
-    )
-    shot_nums = []
-    if "-" in args.shots and "," not in args.shots:
-        lo, hi = map(int, args.shots.split("-", 1))
-        shot_nums = list(range(lo, hi + 1))
-    else:
-        shot_nums = [int(s.strip()) for s in args.shots.split(",") if s.strip()]
+    prompt_template_str = load_prompt_template(tpl)
+    shot_nums_filter = _parse_shot_numbers(shots_spec)
+    out = TailFromJsonResult(json_path=jp)
+
     scene_list = data.get("scenes", [])
     for scene in scene_list:
         for shot in scene.get("shots", []):
             num = shot.get("shotNumber", 0)
-            if shot_nums and num not in shot_nums:
+            shot_id = str(shot.get("shotId", ""))
+            if shot_nums_filter is not None and num not in shot_nums_filter:
                 continue
-            shot_id = shot.get("shotId", "")
             first_rel = shot.get("firstFrame", f"frames/S{num:02d}.png")
             first_path = episode_dir / first_rel
             if not first_path.exists():
-                print(f"[Skip] Shot {num}: 首帧不存在 {first_rel}")
+                msg = f"首帧不存在 {first_rel}"
+                if not quiet:
+                    print(f"[Skip] Shot {num}: {msg}")
+                out.results.append(TailShotResult(num, shot_id, False, "skip", msg))
                 continue
             end_rel = f"endframes/S{num:02d}_end.png"
             end_path = episode_dir / end_rel
-            if end_path.exists() and not args.retry:
-                print(f"[Skip] Shot {num}: {end_rel} 已存在，用 --retry 覆盖")
+            if end_path.exists() and not retry:
+                msg = f"{end_rel} 已存在，用 retry 覆盖"
+                if not quiet:
+                    print(f"[Skip] Shot {num}: {msg}")
+                out.results.append(TailShotResult(num, shot_id, True, "skip", msg))
                 continue
             image_prompt = shot.get("imagePrompt", "")
             video_prompt = shot.get("videoPrompt", "")
@@ -261,19 +334,22 @@ def run_from_json(args) -> None:
                         asset_paths.append(p)
                         asset_names.append(name)
             prompt_text = build_tail_prompt(
-                prompt_template, image_prompt, video_prompt, asset_names
+                prompt_template_str, image_prompt, video_prompt, asset_names
             )
             first_b64 = read_img(first_path)
             asset_b64_list = [read_img(p) for p in asset_paths]
-            if args.dry_run:
-                print(f"[DryRun] Shot {num}: {first_rel} -> {end_rel}")
+            if dry_run:
+                if not quiet:
+                    print(f"[DryRun] Shot {num}: {first_rel} -> {end_rel}")
+                out.results.append(TailShotResult(num, shot_id, True, "dry_run", end_rel))
                 continue
-            endpoint = f"{YUNWU_BASE}/{args.model}:generateContent"
-            print(f"[Run] Shot {num}: {first_rel} -> {end_rel} ({args.model}) ...")
+            endpoint = f"{YUNWU_BASE}/{model}:generateContent"
+            if not quiet:
+                print(f"[Run] Shot {num}: {first_rel} -> {end_rel} ({model}) ...")
             try:
                 img_data = call_fn(
                     api_key, prompt_text, first_b64, asset_b64_list,
-                    endpoint=endpoint, aspect_ratio="9:16", image_size=args.image_size,
+                    endpoint=endpoint, aspect_ratio="9:16", image_size=image_size,
                 )
                 end_path.write_bytes(img_data)
                 for s in scene["shots"]:
@@ -281,13 +357,35 @@ def run_from_json(args) -> None:
                         s["endFrame"] = end_rel
                         s["status"] = "endframe_done"
                         break
-                with open(json_path, "w", encoding="utf-8") as f:
+                with open(jp, "w", encoding="utf-8") as f:
                     json.dump(data, f, ensure_ascii=False, indent=2)
-                print(f"  -> {end_path}")
+                if not quiet:
+                    print(f"  -> {end_path}")
+                out.results.append(TailShotResult(num, shot_id, True, "tail", end_rel))
             except Exception as e:
-                print(f"  [Error] {e}", file=sys.stderr)
-                if args.fail_fast:
+                err = str(e)
+                if not quiet:
+                    print(f"  [Error] {err}", file=sys.stderr)
+                out.results.append(TailShotResult(num, shot_id, False, "error", err))
+                if fail_fast:
                     raise
+    return out
+
+
+def run_from_json(args) -> None:
+    """从 episode.json 读取数据，批量生成尾帧（CLI 入口，内部调用 run_tail_from_json_episode）。"""
+    json_path = args.from_json if args.from_json.is_absolute() else Path.cwd() / args.from_json
+    run_tail_from_json_episode(
+        json_path=json_path,
+        shots_spec=args.shots,
+        prompt_template=args.prompt_template,
+        model=args.model,
+        image_size=args.image_size,
+        dry_run=args.dry_run,
+        retry=args.retry,
+        fail_fast=args.fail_fast,
+        quiet=False,
+    )
 
 
 def get_shot_to_frame(episode_dir: Path) -> list[tuple[str, str]]:

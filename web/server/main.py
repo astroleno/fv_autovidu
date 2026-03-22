@@ -25,6 +25,17 @@ from routes import episodes, export_route, files, generate, shots, tasks
 
 app = FastAPI(title="FV Studio API", version="1.0.0")
 
+
+@app.on_event("startup")
+def _startup_restore_tasks() -> None:
+    """加载本地 tasks_state.json，对未完成的 video 任务做弱恢复（补查 Vidu）。"""
+    try:
+        from routes.tasks import restore_persisted_tasks
+
+        restore_persisted_tasks()
+    except Exception:
+        pass
+
 # CORS：允许前端开发服务器（Vite 默认 5173）
 app.add_middleware(
     CORSMiddleware,
