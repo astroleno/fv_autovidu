@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from models.schemas import Episode, Shot, VideoCandidate
+from models.schemas import DubStatus, Episode, Shot, VideoCandidate
 
 
 def _get_data_root() -> Path:
@@ -170,6 +170,41 @@ def _save_episode(ep_dir: Path, episode: Episode) -> None:
         json.dump(episode.model_dump(mode="json"), f, ensure_ascii=False, indent=2)
 
 
+def set_shot_dub(episode_id: str, shot_id: str, dub: DubStatus | None) -> Shot | None:
+    """
+    设置分镜的 dub 字段并落盘（None 表示清除配音元数据）。
+    """
+    ep_dir = _find_episode_dir(episode_id)
+    if not ep_dir:
+        return None
+    ep = get_episode(episode_id)
+    if not ep:
+        return None
+    for scene in ep.scenes:
+        for i, shot in enumerate(scene.shots):
+            if shot.shotId == shot_id:
+                scene.shots[i] = shot.model_copy(update={"dub": dub})
+                _save_episode(ep_dir, ep)
+                return scene.shots[i]
+    return None
+
+
+def persist_episode(episode: Episode) -> None:
+    """
+    将完整 Episode 写回磁盘（用于更新 jianyingExport、dub 等根级或嵌套字段）。
+
+    Args:
+        episode: 内存中的完整 Episode
+
+    Raises:
+        ValueError: 未找到对应剧集目录
+    """
+    ep_dir = _find_episode_dir(episode.episodeId)
+    if not ep_dir:
+        raise ValueError("Episode not found")
+    _save_episode(ep_dir, episode)
+
+
 def update_shot(episode_id: str, shot_id: str, updates: dict[str, Any]) -> Shot | None:
     """
     更新 Shot 字段。
@@ -282,6 +317,7 @@ def select_candidate(
     """
     选定某个视频候选。
     将指定 candidate 的 selected 置为 True，其他置为 False，并更新 shot.status 为 "selected"。
+    若切换为非 dub.sourceCandidateId 对应候选，则将 dub 标记为 stale（需重新配音）。
     """
     ep_dir = _find_episode_dir(episode_id)
     if not ep_dir:
@@ -297,10 +333,20 @@ def select_candidate(
                     new_candidates.append(
                         c.model_copy(update={"selected": c.id == candidate_id})
                     )
+                new_dub = shot.dub
+                if shot.dub and shot.dub.sourceCandidateId:
+                    if shot.dub.sourceCandidateId != candidate_id:
+                        new_dub = shot.dub.model_copy(
+                            update={
+                                "status": "stale",
+                                "error": "已切换视频候选，需重新配音",
+                            }
+                        )
                 scene.shots[i] = shot.model_copy(
                     update={
                         "videoCandidates": new_candidates,
                         "status": "selected",
+                        "dub": new_dub,
                     }
                 )
                 _save_episode(ep_dir, ep)

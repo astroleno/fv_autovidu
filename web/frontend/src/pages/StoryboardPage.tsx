@@ -5,11 +5,13 @@
  */
 import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router"
-import { Grid3X3, List, Film, ImagePlus, Download, Loader2 } from "lucide-react"
+import { Grid3X3, List, Film, ImagePlus, Loader2 } from "lucide-react"
 import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
 import { Button, Skeleton } from "@/components/ui"
 import {
   BatchResultSummary,
+  DubPanel,
+  ExportPanel,
   SceneGroup,
   ShotCard,
   ShotRow,
@@ -360,12 +362,13 @@ export default function StoryboardPage() {
               <Film className="w-4 h-4" />
               批量视频·首帧模式 ({firstFrameBatchShots.length})
             </Button>
-            <Button variant="primary" className="gap-2">
-              <Download className="w-4 h-4" />
-              导出粗剪
-            </Button>
+            <ExportPanel episodeId={episodeId} />
           </div>
         </div>
+      </div>
+
+      <div className="mb-8">
+        <DubPanel episodeId={episodeId} />
       </div>
 
       {/* Scene 分组 */}

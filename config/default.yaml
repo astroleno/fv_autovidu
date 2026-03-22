@@ -34,3 +34,16 @@ paths:
 
 # 默认分镜包名称
 default_episode: "第2集_EP02_分镜包"
+
+# 剪映草稿导出（画布档位等；路径探测以运行时为准）
+jianying:
+  draft_path: ""
+  canvas_size: "720p"
+
+# ElevenLabs 配音（API Key 使用环境变量 ELEVENLABS_API_KEY）
+elevenlabs:
+  base_url: "https://api.elevenlabs.io"
+  sts_timeout: 120
+  sts_model: "eleven_multilingual_sts_v2"
+  tts_model: "eleven_multilingual_v2"
+  concurrency: 2

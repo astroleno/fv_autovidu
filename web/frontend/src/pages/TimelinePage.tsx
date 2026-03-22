@@ -5,8 +5,7 @@
 import { useEffect } from "react"
 import { useParams } from "react-router"
 import { useEpisodeStore } from "@/stores"
-import { Button } from "@/components/ui"
-import { VideoPlayer } from "@/components/business"
+import { VideoPlayer, ExportPanel } from "@/components/business"
 import { flattenShots } from "@/types"
 import { getFileUrl } from "@/utils/file"
 
@@ -59,7 +58,7 @@ export default function TimelinePage() {
           ))}
         </div>
       </div>
-      <Button variant="primary">导出 MP4</Button>
+      <ExportPanel episodeId={episodeId} />
     </div>
   )
 }

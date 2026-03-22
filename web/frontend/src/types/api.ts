@@ -87,6 +87,58 @@ export interface ExportRoughCutResponse {
   exportPath: string
 }
 
+/** 剪映草稿导出请求 */
+export interface JianyingExportRequest {
+  episodeId: string
+  shotIds?: string[]
+  draftPath?: string
+  createZip?: boolean
+  canvasSize?: "720p" | "1080p"
+}
+
+/** 剪映草稿导出响应 */
+export interface JianyingExportResponse {
+  draftId: string
+  draftDir: string
+  zipPath?: string | null
+  exportedShots: number
+  missingShots: string[]
+  exportedAt: string
+}
+
+/** GET /export/jianying-draft/path */
+export interface JianyingDraftPathResponse {
+  detectedPath: string | null
+  candidates: string[]
+}
+
+/** 配音：批量处理请求 */
+export interface DubProcessRequest {
+  episodeId: string
+  shotIds?: string[]
+  voiceId: string
+  mode?: "sts" | "tts"
+  concurrency?: number
+}
+
+/** 配音：单镜头请求 */
+export interface DubProcessShotRequest {
+  episodeId: string
+  shotId: string
+  voiceId: string
+  mode?: "sts" | "tts"
+  ttsText?: string
+}
+
+export interface DubTaskItem {
+  taskId: string
+  shotId: string
+}
+
+export interface DubProcessResponse {
+  tasks: DubTaskItem[]
+}
+
 /** 任务状态响应 */
 export interface TaskStatusResponse {
   taskId: string

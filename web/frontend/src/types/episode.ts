@@ -51,6 +51,19 @@ export interface VideoCandidate {
   taskStatus: TaskStatus
 }
 
+/** 分镜配音状态（与当前 selected 候选绑定） */
+export interface DubStatus {
+  status: "pending" | "processing" | "completed" | "failed" | "stale"
+  sourceCandidateId?: string
+  mode?: "sts" | "tts"
+  voiceId?: string
+  audioPath?: string
+  originalAudioPath?: string
+  taskId?: string
+  error?: string
+  processedAt?: string
+}
+
 /**
  * Shot：单镜头
  * 包含首帧、尾帧、视频候选、资产、prompt 等完整信息
@@ -70,6 +83,7 @@ export interface Shot {
   status: ShotStatus
   endFrame: string | null
   videoCandidates: VideoCandidate[]
+  dub?: DubStatus
 }
 
 /**
@@ -87,6 +101,14 @@ export interface Scene {
  * Episode：剧集
  * 从平台拉取后的完整数据，episode.json 根结构
  */
+/** 最近一次剪映草稿导出记录 */
+export interface JianyingExportRecord {
+  lastExportedAt: string
+  draftId: string
+  zipPath?: string
+  draftDirRelative?: string
+}
+
 export interface Episode {
   projectId: string
   episodeId: string
@@ -96,6 +118,7 @@ export interface Episode {
   scenes: Scene[]
   /** 剧集级全量资产库，供资产库页面 / RegenPage 使用 */
   assets?: ShotAsset[]
+  jianyingExport?: JianyingExportRecord
 }
 
 /**
