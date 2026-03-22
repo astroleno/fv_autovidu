@@ -20,6 +20,8 @@ PathOrStr = Union[Path, str]
 
 import requests
 
+from src.utils.retry import run_with_http_retry
+
 
 class ViduClient:
     """
@@ -98,6 +100,7 @@ class ViduClient:
         }
         # 移除空值
         payload = {k: v for k, v in payload.items() if v is not None and v != ""}
+        # 提交型 POST 不做盲重试：超时/断线时服务端可能已创建任务，重试会导致重复计费与重复成片
         resp = self._session.post(url, json=payload, timeout=30)
         resp.raise_for_status()
         return resp.json()
@@ -295,9 +298,14 @@ class ViduClient:
             API 响应，含 tasks 数组
         """
         url = f"{self.base_url}/tasks"
-        resp = self._session.get(url, params={"task_ids": task_ids}, timeout=30)
-        resp.raise_for_status()
-        return resp.json()
+
+        def _get() -> dict:
+            r = self._session.get(url, params={"task_ids": task_ids}, timeout=30)
+            r.raise_for_status()
+            return r.json()
+
+        # 查询 GET 可安全重试：不创建新任务，仅拉状态
+        return run_with_http_retry(_get)
 
     # -------------------- 电商一键成片 (ad-one-click) --------------------
     # 详见 docs/vidu/ad.md

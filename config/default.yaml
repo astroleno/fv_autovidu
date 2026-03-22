@@ -1,5 +1,14 @@
 # fv_autovidu 默认配置
 # 详见 docs/vidu/i2v.md
+#
+# 与 Web / CLI 共用的视频生成参数契约（见 docs/自动化流水线计划）：
+# - mode: first_frame | first_last_frame | reference
+# - model / resolution / duration / reference_asset_ids（CLI 用命令行覆盖）
+
+# 默认视频模式（CLI 与文档一致；Web 端由用户选择）
+video:
+  mode: "first_last_frame"  # 首尾帧约束视频，技术实现走 Vidu reference2video 双图
+  # reference 模式默认仅使用 shot.assets 中的资产图（是否混入 firstFrame 见产品待确认）
 
 vidu:
   # API 端点（图生视频）

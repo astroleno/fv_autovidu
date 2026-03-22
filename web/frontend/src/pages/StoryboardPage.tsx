@@ -3,12 +3,13 @@
  * Scene 分组 + Shot 卡片/行 + 状态筛选 + 批量操作 + 视图切换
  * 批量生成尾帧 / 批量生成视频：调用 generateApi，taskStore 轮询并在完成后 Toast
  */
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router"
 import { Grid3X3, List, Film, ImagePlus, Download, Loader2 } from "lucide-react"
 import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
 import { Button, Skeleton } from "@/components/ui"
 import {
+  BatchResultSummary,
   SceneGroup,
   ShotCard,
   ShotRow,
@@ -17,6 +18,7 @@ import {
 } from "@/components/business"
 import { flattenShots } from "@/types"
 import type { ShotStatus } from "@/types"
+import type { GenerateVideoRequest, TaskStatusResponse } from "@/types"
 import { generateApi } from "@/api/generate"
 
 const STATUS_FILTERS: { value: ShotStatus | "all"; label: string }[] = [
@@ -37,6 +39,13 @@ export default function StoryboardPage() {
 
   const [batchEndBusy, setBatchEndBusy] = useState(false)
   const [videoDialogOpen, setVideoDialogOpen] = useState(false)
+  /** 批量结果汇总弹窗（尾帧 / 视频） */
+  const [summaryOpen, setSummaryOpen] = useState(false)
+  const [summaryKind, setSummaryKind] = useState<"endframe" | "video">("video")
+  const [summaryTaskToShot, setSummaryTaskToShot] = useState<Record<string, string>>({})
+  const [summaryResults, setSummaryResults] = useState<TaskStatusResponse[]>([])
+  /** 上一次批量视频请求参数，用于「重试失败镜头」保持一致 mode/model */
+  const lastVideoBatchParamsRef = useRef<GenerateVideoRequest | null>(null)
 
   useEffect(() => {
     if (episodeId) {
@@ -72,11 +81,23 @@ export default function StoryboardPage() {
   }
 
   const allShots = flattenShots(currentEpisode)
-  /** 待生成尾帧：状态为 pending 且已配置首帧路径 */
+  /** 待生成尾帧：pending 且已配置首帧 */
   const pendingShots = allShots.filter(
     (s) => s.status === "pending" && Boolean(s.firstFrame?.trim())
   )
+  /** 尾帧已完成：可用于首尾帧 / 多参考等模式批量视频 */
   const endframeDoneShots = allShots.filter((s) => s.status === "endframe_done")
+  /**
+   * 首帧图生视频（first_frame）批量目标：只要有首帧路径且当前未在生成流程中即可。
+   * 覆盖 pending、endframe_done、video_done、error、selected 等，不仅限于 pending。
+   */
+  const firstFrameBatchShots = allShots.filter((s) => {
+    if (!s.firstFrame?.trim()) return false
+    if (s.status === "endframe_generating" || s.status === "video_generating") {
+      return false
+    }
+    return true
+  })
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   const cacheBust = currentEpisode.pulledAt ?? undefined
   const episodeAssetIds = (currentEpisode.assets ?? []).map((a) => a.assetId)
@@ -89,10 +110,18 @@ export default function StoryboardPage() {
         episodeId,
         shotIds: pendingShots.map((s) => s.shotId),
       })
+      const taskToShot: Record<string, string> = {}
+      res.data.tasks.forEach((t) => {
+        taskToShot[t.taskId] = t.shotId
+      })
       const ids = res.data.tasks.map((t) => t.taskId)
       startPolling(ids, {
         episodeId,
-        onAllSettled: () => {
+        onAllSettled: (results) => {
+          setSummaryKind("endframe")
+          setSummaryTaskToShot(taskToShot)
+          setSummaryResults(results)
+          setSummaryOpen(true)
           pushToast("批量尾帧任务已全部结束", "success")
         },
       })
@@ -106,18 +135,28 @@ export default function StoryboardPage() {
   const handleVideoModeConfirm = async (result: VideoModeSelectorResult) => {
     if (!episodeId || endframeDoneShots.length === 0) return
     try {
-      const res = await generateApi.video({
+      const body: GenerateVideoRequest = {
         episodeId,
         shotIds: endframeDoneShots.map((s) => s.shotId),
         mode: result.mode,
         model: result.model,
         resolution: result.resolution,
         referenceAssetIds: result.referenceAssetIds,
+      }
+      lastVideoBatchParamsRef.current = body
+      const res = await generateApi.video(body)
+      const taskToShot: Record<string, string> = {}
+      res.data.tasks.forEach((t) => {
+        taskToShot[t.taskId] = t.shotId
       })
       const ids = res.data.tasks.map((t) => t.taskId)
       startPolling(ids, {
         episodeId,
-        onAllSettled: () => {
+        onAllSettled: (results) => {
+          setSummaryKind("video")
+          setSummaryTaskToShot(taskToShot)
+          setSummaryResults(results)
+          setSummaryOpen(true)
           pushToast("批量视频任务已全部结束", "success")
         },
       })
@@ -126,8 +165,115 @@ export default function StoryboardPage() {
     }
   }
 
+  /**
+   * 批量首帧视频（mode=first_frame）：目标为 firstFrameBatchShots，与尾帧是否完成无关。
+   */
+  const handleBatchFirstFrameVideo = async () => {
+    if (!episodeId || firstFrameBatchShots.length === 0) return
+    try {
+      const body: GenerateVideoRequest = {
+        episodeId,
+        shotIds: firstFrameBatchShots.map((s) => s.shotId),
+        mode: "first_frame",
+        model: "viduq2-pro-fast",
+        resolution: "720p",
+      }
+      lastVideoBatchParamsRef.current = body
+      const res = await generateApi.video(body)
+      const taskToShot: Record<string, string> = {}
+      res.data.tasks.forEach((t) => {
+        taskToShot[t.taskId] = t.shotId
+      })
+      const ids = res.data.tasks.map((t) => t.taskId)
+      startPolling(ids, {
+        episodeId,
+        onAllSettled: (results) => {
+          setSummaryKind("video")
+          setSummaryTaskToShot(taskToShot)
+          setSummaryResults(results)
+          setSummaryOpen(true)
+          pushToast("批量首帧视频任务已全部结束", "success")
+        },
+      })
+    } catch (e) {
+      pushToast(e instanceof Error ? e.message : "批量首帧视频请求失败", "error")
+    }
+  }
+
   return (
     <div className="p-8">
+      <BatchResultSummary
+        open={summaryOpen}
+        onClose={() => setSummaryOpen(false)}
+        kind={summaryKind}
+        taskToShotId={summaryTaskToShot}
+        results={summaryResults}
+        onRetryFailed={(failedShotIds) => {
+          if (!episodeId || failedShotIds.length === 0) return
+          if (summaryKind === "endframe") {
+            void generateApi
+              .endframe({ episodeId, shotIds: failedShotIds })
+              .then((res) => {
+                const taskToShot: Record<string, string> = {}
+                res.data.tasks.forEach((t) => {
+                  taskToShot[t.taskId] = t.shotId
+                })
+                startPolling(
+                  res.data.tasks.map((t) => t.taskId),
+                  {
+                    episodeId,
+                    onAllSettled: (results) => {
+                      setSummaryKind("endframe")
+                      setSummaryTaskToShot(taskToShot)
+                      setSummaryResults(results)
+                      setSummaryOpen(true)
+                    },
+                  }
+                )
+              })
+              .catch((e: unknown) =>
+                pushToast(e instanceof Error ? e.message : "重试失败", "error")
+              )
+          } else {
+            const base = lastVideoBatchParamsRef.current
+            if (!base) {
+              pushToast("无法重试：缺少上一次批量视频参数", "error")
+              return
+            }
+            void generateApi
+              .video({
+                episodeId,
+                shotIds: failedShotIds,
+                mode: base.mode,
+                model: base.model,
+                resolution: base.resolution,
+                referenceAssetIds: base.referenceAssetIds,
+              })
+              .then((res) => {
+                const taskToShot: Record<string, string> = {}
+                res.data.tasks.forEach((t) => {
+                  taskToShot[t.taskId] = t.shotId
+                })
+                startPolling(
+                  res.data.tasks.map((t) => t.taskId),
+                  {
+                    episodeId,
+                    onAllSettled: (results) => {
+                      setSummaryKind("video")
+                      setSummaryTaskToShot(taskToShot)
+                      setSummaryResults(results)
+                      setSummaryOpen(true)
+                    },
+                  }
+                )
+              })
+              .catch((e: unknown) =>
+                pushToast(e instanceof Error ? e.message : "重试失败", "error")
+              )
+          }
+        }}
+      />
+
       <VideoModeSelector
         open={videoDialogOpen}
         onClose={() => setVideoDialogOpen(false)}
@@ -199,9 +345,20 @@ export default function StoryboardPage() {
               className="gap-2"
               disabled={endframeDoneShots.length === 0}
               onClick={() => setVideoDialogOpen(true)}
+              title="针对尾帧已完成镜头，可选首尾帧/多参考等模式"
             >
               <Film className="w-4 h-4" />
-              批量生成视频 ({endframeDoneShots.length})
+              批量视频·尾帧已完成 ({endframeDoneShots.length})
+            </Button>
+            <Button
+              variant="secondary"
+              className="gap-2"
+              disabled={firstFrameBatchShots.length === 0}
+              onClick={() => void handleBatchFirstFrameVideo()}
+              title="凡有首帧且未在生成中的镜头均可批量走首帧图生视频（含尾帧已完成等）"
+            >
+              <Film className="w-4 h-4" />
+              批量视频·首帧模式 ({firstFrameBatchShots.length})
             </Button>
             <Button variant="primary" className="gap-2">
               <Download className="w-4 h-4" />
