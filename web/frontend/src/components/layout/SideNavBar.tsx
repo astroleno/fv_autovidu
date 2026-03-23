@@ -6,6 +6,7 @@ import { useEffect } from "react"
 import { NavLink, useParams } from "react-router"
 import { Video, Settings, PanelLeftClose, PanelLeft, Activity, Package } from "lucide-react"
 import { useEpisodeStore } from "@/stores"
+import { routes } from "@/utils/routes"
 
 interface SideNavBarProps {
   collapsed: boolean
@@ -14,12 +15,15 @@ interface SideNavBarProps {
 }
 
 const NAV_ITEMS = [
-  { to: "/", icon: Video, label: "剧集列表" },
+  { to: "/", icon: Video, label: "项目列表" },
   { to: "/settings", icon: Settings, label: "设置" },
 ]
 
 export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarProps) {
-  const { episodeId } = useParams<{ episodeId: string }>()
+  const { projectId: routeProjectId, episodeId } = useParams<{
+    projectId?: string
+    episodeId?: string
+  }>()
   const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()
 
   useEffect(() => {
@@ -36,6 +40,8 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
           )
       : []
   const assetCount = assetsList.length
+  /** 资产库链接需 projectId；旧数据从 episode 推断 */
+  const projectId = routeProjectId ?? currentEpisode?.projectId
 
   const width = collapsed ? "w-16" : "w-60"
 
@@ -95,10 +101,10 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
         ))}
 
         {/* 资产库：剧集页时显示，点击进入独立资产库页面 */}
-        {!collapsed && episodeId && (
+        {!collapsed && episodeId && projectId && (
           <div className="mt-4 border-t border-[var(--color-newsprint-black)] pt-4">
             <NavLink
-              to={`/episode/${episodeId}/assets`}
+              to={routes.assets(projectId, episodeId)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors border ${
                   isActive

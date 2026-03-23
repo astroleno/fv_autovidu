@@ -5,6 +5,7 @@ Feeling Video 平台 HTTP 客户端
 封装平台只读 API：
 - login: 登录获取 JWT（支持 phone 或 username）
 - refresh: 刷新 token（建议 1.9h 刷新一次，token 有效期 2h）
+- get_projects / get_project: 项目列表与详情
 - get_project_episodes: 获取项目下的剧集列表
 - get_shots / get_scenes / get_assets: 拉取分镜数据
 - refresh_url: 刷新过期的 COS 文件 URL（备用）
@@ -176,6 +177,53 @@ class FeelingClient:
         if isinstance(raw, dict):
             return [x for x in raw.values() if isinstance(x, dict)]
         return []
+
+    def get_projects(self) -> list[dict[str, Any]]:
+        """
+        获取当前用户可见的项目列表。
+
+        GET {base_url}/projects
+        （与 get_project_episodes 一致：base_url 已含平台 API 前缀，如 .../api）
+
+        Returns:
+            Project 数组，每项含 id、title、description 等（字段以平台为准）
+        """
+        self._ensure_token()
+        url = f"{self.base_url}/projects"
+        resp = self._session.get(url, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        raw = data.get("data", data.get("projects", data.get("items", []))) if isinstance(data, dict) else data
+        if isinstance(raw, dict) and "items" in raw:
+            raw = raw.get("items", [])
+        if isinstance(raw, list):
+            return [x for x in raw if isinstance(x, dict)]
+        if isinstance(raw, dict):
+            return [x for x in raw.values() if isinstance(x, dict)]
+        return []
+
+    def get_project(self, project_id: str) -> dict[str, Any]:
+        """
+        获取单个项目详情。
+
+        GET {base_url}/projects/{projectId}
+
+        Args:
+            project_id: 项目 UUID
+
+        Returns:
+            项目对象 dict；若平台返回 { data: {...} } 则解包 data
+        """
+        self._ensure_token()
+        url = f"{self.base_url}/projects/{project_id}"
+        resp = self._session.get(url, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        if isinstance(data, dict) and "data" in data and isinstance(data["data"], dict):
+            return data["data"]
+        if isinstance(data, dict):
+            return data
+        return {}
 
     def get_shots(self, episode_id: str) -> list[dict[str, Any]]:
         """

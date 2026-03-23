@@ -1,4 +1,5 @@
 export { useEpisodeStore } from "./episodeStore"
+export { useProjectStore } from "./projectStore"
 export { useShotStore } from "./shotStore"
 export { useTaskStore } from "./taskStore"
 export { useToastStore } from "./toastStore"

@@ -11,9 +11,14 @@ import { Button } from "@/components/ui"
 import { VideoPlayer, AssetTag, ShotFrameCompare } from "@/components/business"
 import { flattenShots } from "@/types"
 import { getFileUrl } from "@/utils/file"
+import { routes } from "@/utils/routes"
 
 export default function ShotDetailPage() {
-  const { episodeId, shotId } = useParams<{ episodeId: string; shotId: string }>()
+  const { projectId: routeProjectId, episodeId, shotId } = useParams<{
+    projectId?: string
+    episodeId: string
+    shotId: string
+  }>()
   const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
   const { selectCandidate } = useShotStore()
 
@@ -36,6 +41,7 @@ export default function ShotDetailPage() {
   const nextShot = shotIndex < shots.length - 1 ? shots[shotIndex + 1] : null
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   const cacheBust = currentEpisode.pulledAt ?? undefined
+  const projectId = routeProjectId ?? currentEpisode.projectId
 
   if (!shot) {
     return <div className="p-8">未找到该镜头</div>
@@ -47,7 +53,7 @@ export default function ShotDetailPage() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           {prevShot ? (
-            <Link to={`/episode/${episodeId}/shot/${prevShot.shotId}`}>
+            <Link to={routes.shot(projectId, episodeId, prevShot.shotId)}>
               <Button variant="ghost" className="gap-1">
                 <ChevronLeft className="w-5 h-5" />
                 上一镜头
@@ -60,7 +66,7 @@ export default function ShotDetailPage() {
             S{String(shot.shotNumber).padStart(2, "0")} / {shots.length}
           </span>
           {nextShot ? (
-            <Link to={`/episode/${episodeId}/shot/${nextShot.shotId}`}>
+            <Link to={routes.shot(projectId, episodeId, nextShot.shotId)}>
               <Button variant="ghost" className="gap-1">
                 下一镜头
                 <ChevronRight className="w-5 h-5" />
@@ -80,6 +86,7 @@ export default function ShotDetailPage() {
           </p>
           <ShotFrameCompare
             shot={shot}
+            projectId={projectId}
             episodeId={episodeId}
             basePath={basePath}
             cacheBust={cacheBust}
@@ -126,7 +133,7 @@ export default function ShotDetailPage() {
           <div className="text-xs text-[var(--color-muted)]">
             {shot.cameraMovement} | {shot.duration}s | {shot.aspectRatio}
           </div>
-          <Link to={`/episode/${episodeId}/shot/${shotId}/regen`}>
+          <Link to={routes.regen(projectId, episodeId, shotId)}>
             <Button variant="secondary" className="gap-2">
               <RotateCcw className="w-4 h-4" />
               单帧重生

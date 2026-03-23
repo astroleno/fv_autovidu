@@ -37,3 +37,11 @@ export type {
   DubProcessResponse,
   TaskStatusResponse,
 } from "./api"
+export type {
+  ProjectSummary,
+  ProjectEpisodeSource,
+  ProjectEpisodeItem,
+  ProjectEpisodeListResponse,
+  PullProjectFailedItem,
+  PullProjectResponse,
+} from "./project"

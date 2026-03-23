@@ -32,7 +32,10 @@ const STATUS_FILTERS: { value: ShotStatus | "all"; label: string }[] = [
 ]
 
 export default function StoryboardPage() {
-  const { episodeId } = useParams<{ episodeId: string }>()
+  const { projectId: routeProjectId, episodeId } = useParams<{
+    projectId?: string
+    episodeId: string
+  }>()
   const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
   const { statusFilter, viewMode, setFilter, setViewMode, setShots } =
     useShotStore()
@@ -102,6 +105,8 @@ export default function StoryboardPage() {
   })
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   const cacheBust = currentEpisode.pulledAt ?? undefined
+  /** 新路由 URL 中带 projectId；兼容时回退到 episode.json */
+  const projectId = routeProjectId ?? currentEpisode.projectId
   const episodeAssetIds = (currentEpisode.assets ?? []).map((a) => a.assetId)
 
   const handleBatchEndframe = async () => {
@@ -385,6 +390,7 @@ export default function StoryboardPage() {
                   <ShotCard
                     key={shot.shotId}
                     shot={shot}
+                    projectId={projectId}
                     episodeId={episodeId!}
                     basePath={basePath}
                     cacheBust={cacheBust}
@@ -411,6 +417,7 @@ export default function StoryboardPage() {
                     <ShotRow
                       key={shot.shotId}
                       shot={shot}
+                      projectId={projectId}
                       episodeId={episodeId!}
                       basePath={basePath}
                       cacheBust={cacheBust}
