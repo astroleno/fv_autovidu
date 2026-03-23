@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 任务状态路由：GET /tasks/:taskId, GET /tasks/batch
-代理 Vidu 任务查询，同时支持本地任务追踪。
 
-本地 video-* 任务在轮询时会同步查询 Vidu：成功则下载 mp4 到 data/.../videos/ 并更新 episode.json。
+任务状态持久化在 SQLite（DATA_ROOT/tasks.db），读接口**仅查询**，
+不再触发 Vidu 查询、下载或写 episode.json（由 task_store.video_finalizer 后台完成）。
 """
 
 from __future__ import annotations
@@ -12,8 +12,6 @@ import os
 import sys
 from pathlib import Path
 
-import requests
-
 _SERVER_DIR = Path(__file__).resolve().parent.parent
 if str(_SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(_SERVER_DIR))
@@ -21,87 +19,13 @@ if str(_SERVER_DIR) not in sys.path:
 from fastapi import APIRouter, Query
 
 from models.schemas import TaskStatusResponse
+from services.task_store import get_task_store
 
 router = APIRouter()
 
-# 本地任务状态缓存（内存；仅 video-* 任务镜像到 tasks_state.json）
-_local_tasks: dict[str, dict] = {}
-
-
-def set_local_task(task_id: str, status: str, **kwargs):
-    """
-    供 generate 等路由更新本地任务状态。
-
-    仅 **video-*** 任务会 debounce 落盘（弱恢复）；endframe/regen 仅驻内存，避免重启后假死。
-    """
-    _local_tasks[task_id] = {"status": status, **kwargs}
-    try:
-        from services import task_persistence
-
-        if task_persistence.is_persistable_video_task(task_id, _local_tasks[task_id]):
-            task_persistence.schedule_persist(_local_tasks)
-    except Exception:
-        pass
-
-
-def _schedule_persist_current_tasks() -> None:
-    """在直接修改 _local_tasks 后同步 debounce 落盘（仅 video 条目写入文件）。"""
-    try:
-        from services import task_persistence
-
-        task_persistence.schedule_persist(_local_tasks)
-    except Exception:
-        pass
-
-
-def restore_persisted_tasks() -> None:
-    """
-    服务启动时从磁盘恢复 video 任务，并处理历史误落盘的不完整行。
-
-    1. 对磁盘中 `video-*` 但缺少 `result.vidu_task_id` 等元数据的条目标为 **failed**（无法弱恢复）。
-    2. 对完整条目合并入内存并 `maybe_finalize` 补查 Vidu。
-    3. 刷盘一次，从文件中剔除已标失败/不可恢复的僵尸行。
-    """
-    try:
-        from services import task_persistence
-
-        raw = task_persistence.load_raw_tasks_from_disk()
-        snap = task_persistence.load_tasks_from_disk()
-    except Exception:
-        return
-
-    for tid, row in raw.items():
-        if not str(tid).startswith("video-"):
-            continue
-        if not isinstance(row, dict):
-            continue
-        if task_persistence.has_vidu_recovery_metadata(row):
-            continue
-        _local_tasks[str(tid)] = {
-            "status": "failed",
-            "error": "服务重启后无法恢复：缺少 Vidu 任务元数据（请勿在提交完成前落盘）",
-            "kind": "video",
-            "result": row.get("result") if isinstance(row.get("result"), dict) else {},
-            "episode_id": row.get("episode_id"),
-            "shot_id": row.get("shot_id"),
-            "candidate_id": row.get("candidate_id"),
-        }
-
-    for tid, row in snap.items():
-        if isinstance(row, dict):
-            _local_tasks[str(tid)] = row
-
-    for tid in list(snap.keys()):
-        maybe_finalize_video_task(tid)
-
-    try:
-        task_persistence.flush_now(_local_tasks)
-    except Exception:
-        pass
-
 
 def _get_vidu_client():
-    """获取 ViduClient 实例。"""
+    """获取 ViduClient（用于无前缀的裸 Vidu task id 回退查询）。"""
     try:
         from src.vidu.client import ViduClient
     except ImportError:
@@ -112,172 +36,22 @@ def _get_vidu_client():
     return ViduClient(api_key=key)
 
 
-def _extract_creation_video_url(vt: dict) -> str | None:
-    """从 Vidu query_tasks 单条 task 中解析视频下载 URL。"""
-    cr = vt.get("creations")
-    if cr is None:
-        return None
-    if isinstance(cr, list) and len(cr) > 0:
-        return cr[0].get("url") or cr[0].get("watermarked_url")
-    if isinstance(cr, dict):
-        return cr.get("url") or cr.get("watermarked_url")
-    return None
-
-
-def maybe_finalize_video_task(task_id: str) -> None:
-    """
-    若本地任务为 video-* 且仍为 processing，则查询 Vidu；成功则下载视频并写回 episode。
-    失败则更新候选 taskStatus 与 shot.status。
-    """
-    if task_id not in _local_tasks:
-        return
-    t = _local_tasks[task_id]
-    if t.get("kind") != "video":
-        return
-    if t.get("status") not in ("processing", "pending"):
-        return
-    meta = t.get("result") or {}
-    vidu_id = meta.get("vidu_task_id")
-    episode_id = t.get("episode_id")
-    shot_id = t.get("shot_id")
-    candidate_id = t.get("candidate_id")
-    if not vidu_id or not episode_id or not shot_id or not candidate_id:
-        return
-
-    client = _get_vidu_client()
-    if not client:
-        return
-
-    from services import data_service
-
-    try:
-        resp = client.query_tasks([str(vidu_id)])
-        tasks = resp.get("tasks", [])
-        if not tasks:
-            return
-        vt = tasks[0]
-        state = str(vt.get("state", ""))
-        if state in ("created", "queueing", "processing"):
-            return
-        if state == "failed":
-            data_service.update_video_candidate(
-                episode_id,
-                shot_id,
-                candidate_id,
-                {"taskStatus": "failed"},
-            )
-            data_service.update_shot_status(episode_id, shot_id, "error")
-            _local_tasks[task_id] = {
-                "status": "failed",
-                "error": "Vidu 任务失败",
-                "result": meta,
-                "episode_id": episode_id,
-                "shot_id": shot_id,
-                "candidate_id": candidate_id,
-                "kind": "video",
-            }
-            _schedule_persist_current_tasks()
-            return
-        if state != "success":
-            return
-
-        video_url = _extract_creation_video_url(vt)
-        if not video_url:
-            _local_tasks[task_id] = {
-                "status": "failed",
-                "error": "Vidu 成功但未返回视频 URL",
-                "result": meta,
-                "episode_id": episode_id,
-                "shot_id": shot_id,
-                "candidate_id": candidate_id,
-                "kind": "video",
-            }
-            data_service.update_video_candidate(
-                episode_id,
-                shot_id,
-                candidate_id,
-                {"taskStatus": "failed"},
-            )
-            _schedule_persist_current_tasks()
-            return
-
-        ep_dir = data_service.get_episode_dir(episode_id)
-        if not ep_dir:
-            _local_tasks[task_id] = {
-                "status": "failed",
-                "error": "Episode 目录不存在",
-                "result": meta,
-                "kind": "video",
-            }
-            _schedule_persist_current_tasks()
-            return
-
-        videos_dir = ep_dir / "videos"
-        videos_dir.mkdir(parents=True, exist_ok=True)
-        safe_name = f"{shot_id}_{candidate_id}.mp4"
-        dest = videos_dir / safe_name
-        r = requests.get(video_url, timeout=180)
-        r.raise_for_status()
-        dest.write_bytes(r.content)
-        rel_path = f"videos/{safe_name}"
-
-        data_service.update_video_candidate(
-            episode_id,
-            shot_id,
-            candidate_id,
-            {
-                "videoPath": rel_path,
-                "taskStatus": "success",
-                "model": str(vt.get("model") or ""),
-            },
-        )
-        data_service.update_shot(episode_id, shot_id, {"status": "video_done"})
-        _local_tasks[task_id] = {
-            "status": "success",
-            "result": {**meta, "videoPath": rel_path, "creations": vt.get("creations")},
-            "episode_id": episode_id,
-            "shot_id": shot_id,
-            "candidate_id": candidate_id,
-            "kind": "video",
-        }
-        _schedule_persist_current_tasks()
-    except Exception as e:
-        _local_tasks[task_id] = {
-            "status": "failed",
-            "error": str(e),
-            "result": meta,
-            "episode_id": episode_id,
-            "shot_id": shot_id,
-            "candidate_id": candidate_id,
-            "kind": "video",
-        }
-        try:
-            data_service.update_video_candidate(
-                episode_id,
-                shot_id,
-                candidate_id,
-                {"taskStatus": "failed"},
-            )
-        except Exception:
-            pass
-        _schedule_persist_current_tasks()
-
-
 @router.get("/tasks/{task_id}", response_model=TaskStatusResponse)
 def get_task_status(task_id: str):
-    """查询单个任务状态。"""
-    # 1. 先查本地（video 任务可能需同步 Vidu 并完成下载）
-    if task_id in _local_tasks:
-        maybe_finalize_video_task(task_id)
-        t = _local_tasks[task_id]
+    """查询单个任务状态（仅读 SQLite；无记录时再尝试 Vidu 直连查询）。"""
+    store = get_task_store()
+    row = store.get_task_row(task_id)
+    if row is not None:
+        api = row.to_api_response()
         return TaskStatusResponse(
-            taskId=task_id,
-            status=t.get("status", "pending"),
-            progress=t.get("progress"),
-            result=t.get("result"),
-            error=t.get("error"),
+            taskId=api["taskId"],
+            status=api["status"],
+            progress=api.get("progress"),
+            result=api.get("result"),
+            error=api.get("error"),
         )
-    # 2. 查 Vidu
+
+    # 兼容：历史上可能直接轮询 Vidu 返回的裸 task id（未写入本地 tasks 表）
     client = _get_vidu_client()
     if client:
         try:
@@ -302,45 +76,49 @@ def get_task_status(task_id: str):
 
 @router.get("/tasks/batch", response_model=list[TaskStatusResponse])
 def get_tasks_batch(ids: str = Query(default="", description="逗号分隔的 taskId")):
-    """批量查询任务状态。ids 逗号分隔。"""
+    """批量查询任务状态；无本地记录且为 Vidu 裸 id 时分批 query_tasks。"""
     task_ids = [x.strip() for x in ids.split(",") if x.strip()]
     if not task_ids:
         return []
+
+    store = get_task_store()
+    by_id: dict[str, TaskStatusResponse] = {}
+    need_vidu: list[str] = []
+
     for tid in task_ids:
-        if tid in _local_tasks:
-            maybe_finalize_video_task(tid)
-    result = []
-    # 分批查 Vidu（Vidu 支持一次查多个）
-    vidu_ids = [tid for tid in task_ids if tid not in _local_tasks]
-    if vidu_ids:
+        row = store.get_task_row(tid)
+        if row is not None:
+            api = row.to_api_response()
+            by_id[tid] = TaskStatusResponse(
+                taskId=api["taskId"],
+                status=api["status"],
+                progress=api.get("progress"),
+                result=api.get("result"),
+                error=api.get("error"),
+            )
+        else:
+            need_vidu.append(tid)
+
+    # 去重，避免对同一裸 Vidu id 重复请求
+    need_vidu_unique = list(dict.fromkeys(need_vidu))
+    if need_vidu_unique:
         client = _get_vidu_client()
         if client:
             try:
-                resp = client.query_tasks(vidu_ids)
+                resp = client.query_tasks(need_vidu_unique)
                 for vt in resp.get("tasks", []):
-                    tid = vt.get("id", "")
+                    tid = str(vt.get("id", ""))
                     state = vt.get("state", "pending")
                     mapping = {"created": "pending", "queueing": "pending", "processing": "processing"}
                     status = mapping.get(state, "success" if state == "success" else "failed")
-                    result.append(TaskStatusResponse(
+                    if state == "failed":
+                        status = "failed"
+                    by_id[tid] = TaskStatusResponse(
                         taskId=tid,
                         status=status,
                         result={"creations": vt.get("creations"), "state": state},
-                    ))
+                    )
             except Exception:
                 pass
-    for tid in task_ids:
-        if any(r.taskId == tid for r in result):
-            continue
-        if tid in _local_tasks:
-            t = _local_tasks[tid]
-            result.append(TaskStatusResponse(
-                taskId=tid,
-                status=t.get("status", "pending"),
-                progress=t.get("progress"),
-                result=t.get("result"),
-                error=t.get("error"),
-            ))
-        else:
-            result.append(TaskStatusResponse(taskId=tid, status="pending"))
-    return result
+
+    return [by_id.get(tid, TaskStatusResponse(taskId=tid, status="pending")) for tid in task_ids]

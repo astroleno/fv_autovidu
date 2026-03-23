@@ -7,6 +7,7 @@ FastAPI 应用，提供 /api 路由供前端调用。
 或：uvicorn web.server.main:app --reload --port 8000（需从项目根运行）
 """
 
+import logging
 import sys
 from pathlib import Path
 
@@ -22,19 +23,28 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routes import dub_route, episodes, export_route, files, generate, shots, tasks
+from services.task_store import TaskStoreService
+from services.task_store.video_finalizer import start_video_finalizer_background
+
+_LOG = logging.getLogger(__name__)
 
 app = FastAPI(title="FV Studio API", version="1.0.0")
 
 
 @app.on_event("startup")
-def _startup_restore_tasks() -> None:
-    """加载本地 tasks_state.json，对未完成的 video 任务做弱恢复（补查 Vidu）。"""
+def _startup_task_store() -> None:
+    """
+    初始化 SQLite 任务库、导入旧版 tasks_state.json、标记中断任务、启动 video 收尾线程。
+    """
     try:
-        from routes.tasks import restore_persisted_tasks
+        TaskStoreService.init_database()
+        TaskStoreService.migrate_legacy_json()
+        TaskStoreService.mark_interrupted_processing()
+        start_video_finalizer_background()
+    except Exception:  # pylint: disable=broad-except
+        # 不因任务子系统失败阻止 API 启动，但必须保留堆栈以便排查。
+        _LOG.exception("task_store startup failed")
 
-        restore_persisted_tasks()
-    except Exception:
-        pass
 
 # CORS：允许前端开发服务器（Vite 默认 5173）
 app.add_middleware(

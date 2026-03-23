@@ -35,6 +35,7 @@ from services.audio_service import (
     has_audio_stream,
 )
 from services import elevenlabs_service
+from services.task_store import get_task_store
 
 router = APIRouter()
 
@@ -61,9 +62,7 @@ def _run_dub_task(
     tts_text: str | None,
 ) -> None:
     """在后台线程执行单镜配音并更新 episode.json。"""
-    from routes.tasks import set_local_task
-
-    set_local_task(
+    get_task_store().set_task(
         task_id,
         "processing",
         kind="dub",
@@ -74,7 +73,7 @@ def _run_dub_task(
 
     ep_dir = data_service.get_episode_dir(episode_id)
     if not ep_dir:
-        set_local_task(
+        get_task_store().set_task(
             task_id,
             "failed",
             kind="dub",
@@ -86,7 +85,7 @@ def _run_dub_task(
 
     shot = data_service.get_shot(episode_id, shot_id)
     if not shot:
-        set_local_task(
+        get_task_store().set_task(
             task_id,
             "failed",
             kind="dub",
@@ -110,7 +109,7 @@ def _run_dub_task(
                 mode=mode,
             ),
         )
-        set_local_task(
+        get_task_store().set_task(
             task_id,
             "failed",
             kind="dub",
@@ -171,7 +170,7 @@ def _run_dub_task(
             processedAt=_iso_now(),
         )
         data_service.set_shot_dub(episode_id, shot_id, dub_done)
-        set_local_task(
+        get_task_store().set_task(
             task_id,
             "success",
             kind="dub",
@@ -193,7 +192,7 @@ def _run_dub_task(
                 error=err,
             ),
         )
-        set_local_task(
+        get_task_store().set_task(
             task_id,
             "failed",
             kind="dub",

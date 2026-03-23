@@ -36,7 +36,7 @@ from models.schemas import (
     VideoMode,
 )
 from services import data_service
-from routes.tasks import set_local_task
+from services.task_store import get_task_store
 
 router = APIRouter()
 
@@ -63,24 +63,29 @@ def _normalize_aspect_ratio(aspect: str) -> str:
     return "9:16"
 
 
+def _ts():
+    """任务状态写入入口（SQLite）。"""
+    return get_task_store()
+
+
 def _run_tail_frame(task_id: str, episode_id: str, shot_id: str) -> None:
     """同步执行尾帧生成（在线程中运行）；yunwu 调用受信号量限制。"""
     try:
         ep = data_service.get_episode(episode_id)
         if not ep:
-            set_local_task(task_id, "failed", error="Episode not found")
+            _ts().set_task(task_id, "failed", error="Episode not found")
             return
         shot = data_service.get_shot(episode_id, shot_id)
         if not shot:
-            set_local_task(task_id, "failed", error="Shot not found")
+            _ts().set_task(task_id, "failed", error="Shot not found")
             return
         ep_dir = data_service.get_episode_dir(episode_id)
         if not ep_dir:
-            set_local_task(task_id, "failed", error="Episode dir not found")
+            _ts().set_task(task_id, "failed", error="Episode dir not found")
             return
         first_path = ep_dir / shot.firstFrame
         if not first_path.exists():
-            set_local_task(task_id, "failed", error=f"First frame not found: {shot.firstFrame}")
+            _ts().set_task(task_id, "failed", error=f"First frame not found: {shot.firstFrame}")
             return
         assets_dir = ep_dir / "assets"
         asset_paths = [assets_dir / a.localPath.replace("assets/", "").lstrip("/") for a in shot.assets]
@@ -104,9 +109,9 @@ def _run_tail_frame(task_id: str, episode_id: str, shot_id: str) -> None:
             "endFrame": f"endframes/{end_name}",
             "status": "endframe_done",
         })
-        set_local_task(task_id, "success", result={"path": f"endframes/{end_name}"})
+        _ts().set_task(task_id, "success", result={"path": f"endframes/{end_name}"})
     except Exception as e:
-        set_local_task(task_id, "failed", error=str(e))
+        _ts().set_task(task_id, "failed", error=str(e))
         data_service.update_shot_status(episode_id, shot_id, "error")
 
 
@@ -118,7 +123,7 @@ def generate_endframe(req: GenerateEndframeRequest, background_tasks: Background
     tasks_out: list[EndframeTaskItem] = []
     for shot_id in req.shotIds:
         task_id = f"endframe-{uuid.uuid4().hex[:12]}"
-        set_local_task(task_id, "processing")
+        _ts().set_task(task_id, "processing")
         data_service.update_shot_status(req.episodeId, shot_id, "endframe_generating")
         background_tasks.add_task(_run_tail_frame, task_id, req.episodeId, shot_id)
         tasks_out.append(EndframeTaskItem(taskId=task_id, shotId=shot_id))
@@ -140,19 +145,19 @@ def _run_video_gen(
         with _VIDEO_SEM:
             ep = data_service.get_episode(episode_id)
             if not ep:
-                set_local_task(task_id, "failed", error="Episode not found")
+                _ts().set_task(task_id, "failed", error="Episode not found")
                 return
             shot = data_service.get_shot(episode_id, shot_id)
             if not shot:
-                set_local_task(task_id, "failed", error="Shot not found")
+                _ts().set_task(task_id, "failed", error="Shot not found")
                 return
             ep_dir = data_service.get_episode_dir(episode_id)
             if not ep_dir:
-                set_local_task(task_id, "failed", error="Episode dir not found")
+                _ts().set_task(task_id, "failed", error="Episode dir not found")
                 return
             first_path = ep_dir / shot.firstFrame
             if not first_path.exists():
-                set_local_task(task_id, "failed", error="First frame not found")
+                _ts().set_task(task_id, "failed", error="First frame not found")
                 return
 
             resolved_model = model or _default_video_model(mode)
@@ -174,12 +179,12 @@ def _run_video_gen(
                 )
             elif mode == "first_last_frame":
                 if not shot.endFrame:
-                    set_local_task(task_id, "failed", error="需要先生成尾帧后再使用首尾帧模式")
+                    _ts().set_task(task_id, "failed", error="需要先生成尾帧后再使用首尾帧模式")
                     data_service.update_shot_status(episode_id, shot_id, "error")
                     return
                 end_path = ep_dir / shot.endFrame
                 if not end_path.exists():
-                    set_local_task(task_id, "failed", error=f"尾帧文件不存在: {shot.endFrame}")
+                    _ts().set_task(task_id, "failed", error=f"尾帧文件不存在: {shot.endFrame}")
                     data_service.update_shot_status(episode_id, shot_id, "error")
                     return
                 resp = vidu_service.submit_first_last_video(
@@ -204,7 +209,7 @@ def _run_video_gen(
                         ref_paths.append(p)
                 ref_paths = ref_paths[:7]
                 if not ref_paths:
-                    set_local_task(task_id, "failed", error="多参考图模式至少需要 1 张可用资产图")
+                    _ts().set_task(task_id, "failed", error="多参考图模式至少需要 1 张可用资产图")
                     data_service.update_shot_status(episode_id, shot_id, "error")
                     return
                 resp = vidu_service.submit_reference_video(
@@ -217,12 +222,12 @@ def _run_video_gen(
                     with_subjects=False,
                 )
             else:
-                set_local_task(task_id, "failed", error=f"未知 mode: {mode}")
+                _ts().set_task(task_id, "failed", error=f"未知 mode: {mode}")
                 return
 
             vidu_task_id = resp.get("task_id") or resp.get("id")
             if not vidu_task_id:
-                set_local_task(task_id, "failed", error="Vidu 未返回 task_id")
+                _ts().set_task(task_id, "failed", error="Vidu 未返回 task_id")
                 return
 
             cand_id = f"cand-{uuid.uuid4().hex[:12]}"
@@ -240,17 +245,18 @@ def _run_video_gen(
             )
             data_service.add_video_candidate(episode_id, shot_id, cand)
             data_service.update_shot_status(episode_id, shot_id, "video_generating")
-            set_local_task(
+            _ts().set_task(
                 task_id,
-                "processing",
+                "awaiting_external",
                 result={"vidu_task_id": str(vidu_task_id)},
                 episode_id=episode_id,
                 shot_id=shot_id,
                 candidate_id=cand_id,
                 kind="video",
+                external_task_id=str(vidu_task_id),
             )
     except Exception as e:
-        set_local_task(task_id, "failed", error=str(e))
+        _ts().set_task(task_id, "failed", error=str(e))
         try:
             data_service.update_shot_status(episode_id, shot_id, "error")
         except Exception:
@@ -266,7 +272,7 @@ def generate_video(req: GenerateVideoRequest, background_tasks: BackgroundTasks)
     ref_ids = req.referenceAssetIds
     for shot_id in req.shotIds:
         task_id = f"video-{uuid.uuid4().hex[:12]}"
-        set_local_task(task_id, "processing")
+        _ts().set_task(task_id, "processing")
         background_tasks.add_task(
             _run_video_gen,
             task_id,
@@ -287,19 +293,19 @@ def _run_regen_frame(task_id: str, episode_id: str, shot_id: str, image_prompt: 
     try:
         ep = data_service.get_episode(episode_id)
         if not ep:
-            set_local_task(task_id, "failed", error="Episode not found")
+            _ts().set_task(task_id, "failed", error="Episode not found")
             return
         shot = data_service.get_shot(episode_id, shot_id)
         if not shot:
-            set_local_task(task_id, "failed", error="Shot not found")
+            _ts().set_task(task_id, "failed", error="Shot not found")
             return
         ep_dir = data_service.get_episode_dir(episode_id)
         if not ep_dir:
-            set_local_task(task_id, "failed", error="Episode dir not found")
+            _ts().set_task(task_id, "failed", error="Episode dir not found")
             return
         first_path = ep_dir / shot.firstFrame
         if not first_path.exists():
-            set_local_task(task_id, "failed", error="First frame not found")
+            _ts().set_task(task_id, "failed", error="First frame not found")
             return
         assets_dir = ep_dir / "assets"
         asset_paths = []
@@ -319,16 +325,16 @@ def _run_regen_frame(task_id: str, episode_id: str, shot_id: str, image_prompt: 
             "videoCandidates": [],
             "status": "pending",
         })
-        set_local_task(task_id, "success", result={"newFramePath": shot.firstFrame})
+        _ts().set_task(task_id, "success", result={"newFramePath": shot.firstFrame})
     except Exception as e:
-        set_local_task(task_id, "failed", error=str(e))
+        _ts().set_task(task_id, "failed", error=str(e))
 
 
 @router.post("/generate/regen-frame", response_model=RegenFrameResponse)
 def regen_frame(req: RegenFrameRequest, background_tasks: BackgroundTasks):
     """单帧重生。"""
     task_id = f"regen-{uuid.uuid4().hex[:12]}"
-    set_local_task(task_id, "processing")
+    _ts().set_task(task_id, "processing")
     background_tasks.add_task(
         _run_regen_frame,
         task_id, req.episodeId, req.shotId, req.imagePrompt, req.assetIds or [],
