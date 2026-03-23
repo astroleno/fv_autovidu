@@ -1,0 +1,245 @@
+# -*- coding: utf-8 -*-
+"""
+Video 任务收尾线程（Video Finalizer）
+
+将原 `GET /api/tasks` 中的 Vidu 查询、视频下载、episode.json 写回迁移到后台循环，
+避免读接口产生副作用。
+
+仅处理 `kind=video` 且 `status=awaiting_external` 的任务；幂等：若候选已有 videoPath 则跳过写盘。
+"""
+
+from __future__ import annotations
+
+import logging
+import os
+import threading
+import time
+from typing import Optional
+
+import requests
+
+from . import repository
+from .db import get_connection
+from .models import TaskRow
+from .service import get_task_store
+
+_LOG = logging.getLogger(__name__)
+
+# 轮询间隔（秒），与历史 GET 轮询频率大致同量级
+_POLL_INTERVAL_SEC = 15.0
+
+_thread: Optional[threading.Thread] = None
+_stop = threading.Event()
+
+
+def _get_vidu_client():
+    try:
+        from src.vidu.client import ViduClient
+    except ImportError:
+        return None
+    key = os.environ.get("VIDU_API_KEY") or os.environ.get("API_KEY")
+    if not key:
+        return None
+    return ViduClient(api_key=key)
+
+
+def _extract_creation_video_url(vt: dict) -> Optional[str]:
+    cr = vt.get("creations")
+    if cr is None:
+        return None
+    if isinstance(cr, list) and len(cr) > 0:
+        return cr[0].get("url") or cr[0].get("watermarked_url")
+    if isinstance(cr, dict):
+        return cr.get("url") or cr.get("watermarked_url")
+    return None
+
+
+def _finalize_one_task(task: TaskRow) -> None:
+    """
+    对单条 awaiting_external 的 video 任务：查 Vidu、下载、更新 episode、更新 SQLite。
+    """
+    from services import data_service
+
+    meta = task.result or {}
+    vidu_id = meta.get("vidu_task_id") or task.external_task_id
+    episode_id = task.episode_id
+    shot_id = task.shot_id
+    candidate_id = task.candidate_id
+    task_id = task.id
+
+    if not vidu_id or not episode_id or not shot_id or not candidate_id:
+        get_task_store().set_task(
+            task_id,
+            "failed",
+            kind="video",
+            episode_id=episode_id,
+            shot_id=shot_id,
+            candidate_id=candidate_id,
+            result=meta,
+            error="任务缺少 Vidu 或分镜元数据，无法收尾",
+        )
+        return
+
+    # 幂等：episode 里该候选已有视频路径则直接成功
+    shot = data_service.get_shot(episode_id, shot_id)
+    if shot:
+        cand = next((c for c in shot.videoCandidates if c.id == candidate_id), None)
+        if cand and cand.videoPath and str(cand.videoPath).strip():
+            get_task_store().set_task(
+                task_id,
+                "success",
+                kind="video",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                candidate_id=candidate_id,
+                external_task_id=str(vidu_id),
+                result={**meta, "videoPath": cand.videoPath},
+            )
+            return
+
+    client = _get_vidu_client()
+    if not client:
+        return
+
+    try:
+        resp = client.query_tasks([str(vidu_id)])
+        tasks = resp.get("tasks", [])
+        if not tasks:
+            return
+        vt = tasks[0]
+        state = str(vt.get("state", ""))
+        if state in ("created", "queueing", "processing"):
+            return
+
+        if state == "failed":
+            data_service.update_video_candidate(
+                episode_id,
+                shot_id,
+                candidate_id,
+                {"taskStatus": "failed"},
+            )
+            data_service.update_shot_status(episode_id, shot_id, "error")
+            get_task_store().set_task(
+                task_id,
+                "failed",
+                kind="video",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                candidate_id=candidate_id,
+                result=meta,
+                error="Vidu 任务失败",
+            )
+            return
+
+        if state != "success":
+            return
+
+        video_url = _extract_creation_video_url(vt)
+        if not video_url:
+            data_service.update_video_candidate(
+                episode_id,
+                shot_id,
+                candidate_id,
+                {"taskStatus": "failed"},
+            )
+            get_task_store().set_task(
+                task_id,
+                "failed",
+                kind="video",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                candidate_id=candidate_id,
+                result=meta,
+                error="Vidu 成功但未返回视频 URL",
+            )
+            return
+
+        ep_dir = data_service.get_episode_dir(episode_id)
+        if not ep_dir:
+            get_task_store().set_task(
+                task_id,
+                "failed",
+                kind="video",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                candidate_id=candidate_id,
+                result=meta,
+                error="Episode 目录不存在",
+            )
+            return
+
+        videos_dir = ep_dir / "videos"
+        videos_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = f"{shot_id}_{candidate_id}.mp4"
+        dest = videos_dir / safe_name
+        r = requests.get(video_url, timeout=180)
+        r.raise_for_status()
+        dest.write_bytes(r.content)
+        rel_path = f"videos/{safe_name}"
+
+        data_service.update_video_candidate(
+            episode_id,
+            shot_id,
+            candidate_id,
+            {
+                "videoPath": rel_path,
+                "taskStatus": "success",
+                "model": str(vt.get("model") or ""),
+            },
+        )
+        data_service.update_shot(episode_id, shot_id, {"status": "video_done"})
+        get_task_store().set_task(
+            task_id,
+            "success",
+            kind="video",
+            episode_id=episode_id,
+            shot_id=shot_id,
+            candidate_id=candidate_id,
+            external_task_id=str(vidu_id),
+            result={**meta, "videoPath": rel_path, "creations": vt.get("creations")},
+        )
+    except Exception as e:  # pylint: disable=broad-except
+        _LOG.exception("video finalize 失败 task_id=%s", task_id)
+        try:
+            data_service.update_video_candidate(
+                episode_id,
+                shot_id,
+                candidate_id,
+                {"taskStatus": "failed"},
+            )
+        except Exception:
+            pass
+        get_task_store().set_task(
+            task_id,
+            "failed",
+            kind="video",
+            episode_id=episode_id,
+            shot_id=shot_id,
+            candidate_id=candidate_id,
+            result=meta,
+            error=str(e),
+        )
+
+
+def _loop() -> None:
+    while not _stop.is_set():
+        try:
+            conn = get_connection()
+            batch = repository.get_tasks_by_status(conn, "awaiting_external", kind="video")
+            for t in batch:
+                if _stop.is_set():
+                    break
+                _finalize_one_task(t)
+        except Exception:  # pylint: disable=broad-except
+            _LOG.exception("video finalizer 循环异常")
+        _stop.wait(_POLL_INTERVAL_SEC)
+
+
+def start_video_finalizer_background() -> None:
+    """启动守护线程（进程生命周期内单例）。"""
+    global _thread
+    if _thread is not None and _thread.is_alive():
+        return
+    _stop.clear()
+    _thread = threading.Thread(target=_loop, name="video-finalizer", daemon=True)
+    _thread.start()
