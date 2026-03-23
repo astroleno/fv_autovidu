@@ -3,9 +3,9 @@
 剪映草稿导出服务
 
 职责：
-- 从 Episode 收集已选定（selected）的视频候选，按分镜叙事顺序排列
+- 从 Episode 收集可导出视频候选（有 videoPath；优先 selected，否则第一条），按分镜叙事顺序排列
 - 将素材复制到 `export/jianying/{draftId}/materials/`，生成最小 `draft_info.json` / `draft_meta_info.json`
-- 可选生成 ZIP；可选将草稿目录复制到本机剪映草稿根目录（同机部署）
+- 将草稿目录复制到本机剪映草稿根目录（同机部署）；不生成 ZIP（避免与「导出到剪映」语义重复）
 
 注意：剪映私有协议可能随版本变化；字段以实机验证为准（见 docs/剪映与配音接入方案）。
 """
@@ -15,7 +15,6 @@ from __future__ import annotations
 import json
 import shutil
 import uuid
-import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -24,6 +23,7 @@ from models.schemas import Episode, JianyingExportRecord, JianyingExportRequest,
 
 from services import data_service
 from services.audio_service import probe_duration_sec
+from services.candidate_pick import pick_playable_video_candidate
 from services.jianying_protocol import (
     PROTOCOL_TEMPLATE_VERSION,
     USEC_PER_SEC,
@@ -45,7 +45,7 @@ def collect_exportable_shots(
     shot_ids: list[str] | None,
 ) -> tuple[list[dict[str, Any]], list[str]]:
     """
-    收集可导出的分镜（必须有 selected 且 videoPath 对应文件存在）。
+    收集可导出的分镜（至少一条候选已落盘 videoPath；选取规则见 candidate_pick）。
 
     Returns:
         exportable: 每项含 shotId, candidateId, videoAbs, videoRelative, durationSec
@@ -59,12 +59,12 @@ def collect_exportable_shots(
     for shot in ordered:
         if wanted is not None and shot.shotId not in wanted:
             continue
-        selected = next((c for c in shot.videoCandidates if c.selected), None)
-        if not selected or not selected.videoPath:
+        cand = pick_playable_video_candidate(shot)
+        if not cand or not cand.videoPath:
             if wanted is None or (wanted and shot.shotId in wanted):
                 missing.append(shot.shotId)
             continue
-        abs_path = (ep_dir / selected.videoPath).resolve()
+        abs_path = (ep_dir / cand.videoPath).resolve()
         if not abs_path.is_file():
             missing.append(shot.shotId)
             continue
@@ -74,9 +74,9 @@ def collect_exportable_shots(
         exportable.append(
             {
                 "shotId": shot.shotId,
-                "candidateId": selected.id,
+                "candidateId": cand.id,
                 "videoAbs": abs_path,
-                "videoRelative": selected.videoPath,
+                "videoRelative": cand.videoPath,
                 "durationSec": dur,
                 "shot": shot,
             }
@@ -229,17 +229,6 @@ def build_draft_meta_info(draft_id: str, draft_name: str) -> dict[str, Any]:
     }
 
 
-def _zip_directory(src_dir: Path, zip_path: Path) -> Path:
-    """将目录内容打包为 zip（压缩包根即为草稿文件夹内容）。"""
-    zip_path.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for f in src_dir.rglob("*"):
-            if f.is_file():
-                arc = f.relative_to(src_dir)
-                zf.write(f, arcname=str(arc))
-    return zip_path
-
-
 def _detect_dub_audio_rows(
     ep_dir: Path,
     items: list[dict[str, Any]],
@@ -357,19 +346,16 @@ def export_jianying_draft(
         encoding="utf-8",
     )
 
+    # 不再生成 ZIP；episode 记录仍保留 zipPath 字段以兼容旧 JSON，恒为 None
     zip_rel: str | None = None
-    if req.createZip:
-        zip_path = ep_dir / "export" / "jianying" / f"{draft_id}.zip"
-        _zip_directory(draft_root, zip_path)
-        zip_rel = str(zip_path.relative_to(ep_dir.parent.parent))
 
-    if req.draftPath:
-        target_root = Path(req.draftPath).expanduser().resolve()
-        target_root.mkdir(parents=True, exist_ok=True)
-        dest = target_root / draft_id
-        if dest.exists():
-            shutil.rmtree(dest)
-        shutil.copytree(draft_root, dest)
+    target_root = Path(req.draftPath).expanduser().resolve()
+    target_root.mkdir(parents=True, exist_ok=True)
+    dest = target_root / draft_id
+    if dest.exists():
+        shutil.rmtree(dest)
+    shutil.copytree(draft_root, dest)
+    jianying_copy_abs = str(dest.resolve())
 
     exported_at = datetime.now(tz=timezone.utc).isoformat().replace("+00:00", "Z")
     ep.jianyingExport = JianyingExportRecord(
@@ -385,6 +371,7 @@ def export_jianying_draft(
         "draftId": draft_id,
         "draftDir": draft_dir_abs,
         "zipPath": zip_rel,
+        "jianyingCopyPath": jianying_copy_abs,
         "exportedShots": len(exportable),
         "missingShots": missing,
         "exportedAt": exported_at,
@@ -393,21 +380,37 @@ def export_jianying_draft(
 
 def guess_jianying_draft_root_candidates() -> list[str]:
     """
-    返回本机可能存在的剪映草稿根目录候选路径（未验证存在与否）。
+    返回本机可能存在的剪映草稿根目录候选路径（用于 draftPath）。
 
-    用户可在 macOS 上通过剪映设置确认真实路径；此处仅作辅助填充。
+    剪映国内版实际写入目录多为 ``Projects/com.lveditor.draft``。
+    若该子目录存在，**只返回该路径**，不再追加父级 ``Projects``，避免 UI 上出现
+    「同一根目录两种写法」的重复按钮（用户只需使用侦测到的唯一地址）。
+    若子目录不存在但 ``Projects`` 存在，则退回父级路径供用户自行核对剪映设置。
     """
     home = Path.home()
-    candidates = [
+    bases = [
         home / "Movies" / "JianyingPro" / "User Data" / "Projects",
         home / "Library" / "Application Support" / "JianyingPro" / "User Data" / "Projects",
         home / "Movies" / "CapCut" / "User Data" / "Projects",
     ]
     out: list[str] = []
-    for p in candidates:
+    seen: set[str] = set()
+    for base in bases:
         try:
-            if p.is_dir():
-                out.append(str(p.resolve()))
+            if not base.is_dir():
+                continue
+            sub = base / "com.lveditor.draft"
+            if sub.is_dir():
+                s = str(sub.resolve())
+                if s not in seen:
+                    seen.add(s)
+                    out.append(s)
+                # 已命中标准草稿根，不再追加 base，避免与 sub 并列造成混淆
+                continue
+            root_s = str(base.resolve())
+            if root_s not in seen:
+                seen.add(root_s)
+                out.append(root_s)
         except OSError:
             continue
     return out

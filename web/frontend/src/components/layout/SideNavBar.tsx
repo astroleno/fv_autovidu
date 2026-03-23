@@ -1,10 +1,19 @@
 /**
- * 侧边栏：剧集列表、资产库（独立入口）、设置
- * 资产库为独立页面，在剧集页时显示导航入口
+ * 侧边栏：项目列表、设置；在剧集上下文中追加「粗剪时间线」「分镜板/表」「资产库」
+ * 垂直顺序：粗剪 → 分镜板/表（紧贴资产库上方）→ 资产库
  */
 import { useEffect } from "react"
 import { NavLink, useParams } from "react-router"
-import { Video, Settings, PanelLeftClose, PanelLeft, Activity, Package } from "lucide-react"
+import {
+  Video,
+  Settings,
+  PanelLeftClose,
+  PanelLeft,
+  Activity,
+  Package,
+  Clapperboard,
+  LayoutGrid,
+} from "lucide-react"
 import { useEpisodeStore } from "@/stores"
 import { routes } from "@/utils/routes"
 
@@ -60,7 +69,7 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
               分镜工作室
             </div>
             <div className="text-[9px] uppercase tracking-[0.2em] text-[var(--color-newsprint-black)] font-bold opacity-60">
-              2024 版
+              2026 版
             </div>
           </div>
         )}
@@ -100,21 +109,62 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
           </NavLink>
         ))}
 
-        {/* 资产库：剧集页时显示，点击进入独立资产库页面 */}
-        {!collapsed && episodeId && projectId && (
-          <div className="mt-4 border-t border-[var(--color-newsprint-black)] pt-4">
+        {/**
+         * 当前剧集子页导航（自上而下）：
+         * 粗剪时间线 → 分镜板/表（紧贴资产库上一行）→ 资产库。
+         * 折叠时仅图标，样式与主导航一致。
+         */}
+        {episodeId && projectId && (
+          <div
+            className={`mt-4 border-t border-[var(--color-newsprint-black)] pt-4 space-y-1 ${
+              collapsed ? "px-0" : ""
+            }`}
+          >
             <NavLink
-              to={routes.assets(projectId, episodeId)}
+              to={routes.timeline(projectId, episodeId)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors border ${
+                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
                   isActive
                     ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
                     : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
                 }`
               }
+              title={collapsed ? "粗剪时间线" : undefined}
             >
-              <Package className="w-5 h-5 shrink-0" />
-              <span>资产库 ({assetCount})</span>
+              <Clapperboard className="w-5 h-5 shrink-0" aria-hidden />
+              {!collapsed && <span>粗剪时间线</span>}
+            </NavLink>
+            {/**
+             * 分镜板根路由：必须加 end，否则 /timeline、/assets、/shot/... 会误匹配为「当前在分镜板」
+             */}
+            <NavLink
+              end
+              to={routes.episode(projectId, episodeId)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
+                  isActive
+                    ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
+                    : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
+                }`
+              }
+              title={collapsed ? "分镜板/表" : undefined}
+            >
+              <LayoutGrid className="w-5 h-5 shrink-0" aria-hidden />
+              {!collapsed && <span>分镜板/表</span>}
+            </NavLink>
+            <NavLink
+              to={routes.assets(projectId, episodeId)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
+                  isActive
+                    ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
+                    : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
+                }`
+              }
+              title={collapsed ? `资产库 (${assetCount})` : undefined}
+            >
+              <Package className="w-5 h-5 shrink-0" aria-hidden />
+              {!collapsed && <span>资产库 ({assetCount})</span>}
             </NavLink>
           </div>
         )}

@@ -1,16 +1,15 @@
 /**
- * 导出面板：粗剪 MP4（FFmpeg 拼接）与剪映草稿 ZIP（draft_info + 素材）
+ * 导出面板：粗剪 MP4（FFmpeg 拼接）与剪映草稿导出
  *
- * 使用下拉菜单集中入口，避免工具栏按钮过多；带 padding 的容器使用 box-sizing: border-box。
+ * 剪映导出通过弹窗填写「本机草稿根目录」并复制到剪映；不生成 ZIP（与「整包素材下载」若需可另做独立能力）；
+ * 带 padding 的容器使用 box-sizing: border-box。
  */
 import { useCallback, useEffect, useRef, useState } from "react"
 import { ChevronDown, Download, Loader2, Scissors } from "lucide-react"
 import { Button } from "@/components/ui"
 import { useToastStore } from "@/stores"
 import { exportApi } from "@/api/export"
-
-/** 与 SettingsPage 共用：本机剪映草稿根目录备忘，导出时可选复制草稿 */
-const LS_JIANYING_HINT = "fv_settings_jianying_draft_path_hint"
+import { JianyingExportDialog } from "./JianyingExportDialog"
 
 export interface ExportPanelProps {
   /** 当前剧集 ID */
@@ -30,7 +29,8 @@ function filesUrl(relativeFromDataRoot: string): string {
 export function ExportPanel({ episodeId, disabled = false }: ExportPanelProps) {
   const pushToast = useToastStore((s) => s.push)
   const [open, setOpen] = useState(false)
-  const [busy, setBusy] = useState<"rough" | "jianying" | null>(null)
+  const [jianyingDialogOpen, setJianyingDialogOpen] = useState(false)
+  const [busy, setBusy] = useState<"rough" | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
 
   /** 点击外部关闭下拉 */
@@ -53,45 +53,6 @@ export function ExportPanel({ episodeId, disabled = false }: ExportPanelProps) {
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       pushToast(`粗剪导出失败：${msg}`, "error")
-    } finally {
-      setBusy(null)
-      setOpen(false)
-    }
-  }, [episodeId, pushToast])
-
-  const runJianyingZip = useCallback(async () => {
-    setBusy("jianying")
-    try {
-      let draftPath: string | undefined
-      try {
-        const raw = localStorage.getItem(LS_JIANYING_HINT)?.trim()
-        if (raw) draftPath = raw
-      } catch {
-        /* ignore */
-      }
-      const res = await exportApi.jianyingDraft({
-        episodeId,
-        createZip: true,
-        canvasSize: "720p",
-        ...(draftPath ? { draftPath } : {}),
-      })
-      const zip = res.data.zipPath
-      if (zip) {
-        pushToast(`剪映草稿 ZIP 已生成：${zip}`, "success", 6000)
-        window.open(filesUrl(zip), "_blank", "noopener,noreferrer")
-      } else {
-        pushToast(`剪映草稿已写入目录：${res.data.draftDir}`, "success", 6000)
-      }
-      if (res.data.missingShots?.length) {
-        pushToast(
-          `以下分镜未包含（无已选视频或文件缺失）：${res.data.missingShots.join(", ")}`,
-          "info",
-          8000
-        )
-      }
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
-      pushToast(`剪映导出失败：${msg}`, "error")
     } finally {
       setBusy(null)
       setOpen(false)
@@ -146,17 +107,22 @@ export function ExportPanel({ episodeId, disabled = false }: ExportPanelProps) {
             className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-outline-variant)] disabled:opacity-50"
             style={{ boxSizing: "border-box" }}
             disabled={busyAny}
-            onClick={() => void runJianyingZip()}
+            onClick={() => {
+              setOpen(false)
+              setJianyingDialogOpen(true)
+            }}
           >
-            {busy === "jianying" ? (
-              <Loader2 className="w-4 h-4 animate-spin shrink-0" />
-            ) : (
-              <Scissors className="w-4 h-4 shrink-0" />
-            )}
-            剪映草稿 ZIP
+            <Scissors className="w-4 h-4 shrink-0" />
+            剪映草稿导出…
           </button>
         </div>
       )}
+
+      <JianyingExportDialog
+        open={jianyingDialogOpen}
+        onClose={() => setJianyingDialogOpen(false)}
+        episodeId={episodeId}
+      />
     </div>
   )
 }

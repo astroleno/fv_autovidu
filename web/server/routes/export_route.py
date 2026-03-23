@@ -2,8 +2,9 @@
 """
 导出路由：
 - POST /export/rough-cut — 按选定顺序拼接视频，输出到 export/episode_rough.mp4
-- POST /export/jianying-draft — 剪映草稿包（JSON + 素材 + 可选 ZIP）
+- POST /export/jianying-draft — 剪映草稿（JSON + 素材 + 复制到本机 draftPath，不生成 ZIP）
 - GET /export/jianying-draft/path — 探测本机剪映草稿目录候选
+- GET /system/jianying-draft-path — 与 reference/packages/ugc-export-integrations README 中 UGCFlow 路径一致（别名，同上）
 """
 
 import sys
@@ -22,6 +23,7 @@ from models.schemas import (
     JianyingExportResponse,
 )
 from services import data_service
+from services.candidate_pick import pick_playable_video_candidate
 from services.ffmpeg_service import concat_videos
 from services.jianying_service import export_jianying_draft, guess_jianying_draft_root_candidates
 
@@ -48,14 +50,17 @@ def export_rough_cut(req: ExportRoughCutRequest):
         shot = data_service.get_shot(req.episodeId, shot_id)
         if not shot:
             continue
-        selected = next((c for c in shot.videoCandidates if c.selected), None)
-        if not selected or not selected.videoPath:
+        cand = pick_playable_video_candidate(shot)
+        if not cand or not cand.videoPath:
             continue
-        full = ep_dir / selected.videoPath
+        full = ep_dir / cand.videoPath
         if full.exists():
             video_paths.append(full)
     if not video_paths:
-        raise HTTPException(status_code=400, detail="没有选定的视频可导出")
+        raise HTTPException(
+            status_code=400,
+            detail="没有可拼接的视频（需各镜头至少有一条已落盘的 videoPath）",
+        )
     export_dir = ep_dir / "export"
     export_dir.mkdir(parents=True, exist_ok=True)
     output_path = export_dir / "episode_rough.mp4"
@@ -68,15 +73,10 @@ def export_rough_cut(req: ExportRoughCutRequest):
 @router.post("/export/jianying-draft", response_model=JianyingExportResponse)
 def export_jianying_draft_endpoint(req: JianyingExportRequest):
     """
-    导出剪映草稿：将已选视频按叙事顺序写入草稿目录，可选 ZIP 与本机剪映目录。
+    导出剪映草稿：将已选视频按叙事顺序写入草稿目录，并复制到本机 draftPath。
 
-    约束：createZip 与 draftPath 至少其一（首版默认 ZIP，避免依赖剪映安装路径）。
+    必填 draftPath（非空）；不生成 ZIP。
     """
-    if not req.createZip and not (req.draftPath and str(req.draftPath).strip()):
-        raise HTTPException(
-            status_code=400,
-            detail="请开启 createZip 或提供有效的 draftPath（至少一种导出目标）",
-        )
     try:
         data = export_jianying_draft(req, include_dub_audio=True)
         return JianyingExportResponse(**data)
@@ -86,14 +86,29 @@ def export_jianying_draft_endpoint(req: JianyingExportRequest):
         raise HTTPException(status_code=500, detail=f"写入草稿失败: {exc}") from exc
 
 
+def _jianying_draft_path_hints_payload() -> dict:
+    """本机剪映草稿根目录候选：与 reference 包所述 draftPath 语义一致（写入 {draftPath}/{draftId}/）。"""
+    cands = guess_jianying_draft_root_candidates()
+    return {
+        "detectedPath": cands[0] if cands else None,
+        "candidates": cands,
+    }
+
+
 @router.get("/export/jianying-draft/path")
 def get_jianying_draft_path_hints():
     """
     返回本机探测到的剪映草稿根目录候选（macOS 常见路径）。
     若未找到则 detectedPath 为 null，前端可提示用户手动填写。
     """
-    cands = guess_jianying_draft_root_candidates()
-    return {
-        "detectedPath": cands[0] if cands else None,
-        "candidates": cands,
-    }
+    return _jianying_draft_path_hints_payload()
+
+
+@router.get("/system/jianying-draft-path")
+def get_jianying_draft_path_hints_ugc_reference_alias():
+    """
+    与 `reference/packages/ugc-export-integrations/README.md` §2.1 中
+    `GET /api/system/jianying-draft-path` 对齐（fv_autovidu 挂载在 /api 下）。
+    响应与 GET /export/jianying-draft/path 完全相同。
+    """
+    return _jianying_draft_path_hints_payload()

@@ -81,6 +81,19 @@ console.log(INTEGRATION.version, isConfigured());
 
 **Base URL**：假定服务挂载为 `http://<host>:<port>/api`（以实际部署为准）。
 
+### 2.0 fv_autovidu 仓库中的对应（本仓库）
+
+以下说明 **UGCFlow** 与 **fv_autovidu** 在剪映导出上的差异（本仓库以 `draftPath` 复制为主，**不生成 ZIP**）：
+
+| 概念 | UGCFlow（上文） | fv_autovidu 实现 |
+|------|-----------------|------------------|
+| 剪映草稿根目录 `draftPath` | 写入 `{draftPath}/{draftId}/` | **相同**，见 `web/server/services/jianying_service.export_jianying_draft`；成功响应含 `jianyingCopyPath`（绝对路径）；**不生成 ZIP**（与 UGCFlow 可选 ZIP 不同，避免语义重复） |
+| POST 导出 | `draftPath` 与 `createZip` 至少其一 | `POST /api/export/jianying-draft`：**必填 `draftPath`**，忽略/不支持 ZIP |
+| GET 探测草稿目录 | `GET /api/system/jianying-draft-path` | **双路径**：`GET /api/system/jianying-draft-path`（别名）与 `GET /api/export/jianying-draft/path` 返回一致 `{ detectedPath, candidates }` |
+| macOS 常见目录 | 需在目标机「剪映 → 全局设置 → 草稿位置」核对 | 后端候选含 `.../Movies/JianyingPro/User Data/Projects` 及子目录 `com.lveditor.draft`（若存在则优先） |
+
+> 说明：`draftPath` 填 **剪映识别的草稿根**（常为 `.../Projects/com.lveditor.draft`），导出后完整工程路径为 **`{draftPath}/{draftId}`**，与剪映内新建草稿目录结构一致；**不要**与剪映里手动建的某个空工程文件夹（如「第1集」）混淆。
+
 ### 2.1 剪映草稿
 
 | 方法 | 路径 | 说明 |

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 # ---------- 枚举 / 字面量类型 ----------
 
@@ -224,13 +224,33 @@ class ExportRoughCutResponse(BaseModel):
 
 
 class JianyingExportRequest(BaseModel):
-    """剪映草稿导出请求。"""
+    """
+    剪映草稿导出请求。
+
+    仅支持将草稿目录复制到本机剪映草稿根（draftPath）；**不再生成 ZIP**（与「导出到剪映」语义重复）。
+    若需「打包下载全部素材」应另做独立导出能力，不在本接口混用。
+    """
 
     episodeId: str
     shotIds: Optional[list[str]] = None
-    draftPath: Optional[str] = None
-    createZip: bool = True
-    canvasSize: str = "720p"  # 720p | 1080p
+    draftPath: str
+    # 写入 draft_info.json 的 canvas_config；默认 1080p，前端不提供切换
+    canvasSize: str = "1080p"  # 720p | 1080p
+
+    @field_validator("draftPath")
+    @classmethod
+    def _draft_path_strip(cls, v: str) -> str:
+        s = (v or "").strip()
+        if not s:
+            raise ValueError("draftPath 不能为空")
+        return s
+
+    @field_validator("canvasSize")
+    @classmethod
+    def _canvas_size_literal(cls, v: str) -> str:
+        if v not in ("720p", "1080p"):
+            raise ValueError("canvasSize 须为 720p 或 1080p")
+        return v
 
 
 class JianyingExportResponse(BaseModel):
@@ -239,6 +259,8 @@ class JianyingExportResponse(BaseModel):
     draftId: str
     draftDir: str
     zipPath: Optional[str] = None
+    # 当请求带 draftPath 时：复制到剪映目录后的草稿文件夹绝对路径（draftPath/draftId）
+    jianyingCopyPath: Optional[str] = None
     exportedShots: int
     missingShots: list[str] = Field(default_factory=list)
     exportedAt: str

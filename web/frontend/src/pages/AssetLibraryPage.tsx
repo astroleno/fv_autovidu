@@ -2,8 +2,13 @@
  * 资产库独立界面
  * 展示本集所有资产，支持按类型筛选、点击查看大图与 metadata
  * 图片 URL 使用 pulledAt 缓存破坏，确保重新拉取后显示最新图
+ *
+ * 说明（与「项目/剧集拉取」关系）：
+ * - 后端 pull_episode 会调用平台 get_assets 并写入 episode.assets，同时下载 assets/*.png（与首帧同属一次拉取）。
+ * - 若拉取时勾选「仅同步文案、不下载图片」，则本地无 png，缩略图会加载失败（应用内会提示重新拉取）。
+ * - 元数据能显示但无图：多为未下载文件或平台未返回可下载的 thumbnail URL。
  */
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
 import { useParams, Link } from "react-router"
 import { useEpisodeStore } from "@/stores"
 import { getFileUrl } from "@/utils/file"
@@ -24,6 +29,72 @@ const TYPE_LABELS: Record<string, string> = {
   location: "场景",
   prop: "道具",
   other: "其他",
+}
+
+/**
+ * 卡片缩略图：支持 img onError，避免 404 时误以为「平台没拉资产」
+ * （有 localPath 但文件未落盘时，浏览器会触发 onError）
+ */
+function AssetCardThumbnail({
+  imgUrl,
+  name,
+}: {
+  imgUrl: string
+  name: string
+}) {
+  const [loadError, setLoadError] = useState(false)
+
+  const handleError = useCallback(() => {
+    setLoadError(true)
+  }, [])
+
+  if (!imgUrl || loadError) {
+    return (
+      <div
+        className="w-full h-full flex flex-col items-center justify-center p-3 text-center box-border"
+        style={{ boxSizing: "border-box" }}
+      >
+        <Package className="w-12 h-12 opacity-30 shrink-0 mb-2" aria-hidden />
+        <p className="text-[10px] leading-tight text-[var(--color-muted)] font-medium">
+          {!imgUrl
+            ? "无本地路径：请用顶部「从平台拉取」同步本集"
+            : "图片未落盘或加载失败：请重新拉取，勿勾选「仅同步文案」"}
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={imgUrl}
+      alt={name}
+      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      onError={handleError}
+    />
+  )
+}
+
+/** 弹窗内大图：加载失败时展示说明文案 */
+function AssetModalImage({ src, alt }: { src: string; alt: string }) {
+  const [err, setErr] = useState(false)
+  if (err) {
+    return (
+      <div className="w-full min-h-[200px] flex flex-col items-center justify-center border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)] p-6 box-border">
+        <Package className="w-16 h-16 opacity-40 mb-3" />
+        <p className="text-sm text-center text-[var(--color-muted)]">
+          本地文件不存在或无法加载。请使用顶部「从平台拉取」重新同步本集，并取消勾选「仅同步文案」；必要时勾选「强制重新下载」。
+        </p>
+      </div>
+    )
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="w-full max-h-[50vh] object-contain border border-[var(--color-newsprint-black)]"
+      onError={() => setErr(true)}
+    />
+  )
 }
 
 /**
@@ -88,14 +159,10 @@ function AssetDetailModal({
             <X className="w-5 h-5" />
           </button>
         </div>
-        {/* 大图 */}
-        <div className="p-4 bg-[var(--color-outline-variant)]/30">
+        {/* 大图：onError 时与列表一致给出可操作提示 */}
+        <div className="p-4 bg-[var(--color-outline-variant)]/30 box-border">
           {imgUrl ? (
-            <img
-              src={imgUrl}
-              alt={asset.name}
-              className="w-full max-h-[50vh] object-contain border border-[var(--color-newsprint-black)]"
-            />
+            <AssetModalImage src={imgUrl} alt={asset.name} />
           ) : (
             <div className="w-full h-64 flex items-center justify-center border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]">
               <Package className="w-20 h-20 opacity-40" />
@@ -179,6 +246,9 @@ export default function AssetLibraryPage() {
           <p className="text-[var(--color-newsprint-black)] font-medium opacity-70 text-sm uppercase tracking-tight">
             {currentEpisode.episodeTitle} · {assets.length} 个资产
           </p>
+          <p className="text-xs text-[var(--color-muted)] mt-2 max-w-2xl leading-relaxed">
+            资产列表与缩略图随「从平台拉取剧集」一并写入（同一套 pull_episode）；若仅有文字无图，多半是拉取时勾选了仅同步文案，或平台未返回可下载缩略图。
+          </p>
         </div>
       </div>
 
@@ -220,17 +290,7 @@ export default function AssetLibraryPage() {
                 className="border-2 border-[var(--color-newsprint-black)] overflow-hidden group bg-[var(--color-newsprint-off-white)] hover:shadow-lg transition-shadow text-left cursor-pointer"
               >
                 <div className="aspect-square bg-[var(--color-outline-variant)] relative overflow-hidden">
-                  {imgUrl ? (
-                    <img
-                      src={imgUrl}
-                      alt={a.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Package className="w-16 h-16 opacity-30" />
-                    </div>
-                  )}
+                  <AssetCardThumbnail imgUrl={imgUrl} name={a.name} />
                 </div>
                 <div className="p-4 border-t-2 border-[var(--color-newsprint-black)]">
                   <p className="text-base font-bold truncate" title={a.name}>

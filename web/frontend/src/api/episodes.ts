@@ -4,7 +4,7 @@
  */
 import type { Episode } from "@/types"
 import type { PullEpisodeRequest } from "@/types"
-import { apiClient } from "./client"
+import { apiClient, LONG_REQUEST_TIMEOUT_MS } from "./client"
 
 export const episodesApi = {
   list: () => apiClient.get<Episode[]>("/episodes"),
@@ -15,10 +15,14 @@ export const episodesApi = {
     projectId?: string,
     skipImages = false
   ) =>
-    apiClient.post<Episode>("/episodes/pull", {
-      episodeId,
-      forceRedownload,
-      projectId,
-      skipImages,
-    } as PullEpisodeRequest),
+    apiClient.post<Episode>(
+      "/episodes/pull",
+      {
+        episodeId,
+        forceRedownload,
+        projectId,
+        skipImages,
+      } as PullEpisodeRequest,
+      { timeout: LONG_REQUEST_TIMEOUT_MS }
+    ),
 }

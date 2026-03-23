@@ -28,6 +28,9 @@ _LOG = logging.getLogger(__name__)
 # 轮询间隔（秒），与历史 GET 轮询频率大致同量级
 _POLL_INTERVAL_SEC = 15.0
 
+# 无 Vidu 客户端时只打一次告警，避免刷屏
+_warned_no_vidu_client = False
+
 _thread: Optional[threading.Thread] = None
 _stop = threading.Event()
 
@@ -97,8 +100,15 @@ def _finalize_one_task(task: TaskRow) -> None:
             )
             return
 
+    global _warned_no_vidu_client
     client = _get_vidu_client()
     if not client:
+        if not _warned_no_vidu_client:
+            _warned_no_vidu_client = True
+            _LOG.warning(
+                "VIDU_API_KEY（或 API_KEY）未配置：video_finalizer 无法查询 Vidu、下载 mp4，"
+                "视频任务会长期保持 processing；请在项目根 .env 配置后重启后端。"
+            )
         return
 
     try:

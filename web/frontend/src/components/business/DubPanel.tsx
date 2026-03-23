@@ -106,14 +106,27 @@ export function DubPanel({ episodeId }: DubPanelProps) {
   if (elOk === false) {
     return (
       <div
-        className="rounded border border-dashed border-[var(--color-newsprint-black)] p-4 text-sm text-[var(--color-muted)]"
+        className="rounded border border-dashed border-[var(--color-newsprint-black)] p-4 text-sm text-[var(--color-muted)] space-y-2"
         style={{ boxSizing: "border-box" }}
       >
-        <div className="flex items-center gap-2 font-bold text-[var(--color-ink)] mb-1">
+        <div className="flex items-center gap-2 font-bold text-[var(--color-ink)]">
           <Mic className="w-4 h-4" />
-          配音（ElevenLabs）
+          配音（ElevenLabs）— 可选功能
         </div>
-        <p>服务端未配置 ELEVENLABS_API_KEY，请在项目根 .env 中配置后重启后端。</p>
+        <p className="leading-relaxed">
+          当前<strong>未配置</strong>
+          <code className="mx-1 px-1 bg-[var(--color-outline-variant)] text-[var(--color-ink)] text-xs">
+            ELEVENLABS_API_KEY
+          </code>
+          ，因此<strong>无法使用本面板内的 STS/TTS 配音</strong>（需调用 ElevenLabs 云端，没有密钥服务端不能代你请求）。
+        </p>
+        <p className="leading-relaxed text-[var(--color-ink)]">
+          <strong>其它流程不受影响：</strong>
+          分镜拉取、尾帧/视频生成（Vidu）、任务轮询、剪映导出等均可照常使用；它们不依赖 ElevenLabs。
+        </p>
+        <p className="text-xs">
+          若需要配音：在项目根 <code className="font-mono">.env</code> 中配置 Key 后重启后端；设置页可测试连通性。
+        </p>
       </div>
     )
   }

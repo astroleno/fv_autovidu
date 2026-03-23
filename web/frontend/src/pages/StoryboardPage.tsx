@@ -4,12 +4,13 @@
  * 批量生成尾帧 / 批量生成视频：调用 generateApi，taskStore 轮询并在完成后 Toast
  */
 import { useEffect, useRef, useState } from "react"
-import { useParams } from "react-router"
-import { Grid3X3, List, Film, ImagePlus, Loader2 } from "lucide-react"
+import { Link, useParams } from "react-router"
+import { Clapperboard, Grid3X3, List, Film, ImagePlus, Loader2, Package } from "lucide-react"
 import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
 import { Button, Skeleton } from "@/components/ui"
 import {
   BatchResultSummary,
+  BatchTaskProgressBanner,
   DubPanel,
   ExportPanel,
   SceneGroup,
@@ -22,6 +23,7 @@ import { flattenShots } from "@/types"
 import type { ShotStatus } from "@/types"
 import type { GenerateVideoRequest, TaskStatusResponse } from "@/types"
 import { generateApi } from "@/api/generate"
+import { routes } from "@/utils/routes"
 
 const STATUS_FILTERS: { value: ShotStatus | "all"; label: string }[] = [
   { value: "all", label: "全部" },
@@ -122,6 +124,10 @@ export default function StoryboardPage() {
         taskToShot[t.taskId] = t.shotId
       })
       const ids = res.data.tasks.map((t) => t.taskId)
+      pushToast(
+        `已提交 ${ids.length} 个尾帧任务，镜头将显示「尾帧生成中」；完成后会弹出汇总`,
+        "info"
+      )
       startPolling(ids, {
         episodeId,
         onAllSettled: (results) => {
@@ -157,6 +163,10 @@ export default function StoryboardPage() {
         taskToShot[t.taskId] = t.shotId
       })
       const ids = res.data.tasks.map((t) => t.taskId)
+      pushToast(
+        `已提交 ${ids.length} 个视频任务，镜头将显示「视频生成中」；完成后会弹出汇总`,
+        "info"
+      )
       startPolling(ids, {
         episodeId,
         onAllSettled: (results) => {
@@ -192,6 +202,10 @@ export default function StoryboardPage() {
         taskToShot[t.taskId] = t.shotId
       })
       const ids = res.data.tasks.map((t) => t.taskId)
+      pushToast(
+        `已提交 ${ids.length} 个首帧视频任务；完成后会弹出汇总`,
+        "info"
+      )
       startPolling(ids, {
         episodeId,
         onAllSettled: (results) => {
@@ -289,6 +303,8 @@ export default function StoryboardPage() {
         onConfirm={handleVideoModeConfirm}
       />
 
+      <BatchTaskProgressBanner />
+
       <div className="mb-10 border-l-4 border-[var(--color-primary)] pl-6">
         <h1 className="text-4xl font-extrabold tracking-tighter text-[var(--color-newsprint-black)] uppercase mb-1 font-headline">
           {currentEpisode.episodeTitle} - 分镜板总览
@@ -296,6 +312,28 @@ export default function StoryboardPage() {
         <p className="text-[var(--color-newsprint-black)] font-medium opacity-70 text-sm uppercase tracking-tight">
           {flattenShots(currentEpisode).length} 个镜头
         </p>
+        {/* 子页面入口：粗剪台、资产库；看单条视频需进镜头详情（卡片可点） */}
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-bold uppercase tracking-wider">
+          <span className="text-[var(--color-muted)] font-medium normal-case tracking-normal text-[13px]">
+            单镜头视频预览 / 选片：点击任意镜头卡片 → 进入镜头详情页
+          </span>
+          <Link
+            to={routes.timeline(projectId, episodeId)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[var(--color-newsprint-black)] bg-[var(--color-primary)] text-white hover:opacity-90 transition-opacity box-border"
+            style={{ boxSizing: "border-box" }}
+          >
+            <Clapperboard className="w-4 h-4 shrink-0" aria-hidden />
+            粗剪时间线
+          </Link>
+          <Link
+            to={routes.assets(projectId, episodeId)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[var(--color-newsprint-black)] bg-transparent hover:bg-[var(--color-outline-variant)] transition-colors box-border"
+            style={{ boxSizing: "border-box" }}
+          >
+            <Package className="w-4 h-4 shrink-0" aria-hidden />
+            资产库
+          </Link>
+        </div>
       </div>
 
       {/* 筛选 + 批量操作 + 视图切换 */}

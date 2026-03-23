@@ -6,7 +6,7 @@ import type {
   ProjectSummary,
   PullProjectResponse,
 } from "@/types/project"
-import { apiClient } from "./client"
+import { apiClient, LONG_REQUEST_TIMEOUT_MS } from "./client"
 
 export const projectsApi = {
   list: () => apiClient.get<ProjectSummary[]>("/projects"),
@@ -28,6 +28,7 @@ export const projectsApi = {
       {
         forceRedownload: opts?.forceRedownload ?? false,
         skipImages: opts?.skipImages ?? false,
-      }
+      },
+      { timeout: LONG_REQUEST_TIMEOUT_MS }
     ),
 }

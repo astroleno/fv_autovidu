@@ -8,8 +8,23 @@
 from __future__ import annotations
 
 import json
+import threading
 from pathlib import Path
 from typing import Any
+
+# ---------- 并发安全：同一 episode.json 的「读 → 改 → 写」必须串行 ----------
+# 并行尾帧会同时调用 update_shot；若不加锁，后写回的线程会覆盖先完成的镜头状态，
+# 导致部分镜头永远停在 endframe_generating、但磁盘上 endframes 文件已存在。
+_episode_mutation_locks: dict[str, threading.Lock] = {}
+_episode_mutation_locks_guard = threading.Lock()
+
+
+def _episode_mutation_lock(episode_id: str) -> threading.Lock:
+    """返回该剧集专用的互斥锁（懒创建，按 episodeId 粒度）。"""
+    with _episode_mutation_locks_guard:
+        if episode_id not in _episode_mutation_locks:
+            _episode_mutation_locks[episode_id] = threading.Lock()
+        return _episode_mutation_locks[episode_id]
 
 from models.schemas import DubStatus, Episode, Shot, VideoCandidate
 
@@ -174,19 +189,20 @@ def set_shot_dub(episode_id: str, shot_id: str, dub: DubStatus | None) -> Shot |
     """
     设置分镜的 dub 字段并落盘（None 表示清除配音元数据）。
     """
-    ep_dir = _find_episode_dir(episode_id)
-    if not ep_dir:
+    with _episode_mutation_lock(episode_id):
+        ep_dir = _find_episode_dir(episode_id)
+        if not ep_dir:
+            return None
+        ep = get_episode(episode_id)
+        if not ep:
+            return None
+        for scene in ep.scenes:
+            for i, shot in enumerate(scene.shots):
+                if shot.shotId == shot_id:
+                    scene.shots[i] = shot.model_copy(update={"dub": dub})
+                    _save_episode(ep_dir, ep)
+                    return scene.shots[i]
         return None
-    ep = get_episode(episode_id)
-    if not ep:
-        return None
-    for scene in ep.scenes:
-        for i, shot in enumerate(scene.shots):
-            if shot.shotId == shot_id:
-                scene.shots[i] = shot.model_copy(update={"dub": dub})
-                _save_episode(ep_dir, ep)
-                return scene.shots[i]
-    return None
 
 
 def persist_episode(episode: Episode) -> None:
@@ -199,10 +215,11 @@ def persist_episode(episode: Episode) -> None:
     Raises:
         ValueError: 未找到对应剧集目录
     """
-    ep_dir = _find_episode_dir(episode.episodeId)
-    if not ep_dir:
-        raise ValueError("Episode not found")
-    _save_episode(ep_dir, episode)
+    with _episode_mutation_lock(episode.episodeId):
+        ep_dir = _find_episode_dir(episode.episodeId)
+        if not ep_dir:
+            raise ValueError("Episode not found")
+        _save_episode(ep_dir, episode)
 
 
 def update_shot(episode_id: str, shot_id: str, updates: dict[str, Any]) -> Shot | None:
@@ -217,23 +234,24 @@ def update_shot(episode_id: str, shot_id: str, updates: dict[str, Any]) -> Shot 
     Returns:
         更新后的 Shot，未找到返回 None
     """
-    ep_dir = _find_episode_dir(episode_id)
-    if not ep_dir:
+    with _episode_mutation_lock(episode_id):
+        ep_dir = _find_episode_dir(episode_id)
+        if not ep_dir:
+            return None
+        ep = get_episode(episode_id)
+        if not ep:
+            return None
+        for scene in ep.scenes:
+            for i, shot in enumerate(scene.shots):
+                if shot.shotId == shot_id:
+                    d = shot.model_dump()
+                    for k, v in updates.items():
+                        if k in d:
+                            d[k] = v
+                    scene.shots[i] = Shot.model_validate(d)
+                    _save_episode(ep_dir, ep)
+                    return scene.shots[i]
         return None
-    ep = get_episode(episode_id)
-    if not ep:
-        return None
-    for scene in ep.scenes:
-        for i, shot in enumerate(scene.shots):
-            if shot.shotId == shot_id:
-                d = shot.model_dump()
-                for k, v in updates.items():
-                    if k in d:
-                        d[k] = v
-                scene.shots[i] = Shot.model_validate(d)
-                _save_episode(ep_dir, ep)
-                return scene.shots[i]
-    return None
 
 
 def update_shot_status(episode_id: str, shot_id: str, status: str) -> Shot | None:
@@ -247,21 +265,22 @@ def add_video_candidate(
     candidate: VideoCandidate,
 ) -> Shot | None:
     """向 Shot 添加视频候选。"""
-    ep_dir = _find_episode_dir(episode_id)
-    if not ep_dir:
+    with _episode_mutation_lock(episode_id):
+        ep_dir = _find_episode_dir(episode_id)
+        if not ep_dir:
+            return None
+        ep = get_episode(episode_id)
+        if not ep:
+            return None
+        for scene in ep.scenes:
+            for i, shot in enumerate(scene.shots):
+                if shot.shotId == shot_id:
+                    cand_list = list(shot.videoCandidates)
+                    cand_list.append(candidate)
+                    scene.shots[i] = shot.model_copy(update={"videoCandidates": cand_list})
+                    _save_episode(ep_dir, ep)
+                    return scene.shots[i]
         return None
-    ep = get_episode(episode_id)
-    if not ep:
-        return None
-    for scene in ep.scenes:
-        for i, shot in enumerate(scene.shots):
-            if shot.shotId == shot_id:
-                cand_list = list(shot.videoCandidates)
-                cand_list.append(candidate)
-                scene.shots[i] = shot.model_copy(update={"videoCandidates": cand_list})
-                _save_episode(ep_dir, ep)
-                return scene.shots[i]
-    return None
 
 
 def update_video_candidate(
@@ -279,34 +298,35 @@ def update_video_candidate(
         candidate_id: 候选 id
         updates: 要合并到候选上的字段（与 VideoCandidate 字段名一致）
     """
-    ep_dir = _find_episode_dir(episode_id)
-    if not ep_dir:
+    with _episode_mutation_lock(episode_id):
+        ep_dir = _find_episode_dir(episode_id)
+        if not ep_dir:
+            return None
+        ep = get_episode(episode_id)
+        if not ep:
+            return None
+        for scene in ep.scenes:
+            for i, shot in enumerate(scene.shots):
+                if shot.shotId != shot_id:
+                    continue
+                new_list: list[VideoCandidate] = []
+                found = False
+                for c in shot.videoCandidates:
+                    if c.id == candidate_id:
+                        d = c.model_dump()
+                        for k, v in updates.items():
+                            if k in d:
+                                d[k] = v
+                        new_list.append(VideoCandidate.model_validate(d))
+                        found = True
+                    else:
+                        new_list.append(c)
+                if not found:
+                    return None
+                scene.shots[i] = shot.model_copy(update={"videoCandidates": new_list})
+                _save_episode(ep_dir, ep)
+                return scene.shots[i]
         return None
-    ep = get_episode(episode_id)
-    if not ep:
-        return None
-    for scene in ep.scenes:
-        for i, shot in enumerate(scene.shots):
-            if shot.shotId != shot_id:
-                continue
-            new_list: list[VideoCandidate] = []
-            found = False
-            for c in shot.videoCandidates:
-                if c.id == candidate_id:
-                    d = c.model_dump()
-                    for k, v in updates.items():
-                        if k in d:
-                            d[k] = v
-                    new_list.append(VideoCandidate.model_validate(d))
-                    found = True
-                else:
-                    new_list.append(c)
-            if not found:
-                return None
-            scene.shots[i] = shot.model_copy(update={"videoCandidates": new_list})
-            _save_episode(ep_dir, ep)
-            return scene.shots[i]
-    return None
 
 
 def select_candidate(
@@ -319,39 +339,40 @@ def select_candidate(
     将指定 candidate 的 selected 置为 True，其他置为 False，并更新 shot.status 为 "selected"。
     若切换为非 dub.sourceCandidateId 对应候选，则将 dub 标记为 stale（需重新配音）。
     """
-    ep_dir = _find_episode_dir(episode_id)
-    if not ep_dir:
-        return None
-    ep = get_episode(episode_id)
-    if not ep:
-        return None
-    for scene in ep.scenes:
-        for i, shot in enumerate(scene.shots):
-            if shot.shotId == shot_id:
-                new_candidates = []
-                for c in shot.videoCandidates:
-                    new_candidates.append(
-                        c.model_copy(update={"selected": c.id == candidate_id})
-                    )
-                new_dub = shot.dub
-                if shot.dub and shot.dub.sourceCandidateId:
-                    if shot.dub.sourceCandidateId != candidate_id:
-                        new_dub = shot.dub.model_copy(
-                            update={
-                                "status": "stale",
-                                "error": "已切换视频候选，需重新配音",
-                            }
+    with _episode_mutation_lock(episode_id):
+        ep_dir = _find_episode_dir(episode_id)
+        if not ep_dir:
+            return None
+        ep = get_episode(episode_id)
+        if not ep:
+            return None
+        for scene in ep.scenes:
+            for i, shot in enumerate(scene.shots):
+                if shot.shotId == shot_id:
+                    new_candidates = []
+                    for c in shot.videoCandidates:
+                        new_candidates.append(
+                            c.model_copy(update={"selected": c.id == candidate_id})
                         )
-                scene.shots[i] = shot.model_copy(
-                    update={
-                        "videoCandidates": new_candidates,
-                        "status": "selected",
-                        "dub": new_dub,
-                    }
-                )
-                _save_episode(ep_dir, ep)
-                return scene.shots[i]
-    return None
+                    new_dub = shot.dub
+                    if shot.dub and shot.dub.sourceCandidateId:
+                        if shot.dub.sourceCandidateId != candidate_id:
+                            new_dub = shot.dub.model_copy(
+                                update={
+                                    "status": "stale",
+                                    "error": "已切换视频候选，需重新配音",
+                                }
+                            )
+                    scene.shots[i] = shot.model_copy(
+                        update={
+                            "videoCandidates": new_candidates,
+                            "status": "selected",
+                            "dub": new_dub,
+                        }
+                    )
+                    _save_episode(ep_dir, ep)
+                    return scene.shots[i]
+        return None
 
 
 def resolve_file_path(episode_id: str, relative_path: str) -> Path | None:
