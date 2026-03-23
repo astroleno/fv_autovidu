@@ -62,7 +62,8 @@ def _shot_ids_first_n(episode_id: str, n: int) -> list[tuple[int, str, str]]:
             flat.append((sh.shotNumber, sh.shotId, sh.firstFrame or ""))
     return flat[:n]
 
-_SEM = threading.Semaphore(int(os.getenv("ENDFRAME_CONCURRENCY", "5")))
+_DEFAULT_EF = "20"
+_SEM = threading.Semaphore(int(os.getenv("ENDFRAME_CONCURRENCY", _DEFAULT_EF)))
 
 
 def run_one(shot_id: str) -> tuple[str, str, str | None]:
@@ -125,13 +126,14 @@ def main() -> None:
     shot_ids = [p[1] for p in picked]
 
     print(f"Episode: {EPISODE_ID}")
-    print(f"并发上限: {int(os.getenv('ENDFRAME_CONCURRENCY', '5'))} (ENDFRAME_CONCURRENCY)")
+    print(f"并发上限: {int(os.getenv('ENDFRAME_CONCURRENCY', _DEFAULT_EF))} (ENDFRAME_CONCURRENCY)")
     print(f"待生成镜头（全局序号前 {len(picked)} 个）:")
     for num, sid, ff in picked:
         print(f"  #{num}  {ff}  shotId={sid}")
 
     results: list[tuple[str, str, str | None]] = []
-    with ThreadPoolExecutor(max_workers=5) as ex:
+    _c = int(os.getenv("ENDFRAME_CONCURRENCY", _DEFAULT_EF))
+    with ThreadPoolExecutor(max_workers=max(_c, 1)) as ex:
         futs = {ex.submit(run_one, sid): sid for sid in shot_ids}
         for fut in as_completed(futs):
             results.append(fut.result())

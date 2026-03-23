@@ -23,7 +23,10 @@ CanvasSizeLiteral = Literal["720p", "1080p"]
 
 def canvas_wh(canvas_size: CanvasSizeLiteral) -> tuple[int, int]:
     """
-    将业务画布档位映射为宽高像素。
+    将业务画布档位映射为 draft_info 中的宽高像素（横屏基准）。
+
+    说明：当前为「最小可迭代」横屏 16:9；竖屏短视频（9:16）若剪映实机需要，
+    应改为 1080x1920 等并在 PROTOCOL_TEMPLATE_VERSION 升级时一并验证。
 
     Args:
         canvas_size: 720p 或 1080p

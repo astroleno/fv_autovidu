@@ -5,8 +5,7 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui"
 import { dubApi } from "@/api/dub"
-
-const LS_JIANYING_HINT = "fv_settings_jianying_draft_path_hint"
+import { LS_JIANYING_DRAFT_PATH } from "@/components/business"
 
 export default function SettingsPage() {
   const [apiUrl, setApiUrl] = useState("http://localhost:8000")
@@ -19,7 +18,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     try {
-      const s = localStorage.getItem(LS_JIANYING_HINT)
+      const s = localStorage.getItem(LS_JIANYING_DRAFT_PATH)
       if (s) setJianyingPathHint(s)
     } catch {
       /* ignore */
@@ -29,7 +28,7 @@ export default function SettingsPage() {
   const persistJianyingHint = (v: string) => {
     setJianyingPathHint(v)
     try {
-      localStorage.setItem(LS_JIANYING_HINT, v)
+      localStorage.setItem(LS_JIANYING_DRAFT_PATH, v)
     } catch {
       /* ignore */
     }
@@ -104,7 +103,7 @@ export default function SettingsPage() {
         >
           <h2 className="text-sm font-black uppercase tracking-wider mb-2">剪映草稿目录（可选）</h2>
           <p className="text-xs text-[var(--color-muted)] mb-2">
-            仅作本机路径备忘；默认导出为 ZIP。同机直写剪映目录可在后续从导出接口传 draftPath。
+            与粗剪页「剪映草稿导出」弹窗共用；导出成功后会自动写回此处，打开弹窗时也会预填。
           </p>
           <input
             type="text"

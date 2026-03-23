@@ -170,8 +170,14 @@ export default function AppLayout() {
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <TopNavBar breadcrumbs={breadcrumbs} actions={topActions} />
-        <main className="flex-1 overflow-auto min-w-0">
-          <Outlet />
+        {/**
+         * 主内容区：占满「顶栏以下」视口高度，子页面可用 h-full + min-h-0 做一屏布局（如粗剪台）；
+         * 内部再 overflow-y-auto，长页面（分镜板等）仍在内层滚动。
+         */}
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <Outlet />
+          </div>
         </main>
       </div>
 

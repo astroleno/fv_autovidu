@@ -4,6 +4,10 @@
 
 异步触发生成任务，立即返回 taskId 供前端轮询。
 尾帧批量：每个 shot 独立 task；视频批量：按 mode 分发 Vidu（i2v / 首尾帧 reference2video / 多参考图）。
+
+重要：FastAPI/Starlette 的 BackgroundTasks 会**按顺序**执行每个后台任务；
+若对同一请求 add_task N 次同步函数，会**串行**跑完一张再跑下一张（总耗时 ≈ N × 单张耗时）。
+因此批量尾帧/批量视频改为：只 add_task **一次**，在回调内用 ThreadPoolExecutor 按 ENDFRAME_CONCURRENCY / VIDEO_CONCURRENCY 真正并行。
 """
 
 from __future__ import annotations
@@ -12,6 +16,7 @@ import os
 import sys
 import threading
 import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -40,10 +45,95 @@ from services.task_store import get_task_store
 
 router = APIRouter()
 
-# 并发控制：BackgroundTasks 在线程池执行同步函数，使用 threading.Semaphore
-# 默认 5 路并发可调；若 yunwu 限流可改小或设置环境变量 ENDFRAME_CONCURRENCY
-_ENDFRAME_SEM = threading.Semaphore(int(os.getenv("ENDFRAME_CONCURRENCY", "5")))
-_VIDEO_SEM = threading.Semaphore(int(os.getenv("VIDEO_CONCURRENCY", "5")))
+# 并发控制：
+# 1) 批量任务内用 ThreadPoolExecutor(max_workers=...) 限制并行度（见 _run_*_batch_parallel）
+# 2) Semaphore 保留在单任务函数内，防止将来从别处直接调用 _run_tail_frame 时打爆 API
+# 默认 20 路；若 yunwu/Vidu 限流可改小环境变量
+_ENDFRAME_SEM = threading.Semaphore(int(os.getenv("ENDFRAME_CONCURRENCY", "20")))
+_VIDEO_SEM = threading.Semaphore(int(os.getenv("VIDEO_CONCURRENCY", "20")))
+
+
+def _endframe_max_workers(n_tasks: int) -> int:
+    """批量尾帧线程池大小：不超过任务数，不超过 ENDFRAME_CONCURRENCY。"""
+    cap = int(os.getenv("ENDFRAME_CONCURRENCY", "20"))
+    return max(1, min(n_tasks, cap))
+
+
+def _video_max_workers(n_tasks: int) -> int:
+    """批量视频线程池大小。"""
+    cap = int(os.getenv("VIDEO_CONCURRENCY", "20"))
+    return max(1, min(n_tasks, cap))
+
+
+def _run_endframe_batch_parallel(specs: list[tuple[str, str, str]]) -> None:
+    """
+    在单个 BackgroundTask 内并行执行多路尾帧生成。
+
+    Args:
+        specs: (task_id, episode_id, shot_id) 列表
+    """
+    if not specs:
+        return
+    workers = _endframe_max_workers(len(specs))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [
+            pool.submit(_run_tail_frame, tid, eid, sid) for tid, eid, sid in specs
+        ]
+        for fut in as_completed(futures):
+            try:
+                fut.result()
+            except Exception as e:
+                # _run_tail_frame 内部已捕获；此处防御未预料异常
+                print(f"[Warn] endframe batch worker: {e}")
+
+
+def _run_video_batch_parallel(
+    jobs: list[
+        tuple[
+            str,
+            str,
+            str,
+            VideoMode,
+            str | None,
+            int | None,
+            str | None,
+            list[str] | None,
+        ]
+    ],
+) -> None:
+    """在单个 BackgroundTask 内并行提交多路 Vidu（与尾帧同理，避免 BackgroundTasks 串行）。"""
+    if not jobs:
+        return
+    workers = _video_max_workers(len(jobs))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [
+            pool.submit(
+                _run_video_gen,
+                task_id,
+                episode_id,
+                shot_id,
+                mode,
+                model,
+                duration,
+                resolution,
+                ref_ids,
+            )
+            for (
+                task_id,
+                episode_id,
+                shot_id,
+                mode,
+                model,
+                duration,
+                resolution,
+                ref_ids,
+            ) in jobs
+        ]
+        for fut in as_completed(futures):
+            try:
+                fut.result()
+            except Exception as e:
+                print(f"[Warn] video batch worker: {e}")
 
 
 def _default_video_model(mode: VideoMode) -> str:
@@ -121,12 +211,15 @@ def generate_endframe(req: GenerateEndframeRequest, background_tasks: Background
     if not req.shotIds:
         raise HTTPException(status_code=400, detail="shotIds 不能为空")
     tasks_out: list[EndframeTaskItem] = []
+    specs: list[tuple[str, str, str]] = []
     for shot_id in req.shotIds:
         task_id = f"endframe-{uuid.uuid4().hex[:12]}"
         _ts().set_task(task_id, "processing")
         data_service.update_shot_status(req.episodeId, shot_id, "endframe_generating")
-        background_tasks.add_task(_run_tail_frame, task_id, req.episodeId, shot_id)
+        specs.append((task_id, req.episodeId, shot_id))
         tasks_out.append(EndframeTaskItem(taskId=task_id, shotId=shot_id))
+    # 关键：只注册一个后台任务，内部线程池并行；勿对每镜头 add_task 一次（会串行）
+    background_tasks.add_task(_run_endframe_batch_parallel, specs)
     return BatchEndframeResponse(tasks=tasks_out)
 
 
@@ -270,21 +363,35 @@ def generate_video(req: GenerateVideoRequest, background_tasks: BackgroundTasks)
         raise HTTPException(status_code=400, detail="shotIds 不能为空")
     tasks_out = []
     ref_ids = req.referenceAssetIds
+    jobs: list[
+        tuple[
+            str,
+            str,
+            str,
+            VideoMode,
+            str | None,
+            int | None,
+            str | None,
+            list[str] | None,
+        ]
+    ] = []
     for shot_id in req.shotIds:
         task_id = f"video-{uuid.uuid4().hex[:12]}"
         _ts().set_task(task_id, "processing")
-        background_tasks.add_task(
-            _run_video_gen,
-            task_id,
-            req.episodeId,
-            shot_id,
-            req.mode,
-            req.model,
-            req.duration,
-            req.resolution,
-            ref_ids,
+        jobs.append(
+            (
+                task_id,
+                req.episodeId,
+                shot_id,
+                req.mode,
+                req.model,
+                req.duration,
+                req.resolution,
+                ref_ids,
+            )
         )
         tasks_out.append({"taskId": task_id, "shotId": shot_id})
+    background_tasks.add_task(_run_video_batch_parallel, jobs)
     return GenerateVideoResponse(tasks=tasks_out)
 
 

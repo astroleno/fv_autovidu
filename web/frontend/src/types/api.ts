@@ -87,12 +87,12 @@ export interface ExportRoughCutResponse {
   exportPath: string
 }
 
-/** 剪映草稿导出请求 */
+/** 剪映草稿导出请求（必填 draftPath；不生成 ZIP） */
 export interface JianyingExportRequest {
   episodeId: string
   shotIds?: string[]
-  draftPath?: string
-  createZip?: boolean
+  draftPath: string
+  /** 默认由服务端设为 1080p；一般无需传 */
   canvasSize?: "720p" | "1080p"
 }
 
@@ -101,6 +101,8 @@ export interface JianyingExportResponse {
   draftId: string
   draftDir: string
   zipPath?: string | null
+  /** 填写了 draftPath 时：复制到剪映目录后的草稿文件夹绝对路径 */
+  jianyingCopyPath?: string | null
   exportedShots: number
   missingShots: string[]
   exportedAt: string

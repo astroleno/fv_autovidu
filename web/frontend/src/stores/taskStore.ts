@@ -3,6 +3,8 @@
  * 进行中的任务 + 轮询逻辑；支持任务终态后刷新剧集、全部完成后回调
  *
  * 轮询策略：
+ * - 启动时若带 episodeId：立即 fetchEpisodeDetail，与后端刚写入的 endframe_generating / video_generating 同步
+ * - 首次 batch 请求延迟 0ms，之后每轮成功间隔 3s（避免首包前 3s 界面仍显示旧状态）
  * - 成功拿到 batch 结果：下次间隔重置为 3s，连续失败计数清零
  * - 请求失败：指数退避（3s 起乘 2，上限 30s），连续失败 3 次提示 Toast
  * - 连续失败满 10 次：停止轮询并提示用户手动刷新
@@ -41,7 +43,9 @@ let pollTimeout: ReturnType<typeof setTimeout> | null = null
 /** 记录每个 taskId 上一轮状态，用于检测「首次进入终态」 */
 const previousStatus = new Map<string, string>()
 
+/** 首轮轮询间隔：0 表示提交后立即拉一次任务状态 */
 const INITIAL_DELAY_MS = 3000
+const FIRST_POLL_DELAY_MS = 0
 const MAX_DELAY_MS = 30000
 const TOAST_AFTER_CONSECUTIVE_FAILURES = 3
 const STOP_AFTER_CONSECUTIVE_FAILURES = 10
@@ -61,8 +65,15 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     set({ activeTasks: next })
 
     const pollOptions = options
+    /** 后端在 POST 返回前已写入镜头状态；立刻拉剧集，避免分镜板仍显示 pending */
+    const epId = pollOptions?.episodeId
+    if (epId) {
+      void useEpisodeStore.getState().fetchEpisodeDetail(epId)
+    }
+
     let consecutiveFailures = 0
-    let nextDelayMs = INITIAL_DELAY_MS
+    /** 第一次用 0ms，尽快拿到 processing；之后固定 3s */
+    let nextDelayMs = FIRST_POLL_DELAY_MS
 
     const scheduleNext = () => {
       pollTimeout = window.setTimeout(async () => {
@@ -95,7 +106,6 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
           if (anyNewTerminal) {
             pollOptions?.onAnyTerminal?.()
-            const epId = pollOptions?.episodeId
             if (epId) {
               void useEpisodeStore.getState().fetchEpisodeDetail(epId)
             }
