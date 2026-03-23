@@ -1,8 +1,8 @@
 /**
  * AppLayout 主布局容器
- * 布局：SideNavBar(含剧集列表、资产库、设置) | TopNavBar + 主内容
+ * 布局：SideNavBar | TopNavBar（结构化面包屑）+ 主内容 + 从平台拉取弹窗
  */
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Outlet, useLocation, useParams } from "react-router"
 import { CloudDownload } from "lucide-react"
 import { SideNavBar } from "./SideNavBar"
@@ -11,6 +11,24 @@ import { Dialog, Button } from "@/components/ui"
 import { Toast } from "@/components/ui/Toast"
 import { useEpisodeStore, useToastStore, useUIStore } from "@/stores"
 import { MODAL_PULL_EPISODE } from "@/stores/uiStore"
+import { projectsApi } from "@/api/projects"
+import { routes } from "@/utils/routes"
+
+/** 根据 pathname 判断剧集子页最后一级文案（分镜板 / 资产库 / 镜头 / …） */
+function lastEpisodeSegmentLabel(pathname: string): string {
+  const clean = pathname.split("?")[0].replace(/\/$/, "") || pathname
+  if (clean.endsWith("/timeline")) return "时间线"
+  if (clean.endsWith("/regen")) return "单帧重生"
+  if (clean.endsWith("/assets")) return "资产库"
+  if (clean.includes("/shot/")) return "镜头"
+  if (/\/episode\/[^/]+$/.test(clean)) return "分镜板"
+  return ""
+}
+
+interface Crumb {
+  label: string
+  path?: string
+}
 
 export default function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -19,22 +37,85 @@ export default function AppLayout() {
   /** 仅同步 episode.json（画面描述、提示词），不下载首帧/资产图，速度更快 */
   const [pullSkipImages, setPullSkipImages] = useState(false)
   const [pullLoading, setPullLoading] = useState(false)
+  /** 当前路由下项目的展示标题（来自 GET /api/projects/:id） */
+  const [projectTitle, setProjectTitle] = useState<string | null>(null)
+
   const location = useLocation()
-  const { episodeId: routeEpisodeId } = useParams<{ episodeId?: string }>()
-  const isHome = location.pathname === "/"
-  /** 剧集相关页（分镜板、资产库、镜头详情等）也显示拉取按钮 */
-  const isEpisodePage = Boolean(routeEpisodeId)
+  const { episodeId: routeEpisodeId, projectId: routeProjectId } = useParams<{
+    episodeId?: string
+    projectId?: string
+  }>()
   const { pullNewEpisode, currentEpisode } = useEpisodeStore()
   const { toasts, dismiss: dismissToast } = useToastStore()
   const { activeModal, openModal, closeModal } = useUIStore()
   const pullOpen = activeModal === MODAL_PULL_EPISODE
+
+  /** 进入项目相关页时拉取项目标题，供面包屑使用 */
+  useEffect(() => {
+    if (!routeProjectId) {
+      setProjectTitle(null)
+      return
+    }
+    let cancelled = false
+    projectsApi
+      .detail(routeProjectId)
+      .then((res) => {
+        if (!cancelled) setProjectTitle(res.data.title || null)
+      })
+      .catch(() => {
+        if (!cancelled) setProjectTitle(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [routeProjectId])
 
   /** 打开拉取弹窗时，若当前在剧集页则预填 episodeId */
   useEffect(() => {
     if (pullOpen && routeEpisodeId && !pullId) {
       setPullId(routeEpisodeId)
     }
-  }, [pullOpen, routeEpisodeId])
+  }, [pullOpen, routeEpisodeId, pullId])
+
+  const breadcrumbs: Crumb[] = useMemo(() => {
+    const p = location.pathname
+    const home: Crumb = { label: "首页", path: routes.home() }
+
+    if (p === "/local-episodes") {
+      return [home, { label: "本地剧集" }]
+    }
+    if (p.startsWith("/settings")) {
+      return [home, { label: "设置" }]
+    }
+
+    if (routeProjectId && !routeEpisodeId) {
+      const title = projectTitle || routeProjectId
+      return [home, { label: title, path: routes.project(routeProjectId) }]
+    }
+
+    if (routeProjectId && routeEpisodeId && currentEpisode) {
+      const pt = projectTitle || routeProjectId
+      const last = lastEpisodeSegmentLabel(p)
+      const items: Crumb[] = [
+        home,
+        { label: pt, path: routes.project(routeProjectId) },
+        {
+          label: currentEpisode.episodeTitle,
+          path: routes.episode(routeProjectId, routeEpisodeId),
+        },
+      ]
+      if (last) items.push({ label: last })
+      return items
+    }
+
+    return [home]
+  }, [
+    location.pathname,
+    routeProjectId,
+    routeEpisodeId,
+    currentEpisode,
+    projectTitle,
+  ])
 
   const handleClosePull = () => {
     closeModal()
@@ -47,10 +128,11 @@ export default function AppLayout() {
     if (!pullId.trim()) return
     setPullLoading(true)
     try {
+      /** 优先：剧集页且已加载 currentEpisode；否则项目详情页用 URL 中的 projectId */
       const projectId =
         routeEpisodeId && currentEpisode?.episodeId === routeEpisodeId
           ? currentEpisode.projectId
-          : undefined
+          : routeProjectId ?? undefined
       await pullNewEpisode(pullId.trim(), pullForce, projectId, pullSkipImages)
       handleClosePull()
     } finally {
@@ -58,16 +140,26 @@ export default function AppLayout() {
     }
   }
 
-  const topActions = (isHome || isEpisodePage) ? (
-    <button
-      type="button"
-      onClick={() => openModal(MODAL_PULL_EPISODE)}
-      className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white border border-[var(--color-newsprint-black)] font-bold text-xs uppercase tracking-widest hover:shadow-[4px_4px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
-    >
-      <CloudDownload className="w-4 h-4" />
-      从平台拉取
-    </button>
-  ) : undefined
+  const isEpisodePage = Boolean(routeEpisodeId)
+  const isProjectDetailOnly = Boolean(routeProjectId) && !routeEpisodeId
+
+  /**
+   * 「从平台拉取」仅在具备项目上下文时展示：
+   * - 项目详情：URL 含 projectId，提交时传入 routeProjectId
+   * - 剧集相关页：可带 currentEpisode.projectId
+   * 首页 / 本地剧集 / 设置不展示，避免无 projectId 时落到后端 proj-default，与「项目优先」主流程冲突。
+   */
+  const topActions =
+    isEpisodePage || isProjectDetailOnly ? (
+      <button
+        type="button"
+        onClick={() => openModal(MODAL_PULL_EPISODE)}
+        className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white border border-[var(--color-newsprint-black)] font-bold text-xs uppercase tracking-widest hover:shadow-[4px_4px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all box-border"
+      >
+        <CloudDownload className="w-4 h-4" />
+        从平台拉取
+      </button>
+    ) : undefined
 
   return (
     <div className="flex min-h-screen bg-[var(--color-surface)] box-border">
@@ -77,7 +169,7 @@ export default function AppLayout() {
         taskCount={0}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <TopNavBar actions={topActions} />
+        <TopNavBar breadcrumbs={breadcrumbs} actions={topActions} />
         <main className="flex-1 overflow-auto min-w-0">
           <Outlet />
         </main>
@@ -99,7 +191,7 @@ export default function AppLayout() {
               className="w-full px-3 py-2 border border-[var(--color-newsprint-black)] box-border"
             />
           </div>
-          <div className="p-3 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/50 space-y-3">
+          <div className="p-3 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/50 space-y-3 box-border">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"

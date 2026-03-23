@@ -22,7 +22,7 @@ import config  # noqa: F401  # pylint: disable=unused-import
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import dub_route, episodes, export_route, files, generate, shots, tasks
+from routes import dub_route, episodes, export_route, files, generate, projects, shots, tasks
 from services.task_store import TaskStoreService
 from services.task_store.video_finalizer import start_video_finalizer_background
 
@@ -58,6 +58,7 @@ app.add_middleware(
 # 挂载路由（前端期望 /api 前缀，路由内部已包含 /api）
 app.include_router(files.router, prefix="/api", tags=["files"])
 app.include_router(episodes.router, prefix="/api", tags=["episodes"])
+app.include_router(projects.router, prefix="/api", tags=["projects"])
 app.include_router(shots.router, prefix="/api", tags=["shots"])
 app.include_router(generate.router, prefix="/api", tags=["generate"])
 app.include_router(tasks.router, prefix="/api", tags=["tasks"])

@@ -292,3 +292,71 @@ class TaskStatusResponse(BaseModel):
     progress: Optional[int] = None
     result: Optional[dict[str, Any]] = None
     error: Optional[str] = None
+
+
+# ---------- 项目（Project）相关：与前端 types/project.ts 对齐 ----------
+
+
+class ProjectSummary(BaseModel):
+    """项目列表项：平台信息 + 本地已拉取剧集数。"""
+
+    projectId: str
+    title: str = ""
+    description: str = ""
+    coverImage: Optional[str] = None
+    episodeCount: int = 0
+    pulledEpisodeCount: int = 0
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+
+
+class ProjectDetail(BaseModel):
+    """单项目详情（与 ProjectSummary 字段一致，便于复用）。"""
+
+    projectId: str
+    title: str = ""
+    description: str = ""
+    coverImage: Optional[str] = None
+    episodeCount: int = 0
+    pulledEpisodeCount: int = 0
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+
+
+ProjectEpisodeSource = Literal["remote_and_local", "remote_only", "local_only"]
+
+
+class ProjectEpisodeItem(BaseModel):
+    """远端与本地合并后的单集条目。"""
+
+    episodeId: str
+    title: str = ""
+    episodeNumber: int = 0
+    source: ProjectEpisodeSource = "remote_only"
+    pulledLocally: bool = False
+    localProjectId: Optional[str] = None
+    pulledAt: Optional[str] = None
+
+
+class ProjectEpisodeListResponse(BaseModel):
+    """项目详情页：项目头 + 剧集列表。"""
+
+    project: dict[str, Any] = Field(default_factory=dict)
+    episodes: list[ProjectEpisodeItem] = Field(default_factory=list)
+
+
+class PullProjectFailedItem(BaseModel):
+    """一键拉取失败的一集。"""
+
+    episodeId: str
+    message: str = ""
+
+
+class PullProjectResponse(BaseModel):
+    """POST /projects/{id}/pull-all 响应。"""
+
+    projectId: str
+    requested: int = 0
+    successCount: int = 0
+    failedCount: int = 0
+    failedEpisodes: list[PullProjectFailedItem] = Field(default_factory=list)

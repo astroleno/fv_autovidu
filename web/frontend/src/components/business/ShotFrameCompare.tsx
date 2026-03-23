@@ -11,12 +11,15 @@ import { Link } from "react-router"
 import { Loader2 } from "lucide-react"
 import type { Shot } from "@/types"
 import { getFileUrl } from "@/utils/file"
+import { routes } from "@/utils/routes"
 import { ImagePreview } from "./ImagePreview"
 
 export type ShotFrameCompareVariant = "card" | "row" | "detail"
 
 interface ShotFrameCompareProps {
   shot: Shot
+  /** 所属项目 UUID（新路由 /project/:projectId/...） */
+  projectId: string
   episodeId: string
   basePath: string
   cacheBust?: string
@@ -50,6 +53,7 @@ const variantClass: Record<
 
 export function ShotFrameCompare({
   shot,
+  projectId,
   episodeId,
   basePath,
   cacheBust,
@@ -57,7 +61,7 @@ export function ShotFrameCompare({
   showEndSkeleton = false,
   onRetryEndframe,
 }: ShotFrameCompareProps) {
-  const detailPath = `/episode/${episodeId}/shot/${shot.shotId}`
+  const detailPath = routes.shot(projectId, episodeId, shot.shotId)
   const firstFrameUrl = getFileUrl(shot.firstFrame, basePath, cacheBust)
   const endFrameUrl = shot.endFrame ? getFileUrl(shot.endFrame, basePath, cacheBust) : null
   const vc = variantClass[variant]

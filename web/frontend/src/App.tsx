@@ -1,9 +1,11 @@
 /**
  * FV Studio 应用入口
- * React Router v7 路由配置：6 个页面 + AppLayout
+ * React Router v7：项目 → 剧集 → 分镜 三级路由；保留 /episode/:id/* 兼容重定向
  */
 import { createBrowserRouter, RouterProvider } from "react-router"
 import AppLayout from "@/components/layout/AppLayout"
+import ProjectListPage from "@/pages/ProjectListPage"
+import ProjectDetailPage from "@/pages/ProjectDetailPage"
 import EpisodeListPage from "@/pages/EpisodeListPage"
 import StoryboardPage from "@/pages/StoryboardPage"
 import AssetLibraryPage from "@/pages/AssetLibraryPage"
@@ -11,19 +13,40 @@ import ShotDetailPage from "@/pages/ShotDetailPage"
 import RegenPage from "@/pages/RegenPage"
 import TimelinePage from "@/pages/TimelinePage"
 import SettingsPage from "@/pages/SettingsPage"
+import LegacyEpisodeRedirect from "@/pages/LegacyEpisodeRedirect"
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
     children: [
-      { index: true, element: <EpisodeListPage /> },
-      { path: "episode/:episodeId", element: <StoryboardPage /> },
-      { path: "episode/:episodeId/assets", element: <AssetLibraryPage /> },
-      { path: "episode/:episodeId/shot/:shotId", element: <ShotDetailPage /> },
-      { path: "episode/:episodeId/shot/:shotId/regen", element: <RegenPage /> },
-      { path: "episode/:episodeId/timeline", element: <TimelinePage /> },
+      { index: true, element: <ProjectListPage /> },
+      { path: "local-episodes", element: <EpisodeListPage /> },
+      { path: "project/:projectId", element: <ProjectDetailPage /> },
+      {
+        path: "project/:projectId/episode/:episodeId",
+        element: <StoryboardPage />,
+      },
+      {
+        path: "project/:projectId/episode/:episodeId/assets",
+        element: <AssetLibraryPage />,
+      },
+      {
+        path: "project/:projectId/episode/:episodeId/shot/:shotId",
+        element: <ShotDetailPage />,
+      },
+      {
+        path: "project/:projectId/episode/:episodeId/shot/:shotId/regen",
+        element: <RegenPage />,
+      },
+      {
+        path: "project/:projectId/episode/:episodeId/timeline",
+        element: <TimelinePage />,
+      },
       { path: "settings", element: <SettingsPage /> },
+      /** 旧书签 /episode/:id 及子路径 → 重定向到新 URL（无子路径与有子路径各一条） */
+      { path: "episode/:episodeId", element: <LegacyEpisodeRedirect /> },
+      { path: "episode/:episodeId/*", element: <LegacyEpisodeRedirect /> },
     ],
   },
 ])

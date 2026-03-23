@@ -17,16 +17,25 @@ import { shotStatusLabels } from "@/utils/format"
 import { generateApi } from "@/api/generate"
 import { useTaskStore } from "@/stores/taskStore"
 import { useToastStore } from "@/stores/toastStore"
+import { routes } from "@/utils/routes"
 
 interface ShotCardProps {
   shot: Shot
+  /** 所属项目 UUID，用于拼接新路由 */
+  projectId: string
   episodeId: string
   basePath?: string
   /** 缓存破坏，重新拉取后图片刷新 */
   cacheBust?: string
 }
 
-export function ShotCard({ shot, episodeId, basePath = "", cacheBust }: ShotCardProps) {
+export function ShotCard({
+  shot,
+  projectId,
+  episodeId,
+  basePath = "",
+  cacheBust,
+}: ShotCardProps) {
   const [submitting, setSubmitting] = useState<"endframe" | "video" | null>(null)
   const startPolling = useTaskStore((s) => s.startPolling)
   const pushToast = useToastStore((s) => s.push)
@@ -116,6 +125,7 @@ export function ShotCard({ shot, episodeId, basePath = "", cacheBust }: ShotCard
       <div className="mb-4">
         <ShotFrameCompare
           shot={shot}
+          projectId={projectId}
           episodeId={episodeId}
           basePath={basePath}
           cacheBust={cacheBust}
@@ -148,7 +158,7 @@ export function ShotCard({ shot, episodeId, basePath = "", cacheBust }: ShotCard
         </div>
       )}
       <div className="grid grid-cols-3 gap-1">
-        <Link to={`/episode/${episodeId}/shot/${shot.shotId}/regen`}>
+        <Link to={routes.regen(projectId, episodeId, shot.shotId)}>
           <button
             type="button"
             className="w-full py-1.5 text-[10px] font-black uppercase tracking-wider border border-[var(--color-newsprint-black)] bg-transparent hover:shadow-[4px_4px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"

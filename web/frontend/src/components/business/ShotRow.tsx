@@ -4,6 +4,7 @@
  * 提示词列支持悬浮显示、点击编辑、失焦保存
  */
 import { Link } from "react-router"
+import { routes } from "@/utils/routes"
 import type { Shot } from "@/types"
 import { Badge } from "@/components/ui"
 import { StatusIndicator, AssetTag, ShotPromptCells } from "@/components/business"
@@ -13,13 +14,14 @@ import { useEpisodeStore } from "@/stores"
 
 interface ShotRowProps {
   shot: Shot
+  projectId: string
   episodeId: string
   basePath?: string
   /** 缓存破坏，重新拉取后图片刷新 */
   cacheBust?: string
 }
 
-export function ShotRow({ shot, episodeId, basePath = "", cacheBust }: ShotRowProps) {
+export function ShotRow({ shot, projectId, episodeId, basePath = "", cacheBust }: ShotRowProps) {
   const { updateShot } = useEpisodeStore()
   const showEndSkeleton = shot.status === "endframe_generating"
 
@@ -29,6 +31,7 @@ export function ShotRow({ shot, episodeId, basePath = "", cacheBust }: ShotRowPr
       <td className="py-3 px-4 align-top min-w-[11rem]">
         <ShotFrameCompare
           shot={shot}
+          projectId={projectId}
           episodeId={episodeId}
           basePath={basePath}
           cacheBust={cacheBust}
@@ -66,7 +69,7 @@ export function ShotRow({ shot, episodeId, basePath = "", cacheBust }: ShotRowPr
       </td>
       <td className="py-3 px-4 text-sm">{shot.videoCandidates.length}</td>
       <td className="py-3 px-4">
-        <Link to={`/episode/${episodeId}/shot/${shot.shotId}`}>
+        <Link to={routes.shot(projectId, episodeId, shot.shotId)}>
           <button
             type="button"
             className="text-xs text-[var(--color-primary)] hover:underline"

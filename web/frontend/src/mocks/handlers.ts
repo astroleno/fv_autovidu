@@ -38,8 +38,48 @@ const mockEpisode = {
   ],
 }
 
+const mockProjectSummary = {
+  projectId: "proj-demo",
+  title: "演示项目",
+  description: "MSW 模拟",
+  coverImage: null as string | null,
+  episodeCount: 1,
+  pulledEpisodeCount: 1,
+  createdAt: "2026-03-20T12:00:00Z",
+  updatedAt: "2026-03-23T08:00:00Z",
+}
+
+const mockProjectEpisodes = {
+  project: { projectId: "proj-demo", title: "演示项目" },
+  episodes: [
+    {
+      episodeId: "ep-001",
+      title: "第2集",
+      episodeNumber: 2,
+      source: "remote_and_local" as const,
+      pulledLocally: true,
+      localProjectId: "proj-demo",
+      pulledAt: "2026-03-19T10:00:00Z",
+    },
+  ],
+}
+
 export const handlers = [
   http.get("/api/episodes", () => HttpResponse.json([mockEpisode])),
   http.get("/api/episodes/:id", () => HttpResponse.json(mockEpisode)),
   http.post("/api/episodes/pull", () => HttpResponse.json(mockEpisode)),
+  http.get("/api/projects", () => HttpResponse.json([mockProjectSummary])),
+  http.get("/api/projects/:projectId", () => HttpResponse.json(mockProjectSummary)),
+  http.get("/api/projects/:projectId/episodes", () =>
+    HttpResponse.json(mockProjectEpisodes)
+  ),
+  http.post("/api/projects/:projectId/pull-all", () =>
+    HttpResponse.json({
+      projectId: "proj-demo",
+      requested: 1,
+      successCount: 1,
+      failedCount: 0,
+      failedEpisodes: [],
+    })
+  ),
 ]

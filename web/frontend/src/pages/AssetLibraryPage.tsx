@@ -9,6 +9,7 @@ import { useEpisodeStore } from "@/stores"
 import { getFileUrl } from "@/utils/file"
 import type { ShotAsset } from "@/types"
 import { Package, ArrowLeft, LayoutGrid, X } from "lucide-react"
+import { routes } from "@/utils/routes"
 
 const TYPE_FILTERS: { value: string; label: string }[] = [
   { value: "all", label: "全部" },
@@ -116,7 +117,10 @@ function AssetDetailModal({
 }
 
 export default function AssetLibraryPage() {
-  const { episodeId } = useParams<{ episodeId: string }>()
+  const { projectId: routeProjectId, episodeId } = useParams<{
+    projectId?: string
+    episodeId: string
+  }>()
   const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
   const [typeFilter, setTypeFilter] = useState<string>("all")
   /** 点击资产卡片时，选中并展示大图与 metadata */
@@ -155,13 +159,14 @@ export default function AssetLibraryPage() {
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   /** 使用 pulledAt 作为缓存破坏参数，重新拉取后图片会刷新 */
   const cacheBust = currentEpisode.pulledAt ?? undefined
+  const projectId = routeProjectId ?? currentEpisode.projectId
 
   return (
     <div className="min-h-screen p-8 box-border">
       {/* 顶部：返回 + 标题 */}
       <div className="mb-8 flex flex-wrap items-center gap-4">
         <Link
-          to={`/episode/${episodeId}`}
+          to={routes.episode(projectId, episodeId)}
           className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--color-newsprint-black)] hover:underline"
         >
           <ArrowLeft className="w-4 h-4" />

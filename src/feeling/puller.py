@@ -16,6 +16,7 @@ import argparse
 import json
 import re
 import sys
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -26,6 +27,23 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 from src.feeling.client import FeelingClient
+
+
+@dataclass
+class PullProjectReport:
+    """
+    一键拉取项目下全部剧集的汇总结果（供 Web API 与 CLI 使用）。
+
+    requested: 平台返回的剧集条数（含无 episodeId 被跳过的条目时仍计入尝试次数）
+    success_count: 成功写入本地的 episode 数
+    failed_episodes: 失败条目，每项含 episodeId 与 message
+    success_results: 每集 pull_episode 返回的 episode dict（与旧版 pull_project 返回值一致）
+    """
+
+    requested: int = 0
+    success_count: int = 0
+    failed_episodes: list[dict[str, str]] = field(default_factory=list)
+    success_results: list[dict[str, Any]] = field(default_factory=list)
 
 # 加载 .env
 try:
@@ -476,26 +494,26 @@ def pull_episode(
     return episode
 
 
-def pull_project(
+def pull_project_with_report(
     project_id: str,
     output_dir: Path,
     *,
     client: FeelingClient | None = None,
     force_redownload: bool = False,
     skip_images: bool = False,
-) -> list[dict[str, Any]]:
+) -> PullProjectReport:
     """
-    一键拉取整个项目的所有剧集。
+    一键拉取整个项目的所有剧集，并返回成功/失败明细（不整批失败）。
 
-    先调用 get_project_episodes 获取剧集列表，再逐个拉取。
+    先调用 get_project_episodes 获取剧集列表，再逐个 pull_episode。
     """
     client = client or FeelingClient()
     output_dir = Path(output_dir)
     episodes = client.get_project_episodes(project_id)
+    report = PullProjectReport(requested=len(episodes))
     if not episodes:
         print(f"[Warn] 项目 {project_id} 下无剧集")
-        return []
-    results: list[dict[str, Any]] = []
+        return report
     for i, ep in enumerate(episodes):
         ep_id = str(_get(ep, "id", "episodeId", default=""))
         if not ep_id:
@@ -514,10 +532,37 @@ def pull_project(
                 force_redownload=force_redownload,
                 skip_images=skip_images,
             )
-            results.append(result)
+            report.success_results.append(result)
+            report.success_count += 1
         except Exception as e:
+            msg = str(e) if str(e) else repr(e)
             print(f"[失败] {title}: {e}")
-    return results
+            report.failed_episodes.append({"episodeId": ep_id, "message": msg})
+    return report
+
+
+def pull_project(
+    project_id: str,
+    output_dir: Path,
+    *,
+    client: FeelingClient | None = None,
+    force_redownload: bool = False,
+    skip_images: bool = False,
+) -> list[dict[str, Any]]:
+    """
+    一键拉取整个项目的所有剧集。
+
+    先调用 get_project_episodes 获取剧集列表，再逐个拉取。
+    仅返回成功项列表（与历史行为一致）。
+    """
+    r = pull_project_with_report(
+        project_id,
+        output_dir,
+        client=client,
+        force_redownload=force_redownload,
+        skip_images=skip_images,
+    )
+    return r.success_results
 
 
 def main() -> None:

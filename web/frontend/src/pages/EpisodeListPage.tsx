@@ -9,6 +9,7 @@ import { useEpisodeStore, useUIStore } from "@/stores"
 import { MODAL_PULL_EPISODE } from "@/stores/uiStore"
 import { Button, Card, Progress, Skeleton, EmptyState } from "@/components/ui"
 import { formatRelativeTime, getEpisodeStats } from "@/utils/format"
+import { routes } from "@/utils/routes"
 
 export default function EpisodeListPage() {
   const { episodes, loading, error, fetchEpisodes } = useEpisodeStore()
@@ -54,10 +55,10 @@ export default function EpisodeListPage() {
     <div className="p-8">
       <div className="mb-10 border-l-4 border-[var(--color-primary)] pl-6">
         <h1 className="text-4xl font-extrabold tracking-tighter text-[var(--color-newsprint-black)] uppercase mb-1 font-headline">
-          剧集管理
+          本地剧集
         </h1>
         <p className="text-[var(--color-newsprint-black)] font-medium opacity-70 text-sm uppercase tracking-tight">
-          AI 视频分镜制作与进度跟踪
+          已拉取到本机的剧集（调试入口）；主入口请从首页「项目」进入
         </p>
       </div>
 
@@ -107,7 +108,7 @@ export default function EpisodeListPage() {
                   <span>待处理 {stats.pending}</span>
                 </div>
               </div>
-              <Link to={`/episode/${ep.episodeId}`}>
+              <Link to={routes.episode(ep.projectId, ep.episodeId)}>
                 <Button
                   variant="secondary"
                   className="w-full justify-center gap-2"
