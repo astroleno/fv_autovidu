@@ -6,5 +6,5 @@ if [[ ! -d web/frontend/node_modules ]]; then
   pnpm --prefix web/frontend install
 fi
 
-# 与 postinstall 共用：无 .venv 或依赖不全时创建/安装（见 scripts/ensure_python_venv.sh）
-bash "${ROOT}/scripts/ensure_python_venv.sh"
+# 仅检查本机 python3 是否已装后端依赖（不创建虚拟环境）
+bash "${ROOT}/scripts/ensure_python_deps.sh"

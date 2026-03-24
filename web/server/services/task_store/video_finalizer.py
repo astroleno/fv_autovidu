@@ -25,8 +25,8 @@ from .service import get_task_store
 
 _LOG = logging.getLogger(__name__)
 
-# 轮询间隔（秒），与历史 GET 轮询频率大致同量级
-_POLL_INTERVAL_SEC = 15.0
+# 轮询间隔（秒）；略缩短以便尽快把 awaiting_external 收敛为 success/failed
+_POLL_INTERVAL_SEC = 5.0
 
 # 无 Vidu 客户端时只打一次告警，避免刷屏
 _warned_no_vidu_client = False
@@ -114,9 +114,19 @@ def _finalize_one_task(task: TaskRow) -> None:
     try:
         resp = client.query_tasks([str(vidu_id)])
         tasks = resp.get("tasks", [])
-        if not tasks:
+        vt = tasks[0] if tasks else None
+        # 部分环境下 list 查询偶发空列表，但 GET /tasks/{id}/creations 仍可拿到状态与生成物
+        if vt is None:
+            try:
+                qc = client.query_creations(str(vidu_id))
+                if isinstance(qc, dict) and (
+                    qc.get("state") is not None or qc.get("creations") is not None
+                ):
+                    vt = qc
+            except Exception:  # pylint: disable=broad-except
+                pass
+        if vt is None:
             return
-        vt = tasks[0]
         state = str(vt.get("state", ""))
         if state in ("created", "queueing", "processing"):
             return

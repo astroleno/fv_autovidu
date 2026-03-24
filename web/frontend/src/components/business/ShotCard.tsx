@@ -98,8 +98,19 @@ export function ShotCard({
       const ids = res.data.tasks.map((t) => t.taskId)
       startPolling(ids, {
         episodeId,
-        onAllSettled: () => {
-          pushToast(`视频任务已完成（S${String(shot.shotNumber).padStart(2, "0")}）`, "success")
+        onAllSettled: (results) => {
+          const r = results[0]
+          if (r?.status === "failed") {
+            pushToast(
+              r.error?.slice(0, 500) ?? "视频生成失败",
+              "error"
+            )
+            return
+          }
+          pushToast(
+            `视频任务已完成（S${String(shot.shotNumber).padStart(2, "0")}）`,
+            "success"
+          )
         },
       })
     } catch (e) {

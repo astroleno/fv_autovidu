@@ -14,9 +14,16 @@ const MODEL_OPTIONS: Record<VideoMode, { value: string; label: string }[]> = {
     { value: "viduq3-turbo", label: "viduq3-turbo" },
     { value: "viduq3-pro", label: "viduq3-pro" },
   ],
+  // 与官方 Start end to Video（start-end2video）一致，见 https://platform.vidu.com/docs/start-end-to-video
   first_last_frame: [
-    { value: "viduq3-turbo", label: "viduq3-turbo（默认）" },
+    { value: "viduq3-turbo", label: "viduq3-turbo（默认，首尾帧）" },
     { value: "viduq3-pro", label: "viduq3-pro" },
+    { value: "viduq2-pro-fast", label: "viduq2-pro-fast" },
+    { value: "viduq2-pro", label: "viduq2-pro" },
+    { value: "viduq2-turbo", label: "viduq2-turbo" },
+    { value: "viduq1", label: "viduq1" },
+    { value: "viduq1-classic", label: "viduq1-classic" },
+    { value: "vidu2.0", label: "vidu2.0" },
   ],
   reference: [
     { value: "viduq2-pro", label: "viduq2-pro（默认）" },

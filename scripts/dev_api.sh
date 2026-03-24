@@ -3,11 +3,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-# 开发约定：API 使用仓库 .venv 中的 Python（由 ensure_dev_env / setup_python_venv 创建）
-VENV_PY="${ROOT}/.venv/bin/python"
-if [[ ! -x "${VENV_PY}" ]]; then
-  echo "未找到 ${VENV_PY}。请先执行: pnpm run setup:python 或 bash scripts/setup_python_venv.sh" >&2
+# shellcheck source=python_exec.sh
+source "${ROOT}/scripts/python_exec.sh"
+
+# 依赖需已安装：pip install -r requirements.txt（见 scripts/ensure_python_deps.sh）
+if ! "${FV_PYTHON}" -c "import uvicorn" 2>/dev/null; then
+  echo "当前 Python（${FV_PYTHON}）未安装后端依赖。请执行: pip install -r requirements.txt" >&2
+  echo "若使用 conda/pyenv，请先激活环境，或 export FV_PYTHON=该环境的 python 路径" >&2
   exit 1
 fi
 
-exec "${VENV_PY}" -m uvicorn web.server.main:app --reload --port 8000
+exec "${FV_PYTHON}" -m uvicorn web.server.main:app --reload --port 8000

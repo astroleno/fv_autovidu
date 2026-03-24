@@ -4,12 +4,16 @@ Vidu API 客户端
 
 封装 Vidu 多种能力：
 - 图生视频 (i2v)：POST /img2video，详见 docs/vidu/i2v.md
+- 首尾帧生视频 (start-end2video)：POST /start-end2video，见官方「Start end to Video」
+  - 恰好 2 张图：首帧、尾帧；模型含 viduq3-turbo / viduq3-pro / viduq2-* 等
 - 参考生视频 (reference2video)：POST /reference2video，详见 docs/vidu/reference.md
   - 主体调用：支持多主体 + 台词（音视频直出）
-  - 非主体调用：多图参考，支持 viduq2-pro
+  - 非主体调用：多图参考（1~7 张），与首尾帧专用接口不同，勿混用
 - 电商一键成片 (ad-one-click)：详见 docs/vidu/ad.md
 - 视频复刻 (trending-replicate)：详见 docs/vidu/replicate.md
 """
+
+from __future__ import annotations
 
 import base64
 from pathlib import Path
@@ -102,6 +106,75 @@ class ViduClient:
         payload = {k: v for k, v in payload.items() if v is not None and v != ""}
         # 提交型 POST 不做盲重试：超时/断线时服务端可能已创建任务，重试会导致重复计费与重复成片
         resp = self._session.post(url, json=payload, timeout=30)
+        resp.raise_for_status()
+        return resp.json()
+
+    # -------------------- 首尾帧生视频 (start-end2video) --------------------
+    # 官方文档：https://platform.vidu.com/docs/start-end-to-video
+    # POST {base_url}/start-end2video ，与 reference2video 为不同接口；首尾帧应走本方法。
+
+    def start_end2video(
+        self,
+        images: list[str],
+        prompt: str = "",
+        *,
+        model: str = "viduq3-turbo",
+        duration: int = 5,
+        resolution: str = "720p",
+        seed: int = 0,
+        bgm: bool = False,
+        audio: bool = True,
+        is_rec: bool | None = None,
+        movement_amplitude: str | None = None,
+        off_peak: bool = False,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """
+        首尾帧图生视频：首帧 + 尾帧各一张，走专用接口 start-end2video。
+
+        Args:
+            images: 恰好 2 张，顺序为 [首帧, 尾帧]，URL 或 data:image/...;base64,...
+            prompt: 可选，最多约 5000 字
+            model: 见官方文档 Accepted values（如 viduq3-turbo、viduq3-pro、viduq2-pro 等）
+            duration: 秒，范围依模型而定
+            resolution: 如 720p、1080p
+            seed: 随机种子，0 表示由服务端处理（与 i2v 行为对齐）
+            bgm: 是否加 BGM（q3 上部分时长可能不生效，见文档）
+            audio: 是否音视频直出；仅 q3 系列支持该参数，非 q3 时不在 payload 中发送
+            is_rec: 是否使用推荐提示词
+            movement_amplitude: auto | small | medium | large（q2/q3 上部分参数不生效）
+            off_peak: 错峰
+            **kwargs: 如 callback_url、payload 等
+
+        Returns:
+            task_id、state、model、images、...（与创建类接口一致）
+        """
+        if len(images) != 2:
+            raise ValueError("start-end2video 需要恰好 2 张图：[首帧, 尾帧]")
+        url = f"{self.base_url}/start-end2video"
+        payload: dict[str, Any] = {
+            "model": model,
+            "images": images,
+            "prompt": prompt[:5000],
+            "duration": duration,
+            "resolution": resolution,
+            "seed": seed,
+            "bgm": bgm,
+            "off_peak": off_peak,
+            **kwargs,
+        }
+        # 文档：audio 仅 q3 支持；向 q2/q1 传 true 可能导致 400
+        if (model or "").startswith("viduq3"):
+            payload["audio"] = audio
+        if is_rec is not None:
+            payload["is_rec"] = is_rec
+        if movement_amplitude:
+            payload["movement_amplitude"] = movement_amplitude
+        # 保留 False（如 bgm/off_peak）；仅去掉 None，避免误删布尔假值
+        payload = {k: v for k, v in payload.items() if v is not None}
+        # 双图 data:image;base64,... 的 JSON 可达数 MB，TLS 发送阶段易触发 write timeout（原 60s 不足）。
+        # 使用单一秒数：对 connect + 上传 + 读响应统一放宽，避免慢网上传未完成即被断开。
+        resp = self._session.post(url, json=payload, timeout=300)
         resp.raise_for_status()
         return resp.json()
 
@@ -229,9 +302,8 @@ class ViduClient:
             "off_peak": off_peak,
             **kwargs,
         }
+        # 去掉值为 None 的键；videos 为 None 时此处已不会含 "videos"，不可再 del（否则 KeyError）
         payload = {k: v for k, v in payload.items() if v is not None}
-        if payload.get("videos") is None:
-            del payload["videos"]
         resp = self._session.post(url, json=payload, timeout=60)
         resp.raise_for_status()
         return resp.json()
