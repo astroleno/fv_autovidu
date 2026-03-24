@@ -77,6 +77,11 @@ Desktop.ini
 
 # ------------ Node.js / 前端 ------------
 node_modules/
+# 勿将 pnpm 内容仓库放在仓库根目录；若误生成于此则忽略（正常应在全局 store）
+.pnpm-store/
+# Corepack 在仓库内缓存的 pnpm 版本（不应提交）
+.corepack/
+pnpm-debug.log*
 
 # ------------ 其他 ------------
 *.bak
