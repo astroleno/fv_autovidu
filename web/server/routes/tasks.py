@@ -19,9 +19,41 @@ if str(_SERVER_DIR) not in sys.path:
 from fastapi import APIRouter, Query
 
 from models.schemas import TaskStatusResponse
-from services.task_store import get_task_store
+from services.task_store import TaskRow, get_task_store
 
 router = APIRouter()
+
+
+def _reconcile_awaiting_video_if_episode_has_file(row: TaskRow) -> TaskRow:
+    """
+    若 SQLite 仍为 awaiting_external，但 episode 里该候选已有 videoPath，
+    则补写 success（与 video_finalizer 幂等），避免 GET /tasks/batch 长期返回 processing、前端轮询空转。
+    """
+    if row.status != "awaiting_external" or row.kind != "video":
+        return row
+    if not row.episode_id or not row.shot_id or not row.candidate_id:
+        return row
+    from services import data_service
+
+    shot = data_service.get_shot(row.episode_id, row.shot_id)
+    if not shot:
+        return row
+    cand = next((c for c in shot.videoCandidates if c.id == row.candidate_id), None)
+    if not cand or not str(cand.videoPath or "").strip():
+        return row
+    store = get_task_store()
+    meta = row.result if isinstance(row.result, dict) else {}
+    store.set_task(
+        row.id,
+        "success",
+        kind="video",
+        episode_id=row.episode_id,
+        shot_id=row.shot_id,
+        candidate_id=row.candidate_id,
+        external_task_id=row.external_task_id,
+        result={**meta, "videoPath": cand.videoPath},
+    )
+    return store.get_task_row(row.id) or row
 
 
 def _get_vidu_client():
@@ -42,6 +74,7 @@ def get_task_status(task_id: str):
     store = get_task_store()
     row = store.get_task_row(task_id)
     if row is not None:
+        row = _reconcile_awaiting_video_if_episode_has_file(row)
         api = row.to_api_response()
         return TaskStatusResponse(
             taskId=api["taskId"],
@@ -88,6 +121,7 @@ def get_tasks_batch(ids: str = Query(default="", description="逗号分隔的 ta
     for tid in task_ids:
         row = store.get_task_row(tid)
         if row is not None:
+            row = _reconcile_awaiting_video_if_episode_has_file(row)
             api = row.to_api_response()
             by_id[tid] = TaskStatusResponse(
                 taskId=api["taskId"],

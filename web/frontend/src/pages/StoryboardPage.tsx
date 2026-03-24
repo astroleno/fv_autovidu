@@ -275,7 +275,15 @@ export default function StoryboardPage() {
           setSummaryTaskToShot(taskToShot)
           setSummaryResults(results)
           setSummaryOpen(true)
-          pushToast("批量视频任务已全部结束", "success")
+          const nFail = results.filter((r) => r.status === "failed").length
+          if (nFail > 0) {
+            pushToast(
+              `批量视频已结束：${nFail} 个失败，请查看汇总`,
+              "error"
+            )
+          } else {
+            pushToast("批量视频任务已全部结束", "success")
+          }
         },
       })
     } catch (e) {
@@ -319,7 +327,13 @@ export default function StoryboardPage() {
           setSummaryTaskToShot(taskToShot)
           setSummaryResults(results)
           setSummaryOpen(true)
-          pushToast("批量首帧视频任务已全部结束", "success")
+          const nFail = results.filter((r) => r.status === "failed").length
+          pushToast(
+            nFail > 0
+              ? `批量首帧视频已结束：${nFail} 个失败，请查看汇总`
+              : "批量首帧视频任务已全部结束",
+            nFail > 0 ? "error" : "success"
+          )
         },
       })
     } catch (e) {

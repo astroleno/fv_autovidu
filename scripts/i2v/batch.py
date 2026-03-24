@@ -52,6 +52,7 @@ def load_config() -> dict[str, Any]:
 
 def _default_video_model(mode: VideoMode) -> str:
     """与 web/server/routes/generate._default_video_model 一致。"""
+    # 首尾帧走 start-end2video（与 reference2video 不同）
     if mode == "first_last_frame":
         return "viduq3-turbo"
     if mode == "reference":
@@ -230,13 +231,12 @@ def _submit_one(
                 return None, "缺少尾帧"
             b64_1 = client._image_to_base64(item.first_path)
             b64_2 = client._image_to_base64(item.end_path)
-            resp = client.reference2video_with_images(
+            resp = client.start_end2video(
                 images=[b64_1, b64_2],
                 prompt=item.prompt[:5000],
                 model=model,
                 duration=duration,
                 resolution=resolution,
-                aspect_ratio=item.aspect_ratio,
                 off_peak=bool(vidu_cfg.get("off_peak", False)),
             )
         elif mode == "reference":

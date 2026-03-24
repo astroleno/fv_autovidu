@@ -7,6 +7,7 @@
  * 任务 ID 前缀约定（与后端 generate.py 一致）：
  * - endframe-xxxx → 尾帧生成
  * - video-xxxx → 视频生成
+ * - regen-xxxx → 单帧重生（首帧图）
  */
 import { useMemo } from "react"
 import { Loader2 } from "lucide-react"
@@ -20,18 +21,21 @@ function isTerminal(status: string): boolean {
 export function BatchTaskProgressBanner() {
   const activeTasks = useTaskStore((s) => s.activeTasks)
 
-  const { endframeCount, videoCount, total } = useMemo(() => {
+  const { endframeCount, videoCount, regenCount, total } = useMemo(() => {
     let endframeCount = 0
     let videoCount = 0
+    let regenCount = 0
     activeTasks.forEach((t) => {
       if (isTerminal(t.status)) return
       if (t.taskId.startsWith("endframe-")) endframeCount += 1
       else if (t.taskId.startsWith("video-")) videoCount += 1
+      else if (t.taskId.startsWith("regen-")) regenCount += 1
     })
     return {
       endframeCount,
       videoCount,
-      total: endframeCount + videoCount,
+      regenCount,
+      total: endframeCount + videoCount + regenCount,
     }
   }, [activeTasks])
 
@@ -53,11 +57,15 @@ export function BatchTaskProgressBanner() {
         {endframeCount > 0 && (
           <span className="font-semibold"> 尾帧 {endframeCount} 个</span>
         )}
-        {endframeCount > 0 && videoCount > 0 && <span>；</span>}
+        {endframeCount > 0 && (videoCount > 0 || regenCount > 0) && <span>；</span>}
         {videoCount > 0 && (
           <span className="font-semibold"> 视频 {videoCount} 个</span>
         )}
-        。完成后将弹出汇总；镜头状态与缩略图会随进度刷新。
+        {videoCount > 0 && regenCount > 0 && <span>；</span>}
+        {regenCount > 0 && (
+          <span className="font-semibold"> 单帧重生 {regenCount} 个</span>
+        )}
+        。尾帧/视频批量完成后将弹出汇总；镜头状态与缩略图会随进度刷新。
       </span>
     </div>
   )

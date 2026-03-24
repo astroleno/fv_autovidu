@@ -4,14 +4,13 @@
 # 使用前：
 #   1. cp .env.example .env
 #   2. 在 .env 中填入 VIDU_API_KEY
-#   3. pnpm run setup:python（或 bash scripts/setup_python_venv.sh）
+#   3. pip install -r requirements.txt（本机 Python，不使用仓库 .venv）
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
-# 与后端一致：存在 .venv 时优先用虚拟环境里的 Python
-# shellcheck source=python_venv_exec.sh
-source "${ROOT}/scripts/python_venv_exec.sh"
+# shellcheck source=python_exec.sh
+source "${ROOT}/scripts/python_exec.sh"
 
 echo "=== 1. 裁剪 grid 为单格 ==="
 "${FV_PYTHON}" scripts/crop/crop_grid.py

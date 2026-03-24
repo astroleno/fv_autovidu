@@ -2,8 +2,8 @@
 # -----------------------------------------------------------------------------
 # 在项目根目录执行：按 requirements.txt 安装 Python 依赖（--user 安装到用户目录）。
 #
-# 推荐：日常开发请使用「虚拟环境」—— bash scripts/setup_python_venv.sh 或 pnpm run setup:python
-# 本脚本仅作未使用 .venv、需向当前 python3 用户目录安装时的备用方案。
+# 将依赖安装到当前 python3 的 --user 目录（见脚本内 PEP 668 说明）。
+# 也可直接使用: pip install -r requirements.txt
 #
 # 背景：
 # - Homebrew 等环境的 Python 启用了 PEP 668（externally-managed-environment），

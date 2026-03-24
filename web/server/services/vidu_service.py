@@ -7,9 +7,12 @@ Vidu 服务：图生视频 (i2v)
 
 from __future__ import annotations
 
+import json
 import os
+import time
 from pathlib import Path
 
+import requests
 import sys
 _ROOT = Path(__file__).resolve().parent.parent.parent.parent
 if str(_ROOT) not in sys.path:
@@ -70,21 +73,70 @@ def submit_first_last_video(
     aspect_ratio: str = "9:16",
 ) -> dict:
     """
-    首尾帧双图生视频：将首帧、尾帧作为两张参考图调用 reference2video（非主体）。
+    首尾帧双图生视频：调用官方「Start end to Video」接口 POST /start-end2video。
 
-    Vidu i2v 仅支持单图；首尾约束需走 reference2video_with_images。
+    与 reference2video（多参考图）不同；首尾帧应使用 start-end2video，模型列表见
+    https://platform.vidu.com/docs/start-end-to-video（含 viduq3-turbo、viduq3-pro 等）。
+
+    aspect_ratio：episode 画幅仅用于本地校验提示；该专用接口以两图比例为准，请求体不传 aspect_ratio。
     """
     client = _get_client()
+    _ = aspect_ratio  # 保留参数与 generate 路由一致；Vidu 首尾帧接口以双图约束为主
     b64_first = client._image_to_base64(first_frame_path)
     b64_end = client._image_to_base64(end_frame_path)
-    return client.reference2video_with_images(
-        images=[b64_first, b64_end],
-        prompt=prompt,
-        model=model,
-        duration=duration,
-        resolution=resolution,
-        aspect_ratio=aspect_ratio,
-    )
+    try:
+        out = client.start_end2video(
+            images=[b64_first, b64_end],
+            prompt=prompt,
+            model=model,
+            duration=duration,
+            resolution=resolution,
+        )
+        # #region agent log
+        try:
+            _log_path = _ROOT / ".cursor" / "debug.log"
+            _log_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(_log_path, "a", encoding="utf-8") as _lf:
+                _lf.write(
+                    json.dumps(
+                        {
+                            "hypothesisId": "H_start_end",
+                            "location": "vidu_service.submit_first_last_video",
+                            "message": "start_end2video_ok",
+                            "data": {
+                                "model": model,
+                                "task_id": (out or {}).get("task_id"),
+                            },
+                            "timestamp": int(time.time() * 1000),
+                        },
+                        ensure_ascii=False,
+                    )
+                    + "\n"
+                )
+        except Exception:
+            pass
+        # #endregion
+        return out
+    except requests.exceptions.HTTPError as e:
+        body = ""
+        if e.response is not None:
+            try:
+                body = (e.response.text or "")[:3000]
+            except Exception:
+                pass
+        msg = f"{e}"
+        if body:
+            msg = f"{msg} | {body}"
+        raise RuntimeError(msg) from e
+    except requests.exceptions.ConnectionError as e:
+        # 双图 base64 上传阶段常见：write timed out / Connection aborted
+        em = str(e).lower()
+        if "timed out" in em or "timeout" in em or "aborted" in em:
+            raise RuntimeError(
+                "提交 Vidu 时在发送首尾帧图片数据阶段超时或中断（请求体较大）。"
+                "请稍后重试、检查网络，或适当压缩/缩小首帧与尾帧图片后再试。"
+            ) from e
+        raise RuntimeError(str(e)) from e
 
 
 def submit_reference_video(

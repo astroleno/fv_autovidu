@@ -3,7 +3,7 @@
 生成路由：POST endframe, video, regen-frame
 
 异步触发生成任务，立即返回 taskId 供前端轮询。
-尾帧批量：每个 shot 独立 task；视频批量：按 mode 分发 Vidu（i2v / 首尾帧 reference2video / 多参考图）。
+尾帧批量：每个 shot 独立 task；视频批量：按 mode 分发 Vidu（i2v / 首尾帧 start-end2video / 多参考图 reference2video）。
 
 重要：FastAPI/Starlette 的 BackgroundTasks 会**按顺序**执行每个后台任务；
 若对同一请求 add_task N 次同步函数，会**串行**跑完一张再跑下一张（总耗时 ≈ N × 单张耗时）。
@@ -12,8 +12,11 @@
 
 from __future__ import annotations
 
+import json
+import logging
 import os
 import sys
+import time
 import threading
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -32,16 +35,21 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 from models.schemas import (
     BatchEndframeResponse,
     EndframeTaskItem,
+    Episode,
     GenerateEndframeRequest,
     GenerateVideoRequest,
     GenerateVideoResponse,
     RegenFrameRequest,
     RegenFrameResponse,
+    Shot,
+    ShotAsset,
     VideoCandidate,
     VideoMode,
 )
 from services import data_service
 from services.task_store import get_task_store
+
+_LOG = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -137,7 +145,8 @@ def _run_video_batch_parallel(
 
 
 def _default_video_model(mode: VideoMode) -> str:
-    """按生成模式默认模型（与 TODO_PLAN 一致）。"""
+    """按生成模式默认模型。"""
+    # 首尾帧走官方 start-end2video（见 platform.vidu.com Start end to Video），默认与文档常用 fast 模型一致
     if mode == "first_last_frame":
         return "viduq3-turbo"
     if mode == "reference":
@@ -161,20 +170,34 @@ def _ts():
 def _run_tail_frame(task_id: str, episode_id: str, shot_id: str) -> None:
     """同步执行尾帧生成（在线程中运行）；yunwu 调用受信号量限制。"""
     try:
+        _LOG.info(
+            "[尾帧] 开始 task=%s episode=%s shot=%s",
+            task_id,
+            episode_id,
+            shot_id,
+        )
         ep = data_service.get_episode(episode_id)
         if not ep:
+            _LOG.warning("[尾帧] 失败 task=%s: Episode not found", task_id)
             _ts().set_task(task_id, "failed", error="Episode not found")
             return
         shot = data_service.get_shot(episode_id, shot_id)
         if not shot:
+            _LOG.warning("[尾帧] 失败 task=%s: Shot not found", task_id)
             _ts().set_task(task_id, "failed", error="Shot not found")
             return
         ep_dir = data_service.get_episode_dir(episode_id)
         if not ep_dir:
+            _LOG.warning("[尾帧] 失败 task=%s: Episode dir not found", task_id)
             _ts().set_task(task_id, "failed", error="Episode dir not found")
             return
         first_path = ep_dir / shot.firstFrame
         if not first_path.exists():
+            _LOG.warning(
+                "[尾帧] 失败 task=%s: 首帧文件不存在 path=%s",
+                task_id,
+                shot.firstFrame,
+            )
             _ts().set_task(task_id, "failed", error=f"First frame not found: {shot.firstFrame}")
             return
         assets_dir = ep_dir / "assets"
@@ -200,7 +223,15 @@ def _run_tail_frame(task_id: str, episode_id: str, shot_id: str) -> None:
             "status": "endframe_done",
         })
         _ts().set_task(task_id, "success", result={"path": f"endframes/{end_name}"})
+        _LOG.info(
+            "[尾帧] 成功 task=%s shot=%s endFrame=%s bytes=%d",
+            task_id,
+            shot_id,
+            f"endframes/{end_name}",
+            len(img_data),
+        )
     except Exception as e:
+        _LOG.exception("[尾帧] 异常 task=%s episode=%s shot=%s: %s", task_id, episode_id, shot_id, e)
         _ts().set_task(task_id, "failed", error=str(e))
         data_service.update_shot_status(episode_id, shot_id, "error")
 
@@ -219,6 +250,12 @@ def generate_endframe(req: GenerateEndframeRequest, background_tasks: Background
         specs.append((task_id, req.episodeId, shot_id))
         tasks_out.append(EndframeTaskItem(taskId=task_id, shotId=shot_id))
     # 关键：只注册一个后台任务，内部线程池并行；勿对每镜头 add_task 一次（会串行）
+    _LOG.info(
+        "[尾帧] 已入队 batch episode=%s 镜头数=%d tasks=%s",
+        req.episodeId,
+        len(specs),
+        [t for t, _, _ in specs],
+    )
     background_tasks.add_task(_run_endframe_batch_parallel, specs)
     return BatchEndframeResponse(tasks=tasks_out)
 
@@ -235,21 +272,36 @@ def _run_video_gen(
 ) -> None:
     """同步执行视频生成（提交 Vidu）；任务完成与下载在 GET /tasks 轮询时同步处理。"""
     try:
+        _LOG.info(
+            "[视频] 开始 task=%s episode=%s shot=%s mode=%s",
+            task_id,
+            episode_id,
+            shot_id,
+            mode,
+        )
         with _VIDEO_SEM:
             ep = data_service.get_episode(episode_id)
             if not ep:
+                _LOG.warning("[视频] 失败 task=%s: Episode not found", task_id)
                 _ts().set_task(task_id, "failed", error="Episode not found")
                 return
             shot = data_service.get_shot(episode_id, shot_id)
             if not shot:
+                _LOG.warning("[视频] 失败 task=%s: Shot not found", task_id)
                 _ts().set_task(task_id, "failed", error="Shot not found")
                 return
             ep_dir = data_service.get_episode_dir(episode_id)
             if not ep_dir:
+                _LOG.warning("[视频] 失败 task=%s: Episode dir not found", task_id)
                 _ts().set_task(task_id, "failed", error="Episode dir not found")
                 return
             first_path = ep_dir / shot.firstFrame
             if not first_path.exists():
+                _LOG.warning(
+                    "[视频] 失败 task=%s: 首帧不存在 firstFrame=%s",
+                    task_id,
+                    shot.firstFrame,
+                )
                 _ts().set_task(task_id, "failed", error="First frame not found")
                 return
 
@@ -272,14 +324,35 @@ def _run_video_gen(
                 )
             elif mode == "first_last_frame":
                 if not shot.endFrame:
+                    _LOG.warning(
+                        "[首尾帧视频] 失败 task=%s shot=%s: 未设置 endFrame，请先生成尾帧",
+                        task_id,
+                        shot_id,
+                    )
                     _ts().set_task(task_id, "failed", error="需要先生成尾帧后再使用首尾帧模式")
                     data_service.update_shot_status(episode_id, shot_id, "error")
                     return
                 end_path = ep_dir / shot.endFrame
                 if not end_path.exists():
+                    _LOG.warning(
+                        "[首尾帧视频] 失败 task=%s shot=%s: 尾帧文件不存在 path=%s",
+                        task_id,
+                        shot_id,
+                        shot.endFrame,
+                    )
                     _ts().set_task(task_id, "failed", error=f"尾帧文件不存在: {shot.endFrame}")
                     data_service.update_shot_status(episode_id, shot_id, "error")
                     return
+                _LOG.info(
+                    "[首尾帧视频] 提交 Vidu task=%s shot=%s model=%s 首帧=%s 尾帧=%s dur=%s res=%s",
+                    task_id,
+                    shot_id,
+                    resolved_model,
+                    shot.firstFrame,
+                    shot.endFrame,
+                    resolved_duration,
+                    resolved_resolution,
+                )
                 resp = vidu_service.submit_first_last_video(
                     first_path,
                     end_path,
@@ -320,6 +393,11 @@ def _run_video_gen(
 
             vidu_task_id = resp.get("task_id") or resp.get("id")
             if not vidu_task_id:
+                _LOG.error(
+                    "[视频] 失败 task=%s: Vidu 响应无 task_id resp_keys=%s",
+                    task_id,
+                    list(resp.keys()) if isinstance(resp, dict) else type(resp),
+                )
                 _ts().set_task(task_id, "failed", error="Vidu 未返回 task_id")
                 return
 
@@ -348,7 +426,24 @@ def _run_video_gen(
                 kind="video",
                 external_task_id=str(vidu_task_id),
             )
+            _LOG.info(
+                "[视频] 已提交待轮询 task=%s shot=%s mode=%s vidu_task_id=%s candidate=%s model=%s",
+                task_id,
+                shot_id,
+                mode,
+                vidu_task_id,
+                cand_id,
+                resolved_model,
+            )
     except Exception as e:
+        _LOG.exception(
+            "[视频] 异常 task=%s episode=%s shot=%s mode=%s: %s",
+            task_id,
+            episode_id,
+            shot_id,
+            mode,
+            e,
+        )
         _ts().set_task(task_id, "failed", error=str(e))
         try:
             data_service.update_shot_status(episode_id, shot_id, "error")
@@ -378,6 +473,9 @@ def generate_video(req: GenerateVideoRequest, background_tasks: BackgroundTasks)
     for shot_id in req.shotIds:
         task_id = f"video-{uuid.uuid4().hex[:12]}"
         _ts().set_task(task_id, "processing")
+        # 与尾帧接口一致：在返回 200 前即写入镜头状态，避免前端立刻 fetchEpisode 时仍显示
+        # 上一次失败残留的「出错」；后台 _run_video_gen 若校验失败会再写回 error。
+        data_service.update_shot_status(req.episodeId, shot_id, "video_generating")
         jobs.append(
             (
                 task_id,
@@ -391,8 +489,68 @@ def generate_video(req: GenerateVideoRequest, background_tasks: BackgroundTasks)
             )
         )
         tasks_out.append({"taskId": task_id, "shotId": shot_id})
+    # #region agent log
+    try:
+        _dbg = _PROJECT_ROOT / ".cursor" / "debug.log"
+        _dbg.parent.mkdir(parents=True, exist_ok=True)
+        with open(_dbg, "a", encoding="utf-8") as _df:
+            _df.write(
+                json.dumps(
+                    {
+                        "hypothesisId": "H_race_episode",
+                        "location": "generate.generate_video",
+                        "message": "sync_shot_video_generating",
+                        "data": {"episodeId": req.episodeId, "shotIds": list(req.shotIds)},
+                        "timestamp": int(time.time() * 1000),
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n"
+            )
+    except Exception:
+        pass
+    # #endregion
+    _LOG.info(
+        "[视频] 已入队 batch episode=%s mode=%s 镜头数=%d tasks=%s",
+        req.episodeId,
+        req.mode,
+        len(jobs),
+        [j[0] for j in jobs],
+    )
     background_tasks.add_task(_run_video_batch_parallel, jobs)
     return GenerateVideoResponse(tasks=tasks_out)
+
+
+def _resolve_regen_asset_paths(
+    ep: Episode,
+    shot: Shot,
+    asset_ids: list[str],
+    ep_dir: Path,
+) -> list[Path]:
+    """
+    按请求中的 asset_ids 顺序解析本地资产文件路径（最多 2 个）。
+
+    与前端资产库一致：合并 **剧集级** ``episode.assets`` 与 **镜头级** ``shot.assets`` 的元数据，
+    同一 assetId 以镜头级记录覆盖剧集级（与拉取后镜头上挂接为准）。
+    仅当 ``assets/`` 下文件存在时加入列表；未知 id 或缺文件会跳过（不中断任务）。
+    """
+    by_id: dict[str, ShotAsset] = {}
+    for a in ep.assets:
+        by_id[a.assetId] = a
+    for a in shot.assets:
+        by_id[a.assetId] = a
+    assets_dir = ep_dir / "assets"
+    out: list[Path] = []
+    for aid in asset_ids:
+        meta = by_id.get(aid)
+        if not meta:
+            continue
+        p = assets_dir / meta.localPath.replace("assets/", "").lstrip("/")
+        if p.exists():
+            out.append(p)
+        if len(out) >= 2:
+            break
+    return out
 
 
 def _run_regen_frame(task_id: str, episode_id: str, shot_id: str, image_prompt: str, asset_ids: list[str]):
@@ -414,14 +572,7 @@ def _run_regen_frame(task_id: str, episode_id: str, shot_id: str, image_prompt: 
         if not first_path.exists():
             _ts().set_task(task_id, "failed", error="First frame not found")
             return
-        assets_dir = ep_dir / "assets"
-        asset_paths = []
-        for a in shot.assets:
-            if a.assetId in asset_ids:
-                p = assets_dir / a.localPath.replace("assets/", "").lstrip("/")
-                if p.exists():
-                    asset_paths.append(p)
-        asset_paths = asset_paths[:2]
+        asset_paths = _resolve_regen_asset_paths(ep, shot, asset_ids or [], ep_dir)
         from services.yunwu_service import regenerate_first_frame
         img_data = regenerate_first_frame(first_path, image_prompt, asset_paths)
         frame_path = ep_dir / shot.firstFrame
