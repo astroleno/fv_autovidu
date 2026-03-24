@@ -11,10 +11,15 @@ import sys
 from pathlib import Path
 
 _SERVER_DIR = Path(__file__).resolve().parent.parent
+_PROJECT_ROOT = _SERVER_DIR.parent.parent
 if str(_SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(_SERVER_DIR))
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from fastapi import APIRouter, HTTPException
+
+from src.feeling.episode_fs_lock import episode_fs_lock
 
 from models.schemas import (
     ExportRoughCutRequest,
@@ -32,42 +37,43 @@ router = APIRouter()
 
 @router.post("/export/rough-cut", response_model=ExportRoughCutResponse)
 def export_rough_cut(req: ExportRoughCutRequest):
-    """导出粗剪：按 shot 顺序拼接选定的视频。"""
-    ep = data_service.get_episode(req.episodeId)
-    if not ep:
-        raise HTTPException(status_code=404, detail="Episode not found")
-    ep_dir = data_service.get_episode_dir(req.episodeId)
-    if not ep_dir:
-        raise HTTPException(status_code=404, detail="Episode dir not found")
-    # 收集选定视频路径（按 shot 顺序）
-    video_paths: list[Path] = []
-    shot_ids = req.shotIds or []
-    if not shot_ids:
-        for scene in ep.scenes:
-            for shot in scene.shots:
-                shot_ids.append(shot.shotId)
-    for shot_id in shot_ids:
-        shot = data_service.get_shot(req.episodeId, shot_id)
-        if not shot:
-            continue
-        cand = pick_playable_video_candidate(shot)
-        if not cand or not cand.videoPath:
-            continue
-        full = ep_dir / cand.videoPath
-        if full.exists():
-            video_paths.append(full)
-    if not video_paths:
-        raise HTTPException(
-            status_code=400,
-            detail="没有可拼接的视频（需各镜头至少有一条已落盘的 videoPath）",
-        )
-    export_dir = ep_dir / "export"
-    export_dir.mkdir(parents=True, exist_ok=True)
-    output_path = export_dir / "episode_rough.mp4"
-    concat_videos(video_paths, output_path)
-    # 返回可用于 /api/files/ 的路径：projectId/episodeId/export/episode_rough.mp4
-    rel = str(output_path.relative_to(ep_dir.parent.parent))
-    return ExportRoughCutResponse(exportPath=rel)
+    """导出粗剪：按 shot 顺序拼接选定的视频（ffmpeg 在锁内，与同集 repull 互斥）。"""
+    with episode_fs_lock(req.episodeId):
+        ep = data_service.get_episode(req.episodeId)
+        if not ep:
+            raise HTTPException(status_code=404, detail="Episode not found")
+        ep_dir = data_service.get_episode_dir(req.episodeId)
+        if not ep_dir:
+            raise HTTPException(status_code=404, detail="Episode dir not found")
+        # 收集选定视频路径（按 shot 顺序）
+        video_paths: list[Path] = []
+        shot_ids = req.shotIds or []
+        if not shot_ids:
+            for scene in ep.scenes:
+                for shot in scene.shots:
+                    shot_ids.append(shot.shotId)
+        for shot_id in shot_ids:
+            shot = data_service.get_shot(req.episodeId, shot_id)
+            if not shot:
+                continue
+            cand = pick_playable_video_candidate(shot)
+            if not cand or not cand.videoPath:
+                continue
+            full = ep_dir / cand.videoPath
+            if full.exists():
+                video_paths.append(full)
+        if not video_paths:
+            raise HTTPException(
+                status_code=400,
+                detail="没有可拼接的视频（需各镜头至少有一条已落盘的 videoPath）",
+            )
+        export_dir = ep_dir / "export"
+        export_dir.mkdir(parents=True, exist_ok=True)
+        output_path = export_dir / "episode_rough.mp4"
+        concat_videos(video_paths, output_path)
+        # 返回可用于 /api/files/ 的路径：projectId/episodeId/export/episode_rough.mp4
+        rel = str(output_path.relative_to(ep_dir.parent.parent))
+        return ExportRoughCutResponse(exportPath=rel)
 
 
 @router.post("/export/jianying-draft", response_model=JianyingExportResponse)

@@ -47,13 +47,8 @@ def pull_episode(req: PullEpisodeRequest):
             detail="puller 模块未找到，请确保从项目根目录运行",
         )
     from config import DATA_ROOT
-    # 若本地已有该剧集，从其目录推断 projectId（拉资产需正确 projectId）
-    project_id = getattr(req, "projectId", None)
-    if not project_id:
-        ep_dir = data_service.get_episode_dir(req.episodeId)
-        if ep_dir:
-            project_id = ep_dir.parent.name
-    project_id = project_id or "proj-default"
+    # 单副本归一化：不再从旧本地目录反推 projectId，避免错误项目被固化；缺省用 proj-default
+    project_id = getattr(req, "projectId", None) or "proj-default"
 
     try:
         result = do_pull(

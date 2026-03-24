@@ -51,6 +51,8 @@ from models.schemas import (
 from services import data_service
 from services.task_store import get_task_store
 
+from src.feeling.episode_fs_lock import episode_fs_lock
+
 _LOG = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -237,13 +239,20 @@ def _run_tail_frame(task_id: str, episode_id: str, shot_id: str) -> None:
         # 优先用首帧路径 stem（如 frames/S003.png → S003_end.png），避免多镜头 shotNumber 重复时互相覆盖
         _stem = Path(shot.firstFrame).stem
         end_name = f"{_stem}_end.png" if _stem else f"S{shot.shotNumber:02d}_end.png"
-        end_path = ep_dir / "endframes" / end_name
-        end_path.parent.mkdir(parents=True, exist_ok=True)
-        end_path.write_bytes(img_data)
-        data_service.update_shot(episode_id, shot_id, {
-            "endFrame": f"endframes/{end_name}",
-            "status": "endframe_done",
-        })
+        # 与 pull / dub / video 收尾互斥：Yunwu 在锁外，避免长时间阻塞 repull；落盘前重新解析 ep_dir，防止 repull 后仍写到已删路径
+        with episode_fs_lock(episode_id):
+            ep_dir_write = data_service.get_episode_dir(episode_id)
+            if not ep_dir_write:
+                _LOG.warning("[尾帧] 失败 task=%s: 生成完成后剧集目录不存在（可能 repull 迁移中）", task_id)
+                _ts().set_task(task_id, "failed", error="Episode dir not found after generation")
+                return
+            end_path = ep_dir_write / "endframes" / end_name
+            end_path.parent.mkdir(parents=True, exist_ok=True)
+            end_path.write_bytes(img_data)
+            data_service.update_shot(episode_id, shot_id, {
+                "endFrame": f"endframes/{end_name}",
+                "status": "endframe_done",
+            })
         _ts().set_task(task_id, "success", result={"path": f"endframes/{end_name}"})
         _LOG.info(
             "[尾帧] 成功 task=%s shot=%s endFrame=%s bytes=%d",
@@ -255,7 +264,11 @@ def _run_tail_frame(task_id: str, episode_id: str, shot_id: str) -> None:
     except Exception as e:
         _LOG.exception("[尾帧] 异常 task=%s episode=%s shot=%s: %s", task_id, episode_id, shot_id, e)
         _ts().set_task(task_id, "failed", error=str(e))
-        data_service.update_shot_status(episode_id, shot_id, "error")
+        try:
+            with episode_fs_lock(episode_id):
+                data_service.update_shot_status(episode_id, shot_id, "error")
+        except Exception:
+            _LOG.exception("[尾帧] 写回 error 状态失败 task=%s episode=%s shot=%s", task_id, episode_id, shot_id)
 
 
 @router.post("/generate/endframe", response_model=BatchEndframeResponse)
@@ -689,7 +702,7 @@ def _resolve_regen_asset_paths(
 
 
 def _run_regen_frame(task_id: str, episode_id: str, shot_id: str, image_prompt: str, asset_ids: list[str]):
-    """同步执行单帧重生。"""
+    """同步执行单帧重生。Yunwu 在锁外；落盘与 update_shot 在 episode_fs_lock 内并重新解析 ep_dir。"""
     try:
         ep = data_service.get_episode(episode_id)
         if not ep:
@@ -709,15 +722,22 @@ def _run_regen_frame(task_id: str, episode_id: str, shot_id: str, image_prompt: 
             return
         asset_paths = _resolve_regen_asset_paths(ep, shot, asset_ids or [], ep_dir)
         from services.yunwu_service import regenerate_first_frame
+
         img_data = regenerate_first_frame(first_path, image_prompt, asset_paths)
-        frame_path = ep_dir / shot.firstFrame
-        frame_path.write_bytes(img_data)
-        data_service.update_shot(episode_id, shot_id, {
-            "imagePrompt": image_prompt,
-            "endFrame": None,
-            "videoCandidates": [],
-            "status": "pending",
-        })
+        with episode_fs_lock(episode_id):
+            ep_dir_write = data_service.get_episode_dir(episode_id)
+            if not ep_dir_write:
+                _ts().set_task(task_id, "failed", error="Episode dir not found after regeneration")
+                return
+            frame_path = ep_dir_write / shot.firstFrame
+            frame_path.parent.mkdir(parents=True, exist_ok=True)
+            frame_path.write_bytes(img_data)
+            data_service.update_shot(episode_id, shot_id, {
+                "imagePrompt": image_prompt,
+                "endFrame": None,
+                "videoCandidates": [],
+                "status": "pending",
+            })
         _ts().set_task(task_id, "success", result={"newFramePath": shot.firstFrame})
     except Exception as e:
         _ts().set_task(task_id, "failed", error=str(e))

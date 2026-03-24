@@ -12,16 +12,25 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 import threading
 import time
+from pathlib import Path
 from typing import Optional
 
 import requests
+
+# 保证 `from src.feeling...` 在仅将 web/server 加入 path 时仍可用（与 generate 路由一致）
+_PROJECT_ROOT = Path(__file__).resolve().parents[4]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from . import repository
 from .db import get_connection
 from .models import TaskRow
 from .service import get_task_store
+
+from src.feeling.episode_fs_lock import episode_fs_lock
 
 _LOG = logging.getLogger(__name__)
 
@@ -132,13 +141,14 @@ def _finalize_one_task(task: TaskRow) -> None:
             return
 
         if state == "failed":
-            data_service.update_video_candidate(
-                episode_id,
-                shot_id,
-                candidate_id,
-                {"taskStatus": "failed"},
-            )
-            data_service.update_shot_status(episode_id, shot_id, "error")
+            with episode_fs_lock(episode_id):
+                data_service.update_video_candidate(
+                    episode_id,
+                    shot_id,
+                    candidate_id,
+                    {"taskStatus": "failed"},
+                )
+                data_service.update_shot_status(episode_id, shot_id, "error")
             get_task_store().set_task(
                 task_id,
                 "failed",
@@ -156,12 +166,13 @@ def _finalize_one_task(task: TaskRow) -> None:
 
         video_url = _extract_creation_video_url(vt)
         if not video_url:
-            data_service.update_video_candidate(
-                episode_id,
-                shot_id,
-                candidate_id,
-                {"taskStatus": "failed"},
-            )
+            with episode_fs_lock(episode_id):
+                data_service.update_video_candidate(
+                    episode_id,
+                    shot_id,
+                    candidate_id,
+                    {"taskStatus": "failed"},
+                )
             get_task_store().set_task(
                 task_id,
                 "failed",
@@ -174,54 +185,58 @@ def _finalize_one_task(task: TaskRow) -> None:
             )
             return
 
-        ep_dir = data_service.get_episode_dir(episode_id)
-        if not ep_dir:
-            get_task_store().set_task(
-                task_id,
-                "failed",
-                kind="video",
-                episode_id=episode_id,
-                shot_id=shot_id,
-                candidate_id=candidate_id,
-                result=meta,
-                error="Episode 目录不存在",
-            )
-            return
-
-        videos_dir = ep_dir / "videos"
-        videos_dir.mkdir(parents=True, exist_ok=True)
-        safe_name = f"{shot_id}_{candidate_id}.mp4"
-        dest = videos_dir / safe_name
+        # Vidu HTTP 在锁外；仅落盘与改 episode.json 与同 episode 的 pull/dub 互斥
         r = requests.get(video_url, timeout=180)
         r.raise_for_status()
-        dest.write_bytes(r.content)
-        rel_path = f"videos/{safe_name}"
+        mp4_bytes = r.content
 
-        # 提交阶段已写入 seed；若完成态响应带非零 seed 则覆盖（与 Vidu 最终一致）
-        cand_updates: dict[str, object] = {
-            "videoPath": rel_path,
-            "taskStatus": "success",
-            "model": str(vt.get("model") or ""),
-        }
-        fin_seed = int(vt.get("seed") or 0)
-        if fin_seed > 0:
-            cand_updates["seed"] = fin_seed
-        res_from_vt = vt.get("resolution")
-        if isinstance(res_from_vt, str) and res_from_vt.strip():
-            cand_updates["resolution"] = res_from_vt.strip()
+        with episode_fs_lock(episode_id):
+            ep_dir = data_service.get_episode_dir(episode_id)
+            if not ep_dir:
+                get_task_store().set_task(
+                    task_id,
+                    "failed",
+                    kind="video",
+                    episode_id=episode_id,
+                    shot_id=shot_id,
+                    candidate_id=candidate_id,
+                    result=meta,
+                    error="Episode 目录不存在",
+                )
+                return
 
-        data_service.update_video_candidate(
-            episode_id,
-            shot_id,
-            candidate_id,
-            cand_updates,
-        )
-        # 任一条候选仍标记为 selected 时，镜头终态应为 selected（精出/多候选期间可能曾被写成 video_generating）
-        shot_after = data_service.get_shot(episode_id, shot_id)
-        if shot_after and any(c.selected for c in shot_after.videoCandidates):
-            data_service.update_shot(episode_id, shot_id, {"status": "selected"})
-        else:
-            data_service.update_shot(episode_id, shot_id, {"status": "video_done"})
+            videos_dir = ep_dir / "videos"
+            videos_dir.mkdir(parents=True, exist_ok=True)
+            safe_name = f"{shot_id}_{candidate_id}.mp4"
+            dest = videos_dir / safe_name
+            dest.write_bytes(mp4_bytes)
+            rel_path = f"videos/{safe_name}"
+
+            # 提交阶段已写入 seed；若完成态响应带非零 seed 则覆盖（与 Vidu 最终一致）
+            cand_updates: dict[str, object] = {
+                "videoPath": rel_path,
+                "taskStatus": "success",
+                "model": str(vt.get("model") or ""),
+            }
+            fin_seed = int(vt.get("seed") or 0)
+            if fin_seed > 0:
+                cand_updates["seed"] = fin_seed
+            res_from_vt = vt.get("resolution")
+            if isinstance(res_from_vt, str) and res_from_vt.strip():
+                cand_updates["resolution"] = res_from_vt.strip()
+
+            data_service.update_video_candidate(
+                episode_id,
+                shot_id,
+                candidate_id,
+                cand_updates,
+            )
+            # 任一条候选仍标记为 selected 时，镜头终态应为 selected（精出/多候选期间可能曾被写成 video_generating）
+            shot_after = data_service.get_shot(episode_id, shot_id)
+            if shot_after and any(c.selected for c in shot_after.videoCandidates):
+                data_service.update_shot(episode_id, shot_id, {"status": "selected"})
+            else:
+                data_service.update_shot(episode_id, shot_id, {"status": "video_done"})
         get_task_store().set_task(
             task_id,
             "success",
@@ -235,12 +250,13 @@ def _finalize_one_task(task: TaskRow) -> None:
     except Exception as e:  # pylint: disable=broad-except
         _LOG.exception("video finalize 失败 task_id=%s", task_id)
         try:
-            data_service.update_video_candidate(
-                episode_id,
-                shot_id,
-                candidate_id,
-                {"taskStatus": "failed"},
-            )
+            with episode_fs_lock(episode_id):
+                data_service.update_video_candidate(
+                    episode_id,
+                    shot_id,
+                    candidate_id,
+                    {"taskStatus": "failed"},
+                )
         except Exception:
             pass
         get_task_store().set_task(

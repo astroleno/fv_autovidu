@@ -17,10 +17,18 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+# 与 video_finalizer 一致：保证可 import src.feeling（uvicorn 仅挂 web/server 时）
+_JY_ROOT = Path(__file__).resolve().parents[3]
+if str(_JY_ROOT) not in sys.path:
+    sys.path.insert(0, str(_JY_ROOT))
+
+from src.feeling.episode_fs_lock import episode_fs_lock
 
 from models.schemas import Episode, JianyingExportRecord, JianyingExportRequest, Shot
 
@@ -237,6 +245,8 @@ def export_jianying_draft(
     """
     执行剪映草稿导出，写入磁盘并更新 episode.jianyingExport。
 
+    全程在 episode_fs_lock 内：与同集 repull 互斥，避免 ep_dir 迁移后仍向旧路径写 export/。
+
     Args:
         req: 请求体（含 episodeId）
         include_dub_audio: 是否铺配音轨（依赖 shot.dub 已存在且与选中候选一致）
@@ -245,85 +255,86 @@ def export_jianying_draft(
         适合 JianyingExportResponse 序列化的 dict
     """
     episode_id = req.episodeId
-    ep = data_service.get_episode(episode_id)
-    if not ep:
-        raise ValueError("Episode not found")
-    ep_dir = data_service.get_episode_dir(episode_id)
-    if not ep_dir:
-        raise ValueError("Episode dir not found")
+    with episode_fs_lock(episode_id):
+        ep = data_service.get_episode(episode_id)
+        if not ep:
+            raise ValueError("Episode not found")
+        ep_dir = data_service.get_episode_dir(episode_id)
+        if not ep_dir:
+            raise ValueError("Episode dir not found")
 
-    exportable, missing = collect_exportable_shots(ep, ep_dir, req.shotIds)
-    if not exportable:
-        raise ValueError("没有可导出的已选视频，请确认分镜已选定视频且文件存在")
+        exportable, missing = collect_exportable_shots(ep, ep_dir, req.shotIds)
+        if not exportable:
+            raise ValueError("没有可导出的已选视频，请确认分镜已选定视频且文件存在")
 
-    draft_id = str(uuid.uuid4())
-    draft_name = ep.episodeTitle or episode_id
-    w, h = canvas_wh_vertical_9_16(req.canvasSize)  # 竖屏 9:16，与 pyJianYingDraft 一致
+        draft_id = str(uuid.uuid4())
+        draft_name = ep.episodeTitle or episode_id
+        w, h = canvas_wh_vertical_9_16(req.canvasSize)  # 竖屏 9:16，与 pyJianYingDraft 一致
 
-    draft_root = ep_dir / "export" / "jianying" / draft_id
-    draft_root.mkdir(parents=True, exist_ok=True)
-    materials_dir = draft_root / "materials"
-    materials_dir.mkdir(parents=True, exist_ok=True)
+        draft_root = ep_dir / "export" / "jianying" / draft_id
+        draft_root.mkdir(parents=True, exist_ok=True)
+        materials_dir = draft_root / "materials"
+        materials_dir.mkdir(parents=True, exist_ok=True)
 
-    dub_rows = _detect_dub_audio_rows(ep_dir, exportable) if include_dub_audio else [None] * len(exportable)
+        dub_rows = _detect_dub_audio_rows(ep_dir, exportable) if include_dub_audio else [None] * len(exportable)
 
-    for i, row in enumerate(exportable):
-        ext = row["videoAbs"].suffix or ".mp4"
-        safe = f"{i + 1:03d}_{row['shotId']}{ext}"
-        dst = materials_dir / safe
-        shutil.copy2(row["videoAbs"], dst)
-        rel = f"materials/{safe}"
-        row["materialRel"] = rel
+        for i, row in enumerate(exportable):
+            ext = row["videoAbs"].suffix or ".mp4"
+            safe = f"{i + 1:03d}_{row['shotId']}{ext}"
+            dst = materials_dir / safe
+            shutil.copy2(row["videoAbs"], dst)
+            rel = f"materials/{safe}"
+            row["materialRel"] = rel
 
-        if i < len(dub_rows) and dub_rows[i]:
-            d = dub_rows[i]
-            abs_a = d["_abs"]
-            aext = abs_a.suffix or ".mp3"
-            asafe = f"{i + 1:03d}_{row['shotId']}_dub{aext}"
-            adst = materials_dir / asafe
-            shutil.copy2(abs_a, adst)
+            if i < len(dub_rows) and dub_rows[i]:
+                d = dub_rows[i]
+                abs_a = d["_abs"]
+                aext = abs_a.suffix or ".mp3"
+                asafe = f"{i + 1:03d}_{row['shotId']}_dub{aext}"
+                adst = materials_dir / asafe
+                shutil.copy2(abs_a, adst)
 
-    _write_jianying_draft_pyjdraft(
-        draft_root,
-        draft_id,
-        draft_name,
-        exportable,
-        dub_rows,
-        materials_dir,
-        w,
-        h,
-    )
+        _write_jianying_draft_pyjdraft(
+            draft_root,
+            draft_id,
+            draft_name,
+            exportable,
+            dub_rows,
+            materials_dir,
+            w,
+            h,
+        )
 
-    # 不再生成 ZIP；episode 记录仍保留 zipPath 字段以兼容旧 JSON，恒为 None
-    zip_rel: str | None = None
+        # 不再生成 ZIP；episode 记录仍保留 zipPath 字段以兼容旧 JSON，恒为 None
+        zip_rel: str | None = None
 
-    target_root = Path(req.draftPath).expanduser().resolve()
-    target_root.mkdir(parents=True, exist_ok=True)
-    dest = target_root / draft_id
-    if dest.exists():
-        shutil.rmtree(dest)
-    shutil.copytree(draft_root, dest)
-    jianying_copy_abs = str(dest.resolve())
+        target_root = Path(req.draftPath).expanduser().resolve()
+        target_root.mkdir(parents=True, exist_ok=True)
+        dest = target_root / draft_id
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(draft_root, dest)
+        jianying_copy_abs = str(dest.resolve())
 
-    exported_at = datetime.now(tz=timezone.utc).isoformat().replace("+00:00", "Z")
-    ep.jianyingExport = JianyingExportRecord(
-        lastExportedAt=exported_at,
-        draftId=draft_id,
-        zipPath=zip_rel,
-        draftDirRelative=str(draft_root.relative_to(ep_dir)),
-    )
-    data_service.persist_episode(ep)
+        exported_at = datetime.now(tz=timezone.utc).isoformat().replace("+00:00", "Z")
+        ep.jianyingExport = JianyingExportRecord(
+            lastExportedAt=exported_at,
+            draftId=draft_id,
+            zipPath=zip_rel,
+            draftDirRelative=str(draft_root.relative_to(ep_dir)),
+        )
+        data_service.persist_episode(ep)
 
-    draft_dir_abs = str(draft_root.resolve())
-    return {
-        "draftId": draft_id,
-        "draftDir": draft_dir_abs,
-        "zipPath": zip_rel,
-        "jianyingCopyPath": jianying_copy_abs,
-        "exportedShots": len(exportable),
-        "missingShots": missing,
-        "exportedAt": exported_at,
-    }
+        draft_dir_abs = str(draft_root.resolve())
+        return {
+            "draftId": draft_id,
+            "draftDir": draft_dir_abs,
+            "zipPath": zip_rel,
+            "jianyingCopyPath": jianying_copy_abs,
+            "exportedShots": len(exportable),
+            "missingShots": missing,
+            "exportedAt": exported_at,
+        }
 
 
 def guess_jianying_draft_root_candidates() -> list[str]:

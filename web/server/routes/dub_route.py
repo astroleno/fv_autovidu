@@ -16,10 +16,15 @@ from pathlib import Path
 from typing import Any
 
 _SERVER_DIR = Path(__file__).resolve().parent.parent
+_PROJECT_ROOT = _SERVER_DIR.parent.parent
 if str(_SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(_SERVER_DIR))
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from fastapi import APIRouter, HTTPException
+
+from src.feeling.episode_fs_lock import episode_fs_lock
 
 from models.schemas import (
     DubEpisodeStatusResponse,
@@ -71,135 +76,137 @@ def _run_dub_task(
         result={},
     )
 
-    ep_dir = data_service.get_episode_dir(episode_id)
-    if not ep_dir:
-        get_task_store().set_task(
-            task_id,
-            "failed",
-            kind="dub",
-            episode_id=episode_id,
-            shot_id=shot_id,
-            error="剧集目录不存在",
-        )
-        return
-
-    shot = data_service.get_shot(episode_id, shot_id)
-    if not shot:
-        get_task_store().set_task(
-            task_id,
-            "failed",
-            kind="dub",
-            episode_id=episode_id,
-            shot_id=shot_id,
-            error="分镜不存在",
-        )
-        return
-
-    selected = next((c for c in shot.videoCandidates if c.selected), None)
-    if not selected or not selected.videoPath:
-        err = "无已选视频候选，无法配音"
-        data_service.set_shot_dub(
-            episode_id,
-            shot_id,
-            DubStatus(
-                status="failed",
-                taskId=task_id,
-                error=err,
-                voiceId=voice_id,
-                mode=mode,
-            ),
-        )
-        get_task_store().set_task(
-            task_id,
-            "failed",
-            kind="dub",
-            episode_id=episode_id,
-            shot_id=shot_id,
-            error=err,
-        )
-        return
-
-    dub_dir = ep_dir / "dub"
-    dub_dir.mkdir(parents=True, exist_ok=True)
-    video_abs = (ep_dir / selected.videoPath).resolve()
-
-    data_service.set_shot_dub(
-        episode_id,
-        shot_id,
-        DubStatus(
-            status="processing",
-            sourceCandidateId=selected.id,
-            mode=mode,
-            voiceId=voice_id,
-            taskId=task_id,
-        ),
-    )
-
-    try:
-        original_rel: str | None = None
-        if mode == "tts":
-            text = (tts_text or "").strip() or (shot.videoPrompt or "").strip()
-            if not text:
-                raise ValueError("TTS 模式需要提供文本或 shot.videoPrompt")
-            audio_bytes, ct = elevenlabs_service.text_to_speech(voice_id, text)
-            ext = _suffix_from_content_type(ct)
-        else:
-            if not has_audio_stream(video_abs):
-                raise ValueError("当前视频无音轨，请改用 TTS 模式或更换素材")
-            wav_path = dub_dir / f"{shot_id}_src.wav"
-            extract_audio_from_video(video_abs, wav_path)
-            original_rel = f"dub/{shot_id}_src.wav"
-            audio_bytes, ct = elevenlabs_service.speech_to_speech(
-                voice_id,
-                wav_path.read_bytes(),
+    # 与同 episode 的 pull / video 收尾互斥，避免 ep_dir 被删后仍向旧路径 mkdir 写文件
+    with episode_fs_lock(episode_id):
+        ep_dir = data_service.get_episode_dir(episode_id)
+        if not ep_dir:
+            get_task_store().set_task(
+                task_id,
+                "failed",
+                kind="dub",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                error="剧集目录不存在",
             )
-            ext = _suffix_from_content_type(ct)
+            return
 
-        out_rel = f"dub/{shot_id}_dub{ext}"
-        (ep_dir / out_rel).write_bytes(audio_bytes)
+        shot = data_service.get_shot(episode_id, shot_id)
+        if not shot:
+            get_task_store().set_task(
+                task_id,
+                "failed",
+                kind="dub",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                error="分镜不存在",
+            )
+            return
 
-        dub_done = DubStatus(
-            status="completed",
-            sourceCandidateId=selected.id,
-            mode=mode,
-            voiceId=voice_id,
-            audioPath=out_rel,
-            originalAudioPath=original_rel,
-            taskId=task_id,
-            error=None,
-            processedAt=_iso_now(),
-        )
-        data_service.set_shot_dub(episode_id, shot_id, dub_done)
-        get_task_store().set_task(
-            task_id,
-            "success",
-            kind="dub",
-            episode_id=episode_id,
-            shot_id=shot_id,
-            result={"audioPath": out_rel, "mode": mode},
-        )
-    except Exception as exc:  # pylint: disable=broad-except
-        err = str(exc)
+        selected = next((c for c in shot.videoCandidates if c.selected), None)
+        if not selected or not selected.videoPath:
+            err = "无已选视频候选，无法配音"
+            data_service.set_shot_dub(
+                episode_id,
+                shot_id,
+                DubStatus(
+                    status="failed",
+                    taskId=task_id,
+                    error=err,
+                    voiceId=voice_id,
+                    mode=mode,
+                ),
+            )
+            get_task_store().set_task(
+                task_id,
+                "failed",
+                kind="dub",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                error=err,
+            )
+            return
+
+        dub_dir = ep_dir / "dub"
+        dub_dir.mkdir(parents=True, exist_ok=True)
+        video_abs = (ep_dir / selected.videoPath).resolve()
+
         data_service.set_shot_dub(
             episode_id,
             shot_id,
             DubStatus(
-                status="failed",
+                status="processing",
                 sourceCandidateId=selected.id,
                 mode=mode,
                 voiceId=voice_id,
                 taskId=task_id,
-                error=err,
             ),
         )
-        get_task_store().set_task(
-            task_id,
-            "failed",
-            kind="dub",
-            episode_id=episode_id,
-            shot_id=shot_id,
-            error=err,
-        )
+
+        try:
+            original_rel: str | None = None
+            if mode == "tts":
+                text = (tts_text or "").strip() or (shot.videoPrompt or "").strip()
+                if not text:
+                    raise ValueError("TTS 模式需要提供文本或 shot.videoPrompt")
+                audio_bytes, ct = elevenlabs_service.text_to_speech(voice_id, text)
+                ext = _suffix_from_content_type(ct)
+            else:
+                if not has_audio_stream(video_abs):
+                    raise ValueError("当前视频无音轨，请改用 TTS 模式或更换素材")
+                wav_path = dub_dir / f"{shot_id}_src.wav"
+                extract_audio_from_video(video_abs, wav_path)
+                original_rel = f"dub/{shot_id}_src.wav"
+                audio_bytes, ct = elevenlabs_service.speech_to_speech(
+                    voice_id,
+                    wav_path.read_bytes(),
+                )
+                ext = _suffix_from_content_type(ct)
+
+            out_rel = f"dub/{shot_id}_dub{ext}"
+            (ep_dir / out_rel).write_bytes(audio_bytes)
+
+            dub_done = DubStatus(
+                status="completed",
+                sourceCandidateId=selected.id,
+                mode=mode,
+                voiceId=voice_id,
+                audioPath=out_rel,
+                originalAudioPath=original_rel,
+                taskId=task_id,
+                error=None,
+                processedAt=_iso_now(),
+            )
+            data_service.set_shot_dub(episode_id, shot_id, dub_done)
+            get_task_store().set_task(
+                task_id,
+                "success",
+                kind="dub",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                result={"audioPath": out_rel, "mode": mode},
+            )
+        except Exception as exc:  # pylint: disable=broad-except
+            err = str(exc)
+            data_service.set_shot_dub(
+                episode_id,
+                shot_id,
+                DubStatus(
+                    status="failed",
+                    sourceCandidateId=selected.id,
+                    mode=mode,
+                    voiceId=voice_id,
+                    taskId=task_id,
+                    error=err,
+                ),
+            )
+            get_task_store().set_task(
+                task_id,
+                "failed",
+                kind="dub",
+                episode_id=episode_id,
+                shot_id=shot_id,
+                error=err,
+            )
 
 
 def _collect_dub_shot_ids(episode_id: str, shot_ids: list[str] | None) -> list[str]:

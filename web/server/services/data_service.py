@@ -8,9 +8,12 @@
 from __future__ import annotations
 
 import json
+import logging
 import threading
 from pathlib import Path
 from typing import Any
+
+_LOG = logging.getLogger(__name__)
 
 # ---------- 并发安全：同一 episode.json 的「读 → 改 → 写」必须串行 ----------
 # 并行尾帧会同时调用 update_shot；若不加锁，后写回的线程会覆盖先完成的镜头状态，
@@ -39,8 +42,8 @@ def _get_data_root() -> Path:
 
 def _score_episode_dir(ep_dir: Path) -> tuple[int, int, str]:
     """
-    用于在多个目录对应同一 episodeId 时择优。
-    优先：含画面描述 shot 更多 > 非 proj-default > pulledAt 更新。
+    历史多副本并存时的择优键（过渡期）：画面描述更全 > 非 proj-default > pulledAt 更新。
+    单副本归一化完成后不应再出现多目录；保留本逻辑避免上线瞬间「纯路径序」读到更差副本。
     """
     try:
         data = json.loads((ep_dir / "episode.json").read_text(encoding="utf-8"))
@@ -84,24 +87,33 @@ def _collect_episode_dirs_for_id(episode_id: str) -> list[Path]:
 def _find_episode_dir(episode_id: str) -> Path | None:
     """
     根据 episodeId 查找 episode.json 所在目录。
-    若存在多个 data/{projectId}/{episodeId}/（如 proj-default 与真实项目各一份），
-    择优返回含 visualDescription 更完整、且非占位 projectId 的一份。
+
+    单副本归一化后通常唯一；若仍存在历史多副本，择优并打 WARNING（不依赖路径字典序）。
     """
-    return _pick_best_episode_dir(_collect_episode_dirs_for_id(episode_id))
+    matches = _collect_episode_dirs_for_id(episode_id)
+    if not matches:
+        return None
+    if len(matches) > 1:
+        matches.sort(key=lambda p: str(p))
+        _LOG.warning(
+            "episodeId=%s 存在 %d 个副本: %s — 请重新拉取该剧集以触发归一化清理",
+            episode_id,
+            len(matches),
+            [str(m) for m in matches],
+        )
+    return _pick_best_episode_dir(matches)
 
 
 def list_episodes() -> list[dict[str, Any]]:
     """
     列出所有本地已拉取的 Episode。
 
-    扫描 DATA_ROOT/{projectId}/{episodeId}/episode.json，
-    返回 Episode 摘要列表（用于 GET /api/episodes）。
-    同一 episodeId 多目录时只保留择优后的一条，避免列表重复且读到缺字段的旧副本。
+    扫描 DATA_ROOT/{projectId}/{episodeId}/episode.json（用于 GET /api/episodes）。
+    同一 episodeId 多目录时择优保留一条（与 _find_episode_dir 一致）；仍多副本时打 WARNING。
     """
     root = _get_data_root()
     if not root.exists():
         return []
-    # episodeId -> 该 id 下所有 episode 目录
     by_eid: dict[str, list[Path]] = {}
     for proj_dir in root.iterdir():
         if not proj_dir.is_dir():
@@ -120,10 +132,18 @@ def list_episodes() -> list[dict[str, Any]]:
                 continue
 
     result: list[dict[str, Any]] = []
-    for eid, dirs in by_eid.items():
-        best = _pick_best_episode_dir(dirs)
+    for eid, dirs in sorted(by_eid.items(), key=lambda x: x[0]):
+        dirs_sorted = sorted(dirs, key=lambda p: str(p))
+        best = _pick_best_episode_dir(dirs_sorted)
         if not best:
             continue
+        if len(dirs_sorted) > 1:
+            _LOG.warning(
+                "episodeId=%s 重复 %d 处 — 请重新拉取以归一化: %s",
+                eid,
+                len(dirs_sorted),
+                [str(d) for d in dirs_sorted],
+            )
         try:
             data = json.loads((best / "episode.json").read_text(encoding="utf-8"))
             result.append({
