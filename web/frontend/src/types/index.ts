@@ -23,6 +23,8 @@ export type {
   EndframeTaskItem,
   GenerateVideoRequest,
   GenerateVideoResponse,
+  PromoteVideoItem,
+  PromoteVideoRequest,
   RegenFrameRequest,
   RegenFrameResponse,
   SelectCandidateRequest,

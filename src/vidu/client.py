@@ -66,7 +66,7 @@ class ViduClient:
         model: str = "viduq2-pro-fast",
         duration: int = 5,
         resolution: str = "720p",
-        audio: bool = False,
+        audio: bool = True,
         seed: int = 0,
         off_peak: bool = False,
         **kwargs: Any,
@@ -80,7 +80,7 @@ class ViduClient:
             model: 模型名称
             duration: 视频时长（秒）
             resolution: 分辨率
-            audio: 是否音视频直出
+            audio: 是否音视频直出（默认 True）
             seed: 随机种子，0 为随机
             off_peak: 是否错峰
             **kwargs: 其他可选参数（voice_id, callback_url 等）
@@ -123,6 +123,7 @@ class ViduClient:
         resolution: str = "720p",
         seed: int = 0,
         bgm: bool = False,
+        # 默认音视频直出；仅需画面时显式传 audio=False（q3 写入 payload）
         audio: bool = True,
         is_rec: bool | None = None,
         movement_amplitude: str | None = None,
@@ -140,7 +141,7 @@ class ViduClient:
             resolution: 如 720p、1080p
             seed: 随机种子，0 表示由服务端处理（与 i2v 行为对齐）
             bgm: 是否加 BGM（q3 上部分时长可能不生效，见文档）
-            audio: 是否音视频直出；仅 q3 系列支持该参数，非 q3 时不在 payload 中发送
+            audio: 是否音视频直出（默认 True）；仅 q3 系列写入 payload，非 q3 时不发送
             is_rec: 是否使用推荐提示词
             movement_amplitude: auto | small | medium | large（q2/q3 上部分参数不生效）
             off_peak: 错峰

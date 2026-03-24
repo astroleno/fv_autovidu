@@ -38,6 +38,10 @@ export interface VideoModeSelectorResult {
   resolution: string
   /** reference 模式下可选：限定资产 id，空则各 shot 使用自身全部资产 */
   referenceAssetIds?: string[]
+  /** 首尾帧预览：turbo + 540p + 每镜头多候选 */
+  isPreview?: boolean
+  /** 每镜头候选数 1~3，仅与 isPreview 同时生效 */
+  candidateCount?: number
 }
 
 interface VideoModeSelectorProps {
@@ -61,6 +65,9 @@ export function VideoModeSelector({
   const [model, setModel] = useState("viduq3-turbo")
   const [resolution, setResolution] = useState("720p")
   const [referenceAssetIds, setReferenceAssetIds] = useState<string[]>([])
+  /** 仅 first_last_frame：低成本预览 + 多候选 */
+  const [previewEnabled, setPreviewEnabled] = useState(false)
+  const [candidateCount, setCandidateCount] = useState(2)
 
   const models = MODEL_OPTIONS[mode]
 
@@ -68,10 +75,24 @@ export function VideoModeSelector({
     setMode(m)
     const defaultModel = MODEL_OPTIONS[m][0]?.value ?? "viduq2-pro-fast"
     setModel(defaultModel)
+    if (m !== "first_last_frame") {
+      setPreviewEnabled(false)
+    }
+  }
+
+  const handlePreviewToggle = (checked: boolean) => {
+    setPreviewEnabled(checked)
+    if (checked) {
+      setResolution("540p")
+      setModel("viduq3-turbo")
+      setCandidateCount(2)
+    } else {
+      setResolution("720p")
+    }
   }
 
   const handleConfirm = () => {
-    onConfirm({
+    const base = {
       mode,
       model,
       resolution,
@@ -79,7 +100,16 @@ export function VideoModeSelector({
         mode === "reference" && referenceAssetIds.length > 0
           ? referenceAssetIds
           : undefined,
-    })
+    }
+    if (mode === "first_last_frame" && previewEnabled) {
+      onConfirm({
+        ...base,
+        isPreview: true,
+        candidateCount: Math.min(3, Math.max(1, candidateCount)),
+      })
+    } else {
+      onConfirm(base)
+    }
     onClose()
   }
 
@@ -145,6 +175,37 @@ export function VideoModeSelector({
             <option value="540p">540p</option>
           </select>
         </div>
+
+        {mode === "first_last_frame" && (
+          <div className="border border-dashed border-[var(--color-newsprint-black)] p-3 box-border space-y-3">
+            <label className="flex items-center gap-2 cursor-pointer text-sm">
+              <input
+                type="checkbox"
+                checked={previewEnabled}
+                onChange={(e) => handlePreviewToggle(e.target.checked)}
+              />
+              <span>
+                预览模式（turbo + 多候选，用于锁种精出前的低成本试错）
+              </span>
+            </label>
+            {previewEnabled && (
+              <div>
+                <label className="block text-xs font-bold uppercase text-[var(--color-muted)] mb-1">
+                  每镜头候选数
+                </label>
+                <select
+                  value={String(candidateCount)}
+                  onChange={(e) => setCandidateCount(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-[var(--color-newsprint-black)] box-border bg-white"
+                >
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+              </div>
+            )}
+          </div>
+        )}
 
         {mode === "reference" && episodeAssetIds.length > 0 && (
           <div className="border border-dashed border-[var(--color-newsprint-black)] p-3 box-border">

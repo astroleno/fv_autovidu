@@ -222,7 +222,7 @@ def _submit_one(
                 model=model,
                 duration=duration,
                 resolution=resolution,
-                audio=bool(vidu_cfg.get("audio", False)),
+                audio=bool(vidu_cfg.get("audio", True)),
                 off_peak=bool(vidu_cfg.get("off_peak", False)),
                 aspect_ratio=item.aspect_ratio,
             )
@@ -238,6 +238,7 @@ def _submit_one(
                 duration=duration,
                 resolution=resolution,
                 off_peak=bool(vidu_cfg.get("off_peak", False)),
+                audio=bool(vidu_cfg.get("audio", True)),
             )
         elif mode == "reference":
             if not 1 <= len(item.reference_paths) <= 7:
@@ -600,7 +601,7 @@ def run_batch(episode: str = "第2集_EP02_分镜包", dry_run: bool = False) ->
                 model=vidu_cfg.get("model", "viduq2-pro-fast"),
                 duration=vidu_cfg.get("duration", 5),
                 resolution=vidu_cfg.get("resolution", "720p"),
-                audio=vidu_cfg.get("audio", False),
+                audio=vidu_cfg.get("audio", True),
                 off_peak=vidu_cfg.get("off_peak", False),
             )
             print(f"[OK] {t['group']}/S{t['scene']:02d} → task_id={resp.get('task_id', '?')}")

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
+from typing import Optional
 import os
 import sys
 import time
@@ -39,6 +40,7 @@ from models.schemas import (
     GenerateEndframeRequest,
     GenerateVideoRequest,
     GenerateVideoResponse,
+    PromoteVideoRequest,
     RegenFrameRequest,
     RegenFrameResponse,
     Shot,
@@ -95,20 +97,25 @@ def _run_endframe_batch_parallel(specs: list[tuple[str, str, str]]) -> None:
                 print(f"[Warn] endframe batch worker: {e}")
 
 
-def _run_video_batch_parallel(
-    jobs: list[
-        tuple[
-            str,
-            str,
-            str,
-            VideoMode,
-            str | None,
-            int | None,
-            str | None,
-            list[str] | None,
-        ]
-    ],
-) -> None:
+# 单条视频任务：task_id, episode_id, shot_id, mode, model, duration, resolution(Vidu),
+# ref_ids, seed, is_preview, promoted_from, resolution_label(写入候选展示)
+VideoJobSpec = tuple[
+    str,
+    str,
+    str,
+    VideoMode,
+    str | None,
+    int | None,
+    str | None,
+    list[str] | None,
+    int,
+    bool,
+    str | None,
+    str,
+]
+
+
+def _run_video_batch_parallel(jobs: list[VideoJobSpec]) -> None:
     """在单个 BackgroundTask 内并行提交多路 Vidu（与尾帧同理，避免 BackgroundTasks 串行）。"""
     if not jobs:
         return
@@ -125,6 +132,10 @@ def _run_video_batch_parallel(
                 duration,
                 resolution,
                 ref_ids,
+                seed,
+                is_preview,
+                promoted_from,
+                resolution_label,
             )
             for (
                 task_id,
@@ -135,6 +146,10 @@ def _run_video_batch_parallel(
                 duration,
                 resolution,
                 ref_ids,
+                seed,
+                is_preview,
+                promoted_from,
+                resolution_label,
             ) in jobs
         ]
         for fut in as_completed(futures):
@@ -160,6 +175,13 @@ def _normalize_aspect_ratio(aspect: str) -> str:
     if a in ("9:16", "16:9", "1:1", "4:3", "3:4"):
         return a
     return "9:16"
+
+
+def _video_request_seed_int(seed: Optional[int]) -> int:
+    """GenerateVideoRequest.seed：None 或 <=0 表示随机（Vidu 侧 seed=0）。"""
+    if seed is None or seed <= 0:
+        return 0
+    return int(seed)
 
 
 def _ts():
@@ -269,8 +291,20 @@ def _run_video_gen(
     duration: int | None,
     resolution: str | None,
     reference_asset_ids: list[str] | None,
+    seed: int = 0,
+    is_preview: bool = False,
+    promoted_from: Optional[str] = None,
+    resolution_label: str = "",
 ) -> None:
-    """同步执行视频生成（提交 Vidu）；任务完成与下载在 GET /tasks 轮询时同步处理。"""
+    """
+    同步执行视频生成（提交 Vidu）；任务完成与下载由 video_finalizer 后台收尾。
+
+    Args:
+        seed: Vidu 随机种子；0 表示服务端随机。
+        is_preview: 是否为低成本预览候选（多候选预览时 True）。
+        promoted_from: 精出来源候选 id；普通生成时为 None。
+        resolution_label: 写入 VideoCandidate.resolution，缺省则用 Vidu 实际 resolution。
+    """
     try:
         _LOG.info(
             "[视频] 开始 task=%s episode=%s shot=%s mode=%s",
@@ -308,6 +342,7 @@ def _run_video_gen(
             resolved_model = model or _default_video_model(mode)
             resolved_duration = int(duration if duration is not None else shot.duration)
             resolved_resolution = resolution or "720p"
+            cand_resolution = resolution_label or resolved_resolution
             aspect = _normalize_aspect_ratio(shot.aspectRatio)
 
             from services import vidu_service
@@ -321,6 +356,7 @@ def _run_video_gen(
                     duration=resolved_duration,
                     resolution=resolved_resolution,
                     aspect_ratio=aspect,
+                    seed=seed,
                 )
             elif mode == "first_last_frame":
                 if not shot.endFrame:
@@ -361,6 +397,7 @@ def _run_video_gen(
                     duration=resolved_duration,
                     resolution=resolved_resolution,
                     aspect_ratio=aspect,
+                    seed=seed,
                 )
             elif mode == "reference":
                 assets_dir = ep_dir / "assets"
@@ -386,6 +423,7 @@ def _run_video_gen(
                     resolution=resolved_resolution,
                     aspect_ratio=aspect,
                     with_subjects=False,
+                    seed=seed,
                 )
             else:
                 _ts().set_task(task_id, "failed", error=f"未知 mode: {mode}")
@@ -409,10 +447,13 @@ def _run_video_gen(
                 seed=int(resp.get("seed") or 0),
                 model=resolved_model,
                 mode=mode,
+                resolution=cand_resolution,
                 selected=False,
                 createdAt=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 taskId=str(vidu_task_id),
                 taskStatus="processing",
+                isPreview=is_preview,
+                promotedFrom=promoted_from,
             )
             data_service.add_video_candidate(episode_id, shot_id, cand)
             data_service.update_shot_status(episode_id, shot_id, "video_generating")
@@ -453,42 +494,45 @@ def _run_video_gen(
 
 @router.post("/generate/video", response_model=GenerateVideoResponse)
 def generate_video(req: GenerateVideoRequest, background_tasks: BackgroundTasks):
-    """批量生成视频。"""
+    """批量生成视频；预览模式下每镜头可提交多候选（candidateCount）。"""
     if not req.shotIds:
         raise HTTPException(status_code=400, detail="shotIds 不能为空")
+    is_preview = bool(req.isPreview)
+    candidate_count = int(req.candidateCount) if req.candidateCount is not None else 1
+    if not is_preview:
+        candidate_count = 1
+    if candidate_count < 1 or candidate_count > 3:
+        raise HTTPException(status_code=400, detail="candidateCount 必须在 1~3 之间")
+    req_seed = _video_request_seed_int(req.seed)
+    resolution_label = (req.resolution or "720p").strip() or "720p"
+
     tasks_out = []
     ref_ids = req.referenceAssetIds
-    jobs: list[
-        tuple[
-            str,
-            str,
-            str,
-            VideoMode,
-            str | None,
-            int | None,
-            str | None,
-            list[str] | None,
-        ]
-    ] = []
+    jobs: list[VideoJobSpec] = []
     for shot_id in req.shotIds:
-        task_id = f"video-{uuid.uuid4().hex[:12]}"
-        _ts().set_task(task_id, "processing")
-        # 与尾帧接口一致：在返回 200 前即写入镜头状态，避免前端立刻 fetchEpisode 时仍显示
-        # 上一次失败残留的「出错」；后台 _run_video_gen 若校验失败会再写回 error。
-        data_service.update_shot_status(req.episodeId, shot_id, "video_generating")
-        jobs.append(
-            (
-                task_id,
-                req.episodeId,
-                shot_id,
-                req.mode,
-                req.model,
-                req.duration,
-                req.resolution,
-                ref_ids,
+        for _ in range(candidate_count):
+            task_id = f"video-{uuid.uuid4().hex[:12]}"
+            _ts().set_task(task_id, "processing")
+            # 与尾帧接口一致：在返回 200 前即写入镜头状态，避免前端立刻 fetchEpisode 时仍显示
+            # 上一次失败残留的「出错」；后台 _run_video_gen 若校验失败会再写回 error。
+            data_service.update_shot_status(req.episodeId, shot_id, "video_generating")
+            jobs.append(
+                (
+                    task_id,
+                    req.episodeId,
+                    shot_id,
+                    req.mode,
+                    req.model,
+                    req.duration,
+                    req.resolution,
+                    ref_ids,
+                    req_seed,
+                    is_preview,
+                    None,
+                    resolution_label,
+                )
             )
-        )
-        tasks_out.append({"taskId": task_id, "shotId": shot_id})
+            tasks_out.append({"taskId": task_id, "shotId": shot_id})
     # #region agent log
     try:
         _dbg = _PROJECT_ROOT / ".cursor" / "debug.log"
@@ -514,6 +558,97 @@ def generate_video(req: GenerateVideoRequest, background_tasks: BackgroundTasks)
         "[视频] 已入队 batch episode=%s mode=%s 镜头数=%d tasks=%s",
         req.episodeId,
         req.mode,
+        len(jobs),
+        [j[0] for j in jobs],
+    )
+    background_tasks.add_task(_run_video_batch_parallel, jobs)
+    return GenerateVideoResponse(tasks=tasks_out)
+
+
+@router.post("/generate/video/promote", response_model=GenerateVideoResponse)
+def promote_video(req: PromoteVideoRequest, background_tasks: BackgroundTasks):
+    """
+    基于预览候选的 seed 发起首尾帧精出（更高分辨率 / 不同模型）。
+    校验全部通过后才入队；任一失败返回 400，不部分提交。
+    """
+    if not req.items:
+        raise HTTPException(status_code=400, detail="items 不能为空")
+
+    ep_dir = data_service.get_episode_dir(req.episodeId)
+    if not ep_dir:
+        raise HTTPException(status_code=400, detail="剧集目录不存在")
+
+    err_msgs: list[str] = []
+    validated: list[tuple[str, str, Shot, VideoCandidate]] = []
+
+    for it in req.items:
+        shot = data_service.get_shot(req.episodeId, it.shotId)
+        if not shot:
+            err_msgs.append(f"镜头 {it.shotId} 不存在")
+            continue
+        cand = next((c for c in shot.videoCandidates if c.id == it.candidateId), None)
+        if not cand:
+            err_msgs.append(f"镜头 {it.shotId} 无候选 {it.candidateId}")
+            continue
+        if cand.taskStatus != "success":
+            err_msgs.append(
+                f"镜头 {it.shotId} 候选未完成（taskStatus={cand.taskStatus}）"
+            )
+            continue
+        if cand.seed <= 0:
+            err_msgs.append(f"镜头 {it.shotId} seed 无效，无法精出")
+            continue
+        if not cand.isPreview:
+            err_msgs.append(f"镜头 {it.shotId} 仅 isPreview 候选可精出")
+            continue
+        if cand.mode != "first_last_frame":
+            err_msgs.append(
+                f"镜头 {it.shotId} 精出仅支持首尾帧预览候选（mode=first_last_frame），当前为 {cand.mode}"
+            )
+            continue
+        if not shot.endFrame:
+            err_msgs.append(f"镜头 {it.shotId} 缺少尾帧")
+            continue
+        end_path = ep_dir / shot.endFrame
+        if not end_path.exists():
+            err_msgs.append(f"镜头 {it.shotId} 尾帧文件不存在: {shot.endFrame}")
+            continue
+        validated.append((it.shotId, it.candidateId, shot, cand))
+
+    if err_msgs:
+        raise HTTPException(status_code=400, detail="；".join(err_msgs))
+
+    resolution_label = (req.resolution or "1080p").strip() or "1080p"
+    promote_model = (req.model or "viduq3-pro").strip() or "viduq3-pro"
+
+    jobs: list[VideoJobSpec] = []
+    tasks_out: list[dict[str, str]] = []
+
+    for shot_id, candidate_id, shot, cand in validated:
+        task_id = f"video-{uuid.uuid4().hex[:12]}"
+        _ts().set_task(task_id, "processing")
+        data_service.update_shot_status(req.episodeId, shot_id, "video_generating")
+        jobs.append(
+            (
+                task_id,
+                req.episodeId,
+                shot_id,
+                "first_last_frame",
+                promote_model,
+                int(shot.duration),
+                req.resolution or "1080p",
+                None,
+                int(cand.seed),
+                False,
+                candidate_id,
+                resolution_label,
+            )
+        )
+        tasks_out.append({"taskId": task_id, "shotId": shot_id})
+
+    _LOG.info(
+        "[精出] 已入队 promote episode=%s 条数=%d tasks=%s",
+        req.episodeId,
         len(jobs),
         [j[0] for j in jobs],
     )

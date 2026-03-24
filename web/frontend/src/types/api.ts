@@ -49,6 +49,25 @@ export interface GenerateVideoRequest {
   resolution?: string
   /** 多参考图模式：限定使用的资产 id；不传则使用各 shot 下全部可用资产图 */
   referenceAssetIds?: string[]
+  /** 0 或未传表示随机 */
+  seed?: number
+  /** 每镜头提交次数；仅 isPreview=true 时后端允许多于 1 */
+  candidateCount?: number
+  isPreview?: boolean
+}
+
+/** 锁种精出：单镜头项 */
+export interface PromoteVideoItem {
+  shotId: string
+  candidateId: string
+}
+
+/** 基于预览候选 seed 发起精出 */
+export interface PromoteVideoRequest {
+  episodeId: string
+  items: PromoteVideoItem[]
+  model?: string
+  resolution?: string
 }
 
 /** 生成视频响应 */

@@ -197,17 +197,31 @@ def _finalize_one_task(task: TaskRow) -> None:
         dest.write_bytes(r.content)
         rel_path = f"videos/{safe_name}"
 
+        # 提交阶段已写入 seed；若完成态响应带非零 seed 则覆盖（与 Vidu 最终一致）
+        cand_updates: dict[str, object] = {
+            "videoPath": rel_path,
+            "taskStatus": "success",
+            "model": str(vt.get("model") or ""),
+        }
+        fin_seed = int(vt.get("seed") or 0)
+        if fin_seed > 0:
+            cand_updates["seed"] = fin_seed
+        res_from_vt = vt.get("resolution")
+        if isinstance(res_from_vt, str) and res_from_vt.strip():
+            cand_updates["resolution"] = res_from_vt.strip()
+
         data_service.update_video_candidate(
             episode_id,
             shot_id,
             candidate_id,
-            {
-                "videoPath": rel_path,
-                "taskStatus": "success",
-                "model": str(vt.get("model") or ""),
-            },
+            cand_updates,
         )
-        data_service.update_shot(episode_id, shot_id, {"status": "video_done"})
+        # 任一条候选仍标记为 selected 时，镜头终态应为 selected（精出/多候选期间可能曾被写成 video_generating）
+        shot_after = data_service.get_shot(episode_id, shot_id)
+        if shot_after and any(c.selected for c in shot_after.videoCandidates):
+            data_service.update_shot(episode_id, shot_id, {"status": "selected"})
+        else:
+            data_service.update_shot(episode_id, shot_id, {"status": "video_done"})
         get_task_store().set_task(
             task_id,
             "success",

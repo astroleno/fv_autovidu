@@ -45,10 +45,16 @@ export interface VideoCandidate {
   seed: number
   model: string
   mode: VideoMode
+  /** 与 Vidu 请求一致，如 540p / 720p / 1080p */
+  resolution?: string
   selected: boolean
   createdAt: string
   taskId: string
   taskStatus: TaskStatus
+  /** 低成本预览候选；精出后新候选为 false */
+  isPreview?: boolean
+  /** 精出来源预览候选 id */
+  promotedFrom?: string | null
 }
 
 /** 分镜配音状态（与当前 selected 候选绑定） */
