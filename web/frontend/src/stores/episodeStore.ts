@@ -1,11 +1,20 @@
 /**
  * Episode Store
  * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode / updateShot
+ *
+ * 竞态说明（与 taskStore 轮询配合）：
+ * - startPolling(episodeId) 会立刻 fetchEpisodeDetail，任务完成时 onAnyTerminal 也会再次 fetch。
+ * - 若「较早发起的 GET」比「较晚发起的 GET」更晚返回，旧响应会覆盖新数据，界面仍显示「尾帧生成中」等，
+ *   手动刷新只发一次请求故表现正常。
+ * - 通过 _detailFetchGeneration：每次发起详情请求自增序号，仅当响应返回时序号仍为「当前最新」才写入 store。
  */
 import { create } from "zustand"
 import type { Episode } from "@/types"
 import { episodesApi } from "@/api/episodes"
 import { shotsApi } from "@/api/shots"
+
+/** 单调递增：仅最后一次 fetchEpisodeDetail 的结果允许落盘，避免并发请求乱序覆盖 */
+let _detailFetchGeneration = 0
 
 interface EpisodeStore {
   episodes: Episode[]
@@ -57,20 +66,50 @@ export const useEpisodeStore = create<EpisodeStore>((set, get) => ({
   },
 
   fetchEpisodeDetail: async (id: string) => {
-    set({ loading: true, error: null })
+    const generation = ++_detailFetchGeneration
+    set((s) => ({
+      loading: true,
+      error: null,
+      /**
+       * 切换到另一剧集时清空 current，避免 URL 已是新集仍短暂显示旧集数据。
+       * 若已为同一 id（例如项目页拉取成功后已写入内存），保留以便 GET 失败时仍能展示。
+       */
+      currentEpisode:
+        s.currentEpisode?.episodeId === id ? s.currentEpisode : null,
+    }))
     try {
       const res = await episodesApi.detail(id)
-      set((s) => ({
-        currentEpisode: res.data,
-        // 列表里若已有该剧集，同步为最新详情（含 visualDescription 等字段）
-        episodes: s.episodes.some((e) => e.episodeId === id)
-          ? s.episodes.map((e) => (e.episodeId === id ? res.data : e))
-          : s.episodes,
-      }))
+      // 防御：路径与 body 不一致时不写入
+      if (res.data.episodeId !== id) return
+      set((s) => {
+        if (generation !== _detailFetchGeneration) return s
+        return {
+          currentEpisode: res.data,
+          // 列表里若已有该剧集，同步为最新详情（含 visualDescription 等字段）
+          episodes: s.episodes.some((e) => e.episodeId === id)
+            ? s.episodes.map((e) => (e.episodeId === id ? res.data : e))
+            : s.episodes,
+        }
+      })
     } catch (e) {
-      set({ error: e instanceof Error ? e.message : "获取详情失败" })
+      const msg = e instanceof Error ? e.message : "获取详情失败"
+      set((s) => {
+        if (generation !== _detailFetchGeneration) return s
+        return {
+          error: msg,
+          /**
+           * GET 404 时：若内存中已有同 episodeId（刚 POST /pull 成功写入 store），保留之，
+           * 避免「拉取成功但读盘路径短暂不一致」时整页空白。
+           */
+          currentEpisode:
+            s.currentEpisode?.episodeId === id ? s.currentEpisode : null,
+        }
+      })
     } finally {
-      set({ loading: false })
+      set((s) => {
+        if (generation !== _detailFetchGeneration) return s
+        return { loading: false }
+      })
     }
   },
 

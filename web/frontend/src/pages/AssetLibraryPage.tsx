@@ -9,7 +9,7 @@
  * - 元数据能显示但无图：多为未下载文件或平台未返回可下载的 thumbnail URL。
  */
 import { useEffect, useState, useMemo, useCallback } from "react"
-import { useParams, Link } from "react-router"
+import { useParams, Link, useSearchParams } from "react-router"
 import { useEpisodeStore } from "@/stores"
 import { getFileUrl } from "@/utils/file"
 import type { ShotAsset } from "@/types"
@@ -188,6 +188,7 @@ export default function AssetLibraryPage() {
     projectId?: string
     episodeId: string
   }>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
   const [typeFilter, setTypeFilter] = useState<string>("all")
   /** 点击资产卡片时，选中并展示大图与 metadata */
@@ -211,6 +212,17 @@ export default function AssetLibraryPage() {
           ) as ShotAsset[]
     return fromEpisode
   }, [currentEpisode])
+
+  /**
+   * 深链：分镜表资产标签「查看详情」跳转至 `/assets?assetId=...` 时，
+   * 自动打开对应资产的详情弹窗（与点击网格卡片行为一致）
+   */
+  useEffect(() => {
+    const id = searchParams.get("assetId")
+    if (!id || assets.length === 0) return
+    const found = assets.find((a) => a.assetId === id)
+    if (found) setSelectedAsset(found)
+  }, [searchParams, assets])
 
   /** 按类型筛选后的资产 */
   const filteredAssets = useMemo(() => {
@@ -319,7 +331,15 @@ export default function AssetLibraryPage() {
         <AssetDetailModal
           asset={selectedAsset}
           imgUrl={getFileUrl(selectedAsset.localPath, basePath, cacheBust)}
-          onClose={() => setSelectedAsset(null)}
+          onClose={() => {
+            setSelectedAsset(null)
+            /** 关闭弹窗后去掉 URL 中的 assetId，避免刷新再次自动弹出 */
+            if (searchParams.get("assetId")) {
+              const next = new URLSearchParams(searchParams)
+              next.delete("assetId")
+              setSearchParams(next, { replace: true })
+            }
+          }}
         />
       )}
     </div>

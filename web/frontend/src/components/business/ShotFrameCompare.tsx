@@ -13,6 +13,7 @@ import type { Shot } from "@/types"
 import { getFileUrl } from "@/utils/file"
 import { routes } from "@/utils/routes"
 import { ImagePreview } from "./ImagePreview"
+import { FrameHoverThumbnail } from "./FrameHoverThumbnail"
 
 export type ShotFrameCompareVariant = "card" | "row" | "detail"
 
@@ -71,10 +72,18 @@ export function ShotFrameCompare({
       ? "w-full h-full object-cover grayscale-img"
       : "absolute inset-0 w-full h-full object-cover grayscale-img"
 
-  /** 详情页：可点击放大；卡片/列表：点击进入镜头详情 */
+  /** 详情页：可点击放大；列表 row：悬浮大图 + 点击进入镜头详情；卡片：直接进入详情 */
   const firstFrameBody =
     firstFrameUrl && variant === "detail" ? (
       <ImagePreview src={firstFrameUrl} alt="首帧" className={`${vc.img} max-h-[min(70vh,520px)]`} />
+    ) : firstFrameUrl && variant === "row" ? (
+      <FrameHoverThumbnail
+        src={firstFrameUrl}
+        alt="首帧"
+        detailPath={detailPath}
+        thumbClassName={vc.img}
+        imgClassName={imgClass}
+      />
     ) : firstFrameUrl ? (
       <Link to={detailPath} className="block">
         <div className={vc.img}>
@@ -111,6 +120,14 @@ export function ShotFrameCompare({
     </div>
   ) : endFrameUrl && variant === "detail" ? (
     <ImagePreview src={endFrameUrl} alt="尾帧" className={`${vc.img} max-h-[min(70vh,520px)]`} />
+  ) : endFrameUrl && variant === "row" ? (
+    <FrameHoverThumbnail
+      src={endFrameUrl}
+      alt="尾帧"
+      detailPath={detailPath}
+      thumbClassName={vc.img}
+      imgClassName={imgClass}
+    />
   ) : endFrameUrl ? (
     <Link to={detailPath} className="block">
       <div className={vc.img}>

@@ -3,16 +3,19 @@
  * Scene 分组 + Shot 卡片/行 + 状态筛选 + 批量操作 + 视图切换
  * 批量生成尾帧 / 批量生成视频：调用 generateApi，taskStore 轮询并在完成后 Toast
  */
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router"
 import { Clapperboard, Grid3X3, List, Film, ImagePlus, Loader2, Package } from "lucide-react"
 import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
+import { filterShotsByBatchPick } from "@/utils/batchPick"
 import { Button, Skeleton } from "@/components/ui"
 import {
+  BatchPickScopeControl,
   BatchResultSummary,
   BatchTaskProgressBanner,
   DubPanel,
   ExportPanel,
+  MarqueeGrid,
   SceneGroup,
   ShotCard,
   ShotRow,
@@ -38,9 +41,21 @@ export default function StoryboardPage() {
     projectId?: string
     episodeId: string
   }>()
-  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
-  const { statusFilter, viewMode, setFilter, setViewMode, setShots } =
-    useShotStore()
+  const { currentEpisode, loading, error: episodeError, fetchEpisodeDetail } =
+    useEpisodeStore()
+  const {
+    statusFilter,
+    viewMode,
+    setFilter,
+    setViewMode,
+    setShots,
+    batchPickMode,
+    batchPickedShotIds,
+    setBatchPickMode,
+    toggleBatchPickShot,
+    addBatchPickShots,
+    clearBatchPicks,
+  } = useShotStore()
   const startPolling = useTaskStore((s) => s.startPolling)
   const pushToast = useToastStore((s) => s.push)
 
@@ -53,6 +68,8 @@ export default function StoryboardPage() {
   const [summaryResults, setSummaryResults] = useState<TaskStatusResponse[]>([])
   /** 上一次批量视频请求参数，用于「重试失败镜头」保持一致 mode/model */
   const lastVideoBatchParamsRef = useRef<GenerateVideoRequest | null>(null)
+  /** 分镜「工作区」：筛选/批量/配音/镜头列表；框选模式下点击此区域外则退出框选（弹窗内点击不退出） */
+  const storyboardWorkAreaRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (episodeId) {
@@ -65,6 +82,30 @@ export default function StoryboardPage() {
       setShots(flattenShots(currentEpisode))
     }
   }, [currentEpisode, setShots])
+
+  /** 切换剧集时重置为「全部符合条件」，避免沿用上一集的勾选 id */
+  useEffect(() => {
+    setBatchPickMode("all_eligible")
+  }, [episodeId, setBatchPickMode])
+
+  /**
+   * 框选模式：在分镜工作区外按下鼠标时退出（返回「全部符合条件」）
+   * 捕获阶段先于子组件处理；若点击在 Dialog 内或遮罩上则不退出（避免与弹窗冲突）
+   */
+  useEffect(() => {
+    if (batchPickMode !== "manual") return
+    const onDown = (e: MouseEvent) => {
+      const t = e.target
+      if (!(t instanceof Node)) return
+      if (storyboardWorkAreaRef.current?.contains(t)) return
+      const el = e.target instanceof Element ? e.target : null
+      if (el?.closest('[role="dialog"]')) return
+      if (el?.closest("[aria-modal]")) return
+      setBatchPickMode("all_eligible")
+    }
+    document.addEventListener("mousedown", onDown, true)
+    return () => document.removeEventListener("mousedown", onDown, true)
+  }, [batchPickMode, setBatchPickMode])
 
   if (!episodeId) return null
   if (loading && !currentEpisode) {
@@ -80,9 +121,27 @@ export default function StoryboardPage() {
     )
   }
   if (!currentEpisode) {
+    const is404 =
+      episodeError?.toLowerCase().includes("not found") ||
+      episodeError?.includes("未找到")
     return (
-      <div className="p-8 text-center text-[var(--color-muted)]">
-        未找到该剧集
+      <div className="p-8 max-w-lg mx-auto text-center space-y-4">
+        <p className="text-[var(--color-newsprint-black)] font-bold">
+          {is404 ? "本地尚未找到该剧集数据" : "未找到该剧集"}
+        </p>
+        <p className="text-sm text-[var(--color-muted)]">
+          {is404
+            ? "请从对应项目详情页使用「拉取后进入」，或顶部「从平台拉取」写入本地后再打开。"
+            : episodeError || "请确认路由中的剧集 ID 是否正确。"}
+        </p>
+        {routeProjectId ? (
+          <Link
+            to={routes.project(routeProjectId)}
+            className="inline-block text-sm font-bold text-[var(--color-primary)] underline"
+          >
+            返回项目详情
+          </Link>
+        ) : null}
       </div>
     )
   }
@@ -105,6 +164,29 @@ export default function StoryboardPage() {
     }
     return true
   })
+
+  /** 框选模式下与「已勾选」取交集后的实际批量目标 */
+  const pendingForBatch = useMemo(
+    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, pendingShots),
+    [batchPickMode, batchPickedShotIds, pendingShots]
+  )
+  const endframeForBatch = useMemo(
+    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, endframeDoneShots),
+    [batchPickMode, batchPickedShotIds, endframeDoneShots]
+  )
+  const firstFrameForBatch = useMemo(
+    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, firstFrameBatchShots),
+    [batchPickMode, batchPickedShotIds, firstFrameBatchShots]
+  )
+  /** 「全选当前筛选」：当前状态筛选下可见的全部 shotId */
+  const visibleShotIds = useMemo(
+    () =>
+      allShots
+        .filter((s) => statusFilter === "all" || s.status === statusFilter)
+        .map((s) => s.shotId),
+    [allShots, statusFilter]
+  )
+
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   const cacheBust = currentEpisode.pulledAt ?? undefined
   /** 新路由 URL 中带 projectId；兼容时回退到 episode.json */
@@ -112,12 +194,17 @@ export default function StoryboardPage() {
   const episodeAssetIds = (currentEpisode.assets ?? []).map((a) => a.assetId)
 
   const handleBatchEndframe = async () => {
-    if (!episodeId || pendingShots.length === 0) return
+    if (!episodeId || pendingForBatch.length === 0) {
+      if (batchPickMode === "manual" && pendingShots.length > 0) {
+        pushToast("框选模式下请勾选待生成尾帧的镜头，或改回「全部符合条件」", "info")
+      }
+      return
+    }
     setBatchEndBusy(true)
     try {
       const res = await generateApi.endframe({
         episodeId,
-        shotIds: pendingShots.map((s) => s.shotId),
+        shotIds: pendingForBatch.map((s) => s.shotId),
       })
       const taskToShot: Record<string, string> = {}
       res.data.tasks.forEach((t) => {
@@ -146,11 +233,16 @@ export default function StoryboardPage() {
   }
 
   const handleVideoModeConfirm = async (result: VideoModeSelectorResult) => {
-    if (!episodeId || endframeDoneShots.length === 0) return
+    if (!episodeId || endframeForBatch.length === 0) {
+      if (batchPickMode === "manual" && endframeDoneShots.length > 0) {
+        pushToast("框选模式下请勾选尾帧已完成的镜头，或改回「全部符合条件」", "info")
+      }
+      return
+    }
     try {
       const body: GenerateVideoRequest = {
         episodeId,
-        shotIds: endframeDoneShots.map((s) => s.shotId),
+        shotIds: endframeForBatch.map((s) => s.shotId),
         mode: result.mode,
         model: result.model,
         resolution: result.resolution,
@@ -186,11 +278,16 @@ export default function StoryboardPage() {
    * 批量首帧视频（mode=first_frame）：目标为 firstFrameBatchShots，与尾帧是否完成无关。
    */
   const handleBatchFirstFrameVideo = async () => {
-    if (!episodeId || firstFrameBatchShots.length === 0) return
+    if (!episodeId || firstFrameForBatch.length === 0) {
+      if (batchPickMode === "manual" && firstFrameBatchShots.length > 0) {
+        pushToast("框选模式下请勾选需要首帧视频的镜头，或改回「全部符合条件」", "info")
+      }
+      return
+    }
     try {
       const body: GenerateVideoRequest = {
         episodeId,
-        shotIds: firstFrameBatchShots.map((s) => s.shotId),
+        shotIds: firstFrameForBatch.map((s) => s.shotId),
         mode: "first_frame",
         model: "viduq2-pro-fast",
         resolution: "720p",
@@ -298,7 +395,7 @@ export default function StoryboardPage() {
       <VideoModeSelector
         open={videoDialogOpen}
         onClose={() => setVideoDialogOpen(false)}
-        shotCount={endframeDoneShots.length}
+        shotCount={endframeForBatch.length}
         episodeAssetIds={episodeAssetIds}
         onConfirm={handleVideoModeConfirm}
       />
@@ -336,8 +433,23 @@ export default function StoryboardPage() {
         </div>
       </div>
 
-      {/* 筛选 + 批量操作 + 视图切换 */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+      {/* 分镜工作区：筛选、批量、配音、镜头列表；框选模式下点击此区域外退出框选 */}
+      <div
+        ref={storyboardWorkAreaRef}
+        className="space-y-0 box-border"
+        style={{ boxSizing: "border-box" }}
+        data-storyboard-work-area
+      >
+      {/* 筛选 + 批量操作 + 视图切换；框选模式下禁止选中文字，避免与拖拽框选、勾选冲突 */}
+      <div
+        className={`mb-8 space-y-2 box-border ${
+          batchPickMode === "manual"
+            ? "select-none [-webkit-user-select:none]"
+            : ""
+        }`}
+        style={{ boxSizing: "border-box" }}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           {STATUS_FILTERS.map((f) => (
             <button
@@ -371,11 +483,19 @@ export default function StoryboardPage() {
               <List className="w-4 h-4" />
             </button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <BatchPickScopeControl
+              mode={batchPickMode}
+              onModeChange={setBatchPickMode}
+              pickedCount={batchPickedShotIds.length}
+              visibleShotIds={visibleShotIds}
+              onPickMany={addBatchPickShots}
+              onClearPicks={clearBatchPicks}
+            />
             <Button
               variant="secondary"
               className="gap-2"
-              disabled={pendingShots.length === 0 || batchEndBusy}
+              disabled={pendingForBatch.length === 0 || batchEndBusy}
               onClick={() => void handleBatchEndframe()}
             >
               {batchEndBusy ? (
@@ -383,38 +503,52 @@ export default function StoryboardPage() {
               ) : (
                 <ImagePlus className="w-4 h-4" />
               )}
-              批量生成尾帧 ({pendingShots.length})
+              批量生成尾帧 ({pendingForBatch.length})
             </Button>
             <Button
               variant="secondary"
               className="gap-2"
-              disabled={endframeDoneShots.length === 0}
+              disabled={endframeForBatch.length === 0}
               onClick={() => setVideoDialogOpen(true)}
               title="针对尾帧已完成镜头，可选首尾帧/多参考等模式"
             >
               <Film className="w-4 h-4" />
-              批量视频·尾帧已完成 ({endframeDoneShots.length})
+              批量视频·尾帧已完成 ({endframeForBatch.length})
             </Button>
             <Button
               variant="secondary"
               className="gap-2"
-              disabled={firstFrameBatchShots.length === 0}
+              disabled={firstFrameForBatch.length === 0}
               onClick={() => void handleBatchFirstFrameVideo()}
               title="凡有首帧且未在生成中的镜头均可批量走首帧图生视频（含尾帧已完成等）"
             >
               <Film className="w-4 h-4" />
-              批量视频·首帧模式 ({firstFrameBatchShots.length})
+              批量视频·首帧模式 ({firstFrameForBatch.length})
             </Button>
             <ExportPanel episodeId={episodeId} />
           </div>
         </div>
+        </div>
+        {batchPickMode === "manual" && (
+          <p className="text-[10px] text-[var(--color-muted)] max-w-3xl leading-relaxed">
+            框选模式：列表勾选首列；网格可勾选「选」或在卡片区左键拖拽矩形框选；指针靠近主内容区上下左右边缘时会自动滚动。点击本页上方剧集标题区、侧栏、或点「退出框选」结束。三项批量仅作用于「已勾选且符合条件」的镜头。
+          </p>
+        )}
       </div>
 
       <div className="mb-8">
         <DubPanel episodeId={episodeId} />
       </div>
 
-      {/* Scene 分组 */}
+      {/* Scene 分组（框选模式下同样禁止选中表格/卡片内文案） */}
+      <div
+        className={
+          batchPickMode === "manual"
+            ? "select-none [-webkit-user-select:none] box-border"
+            : "box-border"
+        }
+        style={{ boxSizing: "border-box" }}
+      >
       {currentEpisode.scenes.map((scene) => {
         const sceneShots = scene.shots.filter((s) =>
           statusFilter === "all" ? true : s.status === statusFilter
@@ -423,50 +557,73 @@ export default function StoryboardPage() {
         return (
           <SceneGroup key={scene.sceneId} scene={{ ...scene, shots: sceneShots }}>
             {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {sceneShots.map((shot) => (
-                  <ShotCard
-                    key={shot.shotId}
-                    shot={shot}
-                    projectId={projectId}
-                    episodeId={episodeId!}
-                    basePath={basePath}
-                    cacheBust={cacheBust}
-                  />
-                ))}
-              </div>
-            ) : (
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left text-xs text-[var(--color-muted)] border-b border-[var(--color-divider)]">
-                    <th className="py-2 px-4">编号</th>
-                    <th className="py-2 px-4 min-w-[11rem]">首尾帧</th>
-                    <th className="py-2 px-4">状态</th>
-                    <th className="py-2 px-4">画面描述</th>
-                    <th className="py-2 px-4">图片提示词</th>
-                    <th className="py-2 px-4">视频提示词</th>
-                    <th className="py-2 px-4">资产</th>
-                    <th className="py-2 px-4">候选数</th>
-                    <th className="py-2 px-4">操作</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <MarqueeGrid
+                enabled={batchPickMode === "manual"}
+                onPickShotIds={addBatchPickShots}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {sceneShots.map((shot) => (
-                    <ShotRow
+                    <ShotCard
                       key={shot.shotId}
                       shot={shot}
                       projectId={projectId}
                       episodeId={episodeId!}
                       basePath={basePath}
                       cacheBust={cacheBust}
+                      pickMode={batchPickMode === "manual"}
+                      batchPicked={batchPickedShotIds.includes(shot.shotId)}
+                      onBatchPickToggle={() => toggleBatchPickShot(shot.shotId)}
                     />
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </MarqueeGrid>
+            ) : (
+              <MarqueeGrid
+                enabled={batchPickMode === "manual"}
+                onPickShotIds={addBatchPickShots}
+              >
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-left text-xs text-[var(--color-muted)] border-b border-[var(--color-divider)]">
+                      {batchPickMode === "manual" && (
+                        <th className="py-2 px-2 w-10">选</th>
+                      )}
+                      <th className="py-2 px-4">编号</th>
+                      <th className="py-2 px-4 whitespace-nowrap">时长</th>
+                      <th className="py-2 px-4 min-w-[11rem]">首尾帧</th>
+                      <th className="py-2 px-4 min-w-[6rem]">视频</th>
+                      <th className="py-2 px-4">状态</th>
+                      <th className="py-2 px-4">画面描述</th>
+                      <th className="py-2 px-4">图片提示词</th>
+                      <th className="py-2 px-4">视频提示词</th>
+                      <th className="py-2 px-4">资产</th>
+                      <th className="py-2 px-4">候选数</th>
+                      <th className="py-2 px-4">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sceneShots.map((shot) => (
+                      <ShotRow
+                        key={shot.shotId}
+                        shot={shot}
+                        projectId={projectId}
+                        episodeId={episodeId!}
+                        basePath={basePath}
+                        cacheBust={cacheBust}
+                        pickMode={batchPickMode === "manual"}
+                        batchPicked={batchPickedShotIds.includes(shot.shotId)}
+                        onBatchPickToggle={() => toggleBatchPickShot(shot.shotId)}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </MarqueeGrid>
             )}
           </SceneGroup>
         )
       })}
+      </div>
+      </div>
     </div>
   )
 }

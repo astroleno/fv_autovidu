@@ -1,6 +1,7 @@
 export { useEpisodeStore } from "./episodeStore"
 export { useProjectStore } from "./projectStore"
 export { useShotStore } from "./shotStore"
+export type { BatchPickMode } from "./shotStore"
 export { useTaskStore } from "./taskStore"
 export { useToastStore } from "./toastStore"
 export { useUIStore } from "./uiStore"

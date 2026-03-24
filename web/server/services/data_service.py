@@ -28,17 +28,13 @@ def _episode_mutation_lock(episode_id: str) -> threading.Lock:
 
 from models.schemas import DubStatus, Episode, Shot, VideoCandidate
 
+# 与 web/server/config.py、pull 路由使用同一 DATA_ROOT，避免「拉取写 A 目录、读接口扫 B 目录」导致 404
+from config import DATA_ROOT as _CONFIG_DATA_ROOT
+
 
 def _get_data_root() -> Path:
-    """从环境变量获取数据根目录，默认为项目根目录下的 data/。"""
-    import os
-    root = os.environ.get("DATA_ROOT", "data")
-    p = Path(root)
-    if not p.is_absolute():
-        # web/server/services/data_service.py -> 上溯到项目根
-        proj_root = Path(__file__).resolve().parent.parent.parent.parent
-        p = (proj_root / root).resolve()
-    return p
+    """数据根目录，与 FastAPI 路由、pull_episode 写入路径一致。"""
+    return Path(_CONFIG_DATA_ROOT).resolve()
 
 
 def _score_episode_dir(ep_dir: Path) -> tuple[int, int, str]:

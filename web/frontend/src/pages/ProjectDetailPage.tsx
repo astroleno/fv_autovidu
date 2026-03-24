@@ -50,7 +50,19 @@ export default function ProjectDetailPage() {
     if (!projectId) return
     setPullingId(episodeId)
     try {
-      await episodesApi.pull(episodeId, false, projectId, false)
+      const res = await episodesApi.pull(episodeId, false, projectId, false)
+      /**
+       * 与 AppLayout「从平台拉取」一致：把 POST /pull 返回的 Episode 写入全局 store。
+       * 进入分镜页时即使用内存数据，不依赖 GET /episodes/:id 再读盘（避免 DATA_ROOT 不一致或竞态导致 404）。
+       */
+      useEpisodeStore.setState((s) => {
+        const rest = s.episodes.filter((e) => e.episodeId !== res.data.episodeId)
+        return {
+          episodes: [res.data, ...rest],
+          currentEpisode: res.data,
+          error: null,
+        }
+      })
       pushToast("拉取成功", "success")
       void fetchProjectEpisodes(projectId)
       void fetchEpisodes()
