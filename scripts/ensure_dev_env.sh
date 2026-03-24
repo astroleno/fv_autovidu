@@ -5,7 +5,6 @@ cd "$ROOT"
 if [[ ! -d web/frontend/node_modules ]]; then
   pnpm --prefix web/frontend install
 fi
-if ! python3 -c "import uvicorn" 2>/dev/null; then
-  # Homebrew Python 启用 PEP 668，仅 --user 仍会拒绝；需显式允许写入用户 site-packages
-  python3 -m pip install --user --break-system-packages -r requirements.txt
-fi
+
+# 与 postinstall 共用：无 .venv 或依赖不全时创建/安装（见 scripts/ensure_python_venv.sh）
+bash "${ROOT}/scripts/ensure_python_venv.sh"
