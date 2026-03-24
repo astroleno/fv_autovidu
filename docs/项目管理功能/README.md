@@ -60,7 +60,7 @@
 
 1. `main.py` 统一用 `app.include_router(..., prefix="/api")` 挂载路由。
    因此新增 `projects.py` 时，路由文件内前缀应写 `/projects`，不能再写 `/api/projects`。
-2. `data_service.get_episode(episode_id)` 目前只按 `episodeId` 查本地，并在多个项目副本中择优。
+2. `data_service.get_episode(episode_id)` 按 `episodeId` 查本地唯一目录；同一 episodeId 由 puller 归一化保证不再多副本并存。
    这使旧路由兼容成为可能。
 3. 前端很多跳转路径是硬编码字符串，不能只改 `App.tsx` 就结束。
 
