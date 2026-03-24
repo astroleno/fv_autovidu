@@ -15,6 +15,8 @@ python-dotenv>=1.0.0
 # 后端 API（web/server）
 fastapi>=0.115.0
 uvicorn>=0.30.0
+# Python 3.9 下 Pydantic 解析 PEP604 联合类型（如 X | None）时需此包；3.10+ 亦可保留无害
+eval-type-backport>=0.2.0
 
 # 剪映草稿：生成与官方兼容的 draft_content.json（时间轴）；见 pyJianYingDraft
 pyJianYingDraft>=0.2.6

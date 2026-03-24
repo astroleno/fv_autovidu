@@ -2,7 +2,8 @@
   "name": "fv-autovidu",
   "private": true,
   "scripts": {
-    "setup:python": "python3 -m pip install --user --break-system-packages -r requirements.txt",
+    "setup:python": "bash scripts/setup_python_venv.sh",
+    "postinstall": "bash scripts/ensure_python_venv.sh",
     "dev": "bash scripts/ensure_dev_env.sh && concurrently -n api,web -c blue,green \"bash scripts/dev_api.sh\" \"pnpm --prefix web/frontend run dev\""
   },
   "devDependencies": {
