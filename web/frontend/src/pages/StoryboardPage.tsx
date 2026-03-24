@@ -107,6 +107,56 @@ export default function StoryboardPage() {
     return () => document.removeEventListener("mousedown", onDown, true)
   }, [batchPickMode, setBatchPickMode])
 
+  /**
+   * 以下 useMemo 必须在任何 early return 之前调用，否则 loading/无数据时少跑 hooks，
+   * 会在「有数据后」触发 Rendered more hooks than during the previous render。
+   */
+  const allShots = useMemo(
+    () => (currentEpisode ? flattenShots(currentEpisode) : []),
+    [currentEpisode]
+  )
+  const pendingShots = useMemo(
+    () =>
+      allShots.filter(
+        (s) => s.status === "pending" && Boolean(s.firstFrame?.trim())
+      ),
+    [allShots]
+  )
+  const endframeDoneShots = useMemo(
+    () => allShots.filter((s) => s.status === "endframe_done"),
+    [allShots]
+  )
+  const firstFrameBatchShots = useMemo(
+    () =>
+      allShots.filter((s) => {
+        if (!s.firstFrame?.trim()) return false
+        if (s.status === "endframe_generating" || s.status === "video_generating") {
+          return false
+        }
+        return true
+      }),
+    [allShots]
+  )
+  const pendingForBatch = useMemo(
+    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, pendingShots),
+    [batchPickMode, batchPickedShotIds, pendingShots]
+  )
+  const endframeForBatch = useMemo(
+    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, endframeDoneShots),
+    [batchPickMode, batchPickedShotIds, endframeDoneShots]
+  )
+  const firstFrameForBatch = useMemo(
+    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, firstFrameBatchShots),
+    [batchPickMode, batchPickedShotIds, firstFrameBatchShots]
+  )
+  const visibleShotIds = useMemo(
+    () =>
+      allShots
+        .filter((s) => statusFilter === "all" || s.status === statusFilter)
+        .map((s) => s.shotId),
+    [allShots, statusFilter]
+  )
+
   if (!episodeId) return null
   if (loading && !currentEpisode) {
     return (
@@ -145,47 +195,6 @@ export default function StoryboardPage() {
       </div>
     )
   }
-
-  const allShots = flattenShots(currentEpisode)
-  /** 待生成尾帧：pending 且已配置首帧 */
-  const pendingShots = allShots.filter(
-    (s) => s.status === "pending" && Boolean(s.firstFrame?.trim())
-  )
-  /** 尾帧已完成：可用于首尾帧 / 多参考等模式批量视频 */
-  const endframeDoneShots = allShots.filter((s) => s.status === "endframe_done")
-  /**
-   * 首帧图生视频（first_frame）批量目标：只要有首帧路径且当前未在生成流程中即可。
-   * 覆盖 pending、endframe_done、video_done、error、selected 等，不仅限于 pending。
-   */
-  const firstFrameBatchShots = allShots.filter((s) => {
-    if (!s.firstFrame?.trim()) return false
-    if (s.status === "endframe_generating" || s.status === "video_generating") {
-      return false
-    }
-    return true
-  })
-
-  /** 框选模式下与「已勾选」取交集后的实际批量目标 */
-  const pendingForBatch = useMemo(
-    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, pendingShots),
-    [batchPickMode, batchPickedShotIds, pendingShots]
-  )
-  const endframeForBatch = useMemo(
-    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, endframeDoneShots),
-    [batchPickMode, batchPickedShotIds, endframeDoneShots]
-  )
-  const firstFrameForBatch = useMemo(
-    () => filterShotsByBatchPick(batchPickMode, batchPickedShotIds, firstFrameBatchShots),
-    [batchPickMode, batchPickedShotIds, firstFrameBatchShots]
-  )
-  /** 「全选当前筛选」：当前状态筛选下可见的全部 shotId */
-  const visibleShotIds = useMemo(
-    () =>
-      allShots
-        .filter((s) => statusFilter === "all" || s.status === statusFilter)
-        .map((s) => s.shotId),
-    [allShots, statusFilter]
-  )
 
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   const cacheBust = currentEpisode.pulledAt ?? undefined
