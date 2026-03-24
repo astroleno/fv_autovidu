@@ -87,7 +87,7 @@ console.log(INTEGRATION.version, isConfigured());
 
 | 概念 | UGCFlow（上文） | fv_autovidu 实现 |
 |------|-----------------|------------------|
-| 剪映草稿根目录 `draftPath` | 写入 `{draftPath}/{draftId}/` | **相同**，见 `web/server/services/jianying_service.export_jianying_draft`；成功响应含 `jianyingCopyPath`（绝对路径）；**不生成 ZIP**（与 UGCFlow 可选 ZIP 不同，避免语义重复） |
+| 剪映草稿根目录 `draftPath` | 写入 `{draftPath}/{draftId}/` | **相同**；工程内含 **`draft_content.json`（时间轴）** + `draft_meta_info.json` + `materials/`，由 **pyJianYingDraft** 生成，与 UGCFlow `jianyingDraftExportService` 目的一致；成功响应含 `jianyingCopyPath`；**不生成 ZIP** |
 | POST 导出 | `draftPath` 与 `createZip` 至少其一 | `POST /api/export/jianying-draft`：**必填 `draftPath`**，忽略/不支持 ZIP |
 | GET 探测草稿目录 | `GET /api/system/jianying-draft-path` | **双路径**：`GET /api/system/jianying-draft-path`（别名）与 `GET /api/export/jianying-draft/path` 返回一致 `{ detectedPath, candidates }` |
 | macOS 常见目录 | 需在目标机「剪映 → 全局设置 → 草稿位置」核对 | 后端候选含 `.../Movies/JianyingPro/User Data/Projects` 及子目录 `com.lveditor.draft`（若存在则优先） |

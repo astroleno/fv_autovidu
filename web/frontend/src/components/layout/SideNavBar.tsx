@@ -1,8 +1,10 @@
 /**
  * 侧边栏：项目列表、设置；在剧集上下文中追加「粗剪时间线」「分镜板/表」「资产库」
  * 垂直顺序：粗剪 → 分镜板/表（紧贴资产库上方）→ 资产库
+ *
+ * 不在此重复请求 GET /episodes/:id：各剧集子页（分镜板、时间线、资产库等）已拉取详情，
+ * 避免与 SideNavBar 并发双请求、404 时控制台重复报错。
  */
-import { useEffect } from "react"
 import { NavLink, useParams } from "react-router"
 import {
   Video,
@@ -33,11 +35,7 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
     projectId?: string
     episodeId?: string
   }>()
-  const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()
-
-  useEffect(() => {
-    if (episodeId) void fetchEpisodeDetail(episodeId)
-  }, [episodeId, fetchEpisodeDetail])
+  const { currentEpisode } = useEpisodeStore()
 
   /** 剧集页时资产数量（用于资产库入口显示） */
   const assetsList =

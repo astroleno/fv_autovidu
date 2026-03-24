@@ -125,6 +125,8 @@ export default function ShotDetailPage() {
                     asset={a}
                     basePath={basePath}
                     cacheBust={cacheBust}
+                    projectId={projectId}
+                    episodeId={episodeId}
                   />
                 ))}
               </div>

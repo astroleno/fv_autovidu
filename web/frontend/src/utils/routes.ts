@@ -24,6 +24,13 @@ export const routes = {
   assets: (projectId: string, episodeId: string) =>
     `/project/${encodeURIComponent(projectId)}/episode/${encodeURIComponent(episodeId)}/assets`,
 
+  /**
+   * 资产库并定位到某条资产（打开详情弹窗）
+   * AssetLibraryPage 读取 query `assetId` 后自动选中并展示大图
+   */
+  assetDetail: (projectId: string, episodeId: string, assetId: string) =>
+    `${routes.assets(projectId, episodeId)}?assetId=${encodeURIComponent(assetId)}`,
+
   /** 镜头详情 */
   shot: (projectId: string, episodeId: string, shotId: string) =>
     `/project/${encodeURIComponent(projectId)}/episode/${encodeURIComponent(episodeId)}/shot/${encodeURIComponent(shotId)}`,

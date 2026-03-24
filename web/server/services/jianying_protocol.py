@@ -23,17 +23,25 @@ CanvasSizeLiteral = Literal["720p", "1080p"]
 
 def canvas_wh(canvas_size: CanvasSizeLiteral) -> tuple[int, int]:
     """
-    将业务画布档位映射为 draft_info 中的宽高像素（横屏基准）。
+    将业务画布档位映射为像素宽高（横屏 16:9，历史兼容）。
 
-    说明：当前为「最小可迭代」横屏 16:9；竖屏短视频（9:16）若剪映实机需要，
-    应改为 1080x1920 等并在 PROTOCOL_TEMPLATE_VERSION 升级时一并验证。
+    剪映导出主流程已改用 :func:`canvas_wh_vertical_9_16` + ``draft_content.json``。
+    """
+    if canvas_size == "1080p":
+        return (1920, 1080)
+    return (1280, 720)
+
+
+def canvas_wh_vertical_9_16(canvas_size: CanvasSizeLiteral) -> tuple[int, int]:
+    """
+    竖屏 9:16 画布（短视频常见），与 pyJianYingDraft.ScriptFile 创建参数一致。
 
     Args:
-        canvas_size: 720p 或 1080p
+        canvas_size: 720p → 720×1280；1080p → 1080×1920
 
     Returns:
         (width, height)
     """
     if canvas_size == "1080p":
-        return (1920, 1080)
-    return (1280, 720)
+        return (1080, 1920)
+    return (720, 1280)

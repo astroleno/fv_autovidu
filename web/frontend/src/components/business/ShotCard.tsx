@@ -13,6 +13,7 @@ import { StatusIndicator } from "./StatusIndicator"
 import { DubStatusBadge } from "./DubStatusBadge"
 import { AssetTag } from "./AssetTag"
 import { ShotFrameCompare } from "./ShotFrameCompare"
+import { ShotRowVideoPreview } from "./ShotRowVideoPreview"
 import { shotStatusLabels } from "@/utils/format"
 import { generateApi } from "@/api/generate"
 import { useTaskStore } from "@/stores/taskStore"
@@ -27,6 +28,12 @@ interface ShotCardProps {
   basePath?: string
   /** 缓存破坏，重新拉取后图片刷新 */
   cacheBust?: string
+  /** 分镜板「框选模式」：显示勾选框；外层带 data-batch-pick-item 供 Alt+拖拽框选 */
+  pickMode?: boolean
+  /** 当前是否勾选参与批量 */
+  batchPicked?: boolean
+  /** 切换勾选 */
+  onBatchPickToggle?: () => void
 }
 
 export function ShotCard({
@@ -35,6 +42,9 @@ export function ShotCard({
   episodeId,
   basePath = "",
   cacheBust,
+  pickMode = false,
+  batchPicked = false,
+  onBatchPickToggle,
 }: ShotCardProps) {
   const [submitting, setSubmitting] = useState<"endframe" | "video" | null>(null)
   const startPolling = useTaskStore((s) => s.startPolling)
@@ -99,8 +109,26 @@ export function ShotCard({
     }
   }
 
-  return (
-    <div className="newsprint-card p-4 box-border">
+  const cardInner = (
+    <div className="newsprint-card p-4 box-border relative">
+      {pickMode && (
+        <div
+          className="absolute top-2 left-2 z-30"
+          data-shot-checkbox
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <label className="flex items-center gap-1 cursor-pointer bg-[var(--color-newsprint-off-white)] border border-[var(--color-newsprint-black)] px-1.5 py-0.5 text-[9px] font-black uppercase tracking-tighter shadow-sm box-border">
+            <input
+              type="checkbox"
+              checked={batchPicked}
+              onChange={() => onBatchPickToggle?.()}
+              aria-label={`批量框选：镜头 S${String(shot.shotNumber).padStart(2, "0")}`}
+            />
+            选
+          </label>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-3 pb-2 border-b border-[var(--color-newsprint-black)] border-dashed">
         <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--color-newsprint-black)] opacity-80">
           S{String(shot.shotNumber).padStart(2, "0")} | {shot.cameraMovement} | {shot.duration}s
@@ -135,6 +163,20 @@ export function ShotCard({
         />
       </div>
 
+      {/* 首尾帧之后：主视频缩略 + 悬浮预览，点击进入镜头详情（与分镜表列表「视频」列一致） */}
+      <div className="mb-4">
+        <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-muted)] mb-1.5">
+          视频
+        </p>
+        <ShotRowVideoPreview
+          shot={shot}
+          projectId={projectId}
+          episodeId={episodeId}
+          basePath={basePath}
+          cacheBust={cacheBust}
+        />
+      </div>
+
       {(shot.visualDescription || shot.imagePrompt || shot.videoPrompt) && (
         <div
           className="mb-3 text-[10px] text-[var(--color-muted)] line-clamp-3 box-border"
@@ -153,6 +195,8 @@ export function ShotCard({
               asset={a}
               basePath={basePath}
               cacheBust={cacheBust}
+              projectId={projectId}
+              episodeId={episodeId}
             />
           ))}
         </div>
@@ -199,4 +243,18 @@ export function ShotCard({
       </div>
     </div>
   )
+
+  if (pickMode) {
+    return (
+      <div
+        data-batch-pick-item={shot.shotId}
+        className="relative box-border"
+        style={{ boxSizing: "border-box" }}
+      >
+        {cardInner}
+      </div>
+    )
+  }
+
+  return cardInner
 }

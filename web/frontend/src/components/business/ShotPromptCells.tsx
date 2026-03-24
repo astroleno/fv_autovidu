@@ -136,6 +136,7 @@ export function ShotPromptCells({
       >
         <button
           type="button"
+          data-prompt-preview
           onClick={() => beginEdit(key)}
           className="w-full text-left truncate block cursor-text hover:bg-[var(--color-divider)]/50 -m-1 p-1 rounded"
         >
@@ -192,7 +193,7 @@ export function ShotPromptCells({
                 cancelEdit()
               }
             }}
-            className="p-2 text-xs border-2 border-[var(--color-primary)] bg-[var(--color-newsprint-off-white)] resize-y focus:outline-none max-w-full"
+            className="p-2 text-xs border-2 border-[var(--color-primary)] bg-[var(--color-newsprint-off-white)] resize-y focus:outline-none max-w-full select-text [user-select:text]"
             style={{ boxSizing: "border-box", minHeight: MIN_TEXTAREA_HEIGHT_PX }}
             rows={1}
             aria-label={FIELD_LABEL[editing]}

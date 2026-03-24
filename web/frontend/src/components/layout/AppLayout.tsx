@@ -175,7 +175,10 @@ export default function AppLayout() {
          * 内部再 overflow-y-auto，长页面（分镜板等）仍在内层滚动。
          */}
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <div
+            className="min-h-0 flex-1 overflow-y-auto"
+            data-app-main-scroll
+          >
             <Outlet />
           </div>
         </main>

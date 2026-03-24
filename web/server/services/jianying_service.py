@@ -4,10 +4,13 @@
 
 职责：
 - 从 Episode 收集可导出视频候选（有 videoPath；优先 selected，否则第一条），按分镜叙事顺序排列
-- 将素材复制到 `export/jianying/{draftId}/materials/`，生成最小 `draft_info.json` / `draft_meta_info.json`
-- 将草稿目录复制到本机剪映草稿根目录（同机部署）；不生成 ZIP（避免与「导出到剪映」语义重复）
+- 将素材复制到 `export/jianying/{draftId}/materials/`
+- 使用 **pyJianYingDraft** 生成与剪映兼容的 **`draft_content.json`（时间轴）** 及官方模板的 **`draft_meta_info.json`**
+  （仅写自研 `draft_info.json` 无法显示时间轴，见 reference 与社区逆向说明）
+- 将草稿目录复制到本机剪映草稿根目录（同机部署）；不生成 ZIP
 
-注意：剪映私有协议可能随版本变化；字段以实机验证为准（见 docs/剪映与配音接入方案）。
+注意：剪映 6+ 可能对「由软件保存」的草稿加密；**由本工具生成的未加密 JSON** 在多数版本可导入。
+若仍空白，请记录剪映版本并反馈。
 """
 
 from __future__ import annotations
@@ -24,11 +27,7 @@ from models.schemas import Episode, JianyingExportRecord, JianyingExportRequest,
 from services import data_service
 from services.audio_service import probe_duration_sec
 from services.candidate_pick import pick_playable_video_candidate
-from services.jianying_protocol import (
-    PROTOCOL_TEMPLATE_VERSION,
-    USEC_PER_SEC,
-    canvas_wh,
-)
+from services.jianying_protocol import canvas_wh_vertical_9_16
 
 
 def _flatten_shots_narrative_order(episode: Episode) -> list[Shot]:
@@ -101,132 +100,97 @@ def collect_exportable_shots(
     return exportable, missing
 
 
-def _duration_usec(duration_sec: float) -> int:
-    return max(1, int(duration_sec * USEC_PER_SEC))
-
-
-def build_draft_info(
+def _write_jianying_draft_pyjdraft(
+    draft_root: Path,
     draft_id: str,
     draft_name: str,
-    items: list[dict[str, Any]],
-    materials_rel_paths: list[str],
+    exportable: list[dict[str, Any]],
+    dub_rows: list[dict[str, Any] | None],
+    materials_dir: Path,
     canvas_width: int,
     canvas_height: int,
-    audio_items: list[dict[str, Any]] | None = None,
-) -> dict[str, Any]:
+) -> int:
     """
-    构建 draft_info.json 字典（最小字段集）。
+    使用 pyJianYingDraft 写入 draft_content.json + draft_meta_info.json。
+
+    剪映桌面版**时间轴**读取 ``draft_content.json``（社区与 pyJianYingDraft 文档一致）；
+    仅自研 ``draft_info.json`` 不足以显示轨道，故必须依赖本库生成。
 
     Args:
+        draft_root: 草稿根目录（其下含 materials/）
         draft_id: 草稿 UUID
         draft_name: 显示名称
-        items: collect_exportable_shots 结果，且已绑定 materials 内相对路径键 `materialRel`
-        materials_rel_paths: 与 items 顺序一致的视频素材相对路径（位于草稿根目录下）
-        canvas_width/canvas_height: 像素画布
-        audio_items: 可选；与视频片段时间对齐的配音素材（Phase 3），每项含 materialRel、durationSec
+        exportable: 已复制到 materials 的导出行
+        dub_rows: 与 exportable 对齐的配音行（可为 None）
+        materials_dir: materials 目录路径
+        canvas_width/canvas_height: 像素画布（竖屏 9:16）
+
+    Returns:
+        草稿总时长（微秒），与 ScriptFile.duration 一致
+
+    Raises:
+        ImportError: 未安装 pyJianYingDraft
     """
-    materials_videos: list[dict[str, Any]] = []
-    video_segments: list[dict[str, Any]] = []
-    materials_audios: list[dict[str, Any]] = []
-    audio_segments: list[dict[str, Any]] = []
-
-    timeline_offset = 0
-    audio_items = audio_items or []
-
-    for i, row in enumerate(items):
-        rel = materials_rel_paths[i]
-        material_id = str(uuid.uuid4())
-        dur_sec = float(row["durationSec"])
-        dur_us = _duration_usec(dur_sec)
-
-        materials_videos.append(
-            {
-                "id": material_id,
-                "path": rel,
-                "duration": dur_us,
-                "type": "video",
-            }
+    try:
+        from pyJianYingDraft import (
+            AudioSegment,
+            ScriptFile,
+            VideoSegment,
+            assets,
+            trange,
         )
-        video_segments.append(
-            {
-                "id": str(uuid.uuid4()),
-                "material_id": material_id,
-                "target_timerange": {
-                    "start": timeline_offset,
-                    "duration": dur_us,
-                },
-                "source_timerange": {
-                    "start": 0,
-                    "duration": dur_us,
-                },
-            }
-        )
+        from pyJianYingDraft import SEC, TrackType
+    except ImportError as exc:
+        raise ImportError(
+            "剪映时间轴依赖 pyJianYingDraft，请在后端环境执行：pip install pyJianYingDraft>=0.2.6"
+        ) from exc
 
-        if i < len(audio_items) and audio_items[i]:
-            a = audio_items[i]
-            ap = a.get("materialRel")
-            if ap:
-                audio_material_id = str(uuid.uuid4())
-                a_dur_sec = float(a.get("durationSec") or dur_sec)
-                a_us = _duration_usec(a_dur_sec)
-                materials_audios.append(
-                    {
-                        "id": audio_material_id,
-                        "path": ap,
-                        "duration": a_us,
-                        "type": "audio",
-                    }
-                )
-                audio_segments.append(
-                    {
-                        "id": str(uuid.uuid4()),
-                        "material_id": audio_material_id,
-                        "target_timerange": {
-                            "start": timeline_offset,
-                            "duration": a_us,
-                        },
-                        "source_timerange": {
-                            "start": 0,
-                            "duration": a_us,
-                        },
-                    }
-                )
+    script = ScriptFile(canvas_width, canvas_height, 30, True)
+    script.add_track(TrackType.video)
+    t_us = 0
+    for i, row in enumerate(exportable):
+        ext = row["videoAbs"].suffix or ".mp4"
+        safe = f"{i + 1:03d}_{row['shotId']}{ext}"
+        path = materials_dir / safe
+        dur_us = max(1, int(float(row["durationSec"]) * SEC))
+        seg = VideoSegment(str(path.resolve()), trange(t_us, dur_us))
+        script.add_segment(seg)
+        t_us += dur_us
 
-        timeline_offset += dur_us
+    has_dub = any(
+        i < len(dub_rows) and dub_rows[i] is not None for i in range(len(exportable))
+    )
+    if has_dub:
+        script.add_track(TrackType.audio)
+        t_us = 0
+        for i, row in enumerate(exportable):
+            dur_us = max(1, int(float(row["durationSec"]) * SEC))
+            if i < len(dub_rows) and dub_rows[i]:
+                d = dub_rows[i]
+                assert d is not None
+                abs_a = d["_abs"]
+                aext = abs_a.suffix or ".mp3"
+                asafe = f"{i + 1:03d}_{row['shotId']}_dub{aext}"
+                apath = materials_dir / asafe
+                seg = AudioSegment(str(apath.resolve()), trange(t_us, dur_us))
+                script.add_segment(seg)
+            t_us += dur_us
 
-    now_ts = int(datetime.now(tz=timezone.utc).timestamp())
-    return {
-        "draft_template_version": PROTOCOL_TEMPLATE_VERSION,
-        "id": draft_id,
-        "name": draft_name,
-        "canvas_config": {
-            "width": canvas_width,
-            "height": canvas_height,
-        },
-        "duration": timeline_offset,
-        "materials": {
-            "videos": materials_videos,
-            "audios": materials_audios,
-        },
-        "tracks": [
-            {"type": "video", "segments": video_segments},
-            {"type": "audio", "segments": audio_segments},
-        ],
-        "create_time": now_ts,
-        "update_time": now_ts,
-    }
-
-
-def build_draft_meta_info(draft_id: str, draft_name: str) -> dict[str, Any]:
-    """生成 draft_meta_info.json 最小内容。"""
-    now_ts = int(datetime.now(tz=timezone.utc).timestamp())
-    return {
-        "draft_id": draft_id,
-        "draft_name": draft_name,
-        "tm_create": now_ts,
-        "tm_modify": now_ts,
-        "draft_template_version": PROTOCOL_TEMPLATE_VERSION,
-    }
+    script.dump(str(draft_root / "draft_content.json"))
+    shutil.copy(
+        assets.get_asset_path("DRAFT_META_TEMPLATE"),
+        str(draft_root / "draft_meta_info.json"),
+    )
+    meta_path = draft_root / "draft_meta_info.json"
+    meta_obj = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta_obj["draft_id"] = draft_id.upper()
+    meta_obj["draft_name"] = draft_name
+    meta_obj["tm_duration"] = script.duration
+    meta_path.write_text(
+        json.dumps(meta_obj, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return int(script.duration)
 
 
 def _detect_dub_audio_rows(
@@ -294,27 +258,23 @@ def export_jianying_draft(
 
     draft_id = str(uuid.uuid4())
     draft_name = ep.episodeTitle or episode_id
-    w, h = canvas_wh(req.canvasSize)
+    w, h = canvas_wh_vertical_9_16(req.canvasSize)  # 竖屏 9:16，与 pyJianYingDraft 一致
 
     draft_root = ep_dir / "export" / "jianying" / draft_id
     draft_root.mkdir(parents=True, exist_ok=True)
     materials_dir = draft_root / "materials"
     materials_dir.mkdir(parents=True, exist_ok=True)
 
-    rel_paths: list[str] = []
     dub_rows = _detect_dub_audio_rows(ep_dir, exportable) if include_dub_audio else [None] * len(exportable)
 
-    audio_for_build: list[dict[str, Any]] = []
     for i, row in enumerate(exportable):
         ext = row["videoAbs"].suffix or ".mp4"
         safe = f"{i + 1:03d}_{row['shotId']}{ext}"
         dst = materials_dir / safe
         shutil.copy2(row["videoAbs"], dst)
         rel = f"materials/{safe}"
-        rel_paths.append(rel)
         row["materialRel"] = rel
 
-        dub_entry: dict[str, Any] | None = None
         if i < len(dub_rows) and dub_rows[i]:
             d = dub_rows[i]
             abs_a = d["_abs"]
@@ -322,28 +282,16 @@ def export_jianying_draft(
             asafe = f"{i + 1:03d}_{row['shotId']}_dub{aext}"
             adst = materials_dir / asafe
             shutil.copy2(abs_a, adst)
-            arel = f"materials/{asafe}"
-            dub_entry = {"materialRel": arel, "durationSec": d["durationSec"]}
-        audio_for_build.append(dub_entry or {})
 
-    info = build_draft_info(
+    _write_jianying_draft_pyjdraft(
+        draft_root,
         draft_id,
         draft_name,
         exportable,
-        rel_paths,
+        dub_rows,
+        materials_dir,
         w,
         h,
-        audio_items=audio_for_build,
-    )
-    meta = build_draft_meta_info(draft_id, draft_name)
-
-    (draft_root / "draft_info.json").write_text(
-        json.dumps(info, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    (draft_root / "draft_meta_info.json").write_text(
-        json.dumps(meta, ensure_ascii=False, indent=2),
-        encoding="utf-8",
     )
 
     # 不再生成 ZIP；episode 记录仍保留 zipPath 字段以兼容旧 JSON，恒为 None
