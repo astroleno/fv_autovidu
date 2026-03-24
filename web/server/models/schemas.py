@@ -53,10 +53,16 @@ class VideoCandidate(BaseModel):
     seed: int = 0
     model: str = ""
     mode: VideoMode = "first_frame"
+    # 与 Vidu 请求一致，如 540p / 720p / 1080p；便于前端展示与精出对比
+    resolution: str = ""
     selected: bool = False
     createdAt: str = ""
     taskId: str = ""
     taskStatus: TaskStatus = "pending"
+    # 预览阶段生成的低成本候选；精出后新候选 isPreview=False
+    isPreview: bool = False
+    # 精出候选记录来源预览候选 id，便于追溯
+    promotedFrom: Optional[str] = None
 
 
 class DubStatus(BaseModel):
@@ -179,12 +185,33 @@ class GenerateVideoRequest(BaseModel):
     duration: Optional[int] = None
     resolution: Optional[str] = None
     referenceAssetIds: Optional[list[str]] = None
+    # 0 或 None 表示随机；透传 Vidu
+    seed: Optional[int] = None
+    # 每镜头提交次数；仅 isPreview=True 时允许 >1（见路由层强制）
+    candidateCount: int = 1
+    isPreview: bool = False
 
 
 class GenerateVideoResponse(BaseModel):
     """生成视频响应。"""
 
     tasks: list[dict[str, str]] = Field(default_factory=list)
+
+
+class PromoteVideoItem(BaseModel):
+    """锁种精出：单镜头 + 指定预览候选 id。"""
+
+    shotId: str
+    candidateId: str
+
+
+class PromoteVideoRequest(BaseModel):
+    """基于预览候选 seed 发起更高分辨率/精出模型。"""
+
+    episodeId: str
+    items: list[PromoteVideoItem]
+    model: str = "viduq3-pro"
+    resolution: str = "1080p"
 
 
 class RegenFrameRequest(BaseModel):

@@ -256,6 +256,12 @@ export default function StoryboardPage() {
         model: result.model,
         resolution: result.resolution,
         referenceAssetIds: result.referenceAssetIds,
+        ...(result.mode === "first_last_frame" && result.isPreview
+          ? {
+              isPreview: true,
+              candidateCount: result.candidateCount ?? 1,
+            }
+          : {}),
       }
       lastVideoBatchParamsRef.current = body
       const res = await generateApi.video(body)

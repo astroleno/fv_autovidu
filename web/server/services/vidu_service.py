@@ -37,6 +37,7 @@ def submit_img2video(
     resolution: str = "720p",
     aspect_ratio: str = "9:16",
     end_frame_path: Path | None = None,
+    seed: int = 0,
 ) -> dict:
     """
     提交图生视频任务。
@@ -59,6 +60,7 @@ def submit_img2video(
         duration=duration,
         resolution=resolution,
         aspect_ratio=aspect_ratio,
+        seed=seed,
     )
 
 
@@ -71,6 +73,7 @@ def submit_first_last_video(
     duration: int = 5,
     resolution: str = "720p",
     aspect_ratio: str = "9:16",
+    seed: int = 0,
 ) -> dict:
     """
     首尾帧双图生视频：调用官方「Start end to Video」接口 POST /start-end2video。
@@ -85,12 +88,14 @@ def submit_first_last_video(
     b64_first = client._image_to_base64(first_frame_path)
     b64_end = client._image_to_base64(end_frame_path)
     try:
+        # bgm 默认关；audio 沿用 client 默认 True（音视频直出）
         out = client.start_end2video(
             images=[b64_first, b64_end],
             prompt=prompt,
             model=model,
             duration=duration,
             resolution=resolution,
+            seed=seed,
         )
         # #region agent log
         try:
@@ -149,6 +154,7 @@ def submit_reference_video(
     aspect_ratio: str = "9:16",
     with_subjects: bool = False,
     voice_text: str | None = None,
+    seed: int = 0,
 ) -> dict:
     """
     多参考图生视频（1~7 张）。
@@ -169,6 +175,7 @@ def submit_reference_video(
             duration=duration,
             resolution=resolution,
             aspect_ratio=aspect_ratio,
+            seed=seed,
         )
     b64_list = [client._image_to_base64(Path(p)) for p in reference_images]
     return client.reference2video_with_images(
@@ -178,4 +185,5 @@ def submit_reference_video(
         duration=duration,
         resolution=resolution,
         aspect_ratio=aspect_ratio,
+        seed=seed,
     )
