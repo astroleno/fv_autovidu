@@ -5,7 +5,17 @@
  */
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router"
-import { Clapperboard, Grid3X3, List, Film, ImagePlus, Loader2, Package } from "lucide-react"
+import {
+  Clapperboard,
+  CheckSquare,
+  Grid3X3,
+  List,
+  Film,
+  ImagePlus,
+  Loader2,
+  Package,
+} from "lucide-react"
+import { useEpisodeMediaCacheBust } from "@/hooks"
 import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
 import { filterShotsByBatchPick } from "@/utils/batchPick"
 import { Button, Skeleton } from "@/components/ui"
@@ -43,6 +53,8 @@ export default function StoryboardPage() {
   }>()
   const { currentEpisode, loading, error: episodeError, fetchEpisodeDetail } =
     useEpisodeStore()
+  /** 尾帧/视频写入后 pulledAt 不变，需与 localMediaEpoch 组合才能刷新缩略图 */
+  const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
   const {
     statusFilter,
     viewMode,
@@ -197,7 +209,6 @@ export default function StoryboardPage() {
   }
 
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
-  const cacheBust = currentEpisode.pulledAt ?? undefined
   /** 新路由 URL 中带 projectId；兼容时回退到 episode.json */
   const projectId = routeProjectId ?? currentEpisode.projectId
   const episodeAssetIds = (currentEpisode.assets ?? []).map((a) => a.assetId)
@@ -395,6 +406,12 @@ export default function StoryboardPage() {
                 model: base.model,
                 resolution: base.resolution,
                 referenceAssetIds: base.referenceAssetIds,
+                ...(base.mode === "first_last_frame" && base.isPreview
+                  ? {
+                      isPreview: true,
+                      candidateCount: base.candidateCount ?? 1,
+                    }
+                  : {}),
               })
               .then((res) => {
                 const taskToShot: Record<string, string> = {}
@@ -450,6 +467,14 @@ export default function StoryboardPage() {
           >
             <Clapperboard className="w-4 h-4 shrink-0" aria-hidden />
             粗剪时间线
+          </Link>
+          <Link
+            to={routes.videopick(projectId, episodeId)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[var(--color-newsprint-black)] bg-transparent hover:bg-[var(--color-outline-variant)] transition-colors box-border"
+            style={{ boxSizing: "border-box" }}
+          >
+            <CheckSquare className="w-4 h-4 shrink-0" aria-hidden />
+            选片总览
           </Link>
           <Link
             to={routes.assets(projectId, episodeId)}

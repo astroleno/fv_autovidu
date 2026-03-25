@@ -3,16 +3,16 @@
  * 左侧 40%：首尾帧 + prompt + 资产 + 镜头信息
  * 右侧 60%：候选视频列表 + 选定 + 预览候选「精出 1080p」（锁种 promote）
  */
-import { useEffect, useRef, useState } from "react"
+import { useEffect } from "react"
 import { useParams, Link } from "react-router"
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
-import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
+import { useEpisodeMediaCacheBust, usePromoteCandidate } from "@/hooks"
+import { useEpisodeStore, useShotStore } from "@/stores"
 import { Button } from "@/components/ui"
 import { VideoPlayer, AssetTag, ShotFrameCompare } from "@/components/business"
 import { flattenShots } from "@/types"
 import { getFileUrl } from "@/utils/file"
 import { routes } from "@/utils/routes"
-import { generateApi } from "@/api/generate"
 
 export default function ShotDetailPage() {
   const { projectId: routeProjectId, episodeId, shotId } = useParams<{
@@ -21,15 +21,13 @@ export default function ShotDetailPage() {
     shotId: string
   }>()
   const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
+  const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
   const { selectCandidate } = useShotStore()
-  const startPolling = useTaskStore((s) => s.startPolling)
-  const pushToast = useToastStore((s) => s.push)
-  /**
-   * 精出进行中的候选 id（多路并行：A、B 可同时各占一条）。
-   * state 用于禁用按钮；ref 同步互斥，避免 React 批处理导致连续双击重复请求 API。
-   */
-  const [promotingCandidateIds, setPromotingCandidateIds] = useState<string[]>([])
-  const promotingIdsRef = useRef<Set<string>>(new Set())
+  /** 必须在任意 early return 之前调用，以满足 React hooks 规则；缺参时 promote 内部直接 return */
+  const { promote, isPromoting } = usePromoteCandidate({
+    episodeId: episodeId ?? "",
+    shotId: shotId ?? "",
+  })
 
   useEffect(() => {
     if (episodeId) void fetchEpisodeDetail(episodeId)
@@ -49,66 +47,7 @@ export default function ShotDetailPage() {
   const prevShot = shotIndex > 0 ? shots[shotIndex - 1] : null
   const nextShot = shotIndex < shots.length - 1 ? shots[shotIndex + 1] : null
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
-  const cacheBust = currentEpisode.pulledAt ?? undefined
   const projectId = routeProjectId ?? currentEpisode.projectId
-
-  /** 该候选的精出流程结束（成功/失败/轮询中止）时同步 + 视图移除 */
-  const removePromotingId = (id: string) => {
-    promotingIdsRef.current.delete(id)
-    setPromotingCandidateIds((prev) => prev.filter((x) => x !== id))
-  }
-
-  /**
-   * 对预览候选发起锁种精出（viduq3-pro + 1080p）。
-   * 每个 candidateId 独立占用一条，直至该批轮询结束；ref 防止同 id 连点重复提交。
-   */
-  const handlePromote = async (candidateId: string) => {
-    if (!episodeId || !shotId) return
-    if (promotingIdsRef.current.has(candidateId)) return
-    promotingIdsRef.current.add(candidateId)
-    setPromotingCandidateIds((prev) =>
-      prev.includes(candidateId) ? prev : [...prev, candidateId]
-    )
-    try {
-      const res = await generateApi.promote({
-        episodeId,
-        items: [{ shotId, candidateId }],
-        model: "viduq3-pro",
-        resolution: "1080p",
-      })
-      const ids = res.data.tasks.map((t) => t.taskId)
-      pushToast(
-        `已提交 ${ids.length} 个精出任务，生成完成后将自动刷新`,
-        "info"
-      )
-      startPolling(ids, {
-        episodeId,
-        onAllSettled: (results) => {
-          void fetchEpisodeDetail(episodeId)
-          const nFail = results.filter((r) => r.status === "failed").length
-          const nOk = results.filter((r) => r.status === "success").length
-          if (nFail > 0) {
-            pushToast(
-              nFail === results.length
-                ? "精出任务失败，请查看任务汇总或重试"
-                : `精出完成：${nOk} 个成功，${nFail} 个失败`,
-              "error"
-            )
-          } else {
-            pushToast("精出任务已完成", "success")
-          }
-          removePromotingId(candidateId)
-        },
-        onPollAborted: () => {
-          removePromotingId(candidateId)
-          pushToast("精出状态轮询中断，请手动刷新页面", "error")
-        },
-      })
-    } catch (e) {
-      pushToast(e instanceof Error ? e.message : "精出请求失败", "error")
-      removePromotingId(candidateId)
-    }
-  }
 
   if (!shot) {
     return <div className="p-8">未找到该镜头</div>
@@ -227,7 +166,7 @@ export default function ShotDetailPage() {
                   Boolean(c.isPreview) &&
                   c.taskStatus === "success" &&
                   c.seed > 0
-                const busy = promotingCandidateIds.includes(c.id)
+                const busy = isPromoting(c.id)
                 return (
                   <div
                     key={c.id}
@@ -254,7 +193,7 @@ export default function ShotDetailPage() {
                             variant="secondary"
                             type="button"
                             disabled={busy}
-                            onClick={() => void handlePromote(c.id)}
+                            onClick={() => void promote(c.id)}
                           >
                             {busy ? "精出中…" : "精出 1080p"}
                           </Button>

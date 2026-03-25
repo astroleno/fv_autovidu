@@ -6,6 +6,7 @@
  */
 import { useEffect, useMemo } from "react"
 import { useParams } from "react-router"
+import { useEpisodeMediaCacheBust } from "@/hooks"
 import { useEpisodeStore } from "@/stores"
 import { RegenFramePanel } from "@/components/business/regen"
 import { flattenShots } from "@/types"
@@ -17,6 +18,7 @@ export default function RegenPage() {
     shotId: string
   }>()
   const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()
+  const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
 
   useEffect(() => {
     if (episodeId) void fetchEpisodeDetail(episodeId)
@@ -59,7 +61,6 @@ export default function RegenPage() {
   }
 
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
-  const cacheBust = currentEpisode.pulledAt ?? undefined
 
   return (
     <div className="p-8 box-border" style={{ boxSizing: "border-box" }}>

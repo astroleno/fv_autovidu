@@ -12,6 +12,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { CSSProperties } from "react"
 import { useParams } from "react-router"
+import { useEpisodeMediaCacheBust } from "@/hooks"
 import { useEpisodeStore } from "@/stores"
 import {
   RoughCutActionBar,
@@ -59,6 +60,7 @@ function buildTrackItems(episode: Episode): RoughCutTrackItem[] {
 export default function TimelinePage() {
   const { episodeId } = useParams<{ episodeId: string }>()
   const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
+  const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
 
   /** 当前选中的镜头（可含 pending，用于轨道高亮） */
   const [activeShotId, setActiveShotId] = useState<string | null>(null)
@@ -107,7 +109,6 @@ export default function TimelinePage() {
       : undefined
 
   const basePath = currentEpisode ? `${currentEpisode.projectId}/${currentEpisode.episodeId}` : ""
-  const cacheBust = currentEpisode?.pulledAt ?? undefined
 
   const previewUrl =
     activeClip && currentEpisode
