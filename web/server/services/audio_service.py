@@ -7,7 +7,7 @@
 - 探测容器时长（剪映时间轴与粗剪拼接避免仅用 shot.duration 漂移）
 - 检测是否存在音轨（STS 前置校验）
 
-说明：依赖系统已安装的 ffmpeg/ffprobe，与现有 ffmpeg_service 一致。
+说明：路径由 ``services.ffmpeg_paths`` 解析；Windows 打包版使用内置二进制，开发机仍可用 PATH。
 """
 
 from __future__ import annotations
@@ -15,6 +15,8 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
+
+from services.ffmpeg_paths import get_ffmpeg_exe, get_ffprobe_exe
 
 
 def probe_duration_sec(file_path: Path) -> float | None:
@@ -30,7 +32,7 @@ def probe_duration_sec(file_path: Path) -> float | None:
     if not file_path or not file_path.is_file():
         return None
     cmd = [
-        "ffprobe",
+        get_ffprobe_exe(),
         "-v",
         "error",
         "-show_entries",
@@ -69,7 +71,7 @@ def has_audio_stream(file_path: Path) -> bool:
     if not file_path or not file_path.is_file():
         return False
     cmd = [
-        "ffprobe",
+        get_ffprobe_exe(),
         "-v",
         "error",
         "-select_streams",
@@ -112,7 +114,7 @@ def extract_audio_from_video(
     """
     output_wav.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
-        "ffmpeg",
+        get_ffmpeg_exe(),
         "-y",
         "-i",
         str(video_path.resolve()),
