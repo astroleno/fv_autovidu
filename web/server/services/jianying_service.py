@@ -38,6 +38,36 @@ from services.candidate_pick import pick_playable_video_candidate
 from services.jianying_protocol import canvas_wh_vertical_9_16
 
 
+def _ensure_mediainfo_for_jianying() -> None:
+    """
+    剪映草稿生成链路预检：pyJianYingDraft 在构造 ``VideoSegment(path)`` / ``AudioSegment(path)`` 时会
+    内部调用 ``VideoMaterial(path)`` / ``AudioMaterial(path)``，二者均依赖 **pymediainfo** 解析媒体信息。
+
+    若本机 **未安装或未加载 libmediainfo 动态库**，则 ``pymediainfo.MediaInfo.can_parse()`` 为 False，
+    pyJianYingDraft 会抛出**误导性**异常，例如：
+    - ``ValueError: 不支持的视频素材类型 '.mp4'``（与扩展名无关，实为 MediaInfo 不可用）
+    - ``ValueError: 不支持的音频素材类型 .mp3``（配音轨同理）
+
+    在此提前检测并以明确文案失败，避免用户误以为是 MP4 格式问题。
+
+    Raises:
+        ValueError: 未安装 pymediainfo，或系统缺少 libmediainfo（需用户修复运行环境）
+    """
+    try:
+        from pymediainfo import MediaInfo
+    except ImportError as exc:
+        raise ValueError(
+            "剪映草稿依赖 pymediainfo，请在后端环境执行：pip install pymediainfo"
+        ) from exc
+    if not MediaInfo.can_parse():
+        raise ValueError(
+            "剪映草稿导出需要系统安装 MediaInfo 动态库（libmediainfo）。"
+            "若曾出现「不支持的视频素材类型 '.mp4'」类提示，通常表示本机未正确加载该库，而非 MP4 格式不被支持。"
+            "macOS：brew install mediainfo；Ubuntu/Debian：sudo apt install libmediainfo0v5；"
+            "并确保运行 uvicorn 的进程能加载对应 .dylib/.so（必要时设置环境变量或查阅 pymediainfo 文档）。"
+        )
+
+
 def _flatten_shots_narrative_order(episode: Episode) -> list[Shot]:
     """按场景顺序 + 镜头顺序展开所有 Shot。"""
     out: list[Shot] = []
@@ -266,6 +296,9 @@ def export_jianying_draft(
         exportable, missing = collect_exportable_shots(ep, ep_dir, req.shotIds)
         if not exportable:
             raise ValueError("没有可导出的已选视频，请确认分镜已选定视频且文件存在")
+
+        # 在写盘 / 调用 pyJianYingDraft 之前：避免 libmediainfo 缺失时在复制大量素材后才报误导性「.mp4 不支持」
+        _ensure_mediainfo_for_jianying()
 
         draft_id = str(uuid.uuid4())
         draft_name = ep.episodeTitle or episode_id
