@@ -12,6 +12,7 @@ import AssetLibraryPage from "@/pages/AssetLibraryPage"
 import ShotDetailPage from "@/pages/ShotDetailPage"
 import RegenPage from "@/pages/RegenPage"
 import TimelinePage from "@/pages/TimelinePage"
+import VideoPickPage from "@/pages/VideoPickPage"
 import SettingsPage from "@/pages/SettingsPage"
 import LegacyEpisodeRedirect from "@/pages/LegacyEpisodeRedirect"
 
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "project/:projectId/episode/:episodeId/timeline",
         element: <TimelinePage />,
+      },
+      {
+        path: "project/:projectId/episode/:episodeId/pick",
+        element: <VideoPickPage />,
       },
       { path: "settings", element: <SettingsPage /> },
       /** 旧书签 /episode/:id 及子路径 → 重定向到新 URL（无子路径与有子路径各一条） */

@@ -43,6 +43,10 @@ export const routes = {
   timeline: (projectId: string, episodeId: string) =>
     `/project/${encodeURIComponent(projectId)}/episode/${encodeURIComponent(episodeId)}/timeline`,
 
+  /** 选片总览：同剧集中所有镜头的视频候选浏览与选定 */
+  videopick: (projectId: string, episodeId: string) =>
+    `/project/${encodeURIComponent(projectId)}/episode/${encodeURIComponent(episodeId)}/pick`,
+
   /** 设置 */
   settings: () => "/settings",
 }

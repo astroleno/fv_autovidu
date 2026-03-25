@@ -1,7 +1,7 @@
 /**
  * 资产库独立界面
  * 展示本集所有资产，支持按类型筛选、点击查看大图与 metadata
- * 图片 URL 使用 pulledAt 缓存破坏，确保重新拉取后显示最新图
+ * 图片 URL 使用 pulledAt + localMediaEpoch 组合缓存破坏（见 useEpisodeMediaCacheBust）
  *
  * 说明（与「项目/剧集拉取」关系）：
  * - 后端 pull_episode 会调用平台 get_assets 并写入 episode.assets，同时下载 assets/*.png（与首帧同属一次拉取）。
@@ -10,6 +10,7 @@
  */
 import { useEffect, useState, useMemo, useCallback } from "react"
 import { useParams, Link, useSearchParams } from "react-router"
+import { useEpisodeMediaCacheBust } from "@/hooks"
 import { useEpisodeStore } from "@/stores"
 import { getFileUrl } from "@/utils/file"
 import type { ShotAsset } from "@/types"
@@ -190,6 +191,7 @@ export default function AssetLibraryPage() {
   }>()
   const [searchParams, setSearchParams] = useSearchParams()
   const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
+  const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
   const [typeFilter, setTypeFilter] = useState<string>("all")
   /** 点击资产卡片时，选中并展示大图与 metadata */
   const [selectedAsset, setSelectedAsset] = useState<ShotAsset | null>(null)
@@ -236,8 +238,6 @@ export default function AssetLibraryPage() {
   }
 
   const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
-  /** 使用 pulledAt 作为缓存破坏参数，重新拉取后图片会刷新 */
-  const cacheBust = currentEpisode.pulledAt ?? undefined
   const projectId = routeProjectId ?? currentEpisode.projectId
 
   return (

@@ -1,6 +1,6 @@
 /**
- * 侧边栏：项目列表、设置；在剧集上下文中追加「粗剪时间线」「分镜板/表」「资产库」
- * 垂直顺序：粗剪 → 分镜板/表（紧贴资产库上方）→ 资产库
+ * 侧边栏：项目列表、设置；在剧集上下文中追加「粗剪时间线」「分镜板/表」「选片总览」「资产库」
+ * 垂直顺序：粗剪 → 分镜板/表 → 选片总览 → 资产库
  *
  * 不在此重复请求 GET /episodes/:id：各剧集子页（分镜板、时间线、资产库等）已拉取详情，
  * 避免与 SideNavBar 并发双请求、404 时控制台重复报错。
@@ -15,6 +15,7 @@ import {
   Package,
   Clapperboard,
   LayoutGrid,
+  CheckSquare,
 } from "lucide-react"
 import { useEpisodeStore } from "@/stores"
 import { routes } from "@/utils/routes"
@@ -149,6 +150,20 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
             >
               <LayoutGrid className="w-5 h-5 shrink-0" aria-hidden />
               {!collapsed && <span>分镜板/表</span>}
+            </NavLink>
+            <NavLink
+              to={routes.videopick(projectId, episodeId)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
+                  isActive
+                    ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
+                    : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
+                }`
+              }
+              title={collapsed ? "选片总览" : undefined}
+            >
+              <CheckSquare className="w-5 h-5 shrink-0" aria-hidden />
+              {!collapsed && <span>选片总览</span>}
             </NavLink>
             <NavLink
               to={routes.assets(projectId, episodeId)}

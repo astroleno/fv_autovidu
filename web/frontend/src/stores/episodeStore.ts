@@ -21,10 +21,17 @@ interface EpisodeStore {
   currentEpisode: Episode | null
   loading: boolean
   error: string | null
+  /**
+   * 本地尾帧 / 视频 / 重生等写入磁盘后递增，用于与 pulledAt 组合成图片 URL 的 v=，打破浏览器缓存。
+   * 不参与持久化；详见 utils/episodeCacheBust.ts 与 hooks/useEpisodeMediaCacheBust.ts。
+   */
+  localMediaEpoch: number
   fetchEpisodes: () => Promise<void>
   fetchEpisodeDetail: (id: string) => Promise<void>
   /** 重新拉取当前正在查看的剧集详情（任务完成后刷新分镜状态） */
   refreshEpisode: () => Promise<void>
+  /** 任务落盘并刷新详情后调用，使 getFileUrl 使用新的查询串加载最新缩略图 */
+  bumpLocalMediaCache: () => void
   pullNewEpisode: (
     episodeId: string,
     forceRedownload?: boolean,
@@ -45,6 +52,10 @@ export const useEpisodeStore = create<EpisodeStore>((set, get) => ({
   currentEpisode: null,
   loading: false,
   error: null,
+  localMediaEpoch: 0,
+
+  bumpLocalMediaCache: () =>
+    set((s) => ({ localMediaEpoch: s.localMediaEpoch + 1 })),
 
   fetchEpisodes: async () => {
     set({ loading: true, error: null })
