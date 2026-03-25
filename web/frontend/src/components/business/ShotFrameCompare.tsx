@@ -2,6 +2,7 @@
  * 首帧 + 尾帧同屏对比展示
  *
  * - card：分镜板网格卡片内双列等高竖幅（9:16），便于左右对照
+ * - pick：选片总览左栏专用；仍为双列对照，但通过 max-h 压扁高度，避免占满整卡
  * - row：列表视图内紧凑双列
  * - detail：详情页顶区大号双列（与 card 类似但略大）
  *
@@ -15,7 +16,7 @@ import { routes } from "@/utils/routes"
 import { ImagePreview } from "./ImagePreview"
 import { FrameHoverThumbnail } from "./FrameHoverThumbnail"
 
-export type ShotFrameCompareVariant = "card" | "row" | "detail"
+export type ShotFrameCompareVariant = "card" | "pick" | "row" | "detail"
 
 interface ShotFrameCompareProps {
   shot: Shot
@@ -39,6 +40,12 @@ const variantClass: Record<
     wrap: "grid grid-cols-2 gap-2 box-border",
     img: "relative w-full aspect-[9/16] overflow-hidden bg-[var(--color-outline-variant)] border border-[var(--color-newsprint-black)]",
     label: "text-[9px] font-black uppercase tracking-wider text-[var(--color-muted)] mb-1.5",
+  },
+  /** 选片页左栏：与 card 同交互（点击进入详情），但更紧凑以腾出右栏候选区 */
+  pick: {
+    wrap: "grid grid-cols-2 gap-2 box-border min-w-0",
+    img: "relative w-full aspect-[9/16] max-h-[min(280px,35vh)] overflow-hidden bg-[var(--color-outline-variant)] border border-[var(--color-newsprint-black)]",
+    label: "text-[9px] font-black uppercase tracking-wider text-[var(--color-muted)] mb-1",
   },
   row: {
     wrap: "flex items-stretch gap-3 box-border min-w-0",
@@ -156,12 +163,18 @@ export function ShotFrameCompare({
     </Link>
   );
 
+  const framed =
+    variant === "card" || variant === "pick"
+
   return (
     <div className={vc.wrap}>
       <div
         className={`min-w-0 box-border rounded-sm ${
-          variant === "card" ? "p-2 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/25" : ""
+          framed
+            ? "p-2 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/25"
+            : ""
         }`}
+        style={{ boxSizing: "border-box" }}
       >
         <p className={vc.label}>首帧</p>
         {firstFrameBody}
@@ -169,8 +182,11 @@ export function ShotFrameCompare({
 
       <div
         className={`min-w-0 box-border rounded-sm ${
-          variant === "card" ? "p-2 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/25" : ""
+          framed
+            ? "p-2 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/25"
+            : ""
         }`}
+        style={{ boxSizing: "border-box" }}
       >
         <p className={vc.label}>尾帧</p>
         {endFrameBody}
