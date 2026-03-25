@@ -6,4 +6,5 @@ export type {
 } from "./usePromoteCandidate"
 export { useTaskPolling } from "./useTaskPolling"
 export { useKeyboard } from "./useKeyboard"
+export { useVideoPickKeyboard } from "./useVideoPickKeyboard"
 export { useVirtualizer } from "@tanstack/react-virtual"

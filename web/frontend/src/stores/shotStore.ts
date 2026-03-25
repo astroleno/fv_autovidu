@@ -31,6 +31,7 @@ interface ShotStore {
   addBatchPickShots: (shotIds: string[]) => void
   clearBatchPicks: () => void
   selectCandidate: (episodeId: string, shotId: string, candidateId: string) => Promise<void>
+  clearSelectedCandidate: (episodeId: string, shotId: string) => Promise<void>
   getFilteredShots: () => Shot[]
 }
 
@@ -77,6 +78,31 @@ export const useShotStore = create<ShotStore>((set, get) => ({
       ),
     }))
     // 详情页从 currentEpisode 读数据，需同步刷新 episode.json
+    await useEpisodeStore.getState().fetchEpisodeDetail(episodeId)
+  },
+
+  clearSelectedCandidate: async (episodeId, shotId) => {
+    const episode = useEpisodeStore.getState().currentEpisode
+    const shotFromEpisode =
+      episode?.scenes.flatMap((scene) => scene.shots).find((s) => s.shotId === shotId)
+    const shotFromStore = get().shots.find((s) => s.shotId === shotId)
+    const targetShot = shotFromEpisode ?? shotFromStore
+    if (!targetShot) {
+      throw new Error("未找到镜头，无法清空已选候选")
+    }
+
+    const res = await shotsApi.update(episodeId, shotId, {
+      videoCandidates: targetShot.videoCandidates.map((c) => ({
+        ...c,
+        selected: false,
+      })),
+    })
+
+    set((s) => ({
+      shots: s.shots.map((shot) =>
+        shot.shotId === shotId ? res.data : shot
+      ),
+    }))
     await useEpisodeStore.getState().fetchEpisodeDetail(episodeId)
   },
 

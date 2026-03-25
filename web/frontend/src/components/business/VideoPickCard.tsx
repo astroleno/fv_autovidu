@@ -42,6 +42,13 @@ export interface VideoPickCardProps {
   episodeId: string
   basePath: string
   cacheBust?: string
+  /**
+   * 当前镜头在「筛选后的扁平镜头列表」中的索引（与 VideoPickPage 中 filteredFlatShots 一致），
+   * 用于进入选片模式时定位当前镜头。
+   */
+  flatIndex: number
+  /** 从列表进入 Picking 模式（会保存滚动位置等，由页面注入） */
+  onEnterPicking?: (flatIndex: number) => void
 }
 
 /** 左侧单条提示词：行数截断 + 实测溢出后显示「展开更多」，避免无意义按钮 */
@@ -161,6 +168,8 @@ export function VideoPickCard({
   episodeId,
   basePath,
   cacheBust,
+  flatIndex,
+  onEnterPicking,
 }: VideoPickCardProps) {
   const { selectCandidate } = useShotStore()
   const { promote, isPromoting } = usePromoteCandidate({
@@ -406,6 +415,15 @@ export function VideoPickCard({
     <article
       className="border-2 border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] shadow-[4px_4px_0px_0px_#111111] flex flex-col box-border"
       style={{ boxSizing: "border-box" }}
+      tabIndex={onEnterPicking ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (!onEnterPicking) return
+        if (e.key !== "Enter") return
+        const t = e.target as HTMLElement
+        if (t.closest("a,button,input,textarea,select")) return
+        e.preventDefault()
+        onEnterPicking(flatIndex)
+      }}
     >
       <VideoModeSelector
         open={videoDialogOpen}
@@ -440,6 +458,16 @@ export function VideoPickCard({
         <span className="ml-auto text-[10px] font-black uppercase border border-[var(--color-newsprint-black)] px-2 py-0.5 bg-white shrink-0">
           {shotStatusLabels[shot.status]}
         </span>
+        {onEnterPicking ? (
+          <button
+            type="button"
+            className="text-[10px] font-black uppercase border border-[var(--color-primary)] bg-[var(--color-primary)] text-white px-2 py-0.5 shrink-0 hover:opacity-90 box-border"
+            style={{ boxSizing: "border-box" }}
+            onClick={() => onEnterPicking(flatIndex)}
+          >
+            进入选片
+          </button>
+        ) : null}
       </header>
 
       {/* 主体：lg+ 左右分栏；窄屏上下堆叠（参考在上、候选在下） */}
