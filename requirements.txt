@@ -19,4 +19,5 @@ uvicorn>=0.30.0
 eval-type-backport>=0.2.0
 
 # 剪映草稿：生成与官方兼容的 draft_content.json（时间轴）；见 pyJianYingDraft
+# 依赖 pymediainfo；运行时尚需系统安装 libmediainfo（否则 can_parse 失败，见 jianying_service._ensure_mediainfo_for_jianying）
 pyJianYingDraft>=0.2.6
