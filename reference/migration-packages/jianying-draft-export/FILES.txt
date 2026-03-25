@@ -1,0 +1,21 @@
+# 本迁移包文件清单（生成于从 UGCFlow 复制）
+
+server/services/jianyingDraftExportService.js
+server/services/jianyingDraftExportService.test.js
+server/services/jianyingDraftPathService.js
+server/services/jianyingDraftPathService.test.js
+server/services/videoPreprocess.js
+server/utils/draftNaming.js
+server/utils/pathSafe.js
+server/utils/assetPathResolver.js
+
+examples/VeoDraftExportModal.tsx
+examples/zipDownloadDirectory.ts
+examples/express-route-handlers.example.js
+examples/veo-draft-export-types.ts
+
+tests-from-repo/veo-draft-export.integration.test.js
+tests-from-repo/variantRoutes.draft-export.test.js
+
+README.md
+FILES.txt
