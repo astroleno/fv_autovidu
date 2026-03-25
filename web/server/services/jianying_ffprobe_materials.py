@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from services.audio_service import probe_duration_sec
+from services.ffmpeg_paths import get_ffprobe_exe
 
 # 与 pyJianYingDraft.local_materials.VideoMaterial 中单帧图片占位一致（微秒）
 _PHOTO_PLACEHOLDER_DURATION_US = 10800000000
@@ -43,7 +44,7 @@ def _ffprobe_json(path: Path) -> dict[str, Any]:
     if not path.is_file():
         raise FileNotFoundError(str(path))
     cmd = [
-        "ffprobe",
+        get_ffprobe_exe(),
         "-v",
         "error",
         "-show_streams",
@@ -62,7 +63,7 @@ def _ffprobe_json(path: Path) -> dict[str, Any]:
         )
     except FileNotFoundError as exc:
         raise ValueError(
-            "未找到 ffprobe，请安装 FFmpeg（剪映草稿导出与粗剪共用同一工具链）。"
+            "未找到 ffprobe。若为本机开发请安装 FFmpeg；若为官方 Windows 包请反馈开发者检查打包。"
         ) from exc
     except subprocess.CalledProcessError as exc:
         err = (exc.stderr or exc.stdout or "").strip()

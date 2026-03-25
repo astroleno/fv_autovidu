@@ -1,0 +1,184 @@
+# =============================================================================
+# FV Studio — Windows exe 构建工作流
+#
+# 触发条件：
+#   1. 手动触发（workflow_dispatch）— 可在 Actions 页面点击 "Run workflow"
+#   2. 推送 v* 标签（如 v1.0.0）— 自动创建 GitHub Release 并上传构建产物
+#
+# 构建流程：
+#   Setup Python & Node → 下载 FFmpeg(win64) → 安装依赖 → 构建前端 → PyInstaller 打包 → 压缩 → 上传
+#
+# 产物：
+#   FV_Studio-windows-x64.zip — 包含 FV_Studio.exe 及所有运行时依赖
+# =============================================================================
+
+name: Build Windows EXE
+
+on:
+  # 手动触发（支持所有分支）
+  workflow_dispatch:
+
+  # 推送 v 开头的 tag 时自动触发（如 v1.0.0, v2.1.0-beta）
+  push:
+    tags:
+      - 'v*'
+
+# 同一分支/标签只保留最新的一次构建，取消旧的排队任务
+concurrency:
+  group: build-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Windows EXE
+    runs-on: windows-latest
+
+    steps:
+      # ------------------------------------------------------------------
+      # 1. 检出代码
+      # ------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------------
+      # 2. 设置 Python 环境
+      # ------------------------------------------------------------------
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # ------------------------------------------------------------------
+      # 3. 设置 Node.js + pnpm（用于构建前端）
+      # ------------------------------------------------------------------
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('web/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-store-${{ runner.os }}-
+
+      # ------------------------------------------------------------------
+      # 4. 安装 Python 依赖 + PyInstaller
+      # ------------------------------------------------------------------
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      # ------------------------------------------------------------------
+      # 5. 安装前端依赖并构建
+      # ------------------------------------------------------------------
+      - name: Install frontend dependencies
+        working-directory: web/frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        working-directory: web/frontend
+        run: pnpm run build
+
+      # ------------------------------------------------------------------
+      # 6. 验证前端构建产物
+      # ------------------------------------------------------------------
+      - name: Verify frontend build
+        shell: bash
+        run: |
+          if [ ! -f "web/frontend/dist/index.html" ]; then
+            echo "::error::Frontend build failed — index.html not found"
+            exit 1
+          fi
+          echo "Frontend build OK — dist contents:"
+          ls -la web/frontend/dist/
+
+      # ------------------------------------------------------------------
+      # 7. 下载 FFmpeg（BtbN win64 GPL，与 fv_studio.spec 中 vendor/ffmpeg-windows 约定一致）
+      #    测试同学无需本机安装 ffmpeg/ffprobe
+      # ------------------------------------------------------------------
+      - name: Download FFmpeg for Windows bundle
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
+          Invoke-WebRequest -Uri $url -OutFile ffmpeg-win64.zip
+          Expand-Archive -Path ffmpeg-win64.zip -DestinationPath ffmpeg_extract -Force
+          $ffmpegExe = Get-ChildItem -Path ffmpeg_extract -Recurse -Filter ffmpeg.exe |
+            Where-Object { $_.Directory.Name -eq 'bin' } | Select-Object -First 1
+          if (-not $ffmpegExe) { throw 'ffmpeg.exe not found under a bin/ directory in archive' }
+          $bin = $ffmpegExe.Directory.FullName
+          New-Item -ItemType Directory -Force -Path vendor/ffmpeg-windows/bin | Out-Null
+          Copy-Item -Path (Join-Path $bin '*') -Destination vendor/ffmpeg-windows/bin -Force
+          if (-not (Test-Path 'vendor/ffmpeg-windows/bin/ffprobe.exe')) { throw 'ffprobe.exe missing after copy' }
+
+      # ------------------------------------------------------------------
+      # 8. PyInstaller 打包
+      # ------------------------------------------------------------------
+      - name: Build with PyInstaller
+        run: pyinstaller fv_studio.spec --noconfirm --clean
+
+      # ------------------------------------------------------------------
+      # 9. 将 .env.example 复制到产物根目录（方便用户参考配置）
+      # ------------------------------------------------------------------
+      - name: Copy config template
+        shell: bash
+        run: |
+          cp .env.example dist/FV_Studio/.env.example
+          echo "FV Studio Windows Build" > dist/FV_Studio/README.txt
+          echo "" >> dist/FV_Studio/README.txt
+          echo "使用方法：" >> dist/FV_Studio/README.txt
+          echo "1. 复制 .env.example 为 .env 并填写 API Key" >> dist/FV_Studio/README.txt
+          echo "2. 双击 FV_Studio.exe 启动" >> dist/FV_Studio/README.txt
+          echo "3. 浏览器将自动打开 http://localhost:8000" >> dist/FV_Studio/README.txt
+          echo "" >> dist/FV_Studio/README.txt
+          echo "注意：" >> dist/FV_Studio/README.txt
+          echo "- 首次启动前请先配置 .env 文件" >> dist/FV_Studio/README.txt
+          echo "- 已内置 FFmpeg（粗剪/剪映导出/ffprobe），一般无需再装" >> dist/FV_Studio/README.txt
+          echo "- data/ 目录将自动创建用于存储项目数据" >> dist/FV_Studio/README.txt
+
+      # ------------------------------------------------------------------
+      # 10. 压缩产物为 zip
+      # ------------------------------------------------------------------
+      - name: Create zip archive
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "dist\FV_Studio\*" -DestinationPath "FV_Studio-windows-x64.zip" -Force
+
+      # ------------------------------------------------------------------
+      # 11. 上传为 Actions Artifact（所有触发方式均可下载）
+      # ------------------------------------------------------------------
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FV_Studio-windows-x64
+          path: FV_Studio-windows-x64.zip
+          retention-days: 30
+
+      # ------------------------------------------------------------------
+      # 12. 创建 GitHub Release（仅在 tag 推送时触发）
+      # ------------------------------------------------------------------
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: FV_Studio-windows-x64.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') || contains(github.ref, '-rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

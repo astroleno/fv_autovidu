@@ -10,6 +10,8 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
+from services.ffmpeg_paths import get_ffmpeg_exe
+
 
 def concat_videos(
     video_paths: list[Path],
@@ -35,7 +37,7 @@ def concat_videos(
             p = Path(p).resolve()
             f.write(f"file '{p}'\n")
     cmd = [
-        "ffmpeg",
+        get_ffmpeg_exe(),
         "-y",
         "-f", "concat",
         "-safe", "0",
