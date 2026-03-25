@@ -14,10 +14,13 @@ const MODEL_OPTIONS: Record<VideoMode, { value: string; label: string }[]> = {
     { value: "viduq3-turbo", label: "viduq3-turbo" },
     { value: "viduq3-pro", label: "viduq3-pro" },
   ],
-  // 与官方 Start end to Video（start-end2video）一致，见 https://platform.vidu.com/docs/start-end-to-video
+  /**
+   * 首尾帧：产品策略为「预览 = 540p + turbo」「正式 = 1080p + pro」，避免 720p+turbo 这种折中无意义组合。
+   * 与官方 Start end to Video（start-end2video）一致，见 https://platform.vidu.com/docs/start-end-to-video
+   */
   first_last_frame: [
-    { value: "viduq3-turbo", label: "viduq3-turbo（默认，首尾帧）" },
-    { value: "viduq3-pro", label: "viduq3-pro" },
+    { value: "viduq3-pro", label: "viduq3-pro（默认，正式生成）" },
+    { value: "viduq3-turbo", label: "viduq3-turbo（预览推荐）" },
     { value: "viduq2-pro-fast", label: "viduq2-pro-fast" },
     { value: "viduq2-pro", label: "viduq2-pro" },
     { value: "viduq2-turbo", label: "viduq2-turbo" },
@@ -38,7 +41,7 @@ export interface VideoModeSelectorResult {
   resolution: string
   /** reference 模式下可选：限定资产 id，空则各 shot 使用自身全部资产 */
   referenceAssetIds?: string[]
-  /** 首尾帧预览：turbo + 540p + 每镜头多候选 */
+  /** 首尾帧预览：固定 540p + turbo + 每镜头多候选（与正式 1080p+pro 区分） */
   isPreview?: boolean
   /** 每镜头候选数 1~3，仅与 isPreview 同时生效 */
   candidateCount?: number
@@ -61,11 +64,12 @@ export function VideoModeSelector({
   episodeAssetIds,
   onConfirm,
 }: VideoModeSelectorProps) {
+  /** 默认首尾帧 + 正式档：1080p + viduq3-pro（与预览档 540p+turbo 二选一） */
   const [mode, setMode] = useState<VideoMode>("first_last_frame")
-  const [model, setModel] = useState("viduq3-turbo")
-  const [resolution, setResolution] = useState("720p")
+  const [model, setModel] = useState("viduq3-pro")
+  const [resolution, setResolution] = useState("1080p")
   const [referenceAssetIds, setReferenceAssetIds] = useState<string[]>([])
-  /** 仅 first_last_frame：低成本预览 + 多候选 */
+  /** 仅 first_last_frame：勾选后为预览档（540p+turbo+多候选） */
   const [previewEnabled, setPreviewEnabled] = useState(false)
   const [candidateCount, setCandidateCount] = useState(2)
 
@@ -75,7 +79,11 @@ export function VideoModeSelector({
     setMode(m)
     const defaultModel = MODEL_OPTIONS[m][0]?.value ?? "viduq2-pro-fast"
     setModel(defaultModel)
-    if (m !== "first_last_frame") {
+    if (m === "first_last_frame") {
+      // 进入首尾帧：默认正式档（1080p + pro），避免与预览档混淆
+      setResolution("1080p")
+      setPreviewEnabled(false)
+    } else {
       setPreviewEnabled(false)
     }
   }
@@ -83,11 +91,14 @@ export function VideoModeSelector({
   const handlePreviewToggle = (checked: boolean) => {
     setPreviewEnabled(checked)
     if (checked) {
+      // 预览档：低成本试错，锁种后再走精出或改选 1080p+pro 正式生成
       setResolution("540p")
       setModel("viduq3-turbo")
       setCandidateCount(2)
     } else {
-      setResolution("720p")
+      // 关闭预览：回到正式档默认
+      setResolution("1080p")
+      setModel("viduq3-pro")
     }
   }
 
@@ -185,7 +196,7 @@ export function VideoModeSelector({
                 onChange={(e) => handlePreviewToggle(e.target.checked)}
               />
               <span>
-                预览模式（turbo + 多候选，用于锁种精出前的低成本试错）
+                预览模式（540p + turbo + 多候选；正式生成请关此项，用上方 1080p + pro）
               </span>
             </label>
             {previewEnabled && (

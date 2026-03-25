@@ -1,17 +1,15 @@
 /**
  * VideoPickCard — 选片总览专用卡片
  *
- * 与 ShotCard 分工不同：本组件仅负责「多视频候选对比 + 选定 + 预览精出」，
+ * 与 ShotCard 分工不同：本组件仅负责「多视频候选对比 + 原地选定 + 预览精出」，
  * 不包含批量生成尾帧/视频等生产链路。
  *
  * 交互概要：
  * - 小尺寸首帧图：帮助在网格中快速认出镜头身份
- * - 候选项默认以 poster + 静音短视频在 hover 时循环预览（卡片内，非 portal）
- * - 点击「完整播放」展开与 ShotDetail 一致的 VideoPlayer 控件条
+ * - 每个候选直接使用完整 VideoPlayer（与镜头详情一致），并按 shot.aspectRatio 做横/竖屏区域适配
  * - 选定：调用 shotStore.selectCandidate，成功后 episode 详情由 store 刷新
  * - 精出：usePromoteCandidate，条件与 ShotDetailPage 一致
  */
-import { useCallback, useRef, useState } from "react"
 import { Link } from "react-router"
 import { ExternalLink } from "lucide-react"
 import type { Shot } from "@/types"
@@ -44,58 +42,6 @@ function candidateGridClass(count: number): string {
   return "grid grid-cols-2 lg:grid-cols-3 gap-3"
 }
 
-/**
- * 单个候选项的「缩略预览」：hover 时静音播放，移出暂停并回到起点，避免多路同时出声。
- */
-function CandidateVideoPreview({
-  videoUrl,
-  posterUrl,
-}: {
-  videoUrl: string
-  posterUrl: string | undefined
-}) {
-  const ref = useRef<HTMLVideoElement>(null)
-
-  const onEnter = useCallback(() => {
-    const v = ref.current
-    if (!v) return
-    v.muted = true
-    v.loop = true
-    void v.play().catch(() => {
-      /* 浏览器策略可能导致自动播放失败，静默忽略 */
-    })
-  }, [])
-
-  const onLeave = useCallback(() => {
-    const v = ref.current
-    if (!v) return
-    v.pause()
-    v.currentTime = 0
-  }, [])
-
-  return (
-    <div
-      className="relative w-full aspect-video overflow-hidden bg-black border border-[var(--color-newsprint-black)] box-border"
-      style={{ boxSizing: "border-box" }}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-    >
-      <video
-        ref={ref}
-        src={videoUrl}
-        poster={posterUrl || undefined}
-        className="w-full h-full object-cover"
-        muted
-        playsInline
-        preload="metadata"
-      />
-      <span className="pointer-events-none absolute bottom-1 left-1 text-[8px] font-black uppercase bg-[var(--color-newsprint-black)] text-white px-1 py-0.5 border border-[var(--color-newsprint-black)] opacity-90">
-        Hover 预览
-      </span>
-    </div>
-  )
-}
-
 export function VideoPickCard({
   shot,
   projectId,
@@ -108,14 +54,6 @@ export function VideoPickCard({
     episodeId,
     shotId: shot.shotId,
   })
-
-  /**
-   * 每个镜头独立记录「哪一个候选正在使用完整 VideoPlayer」；
-   * 同一卡片内同时只展开一个，避免一屏多个控件条抢注意力。
-   */
-  const [expandedCandidateId, setExpandedCandidateId] = useState<string | null>(
-    null
-  )
 
   const firstFrameUrl = shot.firstFrame?.trim()
     ? getFileUrl(shot.firstFrame, basePath, cacheBust)
@@ -130,7 +68,8 @@ export function VideoPickCard({
       style={{ boxSizing: "border-box" }}
     >
       {/* 头部：全局镜头号、运镜/时长摘要、状态点 + 文案标签 */}
-      <header className="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-[var(--color-newsprint-black)] bg-[var(--color-divider)] box-border"
+      <header
+        className="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-[var(--color-newsprint-black)] bg-[var(--color-divider)] box-border"
         style={{ boxSizing: "border-box" }}
       >
         <StatusIndicator status={shot.status} />
@@ -139,6 +78,9 @@ export function VideoPickCard({
         </span>
         <span className="text-[10px] text-[var(--color-muted)] uppercase font-bold truncate max-w-[12rem]">
           {shot.cameraMovement} · {shot.duration}s
+        </span>
+        <span className="text-[10px] text-[var(--color-muted)] font-bold border border-dashed border-[var(--color-newsprint-black)] px-1.5 py-0.5">
+          {shot.aspectRatio}
         </span>
         <span className="ml-auto text-[10px] font-black uppercase border border-[var(--color-newsprint-black)] px-2 py-0.5 bg-white">
           {shotStatusLabels[shot.status]}
@@ -155,7 +97,8 @@ export function VideoPickCard({
             <span className="text-[9px] font-black uppercase text-[var(--color-muted)] shrink-0">
               首帧
             </span>
-            <div className="h-14 w-[4.5rem] shrink-0 overflow-hidden border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)] box-border"
+            <div
+              className="h-14 w-[4.5rem] shrink-0 overflow-hidden border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)] box-border"
               style={{ boxSizing: "border-box" }}
             >
               <img
@@ -168,7 +111,8 @@ export function VideoPickCard({
         ) : null}
 
         {shot.videoCandidates.length === 0 ? (
-          <div className="text-xs text-[var(--color-muted)] space-y-2 py-2 box-border"
+          <div
+            className="text-xs text-[var(--color-muted)] space-y-2 py-2 box-border"
             style={{ boxSizing: "border-box" }}
           >
             <p>暂无视频候选，请先在分镜板生成视频。</p>
@@ -183,10 +127,6 @@ export function VideoPickCard({
           <div className={gridClass}>
             {shot.videoCandidates.map((c) => {
               const videoUrl = getFileUrl(c.videoPath, basePath, cacheBust)
-              const posterUrl =
-                c.thumbnailPath?.trim()
-                  ? getFileUrl(c.thumbnailPath, basePath, cacheBust)
-                  : undefined
               const resLabel = c.resolution?.trim() || "—"
               const previewTag = c.isPreview ? " [预览]" : ""
               const canPromote =
@@ -194,7 +134,6 @@ export function VideoPickCard({
                 c.taskStatus === "success" &&
                 c.seed > 0
               const busy = isPromoting(c.id)
-              const expanded = expandedCandidateId === c.id
               const borderSelected = c.selected
                 ? "border-[var(--color-primary)]"
                 : "border-[var(--color-border)]"
@@ -202,19 +141,16 @@ export function VideoPickCard({
               return (
                 <div
                   key={c.id}
-                  className={`flex flex-col border-2 ${borderSelected} p-2 bg-white box-border`}
+                  className={`flex flex-col border-2 ${borderSelected} p-2 bg-white box-border min-w-0`}
                   style={{ boxSizing: "border-box" }}
                 >
-                  {expanded ? (
-                    <VideoPlayer src={videoUrl} className="[&_video]:aspect-video" />
-                  ) : (
-                    <CandidateVideoPreview
-                      videoUrl={videoUrl}
-                      posterUrl={posterUrl}
-                    />
-                  )}
+                  <VideoPlayer
+                    src={videoUrl}
+                    aspectRatio={shot.aspectRatio}
+                  />
 
-                  <div className="mt-2 flex flex-col gap-2 flex-1 min-h-0 box-border"
+                  <div
+                    className="mt-2 flex flex-col gap-2 flex-1 min-h-0 box-border"
                     style={{ boxSizing: "border-box" }}
                   >
                     <p className="text-[10px] text-[var(--color-muted)] leading-snug break-words">
@@ -227,18 +163,6 @@ export function VideoPickCard({
                       ) : null}
                     </p>
                     <div className="flex flex-wrap gap-2 justify-end mt-auto">
-                      <Button
-                        variant="secondary"
-                        type="button"
-                        className="text-[10px] px-2 py-1"
-                        onClick={() =>
-                          setExpandedCandidateId((cur) =>
-                            cur === c.id ? null : c.id
-                          )
-                        }
-                      >
-                        {expanded ? "收起播放器" : "完整播放"}
-                      </Button>
                       {canPromote ? (
                         <Button
                           variant="secondary"
