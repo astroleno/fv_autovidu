@@ -19,6 +19,10 @@ import { generateApi } from "@/api/generate"
 import { useTaskStore } from "@/stores/taskStore"
 import { useToastStore } from "@/stores/toastStore"
 import { routes } from "@/utils/routes"
+import {
+  buildSingleShotVideoQuickRequest,
+  toastAfterVideoTasksSettled,
+} from "@/utils/videoQuickRegenerate"
 
 interface ShotCardProps {
   shot: Shot
@@ -85,32 +89,30 @@ export function ShotCard({
     }
   }
 
+  const shotLabel = `S${String(shot.shotNumber).padStart(2, "0")}`
+
   const handleVideo = async () => {
     if (!canVideo) return
     setSubmitting("video")
     try {
-      const res = await generateApi.video({
+      const body = buildSingleShotVideoQuickRequest(
         episodeId,
-        shotIds: [shot.shotId],
-        mode: defaultVideoMode,
-        model: undefined,
-      })
+        shot.shotId,
+        defaultVideoMode
+      )
+      const res = await generateApi.video(body)
       const ids = res.data.tasks.map((t) => t.taskId)
       startPolling(ids, {
         episodeId,
-        onAllSettled: (results) => {
-          const r = results[0]
-          if (r?.status === "failed") {
-            pushToast(
-              r.error?.slice(0, 500) ?? "视频生成失败",
-              "error"
-            )
-            return
-          }
+        onPollAborted: () => {
           pushToast(
-            `视频任务已完成（S${String(shot.shotNumber).padStart(2, "0")}）`,
-            "success"
+            `视频任务轮询中断（${shotLabel}），请刷新页面后查看结果`,
+            "error",
+            8000
           )
+        },
+        onAllSettled: (results) => {
+          toastAfterVideoTasksSettled(results, pushToast, shotLabel)
         },
       })
     } catch (e) {

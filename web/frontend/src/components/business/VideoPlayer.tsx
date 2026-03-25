@@ -2,46 +2,51 @@
  * VideoPlayer 视频播放器
  * HTML5 video 封装：播放/暂停/进度条/全屏
  *
- * aspectRatio：与 Shot.aspectRatio 一致（如 9:16 / 16:9）时，竖屏用高度上限 + 水平居中，
- * 避免一律塞进 16:9 可视框导致竖屏成片过小；横屏仍用 aspect-video 宽占满。
+ * aspectRatio：与 Shot.aspectRatio 一致时，经由 utils/aspectRatio 解析为多类布局：
+ * - 竖屏：高度上限 + 水平居中
+ * - 方屏 1:1：限制最大边长 + aspect-square
+ * - 横屏：宽铺 aspect-video；超宽（约 2:1 及以上）用 aspect-[2/1] 减少上下留黑
  */
 import { useRef, useState } from "react"
+import {
+  classifyAspectRatio,
+  isUltrawideLandscape,
+} from "@/utils/aspectRatio"
 
 export interface VideoPlayerProps {
   src: string
   className?: string
-  /** 与剧集镜头比例一致，如 "9:16"、"16:9"；缺省按横屏 16:9 区域处理 */
+  /** 与剧集镜头比例一致，如 "9:16"、"16:9"、"1080x1920"；缺省按横屏处理 */
   aspectRatio?: string
 }
 
-/**
- * 将 episode 中的比例字符串规整后判断是否竖屏类比例，
- * 用于选择外层布局（居中窄条 vs 宽铺横屏区域）。
- */
 function videoLayoutForAspect(aspectRatio: string | undefined): {
   outer: string
   video: string
 } {
-  const normalized = (aspectRatio ?? "16:9")
-    .trim()
-    .toLowerCase()
-    .replace(/\s/g, "")
-    .replace("×", ":")
+  const kind = classifyAspectRatio(aspectRatio)
 
-  const portrait =
-    normalized === "9:16" ||
-    normalized === "3:4" ||
-    normalized === "4:5" ||
-    normalized === "2:3" ||
-    normalized === "9/16" ||
-    normalized === "3/4"
-
-  if (portrait) {
+  if (kind === "square") {
+    return {
+      outer:
+        "flex w-full justify-center items-center bg-black min-h-[120px] box-border py-1",
+      video:
+        "w-[min(100%,360px)] aspect-square max-h-[min(360px,50vh)] object-contain box-border",
+    }
+  }
+  if (kind === "portrait") {
     return {
       outer:
         "flex w-full justify-center items-center bg-black min-h-[140px] box-border py-1",
       video:
         "h-[min(420px,52vh)] w-auto max-w-full object-contain box-border",
+    }
+  }
+  /** landscape */
+  if (isUltrawideLandscape(aspectRatio)) {
+    return {
+      outer: "w-full box-border",
+      video: "w-full aspect-[2/1] max-h-[min(240px,40vh)] object-contain box-border",
     }
   }
   return {
