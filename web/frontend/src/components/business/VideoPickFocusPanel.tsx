@@ -493,6 +493,45 @@ export function VideoPickFocusPanel({
     </div>
   ) : null
 
+  const compareHint =
+    hasFirstFrame && nCandidates < 2 ? (
+      <div
+        className="flex flex-wrap items-center gap-2 rounded-sm border border-dashed border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/40 p-3 box-border"
+        style={{ boxSizing: "border-box" }}
+      >
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-bold text-[var(--color-newsprint-black)]">
+            当前镜头只有 {nCandidates} 个候选，暂时无法比选。
+          </p>
+          <p className="text-[10px] text-[var(--color-muted)] mt-1">
+            选片模式会展示该镜头的全部候选。要进入比选，需要先补生成更多候选视频。
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={!canSubmitVideo}
+            className="text-[10px] px-2 py-1.5 h-auto box-border"
+            style={{ boxSizing: "border-box" }}
+            onClick={() => void handleQuickRegenerateVideo()}
+          >
+            再生成 2 个预览候选
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={!canSubmitVideo}
+            className="text-[10px] px-2 py-1.5 h-auto box-border"
+            style={{ boxSizing: "border-box" }}
+            onClick={() => setVideoDialogOpen(true)}
+          >
+            自定义生成
+          </Button>
+        </div>
+      </div>
+    ) : null
+
   return (
     <div
       className="flex flex-col gap-4 min-h-0 min-w-0 box-border"
@@ -542,6 +581,8 @@ export function VideoPickFocusPanel({
           style={{ boxSizing: "border-box", flexBasis: "68%" }}
           aria-label="候选视频"
         >
+          {compareHint}
+
           <VideoPickCandidateGrid
             shot={shot}
             activeCandidateId={activeCandidateId}
