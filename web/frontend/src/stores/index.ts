@@ -5,3 +5,12 @@ export type { BatchPickMode } from "./shotStore"
 export { useTaskStore } from "./taskStore"
 export { useToastStore } from "./toastStore"
 export { useUIStore } from "./uiStore"
+export {
+  useVideoPickStore,
+  readStoredVideoPickMode,
+  writeStoredVideoPickMode,
+} from "./videoPickStore"
+export type {
+  VideoPickMode,
+  VideoPickUndoEntry,
+} from "./videoPickStore"

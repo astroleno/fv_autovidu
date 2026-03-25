@@ -7,7 +7,7 @@
  * - 方屏 1:1：限制最大边长 + aspect-square
  * - 横屏：宽铺 aspect-video；超宽（约 2:1 及以上）用 aspect-[2/1] 减少上下留黑
  */
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   classifyAspectRatio,
   isUltrawideLandscape,
@@ -18,6 +18,10 @@ export interface VideoPlayerProps {
   className?: string
   /** 与剧集镜头比例一致，如 "9:16"、"16:9"、"1080x1920"；缺省按横屏处理 */
   aspectRatio?: string
+  /** 选片模式：当前激活候选自动播放 */
+  autoPlay?: boolean
+  /** 选片模式：播放结束后循环（与 autoPlay 配合） */
+  loop?: boolean
 }
 
 function videoLayoutForAspect(aspectRatio: string | undefined): {
@@ -59,11 +63,25 @@ export function VideoPlayer({
   src,
   className = "",
   aspectRatio,
+  autoPlay = false,
+  loop = false,
 }: VideoPlayerProps) {
   const ref = useRef<HTMLVideoElement>(null)
   const [playing, setPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
   const layout = videoLayoutForAspect(aspectRatio)
+
+  /** 选片：激活态自动播；失活暂停，避免多路同时出声 */
+  useEffect(() => {
+    const v = ref.current
+    if (!v) return
+    if (autoPlay) {
+      void v.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
+    } else {
+      v.pause()
+      setPlaying(false)
+    }
+  }, [autoPlay, src])
 
   const togglePlay = () => {
     const v = ref.current
@@ -107,7 +125,10 @@ export function VideoPlayer({
           src={src}
           className={layout.video}
           style={{ boxSizing: "border-box" }}
-          onEnded={() => setPlaying(false)}
+          loop={loop}
+          onEnded={() => {
+            if (!loop) setPlaying(false)
+          }}
           onTimeUpdate={handleTimeUpdate}
           onClick={togglePlay}
         />

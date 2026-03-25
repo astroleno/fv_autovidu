@@ -9,16 +9,27 @@
  *
  * 刻意不包含：批量尾帧/视频、框选、配音条、导出面板等（保留在 StoryboardPage）
  */
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router"
 import { Clapperboard, LayoutGrid, Package } from "lucide-react"
 import { useEpisodeMediaCacheBust } from "@/hooks"
-import { useEpisodeStore } from "@/stores"
+import {
+  useEpisodeStore,
+  useVideoPickStore,
+  readStoredVideoPickMode,
+  writeStoredVideoPickMode,
+} from "@/stores"
 import { Skeleton } from "@/components/ui"
-import { SceneGroup, VideoPickCard } from "@/components/business"
+import {
+  SceneGroup,
+  VideoPickCard,
+  VideoPickFocusPanel,
+  VideoPickModeToggle,
+} from "@/components/business"
 import { flattenShots } from "@/types"
 import type { Shot } from "@/types"
 import { aspectRatioGroupKey } from "@/utils/aspectRatio"
+import { findFirstPendingShotIndex } from "@/utils/videoPickHelpers"
 import { routes } from "@/utils/routes"
 
 /** 选片页专用筛选：与分镜板 STATUS_FILTERS 区分，不写入 shotStore，避免跨页污染 */
@@ -76,6 +87,12 @@ export default function VideoPickPage() {
     error: episodeError,
     fetchEpisodeDetail,
   } = useEpisodeStore()
+  const mode = useVideoPickStore((s) => s.mode)
+  const enterPicking = useVideoPickStore((s) => s.enterPicking)
+  const exitPicking = useVideoPickStore((s) => s.exitPicking)
+  const resetSessionForEpisode = useVideoPickStore(
+    (s) => s.resetSessionForEpisode
+  )
   const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
   const [pickFilter, setPickFilter] = useState<PickStatusFilter>("all")
   /** 单集内多组画幅时：按 aspectRatioGroupKey 筛选；仅一种比例时不展示该行 */
@@ -95,10 +112,35 @@ export default function VideoPickPage() {
     setAspectRatioFilter("all")
   }, [episodeId])
 
+  /** 切换剧集时清空选片模式会话态（索引、撤销栈等） */
+  useEffect(() => {
+    resetSessionForEpisode()
+  }, [episodeId, resetSessionForEpisode])
+
   const allShots = useMemo(
     () => (currentEpisode ? flattenShots(currentEpisode) : []),
     [currentEpisode]
   )
+
+  /**
+   * 与列表渲染一致的筛选后扁平镜头序列（叙事顺序），供 Picking 模式与 flatIndex 对齐。
+   */
+  const filteredFlatShots = useMemo(() => {
+    if (!currentEpisode) return []
+    return flattenShots(currentEpisode).filter(
+      (s) =>
+        shotMatchesPickFilter(s, pickFilter) &&
+        shotMatchesAspectRatioKey(s, aspectRatioFilter)
+    )
+  }, [currentEpisode, pickFilter, aspectRatioFilter])
+
+  const shotIdToFlatIndex = useMemo(() => {
+    const m = new Map<string, number>()
+    filteredFlatShots.forEach((s, i) => {
+      m.set(s.shotId, i)
+    })
+    return m
+  }, [filteredFlatShots])
 
   /** 本集出现的画幅组（已约化）：例如同时存在 9:16、16:9、1:1 三组则 length===3 */
   const aspectRatioBuckets = useMemo(() => {
@@ -114,14 +156,93 @@ export default function VideoPickPage() {
 
   const showAspectRatioFilter = aspectRatioBuckets.length > 1
 
-  const filteredCount = useMemo(
-    () =>
-      allShots.filter(
-        (s) =>
-          shotMatchesPickFilter(s, pickFilter) &&
-          shotMatchesAspectRatioKey(s, aspectRatioFilter)
-      ).length,
-    [allShots, pickFilter, aspectRatioFilter]
+  const filteredCount = filteredFlatShots.length
+
+  /**
+   * 每个剧集仅应用一次 localStorage 模式（避免随筛选条件变化反复切模式）
+   */
+  const episodeModeAppliedRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    episodeModeAppliedRef.current = null
+  }, [episodeId])
+
+  useEffect(() => {
+    if (!episodeId || !currentEpisode) return
+    if (episodeModeAppliedRef.current === episodeId) return
+    const m = readStoredVideoPickMode(episodeId)
+    if (filteredFlatShots.length === 0) {
+      if (allShots.length === 0) return
+      episodeModeAppliedRef.current = episodeId
+      if (m === "picking") enterPicking(0)
+      else exitPicking()
+      return
+    }
+    episodeModeAppliedRef.current = episodeId
+    if (m === "picking") {
+      enterPicking(findFirstPendingShotIndex(filteredFlatShots))
+    } else {
+      exitPicking()
+    }
+  }, [
+    episodeId,
+    currentEpisode,
+    filteredFlatShots,
+    allShots.length,
+    enterPicking,
+    exitPicking,
+  ])
+
+  /** 模式变更时写回 localStorage（切换剧集后的首次 reset 跳过，避免覆盖待恢复的模式） */
+  const skipNextModePersistRef = useRef(false)
+  useEffect(() => {
+    skipNextModePersistRef.current = true
+  }, [episodeId])
+
+  useEffect(() => {
+    if (!episodeId) return
+    if (skipNextModePersistRef.current) {
+      skipNextModePersistRef.current = false
+      return
+    }
+    writeStoredVideoPickMode(episodeId, mode)
+  }, [episodeId, mode])
+
+  /** 从 Picking 返回列表时恢复进入选片前滚动位置 */
+  const prevModeRef = useRef(mode)
+  useEffect(() => {
+    if (!episodeId) return
+    if (prevModeRef.current === "picking" && mode === "overview") {
+      const key = `fv_pick_scroll_${episodeId}`
+      const y = sessionStorage.getItem(key)
+      if (y != null) {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, Number(y))
+        })
+      }
+    }
+    prevModeRef.current = mode
+  }, [episodeId, mode])
+
+  const saveScrollAndEnterPicking = useCallback(() => {
+    if (!episodeId) return
+    sessionStorage.setItem(
+      `fv_pick_scroll_${episodeId}`,
+      String(window.scrollY)
+    )
+  }, [episodeId])
+
+  const handleEnterPickingFromToolbar = useCallback(() => {
+    saveScrollAndEnterPicking()
+    enterPicking(findFirstPendingShotIndex(filteredFlatShots))
+  }, [enterPicking, filteredFlatShots, saveScrollAndEnterPicking])
+
+  const handleEnterPickingFromCard = useCallback(
+    (flatIndex: number) => {
+      saveScrollAndEnterPicking()
+      enterPicking(flatIndex)
+    },
+    [enterPicking, saveScrollAndEnterPicking]
   )
 
   if (!episodeId) return null
@@ -193,8 +314,9 @@ export default function VideoPickPage() {
             : null}
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-bold uppercase tracking-wider">
+          <VideoPickModeToggle onEnterPicking={handleEnterPickingFromToolbar} />
           <span className="text-[var(--color-muted)] font-medium normal-case tracking-normal text-[13px] max-w-xl">
-            在此页对照参考信息与候选视频并选定；需要编辑提示词或单帧重生请进镜头详情。
+            在此页对照参考信息与候选视频并选定；需要编辑提示词或单帧重生请进镜头详情。列表模式扫全局，选片模式用键盘快速决策。
           </span>
           <Link
             to={routes.episode(projectId, episodeId)}
@@ -223,6 +345,16 @@ export default function VideoPickPage() {
         </div>
       </div>
 
+      {mode === "picking" ? (
+        <VideoPickFocusPanel
+          filteredShots={filteredFlatShots}
+          projectId={projectId}
+          episodeId={episodeId}
+          basePath={basePath}
+          cacheBust={cacheBust}
+        />
+      ) : (
+        <>
       {/* 选片专用筛选条：样式与 StoryboardPage 按钮组保持一致 */}
       <div
         className="mb-8 flex flex-wrap items-center gap-2 box-border"
@@ -304,12 +436,16 @@ export default function VideoPickPage() {
                   episodeId={episodeId}
                   basePath={basePath}
                   cacheBust={cacheBust}
+                  flatIndex={shotIdToFlatIndex.get(shot.shotId) ?? 0}
+                  onEnterPicking={handleEnterPickingFromCard}
                 />
               ))}
             </div>
           </SceneGroup>
         )
       })}
+        </>
+      )}
     </div>
   )
 }
