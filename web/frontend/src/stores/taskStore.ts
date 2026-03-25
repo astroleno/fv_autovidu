@@ -7,6 +7,7 @@
  *   仅将新 taskId 并入同一次 `GET /tasks/batch` 查询（避免单帧重生顶掉批量进度）。
  * - 每批任务独立 `onAllSettled`：仅当该批 **全部** taskId 进入终态时触发该批回调。
  * - 启动时若带 episodeId：立即 fetchEpisodeDetail
+ * - 有任务首次进入终态：按批次解析 episodeId 并 fetch（非仅首个 batch），完成后 bumpLocalMediaCache 以刷新图片 v=
  * - 每「轮询会话」首次请求延迟 0ms，之后成功间隔 3s
  * - 请求失败：指数退避（3s 起乘 2，上限 30s），连续失败 3 次提示 Toast
  * - 连续失败满 10 次：停止轮询并对**尚未结束**的各批调用 `onPollAborted`
@@ -76,6 +77,31 @@ function unionTaskIds(): string[] {
     for (const id of b.taskIds) s.add(id)
   }
   return [...s]
+}
+
+/**
+ * 任务首次进入终态后：按 **批次** 找到对应 episodeId（支持多剧并行轮询），
+ * 拉最新 episode.json，再 bump 图片缓存世代，避免「只刷第一个 batch 的 episode」或「pulledAt 不变导致缩略图不更新」。
+ */
+function refreshEpisodesForNewlyTerminalTasks(newlyTerminalIds: Set<string>): void {
+  const episodeIds = new Set<string>()
+  for (const batch of pollingBatches) {
+    const ep = batch.options.episodeId
+    if (!ep) continue
+    if (batch.taskIds.some((id) => newlyTerminalIds.has(id))) {
+      episodeIds.add(ep)
+    }
+  }
+  if (episodeIds.size === 0) {
+    const fallback = pollingBatches.map((b) => b.options.episodeId).find(Boolean)
+    if (fallback) episodeIds.add(fallback)
+  }
+  const epStore = useEpisodeStore.getState()
+  void Promise.all([...episodeIds].map((id) => epStore.fetchEpisodeDetail(id)))
+    .catch(() => undefined)
+    .finally(() => {
+      epStore.bumpLocalMediaCache()
+    })
 }
 
 function clearTimer(): void {
@@ -177,12 +203,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         set({ activeTasks: pruned })
 
         if (newlyTerminalIds.size > 0) {
-          const epRefresh = pollingBatches
-            .map((b) => b.options.episodeId)
-            .find((e) => Boolean(e))
-          if (epRefresh) {
-            void useEpisodeStore.getState().fetchEpisodeDetail(epRefresh)
-          }
+          refreshEpisodesForNewlyTerminalTasks(newlyTerminalIds)
         }
 
         /** 按批检查是否全部终态 */

@@ -176,7 +176,10 @@ export default function ShotDetailPage() {
                         : "border-[var(--color-border)]"
                     }`}
                   >
-                    <VideoPlayer src={videoUrl} />
+                    <VideoPlayer
+                      src={videoUrl}
+                      aspectRatio={shot.aspectRatio}
+                    />
                     <div className="mt-2 flex flex-col gap-2">
                       <span className="text-xs text-[var(--color-muted)]">
                         {c.model} | {resLabel} | {c.mode} | seed {c.seed}

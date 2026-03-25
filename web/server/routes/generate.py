@@ -162,13 +162,30 @@ def _run_video_batch_parallel(jobs: list[VideoJobSpec]) -> None:
 
 
 def _default_video_model(mode: VideoMode) -> str:
-    """按生成模式默认模型。"""
-    # 首尾帧走官方 start-end2video（见 platform.vidu.com Start end to Video），默认与文档常用 fast 模型一致
+    """按生成模式默认模型（请求未带 model 时）。"""
+    # 首尾帧：正式生成默认 pro；预览档由前端传 turbo + isPreview
     if mode == "first_last_frame":
-        return "viduq3-turbo"
+        return "viduq3-pro"
     if mode == "reference":
         return "viduq2-pro"
     return "viduq2-pro-fast"
+
+
+def _default_video_resolution(
+    mode: VideoMode,
+    resolution: str | None,
+    *,
+    is_preview: bool = False,
+) -> str:
+    """
+    解析 Vidu 分辨率：显式传入优先；否则按模式给默认值。
+    首尾帧：预览 540p / 正式 1080p（避免 720p+turbo 这类无意义折中）。
+    """
+    if resolution and str(resolution).strip():
+        return str(resolution).strip()
+    if mode == "first_last_frame":
+        return "540p" if is_preview else "1080p"
+    return "720p"
 
 
 def _normalize_aspect_ratio(aspect: str) -> str:
@@ -354,7 +371,9 @@ def _run_video_gen(
 
             resolved_model = model or _default_video_model(mode)
             resolved_duration = int(duration if duration is not None else shot.duration)
-            resolved_resolution = resolution or "720p"
+            resolved_resolution = _default_video_resolution(
+                mode, resolution, is_preview=is_preview
+            )
             cand_resolution = resolution_label or resolved_resolution
             aspect = _normalize_aspect_ratio(shot.aspectRatio)
 
@@ -517,7 +536,9 @@ def generate_video(req: GenerateVideoRequest, background_tasks: BackgroundTasks)
     if candidate_count < 1 or candidate_count > 3:
         raise HTTPException(status_code=400, detail="candidateCount 必须在 1~3 之间")
     req_seed = _video_request_seed_int(req.seed)
-    resolution_label = (req.resolution or "720p").strip() or "720p"
+    resolution_label = _default_video_resolution(
+        req.mode, req.resolution, is_preview=is_preview
+    )
 
     tasks_out = []
     ref_ids = req.referenceAssetIds
