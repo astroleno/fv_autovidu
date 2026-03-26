@@ -2,6 +2,11 @@ export { StatusIndicator } from "./StatusIndicator"
 export { AssetTag } from "./AssetTag"
 export { ShotPromptCells } from "./ShotPromptCells"
 export type { PromptFieldKey } from "./ShotPromptCells"
+export { ShotDialogueCells } from "./ShotDialogueCells"
+export type {
+  ShotDialogueCellsProps,
+  DialogueShotUpdates,
+} from "./ShotDialogueCells"
 export { ShotCard } from "./ShotCard"
 export { VideoPickCard } from "./VideoPickCard"
 export type { VideoPickCardProps } from "./VideoPickCard"

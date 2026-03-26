@@ -369,6 +369,38 @@ def update_shot(
         return None
 
 
+def update_episode(
+    episode_id: str,
+    updates: dict[str, Any],
+    namespace_root: Path | None = None,
+) -> Episode | None:
+    """
+    合并更新 Episode 根级字段（与 update_shot 相同的 model_dump 合并再校验写回）。
+
+    Args:
+        episode_id: Episode UUID
+        updates: 仅应包含 Episode 已有键；未知键在合并阶段被忽略（键不在 dump 中则不写入）
+        namespace_root: 数据子根
+
+    Returns:
+        更新后的 Episode；未找到目录或文件则 None
+    """
+    with _episode_mutation_lock(episode_id, namespace_root):
+        ep_dir = _find_episode_dir(episode_id, namespace_root)
+        if not ep_dir:
+            return None
+        ep = get_episode(episode_id, namespace_root)
+        if not ep:
+            return None
+        d = ep.model_dump()
+        for k, v in updates.items():
+            if k in d:
+                d[k] = v
+        new_ep = Episode.model_validate(d)
+        _save_episode(ep_dir, new_ep)
+        return new_ep
+
+
 def update_shot_status(
     episode_id: str,
     shot_id: str,
