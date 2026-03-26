@@ -34,6 +34,7 @@ import {
   buildSingleShotVideoQuickRequest,
   toastAfterVideoTasksSettled,
 } from "@/utils/videoQuickRegenerate"
+import { isPhysicallyNewest } from "@/utils/videoCandidateSort"
 
 /** 组件对外 Props：与分镜卡片类似的剧集上下文，便于拼接静态资源 URL 与路由 */
 export interface VideoPickCardProps {
@@ -201,11 +202,9 @@ export function VideoPickCard({
     !busyEnd &&
     !busyVid &&
     !submittingEndframe
-  const defaultVideoMode: VideoMode = shot.endFrame
-    ? "first_last_frame"
-    : "first_frame"
-
   const shotLabel = `S${String(shot.shotNumber).padStart(2, "0")}`
+  /** 首尾帧再生成依赖尾帧路径（与后端校验一致；不自动补尾帧 v1） */
+  const hasEndFramePath = Boolean(shot.endFrame?.trim())
   const showEndSkeleton =
     busyEnd || submittingEndframe
 
@@ -236,17 +235,17 @@ export function VideoPickCard({
   }
 
   /**
-   * 快捷重新生成：首尾帧镜头走 **预览档**（540p + turbo + 与弹窗一致的候选数），与「自定义参数」里勾选预览一致；
-   * 仅首帧 i2v 仍交给后端默认模型/分辨率。
+   * 快捷再生成（追加候选）：`first_frame` 只跑首帧 i2v；`first_last_frame` 走预览档（540p+turbo+双候选），与弹窗「预览模式」一致。
+   * 注：产品用语「再生成」；失败任务批量补救见 BatchResultSummary「重试失败镜头」。
    */
-  const handleQuickRegenerateVideo = async () => {
+  const handleQuickRegenerateVideo = async (mode: VideoMode) => {
     if (!canSubmitVideo) return
     setSubmittingVideo(true)
     try {
       const body = buildSingleShotVideoQuickRequest(
         episodeId,
         shot.shotId,
-        defaultVideoMode
+        mode
       )
       const res = await generateApi.video(body)
       const ids = res.data.tasks.map((t) => t.taskId)
@@ -339,7 +338,7 @@ export function VideoPickCard({
       style={{ boxSizing: "border-box" }}
     >
       <span className="text-[9px] font-black uppercase text-[var(--color-muted)] shrink-0 w-full sm:w-auto">
-        {nCandidates > 0 ? "增加候选 / 重跑" : "生成视频"}
+        {nCandidates > 0 ? "追加候选 / 再生成" : "生成视频"}
       </span>
       <Button
         type="button"
@@ -347,14 +346,35 @@ export function VideoPickCard({
         disabled={!canSubmitVideo}
         className="text-[10px] px-2 py-1.5 gap-1.5 h-auto box-border"
         style={{ boxSizing: "border-box" }}
-        onClick={() => void handleQuickRegenerateVideo()}
+        onClick={() => void handleQuickRegenerateVideo("first_frame")}
+        title="仅首帧图生视频（i2v），不依赖尾帧"
       >
         {submittingVideo ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
         ) : (
           <Film className="w-3.5 h-3.5 shrink-0" aria-hidden />
         )}
-        重新生成视频
+        仅首帧再生成
+      </Button>
+      <Button
+        type="button"
+        variant="secondary"
+        disabled={!canSubmitVideo || !hasEndFramePath}
+        className="text-[10px] px-2 py-1.5 gap-1.5 h-auto box-border"
+        style={{ boxSizing: "border-box" }}
+        onClick={() => void handleQuickRegenerateVideo("first_last_frame")}
+        title={
+          hasEndFramePath
+            ? "首尾帧预览档（540p+turbo+双候选），与弹窗预览一致"
+            : "需要先生成尾帧后再使用首尾帧模式"
+        }
+      >
+        {submittingVideo ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
+        ) : (
+          <Film className="w-3.5 h-3.5 shrink-0" aria-hidden />
+        )}
+        首尾帧再生成
       </Button>
       <Button
         type="button"
@@ -370,8 +390,8 @@ export function VideoPickCard({
         {busyEnd || busyVid
           ? "尾帧或视频生成中，请等待当前任务结束后再试。"
           : nCandidates > 0
-            ? "在上方成片候选基础上再提交任务，完成后列表会增加新候选。"
-            : "首尾帧快捷为预览档（540p+turbo+双候选）；正式档或多参考请用「自定义参数」。"}
+            ? "在上方成片候选基础上再提交任务，完成后列表会增加新候选；成片落盘后会自动选中最新一条。"
+            : "首尾帧快捷为预览档（540p+turbo+双候选）；正式档或多参考请用「自定义参数」。无尾帧时请先跑尾帧再点「首尾帧再生成」。"}
       </p>
     </div>
   ) : null
@@ -568,16 +588,33 @@ export function VideoPickCard({
                     c.taskStatus === "success" &&
                     c.seed > 0
                   const busy = isPromoting(c.id)
+                  const newest = isPhysicallyNewest(c, shot.videoCandidates)
                   const borderSelected = c.selected
                     ? "border-[var(--color-primary)]"
                     : "border-[var(--color-border)]"
+                  const newestRing =
+                    newest && !c.selected
+                      ? "ring-2 ring-amber-600 ring-offset-1"
+                      : newest && c.selected
+                        ? "ring-2 ring-amber-500/60 ring-offset-1"
+                        : ""
 
                   return (
                     <div
                       key={c.id}
-                      className={`flex flex-col border-2 ${borderSelected} p-2 bg-white box-border min-w-0`}
+                      className={`flex flex-col border-2 ${borderSelected} ${newestRing} p-2 bg-white box-border min-w-0`}
                       style={{ boxSizing: "border-box" }}
                     >
+                      {newest ? (
+                        <div className="flex flex-wrap items-center gap-1 mb-1 min-w-0 box-border">
+                          <span
+                            className="text-[9px] font-black uppercase bg-amber-100 text-amber-950 border border-amber-700 px-1.5 py-0.5 shrink-0"
+                            title="同一镜头下 createdAt 最新的成片"
+                          >
+                            最新
+                          </span>
+                        </div>
+                      ) : null}
                       <VideoPlayer
                         src={videoUrl}
                         aspectRatio={shot.aspectRatio}

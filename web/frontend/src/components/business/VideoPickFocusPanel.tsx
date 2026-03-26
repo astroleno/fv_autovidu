@@ -117,11 +117,9 @@ export function VideoPickFocusPanel({
     !busyEnd &&
     !busyVid &&
     !submittingEndframe
-  const defaultVideoMode: VideoMode = shot?.endFrame
-    ? "first_last_frame"
-    : "first_frame"
-
   const showEndSkeleton = Boolean(shot && (busyEnd || submittingEndframe))
+  /** 与后端「首尾帧需尾帧」一致；无尾帧路径时不提交 first_last_frame */
+  const hasEndFramePath = Boolean(shot?.endFrame?.trim())
 
   const { promote, isPromoting } = usePromoteCandidate({
     episodeId,
@@ -346,14 +344,14 @@ export function VideoPickFocusPanel({
     }
   }
 
-  const handleQuickRegenerateVideo = async () => {
+  const handleQuickRegenerateVideo = async (mode: VideoMode) => {
     if (!shot || !canSubmitVideo) return
     setSubmittingVideo(true)
     try {
       const body = buildSingleShotVideoQuickRequest(
         episodeId,
         shot.shotId,
-        defaultVideoMode
+        mode
       )
       const res = await generateApi.video(body)
       const ids = res.data.tasks.map((t) => t.taskId)
@@ -463,7 +461,7 @@ export function VideoPickFocusPanel({
       style={{ boxSizing: "border-box" }}
     >
       <span className="text-[9px] font-black uppercase text-[var(--color-muted)] shrink-0 w-full sm:w-auto">
-        {nCandidates > 0 ? "增加候选 / 重跑" : "生成视频"}
+        {nCandidates > 0 ? "追加候选 / 再生成" : "生成视频"}
       </span>
       <Button
         type="button"
@@ -471,14 +469,35 @@ export function VideoPickFocusPanel({
         disabled={!canSubmitVideo}
         className="text-[10px] px-2 py-1.5 gap-1.5 h-auto box-border"
         style={{ boxSizing: "border-box" }}
-        onClick={() => void handleQuickRegenerateVideo()}
+        onClick={() => void handleQuickRegenerateVideo("first_frame")}
+        title="仅首帧图生视频（i2v）"
       >
         {submittingVideo ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
         ) : (
           <Film className="w-3.5 h-3.5 shrink-0" aria-hidden />
         )}
-        重新生成视频
+        仅首帧再生成
+      </Button>
+      <Button
+        type="button"
+        variant="secondary"
+        disabled={!canSubmitVideo || !hasEndFramePath}
+        className="text-[10px] px-2 py-1.5 gap-1.5 h-auto box-border"
+        style={{ boxSizing: "border-box" }}
+        onClick={() => void handleQuickRegenerateVideo("first_last_frame")}
+        title={
+          hasEndFramePath
+            ? "首尾帧预览档（540p+turbo+双候选）"
+            : "需要先生成尾帧后再使用首尾帧模式"
+        }
+      >
+        {submittingVideo ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
+        ) : (
+          <Film className="w-3.5 h-3.5 shrink-0" aria-hidden />
+        )}
+        首尾帧再生成
       </Button>
       <Button
         type="button"
@@ -514,9 +533,18 @@ export function VideoPickFocusPanel({
             disabled={!canSubmitVideo}
             className="text-[10px] px-2 py-1.5 h-auto box-border"
             style={{ boxSizing: "border-box" }}
-            onClick={() => void handleQuickRegenerateVideo()}
+            onClick={() =>
+              void handleQuickRegenerateVideo(
+                hasEndFramePath ? "first_last_frame" : "first_frame"
+              )
+            }
+            title={
+              hasEndFramePath
+                ? "首尾帧预览档，一次可出 2 条候选"
+                : "无尾帧时仅首帧再生成"
+            }
           >
-            再生成 2 个预览候选
+            {hasEndFramePath ? "再生成 2 个预览候选" : "再生成候选（仅首帧）"}
           </Button>
           <Button
             type="button"
