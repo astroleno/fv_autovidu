@@ -5,7 +5,8 @@ Video 任务收尾线程（Video Finalizer）
 将原 `GET /api/tasks` 中的 Vidu 查询、视频下载、episode.json 写回迁移到后台循环，
 避免读接口产生副作用。
 
-仅处理 `kind=video` 且 `status=awaiting_external` 的任务；幂等：若候选已有 videoPath 则跳过写盘。
+仅处理 `kind=video` 且 `status=awaiting_external` 的任务；幂等：若候选已有 videoPath 则跳过写盘，
+但仍会将该候选设为当前选中（与「再生成」v1：finalize 后自动选中一致）。
 """
 
 from __future__ import annotations
@@ -98,11 +99,13 @@ def _finalize_one_task(task: TaskRow) -> None:
         )
         return
 
-    # 幂等：episode 里该候选已有视频路径则直接成功
+    # 幂等：episode 里该候选已有视频路径则直接成功（仍选中该候选，与首次落盘行为一致）
     shot = data_service.get_shot(episode_id, shot_id, ns)
     if shot:
         cand = next((c for c in shot.videoCandidates if c.id == candidate_id), None)
         if cand and cand.videoPath and str(cand.videoPath).strip():
+            with episode_fs_lock(episode_id, data_namespace=fs_tag):
+                data_service.select_candidate(episode_id, shot_id, candidate_id, ns)
             get_task_store().set_task(
                 task_id,
                 "success",
@@ -244,12 +247,8 @@ def _finalize_one_task(task: TaskRow) -> None:
                 cand_updates,
                 ns,
             )
-            # 任一条候选仍标记为 selected 时，镜头终态应为 selected（精出/多候选期间可能曾被写成 video_generating）
-            shot_after = data_service.get_shot(episode_id, shot_id, ns)
-            if shot_after and any(c.selected for c in shot_after.videoCandidates):
-                data_service.update_shot(episode_id, shot_id, {"status": "selected"}, ns)
-            else:
-                data_service.update_shot(episode_id, shot_id, {"status": "video_done"}, ns)
+            # 下载完成后选中本候选（含配音 stale 等副作用由 select_candidate 统一处理）
+            data_service.select_candidate(episode_id, shot_id, candidate_id, ns)
         get_task_store().set_task(
             task_id,
             "success",
