@@ -1,10 +1,10 @@
 /**
  * ShotRow 列表视图行
  *
- * 列顺序：编号 | 时长 | 首尾帧（悬浮大图 + 进详情）| 视频（悬浮预览 + 进详情）| 状态 |
+ * 列顺序：编号 | 时长（数字输入，失焦保存）| 首尾帧（悬浮大图 + 进详情）| 视频（悬浮预览 + 进详情）| 状态 |
  * 台词原文 | 译文 | 画面描述 | 图片提示词 | 视频提示词 | 资产（悬浮 + 进资产库详情）| 候选数 | 操作
  *
- * 提示词列支持悬浮显示、点击编辑、失焦保存
+ * 提示词列支持悬浮显示、点击编辑、失焦保存；时长写入 `shot.duration`，供后续视频生成默认秒数。
  */
 import { Link } from "react-router"
 import { routes } from "@/utils/routes"
@@ -15,6 +15,7 @@ import {
   AssetTag,
   ShotDialogueCells,
   ShotPromptCells,
+  ShotDurationCell,
 } from "@/components/business"
 import { ShotFrameCompare } from "./ShotFrameCompare"
 import { ShotRowVideoPreview } from "./ShotRowVideoPreview"
@@ -66,7 +67,11 @@ export function ShotRow({
       )}
       <td className="py-3 px-4 text-sm font-medium whitespace-nowrap">{shot.shotNumber}</td>
       <td className="py-3 px-4 text-sm text-[var(--color-ink)] whitespace-nowrap align-top">
-        {shot.duration}s
+        <ShotDurationCell
+          shot={shot}
+          episodeId={episodeId}
+          updateShot={updateShot}
+        />
       </td>
       <td className="py-3 px-4 align-top min-w-[11rem] overflow-visible">
         <ShotFrameCompare

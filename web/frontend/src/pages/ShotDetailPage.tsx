@@ -10,7 +10,12 @@ import { useEpisodeMediaCacheBust, usePromoteCandidate } from "@/hooks"
 import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import { useEpisodeStore, useShotStore } from "@/stores"
 import { Button } from "@/components/ui"
-import { VideoPlayer, AssetTag, ShotFrameCompare } from "@/components/business"
+import {
+  VideoPlayer,
+  AssetTag,
+  ShotFrameCompare,
+  ShotDurationCell,
+} from "@/components/business"
 import { flattenShots } from "@/types"
 import { getFileUrl } from "@/utils/file"
 import { routes } from "@/utils/routes"
@@ -22,7 +27,8 @@ export default function ShotDetailPage() {
     episodeId: string
     shotId: string
   }>()
-  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
+  const { currentEpisode, loading, fetchEpisodeDetail, updateShot } =
+    useEpisodeStore()
   const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
   const { selectCandidate } = useShotStore()
   /** 必须在任意 early return 之前调用，以满足 React hooks 规则；缺参时 promote 内部直接 return */
@@ -141,8 +147,21 @@ export default function ShotDetailPage() {
               </div>
             </div>
           )}
-          <div className="text-xs text-[var(--color-muted)]">
-            {shot.cameraMovement} | {shot.duration}s | {shot.aspectRatio}
+          <div className="text-xs text-[var(--color-muted)] flex flex-wrap items-center gap-x-2 gap-y-1 box-border">
+            <span>{shot.cameraMovement}</span>
+            <span aria-hidden className="text-[var(--color-border)]">
+              |
+            </span>
+            <ShotDurationCell
+              shot={shot}
+              episodeId={episodeId}
+              updateShot={updateShot}
+              className="text-[var(--color-ink)]"
+            />
+            <span aria-hidden className="text-[var(--color-border)]">
+              |
+            </span>
+            <span>{shot.aspectRatio}</span>
           </div>
           <Link to={routes.regen(projectId, episodeId, shotId)}>
             <Button variant="secondary" className="gap-2">

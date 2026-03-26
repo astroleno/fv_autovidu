@@ -40,8 +40,8 @@ interface EpisodeStore {
     skipImages?: boolean
   ) => Promise<void>
   /**
-   * 更新 Shot 字段（文案类），PATCH 后按响应合并进 currentEpisode。
-   * dialogue / dialogueTranslation 供分镜表「台词原文 / 译文」列落盘。
+   * 更新 Shot 字段，PATCH 后按响应合并进 currentEpisode。
+   * 文案类供分镜表台词/提示词列；`duration` 供分镜表与镜头详情可编辑时长（写入后影响后续视频生成默认秒数）。
    */
   updateShot: (
     episodeId: string,
@@ -54,6 +54,7 @@ interface EpisodeStore {
         | "videoPrompt"
         | "dialogue"
         | "dialogueTranslation"
+        | "duration"
       >
     >
   ) => Promise<void>
