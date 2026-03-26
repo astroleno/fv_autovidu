@@ -379,7 +379,16 @@ def _normalize_episode_dir(
 
 
 # 重拉时从旧 episode.json 合并回新稿的字段（与已迁移的 videos/endframes/dub/export 目录一致）
-_LOCAL_SHOT_MERGE_KEYS: tuple[str, ...] = ("endFrame", "videoCandidates", "dub", "status")
+# 台词与译文：用户在 Web 编辑后须保留，避免平台快照覆盖
+_LOCAL_SHOT_MERGE_KEYS: tuple[str, ...] = (
+    "endFrame",
+    "videoCandidates",
+    "dub",
+    "status",
+    "dialogue",
+    "dialogueTranslation",
+    "associatedDialogue",
+)
 
 
 def _score_shot_local_for_merge(shot: dict[str, Any]) -> tuple[int, int, int, int]:
@@ -412,7 +421,7 @@ def _collect_local_episode_merge_state(output_dir: Path, episode_id: str) -> dic
     ``{projectId}/{episodeId}/episode.json``，提取待合并的本地生成态。
 
     Returns:
-        {"shots_by_id": {shotId: {endFrame, videoCandidates, dub, status}}, "jianyingExport": dict|None}
+        {"shots_by_id": {shotId: {合并字段…}}, "jianyingExport": dict|None}
     """
     shots_by_id: dict[str, dict[str, Any]] = {}
     jianying_candidates: list[dict[str, Any]] = []
