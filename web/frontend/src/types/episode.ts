@@ -71,6 +71,16 @@ export interface DubStatus {
 }
 
 /**
+ * Feeling 平台结构化对白（与 episode.json / Pydantic AssociatedDialogue 对齐）
+ */
+export interface AssociatedDialogue {
+  /** 说话角色名 */
+  role: string
+  /** 该角色台词正文 */
+  content: string
+}
+
+/**
  * Shot：单镜头
  * 包含首帧、尾帧、视频候选、资产、prompt 等完整信息
  */
@@ -90,6 +100,12 @@ export interface Shot {
   endFrame: string | null
   videoCandidates: VideoCandidate[]
   dub?: DubStatus
+  /** 平台原文台词行（字幕/编剧语言） */
+  dialogue?: string
+  /** 结构化对白；无有效内容时可省略 */
+  associatedDialogue?: AssociatedDialogue | null
+  /** 目标语译文，供提示词与 TTS */
+  dialogueTranslation?: string
 }
 
 /**
@@ -125,6 +141,10 @@ export interface Episode {
   /** 剧集级全量资产库，供资产库页面 / RegenPage 使用 */
   assets?: ShotAsset[]
   jianyingExport?: JianyingExportRecord
+  /** 配音目标语（BCP-47 或项目约定），空表示未设置 */
+  dubTargetLocale?: string
+  /** 台词原文语言，供 UI 标签 */
+  sourceLocale?: string
 }
 
 /**
