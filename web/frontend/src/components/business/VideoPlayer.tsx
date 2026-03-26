@@ -2,12 +2,17 @@
  * VideoPlayer 视频播放器
  * HTML5 video 封装：播放/暂停/进度条/全屏
  *
+ * 进度条：使用 `@/components/ui/VideoSeekBar`（剪映式圆形可拖拽拇指 + 底层已播轨道），
+ * 避免原生 range 默认样式「看不见指针」的问题；播放控制使用 lucide Play/Pause，与粗剪台一致。
+ *
  * aspectRatio：与 Shot.aspectRatio 一致时，经由 utils/aspectRatio 解析为多类布局：
  * - 竖屏：高度上限 + 水平居中
  * - 方屏 1:1：限制最大边长 + aspect-square
  * - 横屏：宽铺 aspect-video；超宽（约 2:1 及以上）用 aspect-[2/1] 减少上下留黑
  */
 import { useEffect, useRef, useState } from "react"
+import { Pause, Play } from "lucide-react"
+import { VideoSeekBar } from "@/components/ui/VideoSeekBar"
 import {
   classifyAspectRatio,
   isUltrawideLandscape,
@@ -67,6 +72,8 @@ export function VideoPlayer({
   loop = false,
 }: VideoPlayerProps) {
   const ref = useRef<HTMLVideoElement>(null)
+  /** 用户拖拽进度条时为 true，避免 timeupdate 与受控滑块抢进度导致无法拖拽 */
+  const scrubbingRef = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
   const layout = videoLayoutForAspect(aspectRatio)
@@ -96,13 +103,14 @@ export function VideoPlayer({
 
   const handleTimeUpdate = () => {
     const v = ref.current
-    if (v && v.duration) setProgress((v.currentTime / v.duration) * 100)
+    if (!v || !v.duration) return
+    if (scrubbingRef.current) return
+    setProgress((v.currentTime / v.duration) * 100)
   }
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = (p: number) => {
     const v = ref.current
     if (!v || !v.duration) return
-    const p = Number(e.target.value)
     v.currentTime = (p / 100) * v.duration
     setProgress(p)
   }
@@ -140,17 +148,27 @@ export function VideoPlayer({
         <button
           type="button"
           onClick={togglePlay}
-          className="p-1 text-white hover:bg-white/20"
+          className="flex shrink-0 items-center justify-center p-1.5 text-white hover:bg-white/20"
+          aria-label={playing ? "暂停" : "播放"}
         >
-          {playing ? "⏸" : "▶"}
+          {playing ? (
+            <Pause className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+          ) : (
+            <Play className="h-4 w-4" fill="currentColor" aria-hidden />
+          )}
         </button>
-        <input
-          type="range"
-          min={0}
-          max={100}
+        <VideoSeekBar
           value={progress}
           onChange={handleSeek}
-          className="flex-1 h-1"
+          variant="onDark"
+          className="min-w-0 flex-1"
+          aria-label="播放进度"
+          onSeekStart={() => {
+            scrubbingRef.current = true
+          }}
+          onSeekEnd={() => {
+            scrubbingRef.current = false
+          }}
         />
         <button
           type="button"
