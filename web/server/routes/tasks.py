@@ -18,14 +18,24 @@ if str(_SERVER_DIR) not in sys.path:
 
 from pathlib import Path
 
-from fastapi import APIRouter, Query, Request
+import logging
 
-from models.schemas import TaskStatusResponse
+from fastapi import APIRouter, Body, Query, Request
+
+from models.schemas import (
+    CancelEndframesRequest,
+    CancelEndframesResponse,
+    TaskStatusResponse,
+)
+from services import data_service
 from services.context_service import (
     get_context_task_id,
     namespace_root_from_context_id,
 )
-from services.task_store import TaskRow, get_task_store
+from services.task_store import TaskRow, get_connection, get_task_store
+from services.task_store import repository
+
+_LOG = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -181,3 +191,46 @@ def get_tasks_batch(
                 pass
 
     return [by_id.get(tid, TaskStatusResponse(taskId=tid, status="pending")) for tid in task_ids]
+
+
+@router.post("/tasks/cancel-endframes", response_model=CancelEndframesResponse)
+def cancel_endframes(
+    request: Request,
+    body: CancelEndframesRequest = Body(default_factory=CancelEndframesRequest),
+):
+    """
+    将 processing 中的尾帧任务标为失败，并把仍处 endframe_generating 的镜头置回 pending。
+    可选 episodeId 仅取消该剧集；带 X-FV-Context-Id 时只处理当前上下文（及 context_id 为空的旧任务）。
+    已进入 Yunwu 的后台线程在返回后会检查任务状态，已取消则不再落盘。
+    """
+    req_ctx = get_context_task_id(request)
+    conn = get_connection()
+    rows = repository.get_tasks_by_status(conn, "processing", "endframe")
+    if body.episodeId:
+        rows = [r for r in rows if r.episode_id == body.episodeId]
+    if req_ctx is not None:
+        rows = [r for r in rows if r.context_id is None or r.context_id == req_ctx]
+    store = get_task_store()
+    cancelled_ids: list[str] = []
+    for row in rows:
+        store.set_task(
+            row.id,
+            "failed",
+            error="尾帧生成已取消",
+            context_id=row.context_id,
+        )
+        cancelled_ids.append(row.id)
+        if not row.episode_id or not row.shot_id:
+            continue
+        ns = _namespace_for_task_row(row)
+        shot = data_service.get_shot(row.episode_id, row.shot_id, ns)
+        if shot and shot.status == "endframe_generating":
+            data_service.update_shot_status(
+                row.episode_id, row.shot_id, "pending", ns
+            )
+    _LOG.info(
+        "cancel_endframes: cancelled=%d episode_filter=%s",
+        len(cancelled_ids),
+        body.episodeId,
+    )
+    return CancelEndframesResponse(cancelled=len(cancelled_ids), taskIds=cancelled_ids)

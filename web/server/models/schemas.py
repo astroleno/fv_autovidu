@@ -198,6 +198,17 @@ class BatchEndframeResponse(BaseModel):
     tasks: list[EndframeTaskItem]
 
 
+class CancelEndframesRequest(BaseModel):
+    """取消进行中的尾帧生成任务；可选按剧集过滤。"""
+
+    episodeId: Optional[str] = None
+
+
+class CancelEndframesResponse(BaseModel):
+    cancelled: int
+    taskIds: list[str] = Field(default_factory=list)
+
+
 class GenerateVideoRequest(BaseModel):
     """批量生成视频请求。"""
 

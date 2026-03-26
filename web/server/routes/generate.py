@@ -288,6 +288,14 @@ def _run_tail_frame(
         assets_dir = ep_dir / "assets"
         asset_paths = [assets_dir / a.localPath.replace("assets/", "").lstrip("/") for a in shot.assets]
         asset_paths = [p for p in asset_paths if p.exists()][:2]
+        pre = _ts().get_task_row(task_id)
+        if pre is not None and pre.status != "processing":
+            _LOG.info(
+                "[尾帧] 跳过 Yunwu task=%s: 任务已非 processing（可能已取消）status=%s",
+                task_id,
+                pre.status,
+            )
+            return
         with _ENDFRAME_SEM:
             from services.yunwu_service import generate_tail_frame
 
@@ -297,6 +305,14 @@ def _run_tail_frame(
                 append_dialogue_for_video_prompt(shot.videoPrompt, shot),
                 asset_paths,
             )
+        post = _ts().get_task_row(task_id)
+        if post is not None and post.status != "processing":
+            _LOG.info(
+                "[尾帧] 放弃落盘 task=%s: 推理完成后任务已终态（可能已取消）status=%s",
+                task_id,
+                post.status,
+            )
+            return
         # 优先用首帧路径 stem（如 frames/S003.png → S003_end.png），避免多镜头 shotNumber 重复时互相覆盖
         _stem = Path(shot.firstFrame).stem
         end_name = f"{_stem}_end.png" if _stem else f"S{shot.shotNumber:02d}_end.png"
