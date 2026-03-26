@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui"
 import { dubApi } from "@/api/dub"
 import { LS_JIANYING_DRAFT_PATH } from "@/components/business"
+import { FeelingContextSection } from "@/components/settings/FeelingContextSection"
 
 export default function SettingsPage() {
   const [apiUrl, setApiUrl] = useState("http://localhost:8000")
@@ -63,6 +64,8 @@ export default function SettingsPage() {
     <div className="p-8 max-w-2xl">
       <h1 className="text-4xl font-extrabold uppercase tracking-tighter text-[var(--color-newsprint-black)] mb-10 font-headline">设置</h1>
       <div className="space-y-6">
+        <FeelingContextSection />
+
         <div>
           <label className="block text-[10px] font-black uppercase tracking-wider mb-1">API 地址</label>
           <input

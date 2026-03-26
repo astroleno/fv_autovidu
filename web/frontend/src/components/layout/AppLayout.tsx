@@ -7,9 +7,10 @@ import { Outlet, useLocation, useParams } from "react-router"
 import { CloudDownload } from "lucide-react"
 import { SideNavBar } from "./SideNavBar"
 import { TopNavBar } from "./TopNavBar"
+import { ContextHeaderBadge } from "./ContextHeaderBadge"
 import { Dialog, Button } from "@/components/ui"
 import { Toast } from "@/components/ui/Toast"
-import { useEpisodeStore, useToastStore, useUIStore } from "@/stores"
+import { useContextStore, useEpisodeStore, useToastStore, useUIStore } from "@/stores"
 import { MODAL_PULL_EPISODE } from "@/stores/uiStore"
 import { projectsApi } from "@/api/projects"
 import { routes } from "@/utils/routes"
@@ -46,9 +47,15 @@ export default function AppLayout() {
     projectId?: string
   }>()
   const { pullNewEpisode, currentEpisode } = useEpisodeStore()
+  const fetchContexts = useContextStore((s) => s.fetchContexts)
   const { toasts, dismiss: dismissToast } = useToastStore()
   const { activeModal, openModal, closeModal } = useUIStore()
   const pullOpen = activeModal === MODAL_PULL_EPISODE
+
+  /** 启动时拉取环境与 Profile 列表（无配置文件时 configured=false，顶栏显示 .env 全局） */
+  useEffect(() => {
+    void fetchContexts()
+  }, [fetchContexts])
 
   /** 进入项目相关页时拉取项目标题，供面包屑使用 */
   useEffect(() => {
@@ -169,7 +176,11 @@ export default function AppLayout() {
         taskCount={0}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <TopNavBar breadcrumbs={breadcrumbs} actions={topActions} />
+        <TopNavBar
+          breadcrumbs={breadcrumbs}
+          contextSlot={<ContextHeaderBadge />}
+          actions={topActions}
+        />
         {/**
          * 主内容区：占满「顶栏以下」视口高度，子页面可用 h-full + min-h-0 做一屏布局（如粗剪台）；
          * 内部再 overflow-y-auto，长页面（分镜板等）仍在内层滚动。

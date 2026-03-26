@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router"
 import { Clapperboard, LayoutGrid, Package } from "lucide-react"
 import { useEpisodeMediaCacheBust } from "@/hooks"
+import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import {
   useEpisodeStore,
   useVideoPickStore,
@@ -94,6 +95,7 @@ export default function VideoPickPage() {
     (s) => s.resetSessionForEpisode
   )
   const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
+  const basePath = useEpisodeFileBasePath()
   const [pickFilter, setPickFilter] = useState<PickStatusFilter>("all")
   /** 单集内多组画幅时：按 aspectRatioGroupKey 筛选；仅一种比例时不展示该行 */
   const [aspectRatioFilter, setAspectRatioFilter] = useState<string | "all">(
@@ -292,7 +294,6 @@ export default function VideoPickPage() {
     )
   }
 
-  const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   const projectId = routeProjectId ?? currentEpisode.projectId
   const totalShots = allShots.length
 

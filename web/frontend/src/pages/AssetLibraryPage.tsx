@@ -11,6 +11,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react"
 import { useParams, Link, useSearchParams } from "react-router"
 import { useEpisodeMediaCacheBust } from "@/hooks"
+import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import { useEpisodeStore } from "@/stores"
 import { getFileUrl } from "@/utils/file"
 import type { ShotAsset } from "@/types"
@@ -231,13 +232,13 @@ export default function AssetLibraryPage() {
     if (typeFilter === "all") return assets
     return assets.filter((a) => a.type === typeFilter)
   }, [assets, typeFilter])
+  const basePath = useEpisodeFileBasePath()
 
   if (!episodeId || !currentEpisode) {
     if (loading) return <div className="p-8">加载中...</div>
     return <div className="p-8">未找到该剧集</div>
   }
 
-  const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   const projectId = routeProjectId ?? currentEpisode.projectId
 
   return (

@@ -1,3 +1,6 @@
+export { CONTEXT_PERSIST_KEY } from "./contextPersistKey"
+export { useContextStore } from "./useContextStore"
+export type { ContextEnvironment, ContextProfile } from "./useContextStore"
 export { useEpisodeStore } from "./episodeStore"
 export { useProjectStore } from "./projectStore"
 export { useShotStore } from "./shotStore"

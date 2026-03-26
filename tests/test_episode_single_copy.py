@@ -175,14 +175,15 @@ class TestEndframeUsesFsLock(unittest.TestCase):
         start = text.index("def _run_tail_frame")
         end = text.index("@router.post(\"/generate/endframe\"", start)
         body = text[start:end]
-        self.assertIn("with episode_fs_lock(episode_id):", body)
+        self.assertIn("with episode_fs_lock(episode_id, data_namespace=fs_tag):", body)
         self.assertIn("ep_dir_write = data_service.get_episode_dir", body)
         img_pos = body.find("img_data = generate_tail_frame")
-        lock_pos = body.find("with episode_fs_lock(episode_id):")
+        lock_pat = "with episode_fs_lock(episode_id, data_namespace=fs_tag):"
+        lock_pos = body.find(lock_pat)
         self.assertGreaterEqual(img_pos, 0, "应有 Yunwu generate_tail_frame 调用")
         self.assertGreater(lock_pos, img_pos, "应先 Yunwu 再持锁写盘，避免长时间阻塞 repull")
         self.assertGreaterEqual(
-            body.count("with episode_fs_lock(episode_id):"),
+            body.count(lock_pat),
             2,
             "成功写盘与异常时 update_shot_status 均应持锁",
         )
@@ -199,7 +200,7 @@ class TestEpDirWritePathsUseFsLock(unittest.TestCase):
         end = text.index("@router.post(\"/generate/regen-frame\"", start)
         body = text[start:end]
         y = body.find("img_data = regenerate_first_frame")
-        lock_pos = body.find("with episode_fs_lock(episode_id):")
+        lock_pos = body.find("with episode_fs_lock(episode_id, **lock_kw):")
         self.assertGreaterEqual(y, 0)
         self.assertGreater(lock_pos, y, "应先 Yunwu 再持锁写首帧")
         self.assertIn("ep_dir_write = data_service.get_episode_dir", body)
@@ -211,10 +212,10 @@ class TestEpDirWritePathsUseFsLock(unittest.TestCase):
         start = text.index("def export_rough_cut")
         end = text.index("@router.post(\"/export/jianying-draft\"", start)
         body = text[start:end]
-        self.assertIn("with episode_fs_lock(req.episodeId):", body)
+        self.assertIn("with episode_fs_lock(req.episodeId, data_namespace=tag):", body)
         self.assertIn("concat_videos(", body)
         c = body.find("concat_videos(")
-        lock_line = body.find("with episode_fs_lock(req.episodeId):")
+        lock_line = body.find("with episode_fs_lock(req.episodeId, data_namespace=tag):")
         self.assertLess(lock_line, c, "粗剪应在持锁区间内调用 ffmpeg 拼接")
 
     def test_jianying_export_wrapped_in_lock(self) -> None:
@@ -225,10 +226,10 @@ class TestEpDirWritePathsUseFsLock(unittest.TestCase):
         # 到下一个顶层 def
         next_def = text.index("\ndef guess_jianying_draft_root_candidates", start)
         body = text[start:next_def]
-        self.assertIn("with episode_fs_lock(episode_id):", body)
-        self.assertIn("persist_episode(ep)", body)
-        p = body.find("persist_episode(ep)")
-        lock_pos = body.find("with episode_fs_lock(episode_id):")
+        self.assertIn("with episode_fs_lock(episode_id, data_namespace=lock_tag):", body)
+        self.assertIn("persist_episode(ep, namespace_root)", body)
+        p = body.find("persist_episode(ep, namespace_root)")
+        lock_pos = body.find("with episode_fs_lock(episode_id, data_namespace=lock_tag):")
         self.assertLess(lock_pos, p, "persist_episode 须在锁内")
 
 

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-应用配置：从 .env 和环境变量读取
+应用配置：从 .env、.env.local 和环境变量读取
+
+加载顺序：`load_dotenv(.env)` 后若存在 `.env.local` 则 `load_dotenv(..., override=True)`，
+便于 gitignore 的个人凭据覆盖（与多 Profile 的 FEELING_* 变量一致）。
 
 路径解析策略：
 - **PyInstaller 冻结模式**：用户可编辑文件（.env、data/）位于 exe 所在目录，
@@ -32,6 +35,9 @@ try:
 
     _env_file = _PROJECT_ROOT / ".env"
     load_dotenv(_env_file)
+    _env_local = _PROJECT_ROOT / ".env.local"
+    if _env_local.is_file():
+        load_dotenv(_env_local, override=True)
 except ImportError:
     pass
 

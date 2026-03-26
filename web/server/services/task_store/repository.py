@@ -77,8 +77,8 @@ def insert_task(conn: sqlite3.Connection, task: TaskRow) -> None:
         INSERT INTO tasks (
             id, kind, status, episode_id, shot_id, candidate_id,
             external_task_id, payload, result, error, progress,
-            created_at, updated_at, started_at, completed_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            created_at, updated_at, started_at, completed_at, context_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             task.id,
@@ -96,6 +96,7 @@ def insert_task(conn: sqlite3.Connection, task: TaskRow) -> None:
             task.updated_at,
             task.started_at,
             task.completed_at,
+            task.context_id,
         ),
     )
     _commit(conn)
@@ -109,7 +110,7 @@ def update_task(conn: sqlite3.Connection, task: TaskRow) -> None:
         UPDATE tasks SET
             kind = ?, status = ?, episode_id = ?, shot_id = ?, candidate_id = ?,
             external_task_id = ?, payload = ?, result = ?, error = ?, progress = ?,
-            updated_at = ?, started_at = ?, completed_at = ?
+            updated_at = ?, started_at = ?, completed_at = ?, context_id = ?
         WHERE id = ?
         """,
         (
@@ -126,6 +127,7 @@ def update_task(conn: sqlite3.Connection, task: TaskRow) -> None:
             task.updated_at,
             task.started_at,
             task.completed_at,
+            task.context_id,
             task.id,
         ),
     )
@@ -151,8 +153,8 @@ def upsert_task(conn: sqlite3.Connection, task: TaskRow) -> None:
         INSERT INTO tasks (
             id, kind, status, episode_id, shot_id, candidate_id,
             external_task_id, payload, result, error, progress,
-            created_at, updated_at, started_at, completed_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            created_at, updated_at, started_at, completed_at, context_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
             kind = excluded.kind,
             status = excluded.status,
@@ -166,7 +168,8 @@ def upsert_task(conn: sqlite3.Connection, task: TaskRow) -> None:
             progress = excluded.progress,
             updated_at = excluded.updated_at,
             started_at = excluded.started_at,
-            completed_at = excluded.completed_at
+            completed_at = excluded.completed_at,
+            context_id = COALESCE(excluded.context_id, tasks.context_id)
         """,
         (
             task.id,
@@ -184,6 +187,7 @@ def upsert_task(conn: sqlite3.Connection, task: TaskRow) -> None:
             task.updated_at,
             task.started_at,
             task.completed_at,
+            task.context_id,
         ),
     )
     _commit(conn)

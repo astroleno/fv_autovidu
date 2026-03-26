@@ -88,6 +88,7 @@ def init_db() -> None:
     conn.executescript(_SCHEMA_SQL)
     conn.commit()
     _ensure_progress_column(conn)
+    _ensure_context_id_column(conn)
 
 
 def _ensure_progress_column(conn: sqlite3.Connection) -> None:
@@ -96,4 +97,18 @@ def _ensure_progress_column(conn: sqlite3.Connection) -> None:
     cols = {row[1] for row in cur.fetchall()}
     if "progress" not in cols:
         conn.execute("ALTER TABLE tasks ADD COLUMN progress INTEGER")
+        conn.commit()
+
+
+def _ensure_context_id_column(conn: sqlite3.Connection) -> None:
+    """
+    多 Feeling Profile：任务归属 context_id（与 X-FV-Context-Id 一致），旧行默认为 NULL。
+    """
+    cur = conn.execute("PRAGMA table_info(tasks)")
+    cols = {row[1] for row in cur.fetchall()}
+    if "context_id" not in cols:
+        conn.execute("ALTER TABLE tasks ADD COLUMN context_id TEXT")
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tasks_context ON tasks(context_id)"
+        )
         conn.commit()

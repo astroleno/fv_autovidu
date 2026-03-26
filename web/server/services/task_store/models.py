@@ -28,6 +28,7 @@ class TaskRow:
         result: 结果/中间态（JSON），如 vidu_task_id、videoPath。
         error: 失败原因。
         progress: 可选进度 0-100，供前端展示。
+        context_id: Feeling 多上下文时的 profile id；旧任务为 None。
         时间戳均为 Unix 秒（float）。
     """
 
@@ -42,6 +43,7 @@ class TaskRow:
     result: dict[str, Any] = field(default_factory=dict)
     error: Optional[str] = None
     progress: Optional[int] = None
+    context_id: Optional[str] = None
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
     started_at: Optional[float] = None
@@ -91,6 +93,8 @@ class TaskRow:
             payload = {}
         if not isinstance(result, dict):
             result = {}
+        ctx_raw = row["context_id"] if "context_id" in row.keys() else None
+        ctx_id = str(ctx_raw) if ctx_raw else None
         return cls(
             id=str(row["id"]),
             kind=str(row["kind"]),
@@ -103,6 +107,7 @@ class TaskRow:
             result=result,
             error=row["error"],
             progress=row["progress"],
+            context_id=ctx_id,
             created_at=float(row["created_at"]),
             updated_at=float(row["updated_at"]),
             started_at=float(row["started_at"]) if row["started_at"] is not None else None,

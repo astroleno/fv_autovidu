@@ -16,6 +16,7 @@ import {
   Package,
 } from "lucide-react"
 import { useEpisodeMediaCacheBust } from "@/hooks"
+import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
 import { filterShotsByBatchPick } from "@/utils/batchPick"
 import { Button, Skeleton } from "@/components/ui"
@@ -168,6 +169,7 @@ export default function StoryboardPage() {
         .map((s) => s.shotId),
     [allShots, statusFilter]
   )
+  const basePath = useEpisodeFileBasePath()
 
   if (!episodeId) return null
   if (loading && !currentEpisode) {
@@ -208,7 +210,6 @@ export default function StoryboardPage() {
     )
   }
 
-  const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   /** 新路由 URL 中带 projectId；兼容时回退到 episode.json */
   const projectId = routeProjectId ?? currentEpisode.projectId
   const episodeAssetIds = (currentEpisode.assets ?? []).map((a) => a.assetId)

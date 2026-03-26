@@ -27,8 +27,10 @@ import config  # noqa: F401  # pylint: disable=unused-import
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
-from routes import dub_route, episodes, export_route, files, generate, projects, shots, tasks
+from routes import context_route, dub_route, episodes, export_route, files, generate, projects, shots, tasks
 from services.task_store import TaskStoreService
 from services.task_store.video_finalizer import start_video_finalizer_background
 
@@ -64,7 +66,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 挂载路由（前端期望 /api 前缀，路由内部已包含 /api）
+
+# ---------------------------------------------------------------------------
+# Feeling 多上下文：解析 X-FV-Context-Id，注入 request.state.feeling_context
+# 注册在 CORS 之后，先生效于 CORS 外层，再进入 CORS（与 Starlette 中间件顺序一致）。
+# ---------------------------------------------------------------------------
+@app.middleware("http")
+async def fv_feeling_context_middleware(request: Request, call_next):
+    """无效上下文返回 400；无 Header 则走旧版扁平 DATA_ROOT + 全局 .env。"""
+    from services.context_service import (
+        apply_request_feeling_context,
+        feeling_context_middleware_applies_to_path,
+    )
+
+    if feeling_context_middleware_applies_to_path(request.url.path):
+        err = apply_request_feeling_context(request)
+        if err:
+            return JSONResponse({"detail": err}, status_code=400)
+    return await call_next(request)
+
+
+# 挂载路由（前端期望 /api 前缀；context_route 自带 /contexts 子前缀）
+app.include_router(context_route.router, prefix="/api")
 app.include_router(files.router, prefix="/api", tags=["files"])
 app.include_router(episodes.router, prefix="/api", tags=["episodes"])
 app.include_router(projects.router, prefix="/api", tags=["projects"])

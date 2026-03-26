@@ -11,6 +11,8 @@ interface BreadcrumbItem {
 
 interface TopNavBarProps {
   breadcrumbs?: BreadcrumbItem[]
+  /** 顶栏中部：例如当前 Feeling Profile 徽章，可点击跳转设置 */
+  contextSlot?: React.ReactNode
   actions?: React.ReactNode
 }
 
@@ -35,13 +37,13 @@ function buildBreadcrumbs(pathname: string): BreadcrumbItem[] {
   return items
 }
 
-export function TopNavBar({ breadcrumbs, actions }: TopNavBarProps) {
+export function TopNavBar({ breadcrumbs, contextSlot, actions }: TopNavBarProps) {
   const location = useLocation()
   const crumbs = breadcrumbs ?? buildBreadcrumbs(location.pathname)
 
   return (
-    <header className="sticky top-0 z-40 h-16 border-b border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] flex items-center justify-between px-8 box-border">
-      <nav aria-label="面包屑" className="flex items-center gap-1 md:gap-3 text-[10px] font-black uppercase tracking-tighter text-[var(--color-newsprint-black)]">
+    <header className="sticky top-0 z-40 h-16 border-b border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] flex items-center justify-between px-8 box-border gap-4">
+      <nav aria-label="面包屑" className="flex items-center gap-1 md:gap-3 text-[10px] font-black uppercase tracking-tighter text-[var(--color-newsprint-black)] shrink min-w-0">
         {crumbs.map((item, i) => (
           <span key={i} className="flex items-center gap-1 md:gap-3">
             {i > 0 && (
@@ -60,7 +62,10 @@ export function TopNavBar({ breadcrumbs, actions }: TopNavBarProps) {
           </span>
         ))}
       </nav>
-      {actions && <div className="flex items-center gap-4">{actions}</div>}
+      {contextSlot ? (
+        <div className="shrink-0 flex items-center max-w-[min(420px,40vw)]">{contextSlot}</div>
+      ) : null}
+      {actions && <div className="flex items-center gap-4 shrink-0">{actions}</div>}
     </header>
   )
 }

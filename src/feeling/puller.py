@@ -428,6 +428,7 @@ def pull_episode(
     client: FeelingClient | None = None,
     force_redownload: bool = False,
     skip_images: bool = False,
+    fs_lock_namespace: str = "",
 ) -> dict[str, Any]:
     """
     一键拉取 Episode 数据到本地。
@@ -446,6 +447,7 @@ def pull_episode(
         episode_number: 剧集编号
         client: FeelingClient 实例，缺省时新建
         skip_images: True 时不下载任何图片，仅写入 episode.json（适合只看画面描述/提示词）
+        fs_lock_namespace: 多上下文时为 envKey/workspaceKey，传入 episode_fs_lock 避免跨 Profile 互锁
 
     Returns:
         组装好的 Episode dict（与前端 Episode 类型一致）
@@ -462,7 +464,7 @@ def pull_episode(
     raw_assets = client.get_assets(proj_id, episode_id=episode_id)
 
     # 2. 归一化目录 + 下载资源 + 写 episode.json（与同 episode 的后台 dub/finalizer 互斥）
-    with episode_fs_lock(episode_id):
+    with episode_fs_lock(episode_id, data_namespace=fs_lock_namespace):
         # 在删旧目录前快照本地 episode.json，便于与平台新稿合并（尾帧/视频/配音/剪映导出等元数据）
         local_merge = _collect_local_episode_merge_state(output_dir, episode_id)
         ep_dir = _normalize_episode_dir(output_dir, episode_id, proj_id)
@@ -776,6 +778,7 @@ def pull_project_with_report(
     client: FeelingClient | None = None,
     force_redownload: bool = False,
     skip_images: bool = False,
+    fs_lock_namespace: str = "",
 ) -> PullProjectReport:
     """
     一键拉取整个项目的所有剧集，并返回成功/失败明细（不整批失败）。
@@ -806,6 +809,7 @@ def pull_project_with_report(
                 client=client,
                 force_redownload=force_redownload,
                 skip_images=skip_images,
+                fs_lock_namespace=fs_lock_namespace,
             )
             report.success_results.append(result)
             report.success_count += 1
@@ -823,6 +827,7 @@ def pull_project(
     client: FeelingClient | None = None,
     force_redownload: bool = False,
     skip_images: bool = False,
+    fs_lock_namespace: str = "",
 ) -> list[dict[str, Any]]:
     """
     一键拉取整个项目的所有剧集。
@@ -836,6 +841,7 @@ def pull_project(
         client=client,
         force_redownload=force_redownload,
         skip_images=skip_images,
+        fs_lock_namespace=fs_lock_namespace,
     )
     return r.success_results
 
