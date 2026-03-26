@@ -38,6 +38,7 @@ from services.audio_service import probe_duration_sec
 from services.candidate_pick import pick_playable_video_candidate
 from services.jianying_ffprobe_materials import probe_video_material_fields
 from services.jianying_protocol import canvas_wh_vertical_9_16
+from services.jianying_text_track import build_text_track_payload, subtitle_text_from_shot
 
 
 _DRAFT_AGENCY_CONFIG = {
@@ -343,12 +344,18 @@ def _write_jianying_draft_pyjdraft(
     """
     entries: list[dict[str, Any]] = []
     audio_entries: list[dict[str, Any]] = []
+    # 与主视频轨 target_timerange 对齐的原文字幕三元组 (start_us, duration_us, text)
+    text_track_segments_spec: list[tuple[int, int, str]] = []
     t_us = 0
     for i, row in enumerate(exportable):
         path = materials_dir / row["resourceName"]
         width, height, observed_duration_us, _ = probe_video_material_fields(path.resolve())
         target_duration_us = _seconds_to_us(float(row["durationSec"]))
         observed_duration_us = max(observed_duration_us, target_duration_us)
+
+        sub_line = subtitle_text_from_shot(row["shot"])
+        if sub_line:
+            text_track_segments_spec.append((t_us, target_duration_us, sub_line))
 
         material_id = str(uuid.uuid4())
         speed_id = str(uuid.uuid4())
@@ -495,9 +502,23 @@ def _write_jianying_draft_pyjdraft(
     draft_info = _create_base_draft_info(draft_id, canvas_width, canvas_height, total_duration_us)
     video_track = _build_reference_track("video")
     video_track["segments"] = [entry["segment"] for entry in entries]
-    draft_info["tracks"] = [video_track]
     draft_info["materials"]["videos"] = [entry["material"] for entry in entries]
     draft_info["materials"]["speeds"] = [entry["speed"] for entry in entries]
+
+    text_materials, text_segment_jsons, text_speed_jsons = build_text_track_payload(
+        canvas_width,
+        canvas_height,
+        text_track_segments_spec,
+    )
+    draft_info["materials"]["texts"] = text_materials
+    draft_info["materials"]["speeds"].extend(text_speed_jsons)
+
+    # 轨道顺序：视频 → 文本（叠在上层）→ 音频，与常见时间线堆叠习惯一致
+    draft_info["tracks"] = [video_track]
+    if text_segment_jsons:
+        text_track = _build_reference_track("text")
+        text_track["segments"] = text_segment_jsons
+        draft_info["tracks"].append(text_track)
 
     if audio_entries:
         audio_track = _build_reference_track("audio")
