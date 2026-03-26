@@ -723,6 +723,8 @@ def pull_episode(
                 elif isinstance(used_assets, str) and used_assets in asset_by_id:
                     shot_assets.append(asset_by_id[used_assets])
 
+                # 台词：与 web Shot 模型键名一致；associatedDialogue 仅在有有效 role/content 时为 dict，否则 null
+                dlg, ad = _get_dialogue_fields(sh)
                 shots_out.append({
                     "shotId": shot_id,
                     "shotNumber": global_shot_number,
@@ -737,6 +739,9 @@ def pull_episode(
                     "status": "pending",
                     "endFrame": None,
                     "videoCandidates": [],
+                    "dialogue": dlg,
+                    "associatedDialogue": ad,
+                    "dialogueTranslation": "",
                 })
 
             scenes_out.append({
@@ -795,6 +800,7 @@ def pull_episode(
                                 shot_assets.append(asset_by_id[ua])
                 elif isinstance(used_assets, str) and used_assets in asset_by_id:
                     shot_assets.append(asset_by_id[used_assets])
+                dlg_orphan, ad_orphan = _get_dialogue_fields(s)
                 orphan_shots.append({
                     "shotId": shot_id,
                     "shotNumber": global_shot_number,
@@ -809,6 +815,9 @@ def pull_episode(
                     "status": "pending",
                     "endFrame": None,
                     "videoCandidates": [],
+                    "dialogue": dlg_orphan,
+                    "associatedDialogue": ad_orphan,
+                    "dialogueTranslation": "",
                 })
         if orphan_shots:
             # 按 shotNumber 排序后归入新场景

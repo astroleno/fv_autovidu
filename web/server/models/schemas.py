@@ -83,6 +83,18 @@ class DubStatus(BaseModel):
     processedAt: Optional[str] = None
 
 
+class AssociatedDialogue(BaseModel):
+    """
+    Feeling 平台结构化对白（与 JSON 键 associatedDialogue 对齐）。
+
+    role: 说话角色名；content: 该角色台词正文。与顶层 dialogue 字符串可同时存在，
+    用于字幕展示或从结构化数据拼接展示行。
+    """
+
+    role: str = ""
+    content: str = ""
+
+
 class Shot(BaseModel):
     """单镜头。"""
 
@@ -101,6 +113,13 @@ class Shot(BaseModel):
     endFrame: Optional[str] = None
     videoCandidates: list[VideoCandidate] = Field(default_factory=list)
     dub: Optional[DubStatus] = None
+    # --- 台词与本地化（与 puller / episode.json / 前端 Shot 一致）---
+    # 平台原文台词行（字幕、编剧语言）
+    dialogue: str = ""
+    # 结构化对白；无有效 role/content 时 JSON 中省略或为 null
+    associatedDialogue: Optional[AssociatedDialogue] = None
+    # 目标语译文，供 Vidu 提示词拼接与 TTS；拉取时为空，由 Web 编辑
+    dialogueTranslation: str = ""
 
 
 class JianyingExportRecord(BaseModel):
@@ -133,6 +152,10 @@ class Episode(BaseModel):
     # 剧集级全量资产库（供资产库页面 / RegenPage 展示），拉取时由 puller 填入
     assets: list[ShotAsset] = Field(default_factory=list)
     jianyingExport: Optional[JianyingExportRecord] = None
+    # 配音/本地化：目标语 BCP-47 或项目约定（如 en-US、ja）；空表示未设置
+    dubTargetLocale: str = ""
+    # 台词原文语言标签，供 UI 展示
+    sourceLocale: str = ""
 
 
 # ---------- API 请求/响应（api.ts） ----------
