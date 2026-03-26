@@ -18,7 +18,7 @@ if str(_SERVER_DIR) not in sys.path:
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
 from models.schemas import (
@@ -30,6 +30,11 @@ from models.schemas import (
     PullProjectFailedItem,
 )
 from services import data_service
+from services.context_service import (
+    get_feeling_client,
+    get_feeling_context,
+    get_namespace_data_root_optional,
+)
 
 router = APIRouter()
 
@@ -68,10 +73,10 @@ def _map_remote_project(raw: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _local_episodes_by_project() -> dict[str, list[dict[str, Any]]]:
+def _local_episodes_by_project(namespace_root: Path | None) -> dict[str, list[dict[str, Any]]]:
     """按 projectId 聚合本地已拉取剧集摘要。"""
     out: dict[str, list[dict[str, Any]]] = {}
-    for ep in data_service.list_episodes():
+    for ep in data_service.list_episodes(namespace_root):
         pid = str(ep.get("projectId", "") or "")
         if not pid:
             continue
@@ -166,21 +171,17 @@ def _merge_episode_lists(
 
 
 @router.get("/projects", response_model=list[ProjectSummary])
-def list_projects():
+def list_projects(request: Request):
     """项目列表：平台项目 + 本地 pulledEpisodeCount。"""
+    ns = get_namespace_data_root_optional(request)
     try:
-        from src.feeling.client import FeelingClient
-    except ImportError:
-        raise HTTPException(status_code=500, detail="feeling 客户端未找到，请从项目根目录运行")
-
-    try:
-        client = FeelingClient()
+        client = get_feeling_client(request)
         raw_list = client.get_projects()
     except Exception as e:
         detail = str(e) if str(e) else repr(e)
         raise HTTPException(status_code=502, detail=f"获取平台项目列表失败: {detail}") from e
 
-    by_proj = _local_episodes_by_project()
+    by_proj = _local_episodes_by_project(ns)
     result: list[ProjectSummary] = []
     for raw in raw_list:
         m = _map_remote_project(raw)
@@ -209,21 +210,17 @@ def list_projects():
 
 
 @router.get("/projects/{project_id}", response_model=ProjectDetail)
-def get_project_detail(project_id: str):
+def get_project_detail(project_id: str, request: Request):
     """单项目详情（与列表项字段一致）。"""
+    ns = get_namespace_data_root_optional(request)
     try:
-        from src.feeling.client import FeelingClient
-    except ImportError:
-        raise HTTPException(status_code=500, detail="feeling 客户端未找到，请从项目根目录运行")
-
-    try:
-        client = FeelingClient()
+        client = get_feeling_client(request)
         raw = client.get_project(project_id)
     except Exception as e:
         detail = str(e) if str(e) else repr(e)
         raise HTTPException(status_code=502, detail=f"获取平台项目失败: {detail}") from e
 
-    by_proj = _local_episodes_by_project()
+    by_proj = _local_episodes_by_project(ns)
     m = _map_remote_project(raw if raw else {"id": project_id})
     if not m.get("projectId"):
         m["projectId"] = project_id
@@ -249,15 +246,11 @@ def get_project_detail(project_id: str):
 
 
 @router.get("/projects/{project_id}/episodes", response_model=ProjectEpisodeListResponse)
-def list_project_episodes(project_id: str):
+def list_project_episodes(project_id: str, request: Request):
     """远端剧集 + 本地拉取状态合并。"""
+    ns = get_namespace_data_root_optional(request)
     try:
-        from src.feeling.client import FeelingClient
-    except ImportError:
-        raise HTTPException(status_code=500, detail="feeling 客户端未找到，请从项目根目录运行")
-
-    try:
-        client = FeelingClient()
+        client = get_feeling_client(request)
         remote = client.get_project_episodes(project_id)
         raw_proj = client.get_project(project_id)
     except Exception as e:
@@ -268,7 +261,7 @@ def list_project_episodes(project_id: str):
     if not m.get("projectId"):
         m["projectId"] = project_id
     title = str(m.get("title") or project_id)
-    local_all = data_service.list_episodes()
+    local_all = data_service.list_episodes(ns)
     local_for_project = [e for e in local_all if str(e.get("projectId", "")) == project_id]
 
     episodes = _merge_episode_lists(project_id, remote, local_for_project)
@@ -286,7 +279,7 @@ class PullAllBody(BaseModel):
 
 
 @router.post("/projects/{project_id}/pull-all", response_model=PullProjectResponse)
-def pull_all_project_episodes(project_id: str, body: PullAllBody | None = None):
+def pull_all_project_episodes(project_id: str, request: Request, body: PullAllBody | None = None):
     """一键拉取项目下全部剧集；单集失败不导致整批 500。"""
     try:
         from src.feeling.puller import pull_project_with_report
@@ -295,13 +288,21 @@ def pull_all_project_episodes(project_id: str, body: PullAllBody | None = None):
 
     from config import DATA_ROOT
 
+    ns = get_namespace_data_root_optional(request)
+    output_root = Path(ns) if ns is not None else Path(DATA_ROOT)
+    ctx = get_feeling_context(request)
+    fs_tag = f"{ctx.env_key}/{ctx.workspace_key}" if ctx else ""
+    client = get_feeling_client(request)
+
     opts = body or PullAllBody()
     try:
         report = pull_project_with_report(
             project_id,
-            DATA_ROOT,
+            output_root,
+            client=client,
             force_redownload=opts.forceRedownload,
             skip_images=opts.skipImages,
+            fs_lock_namespace=fs_tag,
         )
     except Exception as e:
         detail = str(e) if str(e) else repr(e)

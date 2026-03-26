@@ -16,12 +16,23 @@ _SERVER_DIR = Path(__file__).resolve().parent.parent
 if str(_SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(_SERVER_DIR))
 
-from fastapi import APIRouter, Query
+from pathlib import Path
+
+from fastapi import APIRouter, Query, Request
 
 from models.schemas import TaskStatusResponse
+from services.context_service import (
+    get_context_task_id,
+    namespace_root_from_context_id,
+)
 from services.task_store import TaskRow, get_task_store
 
 router = APIRouter()
+
+
+def _namespace_for_task_row(row: TaskRow) -> Path | None:
+    """任务创建时写入的 context_id → 数据命名空间；旧任务无 context_id 则仅扁平布局。"""
+    return namespace_root_from_context_id(row.context_id)
 
 
 def _reconcile_awaiting_video_if_episode_has_file(row: TaskRow) -> TaskRow:
@@ -35,7 +46,8 @@ def _reconcile_awaiting_video_if_episode_has_file(row: TaskRow) -> TaskRow:
         return row
     from services import data_service
 
-    shot = data_service.get_shot(row.episode_id, row.shot_id)
+    ns = _namespace_for_task_row(row)
+    shot = data_service.get_shot(row.episode_id, row.shot_id, ns)
     if not shot:
         return row
     cand = next((c for c in shot.videoCandidates if c.id == row.candidate_id), None)
@@ -52,6 +64,7 @@ def _reconcile_awaiting_video_if_episode_has_file(row: TaskRow) -> TaskRow:
         candidate_id=row.candidate_id,
         external_task_id=row.external_task_id,
         result={**meta, "videoPath": cand.videoPath},
+        context_id=row.context_id,
     )
     return store.get_task_row(row.id) or row
 
@@ -69,10 +82,14 @@ def _get_vidu_client():
 
 
 @router.get("/tasks/{task_id}", response_model=TaskStatusResponse)
-def get_task_status(task_id: str):
+def get_task_status(task_id: str, request: Request):
     """查询单个任务状态（仅读 SQLite；无记录时再尝试 Vidu 直连查询）。"""
     store = get_task_store()
     row = store.get_task_row(task_id)
+    req_ctx = get_context_task_id(request)
+    if row is not None and req_ctx is not None:
+        if row.context_id is None or row.context_id != req_ctx:
+            return TaskStatusResponse(taskId=task_id, status="pending")
     if row is not None:
         row = _reconcile_awaiting_video_if_episode_has_file(row)
         api = row.to_api_response()
@@ -108,7 +125,10 @@ def get_task_status(task_id: str):
 
 
 @router.get("/tasks/batch", response_model=list[TaskStatusResponse])
-def get_tasks_batch(ids: str = Query(default="", description="逗号分隔的 taskId")):
+def get_tasks_batch(
+    request: Request,
+    ids: str = Query(default="", description="逗号分隔的 taskId"),
+):
     """批量查询任务状态；无本地记录且为 Vidu 裸 id 时分批 query_tasks。"""
     task_ids = [x.strip() for x in ids.split(",") if x.strip()]
     if not task_ids:
@@ -117,10 +137,13 @@ def get_tasks_batch(ids: str = Query(default="", description="逗号分隔的 ta
     store = get_task_store()
     by_id: dict[str, TaskStatusResponse] = {}
     need_vidu: list[str] = []
+    req_ctx = get_context_task_id(request)
 
     for tid in task_ids:
         row = store.get_task_row(tid)
         if row is not None:
+            if req_ctx is not None and (row.context_id is None or row.context_id != req_ctx):
+                continue
             row = _reconcile_awaiting_video_if_episode_has_file(row)
             api = row.to_api_response()
             by_id[tid] = TaskStatusResponse(

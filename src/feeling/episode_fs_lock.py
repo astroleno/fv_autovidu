@@ -22,17 +22,31 @@ _guard = threading.Lock()
 _locks: dict[str, threading.Lock] = {}
 
 
-def _lock_for(episode_id: str) -> threading.Lock:
+def _lock_key(episode_id: str, data_namespace: str) -> str:
+    """不同命名空间下同一 episodeId 使用独立锁，避免跨 workspace 互相阻塞。"""
+    if data_namespace:
+        return f"{data_namespace}\xff{episode_id}"
+    return episode_id
+
+
+def _lock_for(lock_key: str) -> threading.Lock:
     with _guard:
-        if episode_id not in _locks:
-            _locks[episode_id] = threading.Lock()
-        return _locks[episode_id]
+        if lock_key not in _locks:
+            _locks[lock_key] = threading.Lock()
+        return _locks[lock_key]
 
 
 @contextmanager
-def episode_fs_lock(episode_id: str) -> Generator[None, None, None]:
-    """在持有期间，其它线程对同一 episodeId 的 episode_fs_lock 将阻塞。"""
-    lock = _lock_for(episode_id)
+def episode_fs_lock(episode_id: str, *, data_namespace: str = "") -> Generator[None, None, None]:
+    """
+    在持有期间，其它线程对同一 (data_namespace, episodeId) 的锁将阻塞。
+
+    Args:
+        episode_id: 剧集 UUID
+        data_namespace: 多上下文时为 f\"{envKey}/{workspaceKey}\" 等与 data 目录一致的前缀；空串表示旧版扁平布局。
+    """
+    key = _lock_key(episode_id, data_namespace)
+    lock = _lock_for(key)
     lock.acquire()
     try:
         yield

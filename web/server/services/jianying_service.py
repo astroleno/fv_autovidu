@@ -878,11 +878,12 @@ def _safe_jianying_folder_name(name: str, fallback: str) -> str:
     return s or fallback
 
 
-def _resolve_project_title(project_id: str) -> str | None:
+def _resolve_project_title(project_id: str, feeling_client: Any = None) -> str | None:
     """
     尝试从平台读取项目显示名；失败时返回 None。
 
     命名属于体验层，不能因为平台接口瞬时失败而阻断导出。
+    feeling_client: 多上下文请求传入的 FeelingClient；否则无参构造读 .env。
     """
     pid = (project_id or "").strip()
     if not pid:
@@ -890,7 +891,7 @@ def _resolve_project_title(project_id: str) -> str | None:
     try:
         from src.feeling.client import FeelingClient
 
-        client = FeelingClient()
+        client = feeling_client or FeelingClient()
         raw = client.get_project(pid) or {}
         for key in ("title", "name", "projectTitle", "projectName"):
             v = raw.get(key)
@@ -921,7 +922,12 @@ def _pick_jianying_copy_dest(target_root: Path, draft_name: str, draft_id: str) 
         n += 1
 
 
-def _build_jianying_copy_name(episode: Episode, episode_id: str) -> str:
+def _build_jianying_copy_name(
+    episode: Episode,
+    episode_id: str,
+    *,
+    feeling_client: Any = None,
+) -> str:
     """
     构造复制到剪映目录时使用的草稿文件夹名。
 
@@ -930,7 +936,7 @@ def _build_jianying_copy_name(episode: Episode, episode_id: str) -> str:
     若失败再退回 projectId。
     """
     project_id = (getattr(episode, "projectId", None) or "").strip()
-    project_part = _resolve_project_title(project_id) or project_id
+    project_part = _resolve_project_title(project_id, feeling_client) or project_id
     episode_part = (getattr(episode, "episodeTitle", None) or "").strip() or episode_id
     combined = f"{project_part}-{episode_part}" if project_part else episode_part
     return _safe_jianying_folder_name(combined, episode_id)
@@ -940,6 +946,8 @@ def export_jianying_draft(
     req: JianyingExportRequest,
     *,
     include_dub_audio: bool = True,
+    namespace_root: Path | None = None,
+    feeling_client: Any = None,
 ) -> dict[str, Any]:
     """
     执行剪映草稿导出，写入磁盘并更新 episode.jianyingExport。
@@ -949,16 +957,21 @@ def export_jianying_draft(
     Args:
         req: 请求体（含 episodeId）
         include_dub_audio: 是否铺配音轨（依赖 shot.dub 已存在且与选中候选一致）
+        namespace_root: 多上下文时的数据子根；None 为旧版扁平布局
+        feeling_client: 解析项目标题用的 Feeling 客户端
 
     Returns:
         适合 JianyingExportResponse 序列化的 dict
     """
+    from services.context_service import fs_lock_tag_from_namespace_root
+
     episode_id = req.episodeId
-    with episode_fs_lock(episode_id):
-        ep = data_service.get_episode(episode_id)
+    lock_tag = fs_lock_tag_from_namespace_root(namespace_root)
+    with episode_fs_lock(episode_id, data_namespace=lock_tag):
+        ep = data_service.get_episode(episode_id, namespace_root)
         if not ep:
             raise ValueError("Episode not found")
-        ep_dir = data_service.get_episode_dir(episode_id)
+        ep_dir = data_service.get_episode_dir(episode_id, namespace_root)
         if not ep_dir:
             raise ValueError("Episode dir not found")
 
@@ -968,7 +981,7 @@ def export_jianying_draft(
 
         draft_id = str(uuid.uuid4())
         draft_name = ep.episodeTitle or episode_id
-        copy_name = _build_jianying_copy_name(ep, episode_id)
+        copy_name = _build_jianying_copy_name(ep, episode_id, feeling_client=feeling_client)
         w, h = canvas_wh_vertical_9_16(req.canvasSize)  # 竖屏 9:16，与 pyJianYingDraft 一致
 
         draft_root = ep_dir / "export" / "jianying" / draft_id
@@ -1024,7 +1037,7 @@ def export_jianying_draft(
             zipPath=zip_rel,
             draftDirRelative=str(draft_root.relative_to(ep_dir)),
         )
-        data_service.persist_episode(ep)
+        data_service.persist_episode(ep, namespace_root)
 
         draft_dir_abs = str(draft_root.resolve())
         return {

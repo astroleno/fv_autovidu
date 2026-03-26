@@ -22,7 +22,7 @@ if str(_SERVER_DIR) not in sys.path:
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from src.feeling.episode_fs_lock import episode_fs_lock
 
@@ -35,6 +35,11 @@ from models.schemas import (
     DubTaskItem,
 )
 from services import data_service
+from services.context_service import (
+    fs_lock_tag_from_namespace_root,
+    get_context_task_id,
+    get_namespace_data_root_optional,
+)
 from services.audio_service import (
     extract_audio_from_video,
     has_audio_stream,
@@ -65,6 +70,10 @@ def _run_dub_task(
     voice_id: str,
     mode: str,
     tts_text: str | None,
+    *,
+    namespace_root: Path | None = None,
+    fs_lock_tag: str = "",
+    task_context_id: str | None = None,
 ) -> None:
     """在后台线程执行单镜配音并更新 episode.json。"""
     get_task_store().set_task(
@@ -74,11 +83,12 @@ def _run_dub_task(
         episode_id=episode_id,
         shot_id=shot_id,
         result={},
+        context_id=task_context_id,
     )
 
     # 与同 episode 的 pull / video 收尾互斥，避免 ep_dir 被删后仍向旧路径 mkdir 写文件
-    with episode_fs_lock(episode_id):
-        ep_dir = data_service.get_episode_dir(episode_id)
+    with episode_fs_lock(episode_id, data_namespace=fs_lock_tag):
+        ep_dir = data_service.get_episode_dir(episode_id, namespace_root)
         if not ep_dir:
             get_task_store().set_task(
                 task_id,
@@ -87,10 +97,11 @@ def _run_dub_task(
                 episode_id=episode_id,
                 shot_id=shot_id,
                 error="剧集目录不存在",
+                context_id=task_context_id,
             )
             return
 
-        shot = data_service.get_shot(episode_id, shot_id)
+        shot = data_service.get_shot(episode_id, shot_id, namespace_root)
         if not shot:
             get_task_store().set_task(
                 task_id,
@@ -115,6 +126,7 @@ def _run_dub_task(
                     voiceId=voice_id,
                     mode=mode,
                 ),
+                namespace_root,
             )
             get_task_store().set_task(
                 task_id,
@@ -123,6 +135,7 @@ def _run_dub_task(
                 episode_id=episode_id,
                 shot_id=shot_id,
                 error=err,
+                context_id=task_context_id,
             )
             return
 
@@ -140,6 +153,7 @@ def _run_dub_task(
                 voiceId=voice_id,
                 taskId=task_id,
             ),
+            namespace_root,
         )
 
         try:
@@ -176,7 +190,7 @@ def _run_dub_task(
                 error=None,
                 processedAt=_iso_now(),
             )
-            data_service.set_shot_dub(episode_id, shot_id, dub_done)
+            data_service.set_shot_dub(episode_id, shot_id, dub_done, namespace_root)
             get_task_store().set_task(
                 task_id,
                 "success",
@@ -184,6 +198,7 @@ def _run_dub_task(
                 episode_id=episode_id,
                 shot_id=shot_id,
                 result={"audioPath": out_rel, "mode": mode},
+                context_id=task_context_id,
             )
         except Exception as exc:  # pylint: disable=broad-except
             err = str(exc)
@@ -198,6 +213,7 @@ def _run_dub_task(
                     taskId=task_id,
                     error=err,
                 ),
+                namespace_root,
             )
             get_task_store().set_task(
                 task_id,
@@ -206,12 +222,17 @@ def _run_dub_task(
                 episode_id=episode_id,
                 shot_id=shot_id,
                 error=err,
+                context_id=task_context_id,
             )
 
 
-def _collect_dub_shot_ids(episode_id: str, shot_ids: list[str] | None) -> list[str]:
+def _collect_dub_shot_ids(
+    episode_id: str,
+    shot_ids: list[str] | None,
+    namespace_root: Path | None = None,
+) -> list[str]:
     """确定要处理的分镜 ID 列表（默认：全部有已选候选的分镜）。"""
-    ep = data_service.get_episode(episode_id)
+    ep = data_service.get_episode(episode_id, namespace_root)
     if not ep:
         return []
     out: list[str] = []
@@ -256,9 +277,10 @@ def dub_voices():
 
 
 @router.get("/dub/status/{episode_id}", response_model=DubEpisodeStatusResponse)
-def dub_status(episode_id: str):
+def dub_status(episode_id: str, request: Request):
     """查询各分镜 dub 状态摘要。"""
-    ep = data_service.get_episode(episode_id)
+    ns = get_namespace_data_root_optional(request)
+    ep = data_service.get_episode(episode_id, ns)
     if not ep:
         raise HTTPException(status_code=404, detail="Episode not found")
     rows: list[dict[str, Any]] = []
@@ -270,11 +292,14 @@ def dub_status(episode_id: str):
 
 
 @router.post("/dub/process", response_model=DubProcessResponse)
-def dub_process(req: DubProcessRequest):
+def dub_process(req: DubProcessRequest, request: Request):
     """批量配音：为每个分镜启动后台任务并立即返回 taskId 列表。"""
     if not elevenlabs_service.is_configured():
         raise HTTPException(status_code=503, detail="未配置 ELEVENLABS_API_KEY")
-    ids = _collect_dub_shot_ids(req.episodeId, req.shotIds)
+    ns = get_namespace_data_root_optional(request)
+    tag = fs_lock_tag_from_namespace_root(ns)
+    ctx_tid = get_context_task_id(request)
+    ids = _collect_dub_shot_ids(req.episodeId, req.shotIds, ns)
     if not ids:
         raise HTTPException(status_code=400, detail="没有可配音的已选分镜")
 
@@ -298,6 +323,9 @@ def dub_process(req: DubProcessRequest):
                     req.voiceId,
                     req.mode,
                     None,
+                    namespace_root=ns,
+                    fs_lock_tag=tag,
+                    task_context_id=ctx_tid,
                 )
 
         threading.Thread(target=_job, daemon=True).start()
@@ -306,10 +334,13 @@ def dub_process(req: DubProcessRequest):
 
 
 @router.post("/dub/process-shot", response_model=DubTaskItem)
-def dub_process_shot(req: DubProcessShotRequest):
+def dub_process_shot(req: DubProcessShotRequest, request: Request):
     """单镜配音。"""
     if not elevenlabs_service.is_configured():
         raise HTTPException(status_code=503, detail="未配置 ELEVENLABS_API_KEY")
+    ns = get_namespace_data_root_optional(request)
+    tag = fs_lock_tag_from_namespace_root(ns)
+    ctx_tid = get_context_task_id(request)
     task_id = f"dub-{uuid.uuid4().hex}"
 
     def _job() -> None:
@@ -320,6 +351,9 @@ def dub_process_shot(req: DubProcessShotRequest):
             req.voiceId,
             req.mode,
             req.ttsText,
+            namespace_root=ns,
+            fs_lock_tag=tag,
+            task_context_id=ctx_tid,
         )
 
     threading.Thread(target=_job, daemon=True).start()

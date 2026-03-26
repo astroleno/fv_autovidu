@@ -30,6 +30,8 @@ from .db import get_connection
 from .models import TaskRow
 from .service import get_task_store
 
+from services.context_service import fs_lock_tag_from_namespace_root, namespace_root_from_context_id
+
 from src.feeling.episode_fs_lock import episode_fs_lock
 
 _LOG = logging.getLogger(__name__)
@@ -72,6 +74,9 @@ def _finalize_one_task(task: TaskRow) -> None:
     """
     from services import data_service
 
+    ns = namespace_root_from_context_id(task.context_id)
+    fs_tag = fs_lock_tag_from_namespace_root(ns)
+
     meta = task.result or {}
     vidu_id = meta.get("vidu_task_id") or task.external_task_id
     episode_id = task.episode_id
@@ -89,11 +94,12 @@ def _finalize_one_task(task: TaskRow) -> None:
             candidate_id=candidate_id,
             result=meta,
             error="任务缺少 Vidu 或分镜元数据，无法收尾",
+            context_id=task.context_id,
         )
         return
 
     # 幂等：episode 里该候选已有视频路径则直接成功
-    shot = data_service.get_shot(episode_id, shot_id)
+    shot = data_service.get_shot(episode_id, shot_id, ns)
     if shot:
         cand = next((c for c in shot.videoCandidates if c.id == candidate_id), None)
         if cand and cand.videoPath and str(cand.videoPath).strip():
@@ -106,6 +112,7 @@ def _finalize_one_task(task: TaskRow) -> None:
                 candidate_id=candidate_id,
                 external_task_id=str(vidu_id),
                 result={**meta, "videoPath": cand.videoPath},
+                context_id=task.context_id,
             )
             return
 
@@ -141,14 +148,15 @@ def _finalize_one_task(task: TaskRow) -> None:
             return
 
         if state == "failed":
-            with episode_fs_lock(episode_id):
+            with episode_fs_lock(episode_id, data_namespace=fs_tag):
                 data_service.update_video_candidate(
                     episode_id,
                     shot_id,
                     candidate_id,
                     {"taskStatus": "failed"},
+                    ns,
                 )
-                data_service.update_shot_status(episode_id, shot_id, "error")
+                data_service.update_shot_status(episode_id, shot_id, "error", ns)
             get_task_store().set_task(
                 task_id,
                 "failed",
@@ -158,6 +166,7 @@ def _finalize_one_task(task: TaskRow) -> None:
                 candidate_id=candidate_id,
                 result=meta,
                 error="Vidu 任务失败",
+                context_id=task.context_id,
             )
             return
 
@@ -166,12 +175,13 @@ def _finalize_one_task(task: TaskRow) -> None:
 
         video_url = _extract_creation_video_url(vt)
         if not video_url:
-            with episode_fs_lock(episode_id):
+            with episode_fs_lock(episode_id, data_namespace=fs_tag):
                 data_service.update_video_candidate(
                     episode_id,
                     shot_id,
                     candidate_id,
                     {"taskStatus": "failed"},
+                    ns,
                 )
             get_task_store().set_task(
                 task_id,
@@ -182,6 +192,7 @@ def _finalize_one_task(task: TaskRow) -> None:
                 candidate_id=candidate_id,
                 result=meta,
                 error="Vidu 成功但未返回视频 URL",
+                context_id=task.context_id,
             )
             return
 
@@ -190,8 +201,8 @@ def _finalize_one_task(task: TaskRow) -> None:
         r.raise_for_status()
         mp4_bytes = r.content
 
-        with episode_fs_lock(episode_id):
-            ep_dir = data_service.get_episode_dir(episode_id)
+        with episode_fs_lock(episode_id, data_namespace=fs_tag):
+            ep_dir = data_service.get_episode_dir(episode_id, ns)
             if not ep_dir:
                 get_task_store().set_task(
                     task_id,
@@ -202,6 +213,7 @@ def _finalize_one_task(task: TaskRow) -> None:
                     candidate_id=candidate_id,
                     result=meta,
                     error="Episode 目录不存在",
+                    context_id=task.context_id,
                 )
                 return
 
@@ -230,13 +242,14 @@ def _finalize_one_task(task: TaskRow) -> None:
                 shot_id,
                 candidate_id,
                 cand_updates,
+                ns,
             )
             # 任一条候选仍标记为 selected 时，镜头终态应为 selected（精出/多候选期间可能曾被写成 video_generating）
-            shot_after = data_service.get_shot(episode_id, shot_id)
+            shot_after = data_service.get_shot(episode_id, shot_id, ns)
             if shot_after and any(c.selected for c in shot_after.videoCandidates):
-                data_service.update_shot(episode_id, shot_id, {"status": "selected"})
+                data_service.update_shot(episode_id, shot_id, {"status": "selected"}, ns)
             else:
-                data_service.update_shot(episode_id, shot_id, {"status": "video_done"})
+                data_service.update_shot(episode_id, shot_id, {"status": "video_done"}, ns)
         get_task_store().set_task(
             task_id,
             "success",
@@ -246,16 +259,18 @@ def _finalize_one_task(task: TaskRow) -> None:
             candidate_id=candidate_id,
             external_task_id=str(vidu_id),
             result={**meta, "videoPath": rel_path, "creations": vt.get("creations")},
+            context_id=task.context_id,
         )
     except Exception as e:  # pylint: disable=broad-except
         _LOG.exception("video finalize 失败 task_id=%s", task_id)
         try:
-            with episode_fs_lock(episode_id):
+            with episode_fs_lock(episode_id, data_namespace=fs_tag):
                 data_service.update_video_candidate(
                     episode_id,
                     shot_id,
                     candidate_id,
                     {"taskStatus": "failed"},
+                    ns,
                 )
         except Exception:
             pass
@@ -268,6 +283,7 @@ def _finalize_one_task(task: TaskRow) -> None:
             candidate_id=candidate_id,
             result=meta,
             error=str(e),
+            context_id=task.context_id,
         )
 
 

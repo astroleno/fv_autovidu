@@ -11,6 +11,9 @@
 *.key
 secrets/
 
+# Feeling 多环境与 Profile 映射（可含账号变量名，勿提交私有人 copy）
+config/feeling_contexts.json
+
 # ------------ Python ------------
 __pycache__/
 *.py[cod]

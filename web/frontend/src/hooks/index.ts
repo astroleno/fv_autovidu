@@ -1,4 +1,5 @@
 export { useEpisodeMediaCacheBust } from "./useEpisodeMediaCacheBust"
+export { useEpisodeFileBasePath } from "./useEpisodeFileBasePath"
 export { usePromoteCandidate } from "./usePromoteCandidate"
 export type {
   UsePromoteCandidateOptions,

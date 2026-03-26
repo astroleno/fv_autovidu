@@ -63,7 +63,7 @@ class TaskStoreService:
         替代原 `set_local_task`：按 id 写入或合并整行状态。
 
         支持的 kwargs：kind, episode_id, shot_id, candidate_id, external_task_id,
-        result (dict), error, progress, payload (dict), started_at, completed_at。
+        result (dict), error, progress, payload (dict), started_at, completed_at, context_id。
 
         未传入的字段尽量保留数据库中已有值（与原内存 dict 覆盖语义略有不同：
         显式传 None 仍会写入 None）。
@@ -115,6 +115,7 @@ class TaskStoreService:
             updated_at=now,
             started_at=_pick("started_at", existing.started_at if existing else None),
             completed_at=_pick("completed_at", existing.completed_at if existing else None),
+            context_id=_pick("context_id", existing.context_id if existing else None),
         )
         if "started_at" in kwargs and kwargs["started_at"] is not None:
             row.started_at = float(kwargs["started_at"])
@@ -153,6 +154,7 @@ class TaskStoreService:
         shot_id: Optional[str] = None,
         candidate_id: Optional[str] = None,
         payload: Optional[dict[str, Any]] = None,
+        context_id: Optional[str] = None,
     ) -> None:
         """显式创建 pending 任务（可选，用于需要完整 payload 快照的场景）。"""
         conn = get_connection()
@@ -168,6 +170,7 @@ class TaskStoreService:
             result={},
             created_at=now,
             updated_at=now,
+            context_id=context_id,
         )
         repository.upsert_task(conn, row)
 

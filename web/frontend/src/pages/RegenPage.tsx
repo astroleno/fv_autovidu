@@ -7,6 +7,7 @@
 import { useEffect, useMemo } from "react"
 import { useParams } from "react-router"
 import { useEpisodeMediaCacheBust } from "@/hooks"
+import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import { useEpisodeStore } from "@/stores"
 import { RegenFramePanel } from "@/components/business/regen"
 import { flattenShots } from "@/types"
@@ -19,6 +20,7 @@ export default function RegenPage() {
   }>()
   const { currentEpisode, fetchEpisodeDetail } = useEpisodeStore()
   const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
+  const basePath = useEpisodeFileBasePath()
 
   useEffect(() => {
     if (episodeId) void fetchEpisodeDetail(episodeId)
@@ -59,8 +61,6 @@ export default function RegenPage() {
   if (!shot) {
     return <div className="p-8">未找到镜头</div>
   }
-
-  const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
 
   return (
     <div className="p-8 box-border" style={{ boxSizing: "border-box" }}>

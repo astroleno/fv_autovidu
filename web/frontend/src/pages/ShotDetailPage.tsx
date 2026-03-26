@@ -7,6 +7,7 @@ import { useEffect } from "react"
 import { useParams, Link } from "react-router"
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
 import { useEpisodeMediaCacheBust, usePromoteCandidate } from "@/hooks"
+import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import { useEpisodeStore, useShotStore } from "@/stores"
 import { Button } from "@/components/ui"
 import { VideoPlayer, AssetTag, ShotFrameCompare } from "@/components/business"
@@ -28,6 +29,8 @@ export default function ShotDetailPage() {
     episodeId: episodeId ?? "",
     shotId: shotId ?? "",
   })
+  /** 多上下文：含 profile 前缀的 /api/files/ 路径；无 Profile 时等同旧版 projectId/episodeId */
+  const basePath = useEpisodeFileBasePath()
 
   useEffect(() => {
     if (episodeId) void fetchEpisodeDetail(episodeId)
@@ -46,7 +49,6 @@ export default function ShotDetailPage() {
   const shot = shots[shotIndex]
   const prevShot = shotIndex > 0 ? shots[shotIndex - 1] : null
   const nextShot = shotIndex < shots.length - 1 ? shots[shotIndex + 1] : null
-  const basePath = `${currentEpisode.projectId}/${currentEpisode.episodeId}`
   const projectId = routeProjectId ?? currentEpisode.projectId
 
   if (!shot) {
