@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Episode 路由：GET list/detail, POST pull
+Episode 路由：GET list/detail, PATCH partial update, POST pull
 """
 
 import sys
@@ -13,7 +13,7 @@ if str(_SERVER_DIR) not in sys.path:
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Body, HTTPException, Request
 
 from models.schemas import Episode, PullEpisodeRequest
 from services import data_service
@@ -24,6 +24,9 @@ from services.context_service import (
 )
 
 router = APIRouter()
+
+# PATCH /episodes/{id} 仅允许写入的 Episode 根字段（其余键丢弃，避免误改结构）
+_ALLOWED_EPISODE_PATCH_KEYS = frozenset({"dubTargetLocale", "sourceLocale"})
 
 
 @router.get("/episodes", response_model=list[dict])
@@ -38,6 +41,22 @@ def get_episode(episode_id: str, request: Request):
     """获取单个 Episode 完整数据。"""
     ns = get_namespace_data_root_optional(request)
     ep = data_service.get_episode(episode_id, ns)
+    if not ep:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    return ep
+
+
+@router.patch("/episodes/{episode_id}", response_model=Episode)
+def patch_episode(
+    episode_id: str,
+    request: Request,
+    body: dict = Body(default_factory=dict),
+):
+    """部分更新 Episode（当前仅 dubTargetLocale、sourceLocale）。"""
+    ns = get_namespace_data_root_optional(request)
+    raw = body if isinstance(body, dict) else {}
+    filtered = {k: v for k, v in raw.items() if k in _ALLOWED_EPISODE_PATCH_KEYS}
+    ep = data_service.update_episode(episode_id, filtered, ns)
     if not ep:
         raise HTTPException(status_code=404, detail="Episode not found")
     return ep

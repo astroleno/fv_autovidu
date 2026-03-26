@@ -2,7 +2,7 @@
  * ShotRow 列表视图行
  *
  * 列顺序：编号 | 时长 | 首尾帧（悬浮大图 + 进详情）| 视频（悬浮预览 + 进详情）| 状态 |
- * 画面描述 | 图片提示词 | 视频提示词 | 资产（悬浮 + 进资产库详情）| 候选数 | 操作
+ * 台词原文 | 译文 | 画面描述 | 图片提示词 | 视频提示词 | 资产（悬浮 + 进资产库详情）| 候选数 | 操作
  *
  * 提示词列支持悬浮显示、点击编辑、失焦保存
  */
@@ -10,7 +10,12 @@ import { Link } from "react-router"
 import { routes } from "@/utils/routes"
 import type { Shot } from "@/types"
 import { Badge } from "@/components/ui"
-import { StatusIndicator, AssetTag, ShotPromptCells } from "@/components/business"
+import {
+  StatusIndicator,
+  AssetTag,
+  ShotDialogueCells,
+  ShotPromptCells,
+} from "@/components/business"
 import { ShotFrameCompare } from "./ShotFrameCompare"
 import { ShotRowVideoPreview } from "./ShotRowVideoPreview"
 import { shotStatusLabels } from "@/utils/format"
@@ -89,6 +94,11 @@ export function ShotRow({
           <Badge status={shot.status}>{shotStatusLabels[shot.status]}</Badge>
         </div>
       </td>
+      <ShotDialogueCells
+        shot={shot}
+        episodeId={episodeId}
+        updateShot={updateShot}
+      />
       <ShotPromptCells
         shot={shot}
         episodeId={episodeId}

@@ -1,6 +1,6 @@
 /**
  * Episode Store
- * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode / updateShot
+ * Episode 列表 + 当前 Episode + fetchEpisodes / fetchEpisodeDetail / pullNewEpisode / updateShot / updateEpisodeLocales
  *
  * 竞态说明（与 taskStore 轮询配合）：
  * - startPolling(episodeId) 会立刻 fetchEpisodeDetail，任务完成时 onAnyTerminal 也会再次 fetch。
@@ -9,7 +9,7 @@
  * - 通过 _detailFetchGeneration：每次发起详情请求自增序号，仅当响应返回时序号仍为「当前最新」才写入 store。
  */
 import { create } from "zustand"
-import type { Episode } from "@/types"
+import type { Episode, Shot } from "@/types"
 import { episodesApi } from "@/api/episodes"
 import { shotsApi } from "@/api/shots"
 
@@ -39,11 +39,30 @@ interface EpisodeStore {
     /** 仅同步文案（画面描述等），不下载首帧/资产图 */
     skipImages?: boolean
   ) => Promise<void>
-  /** 更新 Shot 字段（如 visualDescription/imagePrompt/videoPrompt），同步到 currentEpisode */
+  /**
+   * 更新 Shot 字段（文案类），PATCH 后按响应合并进 currentEpisode。
+   * dialogue / dialogueTranslation 供分镜表「台词原文 / 译文」列落盘。
+   */
   updateShot: (
     episodeId: string,
     shotId: string,
-    updates: Partial<{ visualDescription: string; imagePrompt: string; videoPrompt: string }>
+    updates: Partial<
+      Pick<
+        Shot,
+        | "visualDescription"
+        | "imagePrompt"
+        | "videoPrompt"
+        | "dialogue"
+        | "dialogueTranslation"
+      >
+    >
+  ) => Promise<void>
+  /**
+   * PATCH 剧集 dubTargetLocale / sourceLocale，用接口返回的完整 Episode 替换 store 中同 id 项。
+   */
+  updateEpisodeLocales: (
+    episodeId: string,
+    data: { dubTargetLocale?: string; sourceLocale?: string }
   ) => Promise<void>
 }
 
@@ -173,6 +192,20 @@ export const useEpisodeStore = create<EpisodeStore>((set, get) => ({
         ),
       }))
       return { currentEpisode: { ...s.currentEpisode, scenes: newScenes } }
+    })
+  },
+
+  updateEpisodeLocales: async (episodeId, data) => {
+    const res = await episodesApi.patch(episodeId, data)
+    set((s) => {
+      const next = res.data
+      return {
+        currentEpisode:
+          s.currentEpisode?.episodeId === episodeId ? next : s.currentEpisode,
+        episodes: s.episodes.some((e) => e.episodeId === episodeId)
+          ? s.episodes.map((e) => (e.episodeId === episodeId ? next : e))
+          : s.episodes,
+      }
     })
   },
 }))
