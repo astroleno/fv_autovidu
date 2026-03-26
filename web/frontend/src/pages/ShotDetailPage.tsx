@@ -14,6 +14,7 @@ import { VideoPlayer, AssetTag, ShotFrameCompare } from "@/components/business"
 import { flattenShots } from "@/types"
 import { getFileUrl } from "@/utils/file"
 import { routes } from "@/utils/routes"
+import { isPhysicallyNewest } from "@/utils/videoCandidateSort"
 
 export default function ShotDetailPage() {
   const { projectId: routeProjectId, episodeId, shotId } = useParams<{
@@ -169,15 +170,28 @@ export default function ShotDetailPage() {
                   c.taskStatus === "success" &&
                   c.seed > 0
                 const busy = isPromoting(c.id)
+                const newest = isPhysicallyNewest(c, shot.videoCandidates)
+                const newestRing =
+                  newest && !c.selected
+                    ? "ring-2 ring-amber-600 ring-offset-1"
+                    : newest && c.selected
+                      ? "ring-2 ring-amber-500/60 ring-offset-1"
+                      : ""
                 return (
                   <div
                     key={c.id}
-                    className={`border-2 border-[var(--color-newsprint-black)] p-4 box-border ${
+                    className={`border-2 border-[var(--color-newsprint-black)] p-4 box-border ${newestRing} ${
                       c.selected
                         ? "border-[var(--color-primary)]"
                         : "border-[var(--color-border)]"
                     }`}
+                    style={{ boxSizing: "border-box" }}
                   >
+                    {newest ? (
+                      <p className="text-[9px] font-black uppercase bg-amber-100 text-amber-950 border border-amber-700 px-1.5 py-0.5 inline-block mb-2">
+                        最新
+                      </p>
+                    ) : null}
                     <VideoPlayer
                       src={videoUrl}
                       aspectRatio={shot.aspectRatio}

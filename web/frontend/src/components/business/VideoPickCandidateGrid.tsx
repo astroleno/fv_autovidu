@@ -5,6 +5,7 @@
  * - 激活态 / 已选态 / 合并态视觉区分（边框 + 标签，非仅靠颜色）
  */
 import type { Shot, VideoCandidate } from "@/types"
+import { isPhysicallyNewest } from "@/utils/videoCandidateSort"
 import { VideoPlayer } from "./VideoPlayer"
 
 export interface VideoPickCandidateGridProps {
@@ -53,6 +54,7 @@ function CandidateCell({
 
   const resLabel = c.resolution?.trim() || "—"
   const previewTag = c.isPreview ? " [预览]" : ""
+  const newest = isPhysicallyNewest(c, shot.videoCandidates)
 
   return (
     <div
@@ -67,7 +69,7 @@ function CandidateCell({
           onActivate()
         }
       }}
-      aria-label={`候选 ${indexLabel}${selected ? "，已选定" : ""}${active ? "，当前激活" : ""}`}
+      aria-label={`候选 ${indexLabel}${newest ? "，物理最新" : ""}${selected ? "，已选定" : ""}${active ? "，当前激活" : ""}`}
     >
       <div className="min-h-[min(480px,50vh)] box-border flex flex-col justify-center" style={{ boxSizing: "border-box" }}>
         <VideoPlayer
@@ -81,6 +83,11 @@ function CandidateCell({
         <span className="text-[10px] font-black text-[var(--color-newsprint-black)] border border-[var(--color-newsprint-black)] px-1.5 py-0.5 shrink-0">
           #{indexLabel}
         </span>
+        {newest ? (
+          <span className="text-[9px] font-black uppercase bg-amber-100 text-amber-950 border border-amber-700 px-1.5 py-0.5 shrink-0">
+            最新
+          </span>
+        ) : null}
         {selected ? (
           <span className="text-[9px] font-black uppercase bg-[var(--color-primary)] text-white px-1.5 py-0.5 shrink-0">
             已选
@@ -110,7 +117,7 @@ export function VideoPickCandidateGrid({
   if (list.length === 0) {
     return (
       <p className="text-sm text-[var(--color-muted)] box-border" style={{ boxSizing: "border-box" }}>
-        暂无视频候选，可在右侧参考区确认首尾帧后使用下方工具重新生成。
+        暂无视频候选，可在右侧参考区确认首尾帧后使用下方工具再生成。
       </p>
     )
   }

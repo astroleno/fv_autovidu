@@ -2,7 +2,7 @@
  * 批量任务结果汇总弹窗
  *
  * 在批量尾帧 / 批量视频轮询全部结束后展示成功数、失败数与失败镜头明细，
- * 可选「重试失败镜头」（由父组件传入回调，再次调用 generate API）。
+ * 可选「重试失败镜头」（**仅**针对任务失败；与选片页「再生成 / 追加候选」不是同一概念）。
  */
 import { Dialog } from "@/components/ui/Dialog"
 import { Button } from "@/components/ui"

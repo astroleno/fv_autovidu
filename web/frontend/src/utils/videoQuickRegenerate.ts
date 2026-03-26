@@ -1,5 +1,8 @@
 /**
- * 单镜头「快捷出视频 / 重新生成」请求体构造与任务完成 Toast 汇总
+ * 单镜头「快捷出视频 / 再生成（追加候选）」请求体构造与任务完成 Toast 汇总
+ *
+ * 术语：此处「再生成」指质量不满意时追加新候选；**不是** `BatchResultSummary` 里失败任务的「重试失败镜头」。
+ * 详见 `docs/superpowers/specs/2025-03-26-video-generation-modes-retry-design.md` §5。
  *
  * 背景：
  * - 后端 `POST /generate/video` 在 **未** 传 `isPreview` 时，首尾帧模式会走正式档默认（1080p + viduq3-pro），
