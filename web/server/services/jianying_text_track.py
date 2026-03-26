@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-剪映草稿「原文对白」文本轨构建
+剪映草稿字幕文本轨构建
 
 职责：
-- 从 Episode 的 Shot 抽取用于字幕展示的一行字符串（优先顶层 dialogue，其次结构化 associatedDialogue）
+- 从 Episode 的 Shot 抽取用于字幕展示的一行字符串：
+  优先用户编辑的 **译文** ``dialogueTranslation``，否则 **原文** ``dialogue``，再否则结构化 ``associatedDialogue``
 - 使用已安装的 pyJianYingDraft 生成与视频主轨 target_timerange 对齐的 TextSegment 素材与片段 JSON
 
 说明：
@@ -25,15 +26,20 @@ from models.schemas import Shot
 
 def subtitle_text_from_shot(shot: Shot) -> str:
     """
-    从分镜得到单行字幕文案（原文「丙」轨，不做翻译）。
+    从分镜得到单行字幕文案（与 Vidu/TTS 共用「译文」字段时，剪映也优先展示译文）。
 
     优先级：
-    1. 非空字符串 `shot.dialogue`（strip 后）
-    2. `shot.associatedDialogue`：role 与 content 均非空时格式化为「角色：内容」；否则仅返回非空的 content（仅 role 无 content 时返回空）
+    1. 非空 `shot.dialogueTranslation`（strip 后）— 用户在本机填写的目标语字幕
+    2. 非空 `shot.dialogue`（strip 后）— 平台拉取的原文台词行
+    3. `shot.associatedDialogue`：role 与 content 均非空时格式化为「角色：内容」；否则仅返回非空的 content（仅 role 无 content 时返回空）
 
     Returns:
         无可用文案时返回空字符串。
     """
+    translated = (shot.dialogueTranslation or "").strip()
+    if translated:
+        return translated
+
     line = (shot.dialogue or "").strip()
     if line:
         return line

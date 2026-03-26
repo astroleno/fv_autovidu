@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-剪映原文字幕轨：subtitle_text_from_shot 与 build_text_track_payload 单测。
+剪映字幕轨：subtitle_text_from_shot 与 build_text_track_payload 单测。
 """
 
 from __future__ import annotations
@@ -31,6 +31,22 @@ class TestSubtitleTextFromShot(unittest.TestCase):
             dialogue="  你好  ",
         )
         self.assertEqual(subtitle_text_from_shot(shot), "你好")
+
+    def test_subtitle_prefers_translation_over_dialogue(self) -> None:
+        """有译文时剪映字幕与 Vidu/TTS 一致，优先展示译文。"""
+        from models.schemas import Shot
+        from services.jianying_text_track import subtitle_text_from_shot
+
+        shot = Shot(
+            shotId="s1",
+            shotNumber=1,
+            imagePrompt="",
+            videoPrompt="",
+            firstFrame="",
+            dialogue="原文",
+            dialogueTranslation="Translated line",
+        )
+        self.assertEqual(subtitle_text_from_shot(shot), "Translated line")
 
     def test_subtitle_text_from_associated_dialogue(self) -> None:
         from models.schemas import AssociatedDialogue, Shot

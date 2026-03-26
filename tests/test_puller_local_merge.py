@@ -152,6 +152,40 @@ class TestPullerLocalMerge(unittest.TestCase):
         self.assertEqual(sh["dub"]["audioPath"], "dub/sh1.mp3")
         self.assertEqual(episode["jianyingExport"]["draftId"], "d1")
 
+    def test_merge_preserves_dialogue_and_translation(self) -> None:
+        """重拉合并须保留本机编辑的 dialogue / dialogueTranslation / associatedDialogue。"""
+        from src.feeling.puller import _merge_local_episode_state_into_episode
+
+        episode = {
+            "scenes": [
+                {
+                    "shots": [
+                        {
+                            "shotId": "sh1",
+                            "dialogue": "平台快照原文",
+                            "dialogueTranslation": "",
+                            "associatedDialogue": None,
+                        }
+                    ]
+                }
+            ]
+        }
+        local = {
+            "shots_by_id": {
+                "sh1": {
+                    "dialogue": "用户改过原文",
+                    "dialogueTranslation": "Hello",
+                    "associatedDialogue": {"role": "卡尔", "content": "Hi"},
+                }
+            }
+        }
+        _merge_local_episode_state_into_episode(episode, local)
+        sh = episode["scenes"][0]["shots"][0]
+        self.assertEqual(sh["dialogue"], "用户改过原文")
+        self.assertEqual(sh["dialogueTranslation"], "Hello")
+        self.assertEqual(sh["associatedDialogue"]["role"], "卡尔")
+        self.assertEqual(sh["associatedDialogue"]["content"], "Hi")
+
 
 if __name__ == "__main__":
     unittest.main()
