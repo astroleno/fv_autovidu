@@ -1,11 +1,18 @@
 /**
  * 粗剪台 — 时间线区域（对齐原型：Tracks 角标、时间标尺、V1 视频轨、A1/A2 音轨占位）
  * - V1：已出片镜头显示首帧缩略图 + SHOT 编号 + 时长；未出片为虚线 PENDING
+ * - 镜头之间：使用细竖线分隔（剪映式），不使用 ⚡ emoji 占位，避免「假功能」观感
  * - 音轨：当前无后端数据，展示占位与「暂无音轨」
  */
+import { useCallback, useRef, type PointerEvent } from "react"
 import type { Shot, VideoCandidate } from "@/types"
 import { getFileUrl } from "@/utils/file"
-import { buildRulerTicks, formatTimeHhMmSs, formatTimeMmSs } from "./roughcutUtils"
+import {
+  buildRulerTicks,
+  formatTimeHhMmSs,
+  formatTimeMmSs,
+  timelinePercentFromClientX,
+} from "./roughcutUtils"
 
 /** 时间线上的单条叙事单元：要么可播片段，要么待生成占位 */
 export type RoughCutTrackItem =
@@ -18,6 +25,8 @@ export interface RoughCutTimelineProps {
   items: RoughCutTrackItem[]
   activeShotId: string | null
   onSelectShot: (shotId: string) => void
+  /** 绿色播放头拖拽 seek 到整条粗剪时间上的某一点 */
+  onSeek?: (globalTimeSec: number) => void
   /** 叙事总时长（用于标尺与游标比例） */
   totalLayoutSec: number
   /** 当前播放头在整条叙事时间上的位置（秒），由预览播放器回调 */
@@ -50,11 +59,21 @@ export function RoughCutTimeline({
   items,
   activeShotId,
   onSelectShot,
+  onSeek,
   totalLayoutSec,
   playheadSec,
 }: RoughCutTimelineProps) {
   const ticks = buildRulerTicks(totalLayoutSec)
   const headPct = playheadPercent(items, activeShotId, playheadSec, totalLayoutSec)
+  const laneRef = useRef<HTMLDivElement>(null)
+
+  const seekFromClientX = useCallback((clientX: number) => {
+    if (!onSeek || totalLayoutSec <= 0) return
+    const rect = laneRef.current?.getBoundingClientRect()
+    if (!rect || rect.width <= 0) return
+    const percent = timelinePercentFromClientX(clientX, rect)
+    onSeek((percent / 100) * totalLayoutSec)
+  }, [onSeek, totalLayoutSec])
 
   return (
     <section
@@ -89,8 +108,13 @@ export function RoughCutTimeline({
       </div>
 
       <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-auto">
+        <div
+          ref={laneRef}
+          className="pointer-events-none absolute bottom-0 left-[180px] right-0 top-0"
+          aria-hidden
+        />
         {/* 全局播放头：与 V1 + 音轨纵向对齐 */}
-        <PlayheadLine leftPercent={headPct} />
+        <PlayheadLine leftPercent={headPct} onSeek={seekFromClientX} />
 
         {/* V1 视频轨 */}
         <div className="flex min-h-[5rem] border-b border-[var(--color-newsprint-black)] bg-white/60">
@@ -114,9 +138,7 @@ export function RoughCutTimeline({
                     return (
                       <div key={shot.shotId} className="flex min-w-0 items-stretch" style={flexStyle}>
                         {idx > 0 ? (
-                          <div className="z-10 flex w-5 shrink-0 items-center justify-center self-center border border-[var(--color-newsprint-black)] bg-white text-[10px] text-[var(--color-newsprint-black)]">
-                            ⚡
-                          </div>
+                          <ClipSeparator />
                         ) : null}
                         <button
                           type="button"
@@ -142,9 +164,7 @@ export function RoughCutTimeline({
                   return (
                     <div key={shot.shotId} className="flex min-w-0 items-stretch" style={flexStyle}>
                       {idx > 0 ? (
-                        <div className="z-10 flex w-5 shrink-0 items-center justify-center self-center border border-[var(--color-newsprint-black)] bg-white text-[10px] text-[var(--color-newsprint-black)]">
-                          ⚡
-                        </div>
+                        <ClipSeparator />
                       ) : null}
                       <button
                         type="button"
@@ -207,16 +227,80 @@ export function RoughCutTimeline({
   )
 }
 
-/** 播放头：左侧固定 180px 轨道标题宽度 + 剩余宽度 * 百分比 */
-function PlayheadLine({ leftPercent }: { leftPercent: number }) {
+/**
+ * 镜头块之间的分隔：剪映类产品多为细线或微缝，不用图标块占位。
+ * 使用 2px 浅竖线贯穿当前行高，避免抢戏。
+ */
+function ClipSeparator() {
   return (
     <div
-      className="pointer-events-none absolute bottom-0 top-0 z-40 w-px bg-[var(--color-primary)]"
+      className="z-10 w-[2px] shrink-0 self-stretch bg-[var(--color-outline-variant)]"
+      aria-hidden
+    />
+  )
+}
+
+/** 播放头：左侧固定 180px 轨道标题宽度 + 剩余宽度 * 百分比；支持拖拽 seek。 */
+function PlayheadLine({
+  leftPercent,
+  onSeek,
+}: {
+  leftPercent: number
+  onSeek?: (clientX: number) => void
+}) {
+  const x = (leftPercent / 100).toFixed(4)
+
+  const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (!onSeek) return
+    e.preventDefault()
+    onSeek(e.clientX)
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    if (!onSeek || !e.currentTarget.hasPointerCapture(e.pointerId)) return
+    onSeek(e.clientX)
+  }
+
+  const handlePointerUp = (e: PointerEvent<HTMLDivElement>) => {
+    if (!onSeek) return
+    onSeek(e.clientX)
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId)
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return (
+    <div
+      className={`absolute bottom-0 top-0 z-40 flex w-5 -translate-x-1/2 flex-col items-center ${
+        onSeek ? "cursor-ew-resize touch-none" : "pointer-events-none"
+      }`}
       style={{
-        left: `calc(180px + (100% - 180px) * ${(leftPercent / 100).toFixed(4)})`,
+        left: `calc(180px + (100% - 180px) * ${x})`,
       }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
     >
-      <div className="absolute -left-[2px] top-0 h-[5px] w-[5px] bg-[var(--color-primary)]" />
+      {/* 顶部三角指示（与常见 NLE 播放头一致） */}
+      <div
+        className="border-x-[6px] border-x-transparent border-t-[7px] border-t-[var(--color-primary)]"
+        style={{ boxSizing: "border-box" }}
+        aria-hidden
+      />
+      <div
+        className="min-h-0 w-[3px] flex-1 bg-[var(--color-primary)] shadow-[1px_0_0_rgba(17,17,17,0.15)]"
+        style={{ boxSizing: "border-box" }}
+      />
     </div>
   )
 }
