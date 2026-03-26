@@ -63,6 +63,43 @@ def _suffix_from_content_type(ct: str) -> str:
     return ".mp3"
 
 
+def _resolve_tts_text(shot: Any, tts_text: str | None) -> str:
+    """
+    为 TTS 模式解析最终朗读字符串（纯函数，便于单测覆盖优先级）。
+
+    优先级（与产品约定一致：批量配音不传 ttsText 时，优先读用户填写的目标语译文，
+    避免误用中文原文配外语音色；最后再回退到分镜 videoPrompt）：
+
+    1. 请求体 / 调用方显式传入的 ``tts_text``（非空且 strip 后非空则直接采用）。
+    2. 分镜上的 ``dialogueTranslation``（译文）；旧数据或简易对象可能无此属性，使用
+       ``getattr(..., None)`` 读取，缺失或非字符串时视为空。
+    3. 分镜 ``videoPrompt``；同样用 ``getattr`` 兼容无该字段的对象。
+    4. 若以上皆空，抛出 ``ValueError``，提示用户填写「译文」或 ``videoPrompt``，
+       或在单镜接口传入 ``ttsText``。
+
+    Args:
+        shot: 分镜对象（如 ``models.schemas.Shot`` 或测试用 SimpleNamespace）。
+        tts_text: 单镜配音接口传入的朗读文案；批量流程通常为 ``None``。
+
+    Returns:
+        非空的去首尾空白后的朗读文本。
+
+    Raises:
+        ValueError: 无法从任一来源得到非空文本时。
+    """
+    text = (tts_text or "").strip()
+    if not text:
+        text = (getattr(shot, "dialogueTranslation", None) or "").strip()
+    if not text:
+        text = (getattr(shot, "videoPrompt", None) or "").strip()
+    if not text:
+        raise ValueError(
+            "TTS 需要提供朗读文本：请填写分镜「译文」(dialogueTranslation)、videoPrompt，"
+            "或在单镜配音请求中传入 ttsText"
+        )
+    return text
+
+
 def _run_dub_task(
     task_id: str,
     episode_id: str,
@@ -159,9 +196,7 @@ def _run_dub_task(
         try:
             original_rel: str | None = None
             if mode == "tts":
-                text = (tts_text or "").strip() or (shot.videoPrompt or "").strip()
-                if not text:
-                    raise ValueError("TTS 模式需要提供文本或 shot.videoPrompt")
+                text = _resolve_tts_text(shot, tts_text)
                 audio_bytes, ct = elevenlabs_service.text_to_speech(voice_id, text)
                 ext = _suffix_from_content_type(ct)
             else:
