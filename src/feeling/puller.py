@@ -77,6 +77,91 @@ def _get_visual_description(sh: dict) -> str:
     return vd or ""
 
 
+def _normalize_associated_dialogue_dict(ad: dict) -> dict[str, str] | None:
+    """
+    将平台返回的 associated 对白 dict 规范为 {"role": str, "content": str}。
+
+    若 role、content 在去空白后均为空，视为无有效结构化对白，返回 None。
+    """
+    r = ad.get("role")
+    c = ad.get("content")
+    role_s = "" if r is None else str(r)
+    content_s = "" if c is None else str(c)
+    if not role_s.strip() and not content_s.strip():
+        return None
+    return {"role": role_s, "content": content_s}
+
+
+def _associated_dialogue_from_shot_list_item(item: dict) -> dict[str, str] | None:
+    """
+    从 shot_list 单条中读取对白；API dump 使用 snake_case ``associated_dialogue``，
+    部分载荷可能带 camelCase ``associatedDialogue``，二者均尝试。
+    """
+    if not isinstance(item, dict):
+        return None
+    raw_ad = item.get("associated_dialogue")
+    if raw_ad is None:
+        raw_ad = item.get("associatedDialogue")
+    if isinstance(raw_ad, dict):
+        return _normalize_associated_dialogue_dict(raw_ad)
+    return None
+
+
+def _get_dialogue_fields(sh: dict) -> tuple[str, dict | None]:
+    """
+    从 Feeling 平台单条 shot（原始 dict）提取台词行与结构化对白。
+
+    **台词行 dialogue：**
+    - 优先顶层 ``dialogue`` / ``Dialogue``；
+    - 若为空则读 ``metadata`` 内同名键。
+
+    **结构化 associatedDialogue：**
+    - 优先顶层 ``associatedDialogue``：须为含 ``role`` / ``content`` 的 dict，规范化后若仍无有效内容则继续向下找；
+    - 否则遍历 ``metadata.shotMaster.raw.shot_list`` 中每一项的 ``associated_dialogue``（及 camelCase 别名），
+      取第一个有有效 role 或 content 的项。
+
+    Returns:
+        (dialogue_line, associated_dict_or_none)。若既无台词行也无有效结构化对白，返回 ``("", None)``。
+    """
+    if not isinstance(sh, dict):
+        return ("", None)
+
+    # 1) 台词字符串：顶层优先，空则 metadata.dialogue
+    line = _get(sh, "dialogue", "Dialogue", default="") or ""
+    if not line:
+        meta_early = sh.get("metadata")
+        if isinstance(meta_early, dict):
+            line = _get(meta_early, "dialogue", "Dialogue", default="") or ""
+
+    # 2) 结构化对白：顶层 associatedDialogue
+    assoc: dict[str, str] | None = None
+    top_assoc = sh.get("associatedDialogue")
+    if isinstance(top_assoc, dict):
+        assoc = _normalize_associated_dialogue_dict(top_assoc)
+
+    # 3) 仍无时：从 metadata.shotMaster.raw.shot_list 逐项取 associated_dialogue（snake_case）
+    if assoc is None:
+        meta = sh.get("metadata")
+        if isinstance(meta, dict):
+            shot_master = meta.get("shotMaster")
+            if isinstance(shot_master, dict):
+                raw = shot_master.get("raw")
+                if isinstance(raw, dict):
+                    lst = raw.get("shot_list")
+                    if isinstance(lst, list):
+                        for item in lst:
+                            cand = _associated_dialogue_from_shot_list_item(item)
+                            if cand is not None:
+                                assoc = cand
+                                break
+
+    # 既无有效台词行也无结构化对白 → 与下游约定一致返回 ("", None)
+    has_line = bool((line or "").strip())
+    if not has_line and assoc is None:
+        return ("", None)
+    return (line or "", assoc)
+
+
 def _get_shot_prompts(sh: dict) -> tuple[str, str]:
     """
     从 shot 对象中提取图片提示词和视频提示词。
