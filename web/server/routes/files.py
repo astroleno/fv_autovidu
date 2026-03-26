@@ -48,6 +48,7 @@ def _resolve_file_under_data_root(path: str) -> Path:
     data_root = Path(DATA_ROOT).resolve()
     parts = [p for p in path.replace("\\", "/").split("/") if p]
     full_path: Path | None = None
+    legacy_rel_from_context: str | None = None
 
     # 至少三段 contextId/projectId/episodeId/... 时才尝试按 Feeling profile 解析
     if len(parts) >= 3:
@@ -58,11 +59,17 @@ def _resolve_file_under_data_root(path: str) -> Path:
             ctx = get_context_resolver().resolve(parts[0])
             ns = get_context_data_root(ctx, data_root).resolve()
             rel = "/".join(parts[1:])
+            legacy_rel_from_context = rel
             candidate = (ns / rel).resolve()
             if candidate.is_file() and str(candidate).startswith(str(ns)):
                 full_path = candidate
         except (ValueError, FileNotFoundError, OSError):
             full_path = None
+
+    if (full_path is None or not full_path.is_file()) and legacy_rel_from_context:
+        legacy_candidate = (data_root / legacy_rel_from_context).resolve()
+        if legacy_candidate.is_file() and str(legacy_candidate).startswith(str(data_root)):
+            full_path = legacy_candidate
 
     if full_path is None or not full_path.is_file():
         full_path = (data_root / path).resolve()

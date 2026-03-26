@@ -183,15 +183,15 @@ def list_episodes(namespace_root: Path | None = None) -> list[dict[str, Any]]:
         nr = namespace_root.resolve()
         if nr.is_dir():
             project_parents.append(nr)
-    else:
-        legacy = _legacy_data_root()
-        if legacy.exists():
-            for top in legacy.iterdir():
-                if not top.is_dir():
-                    continue
-                if _looks_like_env_namespace(top):
-                    continue
-                project_parents.append(top)
+
+    legacy = _legacy_data_root()
+    if legacy.exists():
+        for top in legacy.iterdir():
+            if not top.is_dir():
+                continue
+            if _looks_like_env_namespace(top):
+                continue
+            project_parents.append(top)
 
     if not project_parents:
         return []
