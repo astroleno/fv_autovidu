@@ -12,4 +12,12 @@ export { RoughCutActionBar } from "./RoughCutActionBar"
 export type { RoughCutActionBarProps } from "./RoughCutActionBar"
 export { RoughCutTimeline } from "./RoughCutTimeline"
 export type { RoughCutTimelineProps, RoughCutTrackItem } from "./RoughCutTimeline"
-export { formatTimeMmSs, formatTimeHhMmSs, buildRulerTicks, layoutDurationSec } from "./roughcutUtils"
+export {
+  formatTimeMmSs,
+  formatTimeHhMmSs,
+  buildRulerTicks,
+  layoutDurationSec,
+  getTimelineSeekTarget,
+  timelinePercentFromClientX,
+} from "./roughcutUtils"
+export type { TimelineSeekTarget } from "./roughcutUtils"

@@ -8,7 +8,8 @@
  * - 键盘：←/→ 快退/快进（默认 5s）；↑/↓ 上一段/下一段。
  */
 import { useCallback, useEffect, useRef, useState } from "react"
-import { SkipBack, SkipForward, Volume2, Maximize2, Settings } from "lucide-react"
+import { SkipBack, SkipForward, Maximize2, Pause, Play } from "lucide-react"
+import { VideoSeekBar } from "@/components/ui/VideoSeekBar"
 
 /** 默认单次快进/快退步长（秒） */
 const DEFAULT_SEEK_STEP_SEC = 5
@@ -35,6 +36,8 @@ export interface RoughCutVideoPlayerProps {
   disableNext?: boolean
   /** 用于时间轴游标：当前播放时间、当前片段时长 */
   onTimeUpdate?: (currentSec: number, durationSec: number) => void
+  /** 外部时间线触发的 seek 请求；id 变化时执行 */
+  externalSeek?: { id: number; timeSec: number } | null
   className?: string
   /**
    * 键盘 ←/→ 每次调整的秒数（默认 5）。
@@ -53,10 +56,13 @@ export function RoughCutVideoPlayer({
   disablePrev = false,
   disableNext = false,
   onTimeUpdate,
+  externalSeek = null,
   className = "",
   seekStepSec = DEFAULT_SEEK_STEP_SEC,
 }: RoughCutVideoPlayerProps) {
   const ref = useRef<HTMLVideoElement>(null)
+  /** 拖拽进度条时暂停用 timeupdate 写回滑块，否则受控 value 与播放进度互相覆盖、无法拖拽 */
+  const scrubbingRef = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [progressPct, setProgressPct] = useState(0)
   const [cur, setCur] = useState(0)
@@ -89,8 +95,10 @@ export function RoughCutVideoPlayer({
     if (!v || !v.duration) return
     const d = v.duration
     setDur(d)
-    setCur(v.currentTime)
-    setProgressPct((v.currentTime / d) * 100)
+    if (!scrubbingRef.current) {
+      setCur(v.currentTime)
+      setProgressPct((v.currentTime / d) * 100)
+    }
     onTimeUpdate?.(v.currentTime, d)
   }, [onTimeUpdate])
 
@@ -173,6 +181,50 @@ export function RoughCutVideoPlayer({
   }, [src])
 
   /**
+   * 来自时间线的外部 seek：
+   * - 同镜头：立即跳转
+   * - 切镜头：等 metadata 就绪后再跳
+   */
+  useEffect(() => {
+    if (!externalSeek) return
+
+    const v = ref.current
+    if (!v) return
+
+    const applySeek = () => {
+      const durationSec =
+        Number.isFinite(v.duration) && v.duration > 0 ? v.duration : 0
+      const boundedTimeSec =
+        durationSec > 0
+          ? Math.min(Math.max(externalSeek.timeSec, 0), durationSec)
+          : Math.max(externalSeek.timeSec, 0)
+
+      v.currentTime = boundedTimeSec
+      setCur(boundedTimeSec)
+      if (durationSec > 0) {
+        setDur(durationSec)
+        setProgressPct((boundedTimeSec / durationSec) * 100)
+      } else {
+        setProgressPct(0)
+      }
+      onTimeUpdate?.(boundedTimeSec, durationSec)
+    }
+
+    if (v.readyState >= HTMLMediaElement.HAVE_METADATA) {
+      applySeek()
+      return
+    }
+
+    const onLoadedMetadata = () => {
+      v.removeEventListener("loadedmetadata", onLoadedMetadata)
+      applySeek()
+    }
+
+    v.addEventListener("loadedmetadata", onLoadedMetadata)
+    return () => v.removeEventListener("loadedmetadata", onLoadedMetadata)
+  }, [externalSeek, onTimeUpdate])
+
+  /**
    * 全局快捷键：←/→ 快进快退，↑/↓ 上/下一段（不在输入框内时生效）。
    */
   useEffect(() => {
@@ -230,12 +282,13 @@ export function RoughCutVideoPlayer({
     markAutoplayIfPlayingBeforeClipChange,
   ])
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = (p: number) => {
     const v = ref.current
     if (!v || !v.duration) return
-    const p = Number(e.target.value)
-    v.currentTime = (p / 100) * v.duration
+    const t = (p / 100) * v.duration
+    v.currentTime = t
     setProgressPct(p)
+    setCur(t)
   }
 
   const fullscreen = () => {
@@ -268,30 +321,23 @@ export function RoughCutVideoPlayer({
           onLoadedMetadata={handleTimeUpdate}
           onClick={togglePlay}
         />
-        {/* 底部控制条：原型为白底顶边 */}
+        {/* 底部控制条：叠在 video 之上须 z-index，否则点击会落到 video 上；白底 + VideoSeekBar */}
         <div
-          className="absolute inset-x-0 bottom-0 flex flex-col gap-2 border-t border-[var(--color-newsprint-black)] bg-white px-3 py-2 text-[var(--color-newsprint-black)] box-border"
+          className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-[var(--color-newsprint-black)] bg-white px-3 py-2 text-[var(--color-newsprint-black)] box-border"
           style={{ boxSizing: "border-box" }}
         >
-          {/* 进度：底层浅轨 + range 控件（同原型进度条交互） */}
-          <div className="relative h-2 w-full">
-            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 overflow-hidden bg-black/10">
-              <div
-                className="h-full bg-[var(--color-primary)]"
-                style={{ width: `${progressPct}%` }}
-              />
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={0.1}
-              value={progressPct}
-              onChange={handleSeek}
-              className="relative z-10 h-2 w-full cursor-pointer opacity-80 accent-[var(--color-primary)]"
-              aria-label="进度"
-            />
-          </div>
+          <VideoSeekBar
+            value={progressPct}
+            onChange={handleSeek}
+            variant="onLight"
+            aria-label="播放进度"
+            onSeekStart={() => {
+              scrubbingRef.current = true
+            }}
+            onSeekEnd={() => {
+              scrubbingRef.current = false
+            }}
+          />
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -310,9 +356,9 @@ export function RoughCutVideoPlayer({
                 aria-label={playing ? "暂停" : "播放"}
               >
                 {playing ? (
-                  <span className="text-xs">⏸</span>
+                  <Pause className="h-4 w-4" strokeWidth={2.5} aria-hidden />
                 ) : (
-                  <span className="text-xs">▶</span>
+                  <Play className="h-4 w-4" fill="currentColor" aria-hidden />
                 )}
               </button>
               <button
@@ -329,12 +375,6 @@ export function RoughCutVideoPlayer({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <button type="button" className="hover:text-[var(--color-primary)]" aria-label="音量">
-                <Volume2 className="h-4 w-4" />
-              </button>
-              <button type="button" className="hover:text-[var(--color-primary)]" aria-label="设置">
-                <Settings className="h-4 w-4" />
-              </button>
               <button
                 type="button"
                 onClick={fullscreen}

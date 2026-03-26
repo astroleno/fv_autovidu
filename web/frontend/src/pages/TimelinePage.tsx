@@ -16,6 +16,7 @@ import { useEpisodeMediaCacheBust } from "@/hooks"
 import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import { useEpisodeStore } from "@/stores"
 import {
+  getTimelineSeekTarget,
   RoughCutActionBar,
   RoughCutActiveShotInfo,
   RoughCutMetaBar,
@@ -68,6 +69,9 @@ export default function TimelinePage() {
   const [activeShotId, setActiveShotId] = useState<string | null>(null)
   /** 当前预览片段内播放时间（秒），用于时间轴游标 */
   const [clipPlayheadSec, setClipPlayheadSec] = useState(0)
+  /** 时间线主动 seek 时递增，用于驱动播放器执行同值重复 seek */
+  const [externalSeekId, setExternalSeekId] = useState(0)
+  const [externalSeekTimeSec, setExternalSeekTimeSec] = useState<number | null>(null)
 
   useEffect(() => {
     if (episodeId) void fetchEpisodeDetail(episodeId)
@@ -133,10 +137,20 @@ export default function TimelinePage() {
     setClipPlayheadSec(cur)
   }, [])
 
-  /** 切换镜头时重置游标（视频会重新加载） */
-  useEffect(() => {
+  const handleSelectShot = useCallback((shotId: string) => {
+    setActiveShotId(shotId)
     setClipPlayheadSec(0)
-  }, [activeShotId])
+  }, [])
+
+  const handleTimelineSeek = useCallback((globalTimeSec: number) => {
+    const target = getTimelineSeekTarget(trackItems, globalTimeSec)
+    if (!target) return
+
+    setActiveShotId(target.shotId)
+    setClipPlayheadSec(target.clipTimeSec)
+    setExternalSeekTimeSec(target.clipTimeSec)
+    setExternalSeekId((id) => id + 1)
+  }, [trackItems])
 
   if (!episodeId || loading || !currentEpisode) {
     return (
@@ -209,6 +223,11 @@ export default function TimelinePage() {
                   playableShotIds.indexOf(activeShotId) >= playableShotIds.length - 1)
               }
               onTimeUpdate={onTimeUpdate}
+              externalSeek={
+                externalSeekTimeSec == null
+                  ? null
+                  : { id: externalSeekId, timeSec: externalSeekTimeSec }
+              }
               className="h-full min-h-0 w-full"
             />
           ) : (
@@ -253,7 +272,8 @@ export default function TimelinePage() {
           cacheBust={cacheBust}
           items={trackItems}
           activeShotId={activeShotId}
-          onSelectShot={setActiveShotId}
+          onSelectShot={handleSelectShot}
+          onSeek={handleTimelineSeek}
           totalLayoutSec={totalLayoutSec}
           playheadSec={activeEntry?.kind === "clip" ? clipPlayheadSec : 0}
         />
