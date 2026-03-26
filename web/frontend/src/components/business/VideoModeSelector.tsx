@@ -1,8 +1,11 @@
 /**
  * 批量生成视频：模式 / 模型 / 分辨率选择弹窗
  * 与 StoryboardPage 批量「生成视频」配合，确认后提交 generateApi.video
+ *
+ * 单镜无尾帧时由父组件传入 `firstLastFrameAllowed={false}`，禁用首尾帧选项，
+ * 避免用户从「自定义参数」仍选首尾帧而落到后端报错（与产品 spec 一致）。
  */
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { VideoMode } from "@/types"
 import { Dialog, Button } from "@/components/ui"
 import { ReferenceImagePicker } from "./ReferenceImagePicker"
@@ -55,6 +58,11 @@ interface VideoModeSelectorProps {
   /** 剧集级资产 id 列表（用于多参考图模式勾选） */
   episodeAssetIds: string[]
   onConfirm: (result: VideoModeSelectorResult) => void
+  /**
+   * 是否允许选择「首尾帧双图」模式。单镜选片且无尾帧路径时应为 false（禁用该 radio）。
+   * 未传时视为 true，保持分镜批量等场景的原有默认。
+   */
+  firstLastFrameAllowed?: boolean
 }
 
 export function VideoModeSelector({
@@ -63,6 +71,7 @@ export function VideoModeSelector({
   shotCount,
   episodeAssetIds,
   onConfirm,
+  firstLastFrameAllowed = true,
 }: VideoModeSelectorProps) {
   /** 默认首尾帧 + 正式档：1080p + viduq3-pro（与预览档 540p+turbo 二选一） */
   const [mode, setMode] = useState<VideoMode>("first_last_frame")
@@ -102,7 +111,23 @@ export function VideoModeSelector({
     }
   }
 
+  /**
+   * 弹窗打开且当前镜不允许首尾帧时：若内部状态仍为 first_last_frame（含初始默认值），
+   * 强制切到 first_frame 并同步默认模型，避免用户未改 radio 就点「开始生成」。
+   */
+  useEffect(() => {
+    if (!open || firstLastFrameAllowed) return
+    if (mode !== "first_last_frame") return
+    const dm = MODEL_OPTIONS.first_frame[0]?.value ?? "viduq2-pro-fast"
+    setMode("first_frame")
+    setModel(dm)
+    setPreviewEnabled(false)
+  }, [open, firstLastFrameAllowed, mode])
+
   const handleConfirm = () => {
+    if (mode === "first_last_frame" && !firstLastFrameAllowed) {
+      return
+    }
     const base = {
       mode,
       model,
@@ -139,20 +164,39 @@ export function VideoModeSelector({
               ["first_last_frame", "首尾帧双图（推荐，需已生成尾帧）"],
               ["reference", "多参考图（使用各镜头关联资产）"],
             ] as const
-          ).map(([value, label]) => (
-            <label
-              key={value}
-              className="flex items-center gap-2 cursor-pointer text-sm"
-            >
-              <input
-                type="radio"
-                name="vid-mode"
-                checked={mode === value}
-                onChange={() => handleModeChange(value)}
-              />
-              {label}
-            </label>
-          ))}
+          ).map(([value, label]) => {
+            const flDisabled =
+              value === "first_last_frame" && !firstLastFrameAllowed
+            return (
+              <label
+                key={value}
+                className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm ${
+                  flDisabled
+                    ? "opacity-60 cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="vid-mode"
+                  checked={mode === value}
+                  disabled={flDisabled}
+                  onChange={() => {
+                    if (!flDisabled) handleModeChange(value)
+                  }}
+                />
+                <span>{label}</span>
+                {flDisabled ? (
+                  <span
+                    className="text-[11px] text-[var(--color-muted)] w-full pl-6 box-border"
+                    style={{ boxSizing: "border-box" }}
+                  >
+                    当前镜头无尾帧路径，请先在分镜板或此处生成尾帧后再选此项。
+                  </span>
+                ) : null}
+              </label>
+            )
+          })}
         </fieldset>
 
         <div>

@@ -570,6 +570,7 @@ export function VideoPickFocusPanel({
         onClose={() => setVideoDialogOpen(false)}
         shotCount={1}
         episodeAssetIds={episodeAssetIds}
+        firstLastFrameAllowed={hasEndFramePath}
         onConfirm={(r) => void handleVideoModeConfirm(r)}
       />
 
