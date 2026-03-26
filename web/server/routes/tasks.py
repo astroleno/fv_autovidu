@@ -87,8 +87,10 @@ def get_task_status(task_id: str, request: Request):
     store = get_task_store()
     row = store.get_task_row(task_id)
     req_ctx = get_context_task_id(request)
+    # 仅当任务已绑定**其它**上下文时隐藏；context_id 为空表示旧版/未绑定任务，应对当前请求返回真实状态，
+    # 否则带 X-FV-Context-Id 的前端会一直拿到 pending，轮询永不结束。
     if row is not None and req_ctx is not None:
-        if row.context_id is None or row.context_id != req_ctx:
+        if row.context_id is not None and row.context_id != req_ctx:
             return TaskStatusResponse(taskId=task_id, status="pending")
     if row is not None:
         row = _reconcile_awaiting_video_if_episode_has_file(row)
@@ -142,7 +144,7 @@ def get_tasks_batch(
     for tid in task_ids:
         row = store.get_task_row(tid)
         if row is not None:
-            if req_ctx is not None and (row.context_id is None or row.context_id != req_ctx):
+            if req_ctx is not None and row.context_id is not None and row.context_id != req_ctx:
                 continue
             row = _reconcile_awaiting_video_if_episode_has_file(row)
             api = row.to_api_response()
