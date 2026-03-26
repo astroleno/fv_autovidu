@@ -72,7 +72,7 @@
 ### 6.1 「最新」与自动选中 — 数据规则（无新字段 v1）
 
 - **`VideoCandidate` 已有 `createdAt`（ISO 字符串）**。  
-  **「物理最新」候选**：同一镜下 `createdAt` **字典序最大**（或与写入顺序一致时等价于 **列表最后一项**，实现时需与后端 `add_video_candidate` 追加语义对齐，**以 `createdAt` 比较为准更稳**）。
+  **「物理最新」候选**：同一镜下 `createdAt` **字典序最大**；若多候选 **同秒**（后端 `createdAt` 为秒级），则以 **`videoCandidates` 数组中更靠后** 的条目为准（与 `add_video_candidate` 追加顺序一致）。前端实现：`videoCandidateSort.ts` 中 `createdAt` 相等时按 **下标 tie-break**。
 - **自动选中**：在 **视频 finalize 成功**、已写入 `videoPath` 之后，将该 **本次完成的 `candidate_id`** 设为当前选中（调用现有 `data_service.select_candidate`）。  
   **推荐落点**：`web/server/services/task_store/video_finalizer.py` 在 `update_video_candidate` 成功后调用 `select_candidate`（需传入与其它路径一致的 `namespace_root`），保证 **单写入口**、避免前端轮询竞态。  
   若产品确认「仅再生成任务自动选中、首次批量不选中」，可在后续迭代用任务元数据收窄；**v1 默认**：凡本镜 **新视频落盘成功** 即选中该候选（与 §11 四句一致）。
