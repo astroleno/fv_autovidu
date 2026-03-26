@@ -49,6 +49,7 @@ from models.schemas import (
     VideoMode,
 )
 from services import data_service
+from services.prompt_compose import append_dialogue_for_video_prompt
 from services.context_service import (
     fs_lock_tag_from_namespace_root,
     get_context_task_id,
@@ -293,7 +294,7 @@ def _run_tail_frame(
             img_data = generate_tail_frame(
                 first_path,
                 shot.imagePrompt,
-                shot.videoPrompt,
+                append_dialogue_for_video_prompt(shot.videoPrompt, shot),
                 asset_paths,
             )
         # 优先用首帧路径 stem（如 frames/S003.png → S003_end.png），避免多镜头 shotNumber 重复时互相覆盖
@@ -457,6 +458,10 @@ def _run_video_gen(
             )
             cand_resolution = resolution_label or resolved_resolution
             aspect = _normalize_aspect_ratio(shot.aspectRatio)
+            # 与尾帧一致：Vidu 口型/表演读取译文对白块（prompt_compose 内幂等）
+            composed_video_prompt = append_dialogue_for_video_prompt(
+                shot.videoPrompt, shot
+            )
 
             from services import vidu_service
 
@@ -464,7 +469,7 @@ def _run_video_gen(
             if mode == "first_frame":
                 resp = vidu_service.submit_img2video(
                     first_path,
-                    shot.videoPrompt,
+                    composed_video_prompt,
                     model=resolved_model,
                     duration=resolved_duration,
                     resolution=resolved_resolution,
@@ -515,7 +520,7 @@ def _run_video_gen(
                 resp = vidu_service.submit_first_last_video(
                     first_path,
                     end_path,
-                    shot.videoPrompt,
+                    composed_video_prompt,
                     model=resolved_model,
                     duration=resolved_duration,
                     resolution=resolved_resolution,
@@ -545,7 +550,7 @@ def _run_video_gen(
                     return
                 resp = vidu_service.submit_reference_video(
                     ref_paths,
-                    shot.videoPrompt,
+                    composed_video_prompt,
                     model=resolved_model,
                     duration=resolved_duration,
                     resolution=resolved_resolution,
