@@ -116,3 +116,84 @@ h1, h2, h3, .font-headline {
   box-sizing: border-box;
   filter: none;
 }
+
+/* ========== 视频进度条：剪映式可拖拽圆形指针（VideoSeekBar） ========== */
+.video-seek-bar {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  box-sizing: border-box;
+  /* 与 VideoSeekBar 容器 h-7 对齐，扩大可拖拽命中区 */
+  min-height: 28px;
+  touch-action: none;
+}
+
+.video-seek-bar:focus {
+  outline: none;
+}
+
+.video-seek-bar:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* WebKit：透明轨道，由组件内底层 div 负责「槽 + 已播」 */
+.video-seek-bar::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+  border: none;
+}
+
+.video-seek-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--color-newsprint-black);
+  box-shadow: 0 1px 3px rgba(17, 17, 17, 0.35);
+  cursor: grab;
+}
+
+.video-seek-bar:active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+
+/* 深色控制条：亮拇指 */
+.video-seek-bar--on-dark::-webkit-slider-thumb {
+  background: #ffffff;
+}
+
+/* 浅色控制条：白芯 + 黑边（在白底上仍清晰，接近剪映时间轴指针） */
+.video-seek-bar--on-light::-webkit-slider-thumb {
+  background: #ffffff;
+}
+
+/* Firefox */
+.video-seek-bar::-moz-range-track {
+  height: 4px;
+  background: transparent;
+  border: none;
+}
+
+.video-seek-bar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--color-newsprint-black);
+  box-shadow: 0 1px 3px rgba(17, 17, 17, 0.35);
+  cursor: grab;
+}
+
+.video-seek-bar:active::-moz-range-thumb {
+  cursor: grabbing;
+}
+
+.video-seek-bar--on-dark::-moz-range-thumb {
+  background: #ffffff;
+}
+
+.video-seek-bar--on-light::-moz-range-thumb {
+  background: #ffffff;
+}
