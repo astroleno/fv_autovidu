@@ -166,9 +166,12 @@ class PullEpisodeRequest(BaseModel):
 
     episodeId: str
     projectId: Optional[str] = None  # 可选，拉资产需正确 projectId；缺省时从本地已存在剧集推断
-    forceRedownload: bool = False  # 强制重新下载资产图（修复拉成风格图时使用）
-    # True：不下载首帧/资产图，只写 episode.json（画面描述、提示词等仍从平台拉取）
+    forceRedownload: bool = False  # 强制覆盖本地已有首帧/资产图
+    # 兼容：为 True 时首帧与资产图均不下载（仅写 episode.json）
     skipImages: bool = False
+    # 分别控制首帧与资产图；若 skipImages=True 则二者均视为 True
+    skipFrames: bool = False
+    skipAssets: bool = False
 
 
 class GenerateEndframeRequest(BaseModel):

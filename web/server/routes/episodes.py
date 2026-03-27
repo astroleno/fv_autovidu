@@ -87,8 +87,10 @@ def pull_episode(req: PullEpisodeRequest, request: Request):
             req.episodeId,
             output_root,
             project_id=project_id,
-            force_redownload=getattr(req, "forceRedownload", False),
-            skip_images=getattr(req, "skipImages", False),
+            force_redownload=req.forceRedownload,
+            skip_frames=req.skipFrames,
+            skip_assets=req.skipAssets,
+            skip_images=req.skipImages,
             client=client,
             fs_lock_namespace=fs_tag,
         )

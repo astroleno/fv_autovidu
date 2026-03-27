@@ -16,19 +16,23 @@ export const episodesApi = {
   detail: (id: string) => apiClient.get<Episode>(`/episodes/${id}`),
   patch: (id: string, data: EpisodeLocalePatch) =>
     apiClient.patch<Episode>(`/episodes/${id}`, data),
-  pull: (
-    episodeId: string,
-    forceRedownload = false,
-    projectId?: string,
-    skipImages = false
-  ) =>
+  pull: (params: {
+    episodeId: string
+    forceRedownload?: boolean
+    projectId?: string
+    skipImages?: boolean
+    skipFrames?: boolean
+    skipAssets?: boolean
+  }) =>
     apiClient.post<Episode>(
       "/episodes/pull",
       {
-        episodeId,
-        forceRedownload,
-        projectId,
-        skipImages,
+        episodeId: params.episodeId,
+        forceRedownload: params.forceRedownload ?? false,
+        projectId: params.projectId,
+        skipImages: params.skipImages ?? false,
+        skipFrames: params.skipFrames ?? false,
+        skipAssets: params.skipAssets ?? false,
       } as PullEpisodeRequest,
       { timeout: LONG_REQUEST_TIMEOUT_MS }
     ),

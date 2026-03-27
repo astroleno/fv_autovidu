@@ -521,6 +521,8 @@ def pull_episode(
     episode_number: int = 1,
     client: FeelingClient | None = None,
     force_redownload: bool = False,
+    skip_frames: bool = False,
+    skip_assets: bool = False,
     skip_images: bool = False,
     fs_lock_namespace: str = "",
 ) -> dict[str, Any]:
@@ -529,8 +531,8 @@ def pull_episode(
 
     流程：
     1. 调用 get_scenes、get_shots、get_assets
-    2. 下载所有首帧图 -> frames/S{nn}.png（skip_images=True 时跳过）
-    3. 下载所有资产图 -> assets/{name}.png（skip_images=True 时跳过）
+    2. 下载首帧图 -> frames/S{nn}.png（skip_frames=True 时跳过）
+    3. 下载资产图 -> assets/{name}.png（skip_assets=True 时跳过）
     4. 组装 episode.json 写入 output_dir（含 visualDescription / 提示词 等）
 
     Args:
@@ -540,12 +542,17 @@ def pull_episode(
         episode_title: 剧集标题，缺省时用 "第N集"
         episode_number: 剧集编号
         client: FeelingClient 实例，缺省时新建
-        skip_images: True 时不下载任何图片，仅写入 episode.json（适合只看画面描述/提示词）
+        skip_frames: True 时不下载首帧图
+        skip_assets: True 时不下载资产图
+        skip_images: 兼容旧参数；为 True 时等价于 skip_frames 与 skip_assets 均为 True
         fs_lock_namespace: 多上下文时为 envKey/workspaceKey，传入 episode_fs_lock 避免跨 Profile 互锁
 
     Returns:
         组装好的 Episode dict（与前端 Episode 类型一致）
     """
+    if skip_images:
+        skip_frames = True
+        skip_assets = True
     client = client or FeelingClient()
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -595,7 +602,7 @@ def pull_episode(
             local_path = f"assets/{local_name}"
             full_path = assets_dir / local_name
             if (
-                not skip_images
+                not skip_assets
                 and img_url
                 and (force_redownload or not full_path.exists())
             ):
@@ -703,7 +710,7 @@ def pull_episode(
                 frame_rel = f"frames/{frame_name}"
                 frame_path = frames_dir / frame_name
                 if (
-                    not skip_images
+                    not skip_frames
                     and frame_url
                     and (force_redownload or not frame_path.exists())
                 ):
@@ -783,7 +790,7 @@ def pull_episode(
                 frame_rel = f"frames/{frame_name}"
                 frame_path = frames_dir / frame_name
                 if (
-                    not skip_images
+                    not skip_frames
                     and frame_url
                     and (force_redownload or not frame_path.exists())
                 ):
@@ -867,8 +874,12 @@ def pull_episode(
         json_path = ep_dir / "episode.json"
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(episode, f, ensure_ascii=False, indent=2)
-        if skip_images:
-            print(f"[OK] 已拉取文案至 {json_path}（已跳过图片下载）")
+        if skip_frames and skip_assets:
+            print(f"[OK] 已拉取文案至 {json_path}（已跳过首帧与资产图下载）")
+        elif skip_frames:
+            print(f"[OK] 已拉取至 {json_path}（已跳过首帧图下载）")
+        elif skip_assets:
+            print(f"[OK] 已拉取至 {json_path}（已跳过资产图下载）")
         else:
             print(f"[OK] 已拉取至 {json_path}")
         return episode
@@ -880,6 +891,8 @@ def pull_project_with_report(
     *,
     client: FeelingClient | None = None,
     force_redownload: bool = False,
+    skip_frames: bool = False,
+    skip_assets: bool = False,
     skip_images: bool = False,
     fs_lock_namespace: str = "",
 ) -> PullProjectReport:
@@ -911,6 +924,8 @@ def pull_project_with_report(
                 episode_number=num,
                 client=client,
                 force_redownload=force_redownload,
+                skip_frames=skip_frames,
+                skip_assets=skip_assets,
                 skip_images=skip_images,
                 fs_lock_namespace=fs_lock_namespace,
             )
@@ -929,6 +944,8 @@ def pull_project(
     *,
     client: FeelingClient | None = None,
     force_redownload: bool = False,
+    skip_frames: bool = False,
+    skip_assets: bool = False,
     skip_images: bool = False,
     fs_lock_namespace: str = "",
 ) -> list[dict[str, Any]]:
@@ -943,6 +960,8 @@ def pull_project(
         output_dir,
         client=client,
         force_redownload=force_redownload,
+        skip_frames=skip_frames,
+        skip_assets=skip_assets,
         skip_images=skip_images,
         fs_lock_namespace=fs_lock_namespace,
     )
@@ -960,11 +979,23 @@ def main() -> None:
     parser.add_argument(
         "--skip-images",
         action="store_true",
-        help="不下载首帧/资产图，只写 episode.json（含画面描述、提示词等元数据）",
+        help="不下载首帧与资产图，只写 episode.json（含画面描述、提示词等元数据）；等价于同时 --skip-frames --skip-assets",
+    )
+    parser.add_argument(
+        "--skip-frames",
+        action="store_true",
+        help="不下载首帧图，仍写 episode.json；可与 --skip-assets 组合",
+    )
+    parser.add_argument(
+        "--skip-assets",
+        action="store_true",
+        help="不下载资产图，仍写 episode.json；可与 --skip-frames 组合",
     )
     args = parser.parse_args()
 
     # 同时传 --episode-id 与 --project-id 时：只拉单集，project-id 仅用于资产接口与目录名
+    skip_frames = bool(args.skip_frames) or bool(args.skip_images)
+    skip_assets = bool(args.skip_assets) or bool(args.skip_images)
     if args.episode_id:
         pull_episode(
             args.episode_id,
@@ -973,7 +1004,8 @@ def main() -> None:
             episode_title=args.title,
             episode_number=args.number,
             force_redownload=args.force,
-            skip_images=args.skip_images,
+            skip_frames=skip_frames,
+            skip_assets=skip_assets,
         )
         return
     if args.project_id:
@@ -981,7 +1013,8 @@ def main() -> None:
             args.project_id,
             args.output,
             force_redownload=args.force,
-            skip_images=args.skip_images,
+            skip_frames=skip_frames,
+            skip_assets=skip_assets,
         )
         return
     parser.error("请指定 --episode-id 或 --project-id")

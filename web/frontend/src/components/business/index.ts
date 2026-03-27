@@ -59,3 +59,6 @@ export { DubStatusBadge } from "./DubStatusBadge"
 export { BatchTaskProgressBanner } from "./BatchTaskProgressBanner"
 export { RegenFramePanel } from "./regen"
 export type { RegenFramePanelProps } from "./regen"
+/** 平台拉取：图片下载选项 × 本地覆盖策略；分镜数据与 episode.json 说明见组件内 */
+export { PullSyncOptions } from "./PullSyncOptions"
+export type { PullSyncOptionsProps } from "./PullSyncOptions"

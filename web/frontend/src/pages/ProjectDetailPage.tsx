@@ -12,6 +12,7 @@ import { episodesApi } from "@/api/episodes"
 import { projectsApi } from "@/api/projects"
 import type { ProjectEpisodeItem } from "@/types/project"
 import { Button, Card, Skeleton, EmptyState } from "@/components/ui"
+import { PullSyncOptions } from "@/components/business/PullSyncOptions"
 import { routes } from "@/utils/routes"
 
 function sourceLabel(source: ProjectEpisodeItem["source"]): string {
@@ -43,20 +44,32 @@ export default function ProjectDetailPage() {
   const [pullAllBusy, setPullAllBusy] = useState(false)
   /** 一键拉取选项面板展开状态 */
   const [pullAllOptionsOpen, setPullAllOptionsOpen] = useState(false)
-  /** 强制重新下载资产/首帧图（覆盖本地已有文件） */
+  /** 维度二：本地已有图片时是否强制覆盖 */
   const [pullAllForce, setPullAllForce] = useState(false)
-  /** 仅同步分镜文案，不下载图片 */
-  const [pullAllSkipImages, setPullAllSkipImages] = useState(false)
+  /** 维度一：是否下载首帧 / 资产图（分镜数据随拉取写入 episode.json，与分镜表同源） */
+  const [pullAllDownloadFrames, setPullAllDownloadFrames] = useState(true)
+  const [pullAllDownloadAssets, setPullAllDownloadAssets] = useState(true)
 
   useEffect(() => {
     if (projectId) void fetchProjectEpisodes(projectId)
   }, [projectId, fetchProjectEpisodes])
 
+  /** 未勾选任何图片类下载时，强制覆盖无意义 */
+  useEffect(() => {
+    if (!pullAllDownloadFrames && !pullAllDownloadAssets) setPullAllForce(false)
+  }, [pullAllDownloadFrames, pullAllDownloadAssets])
+
   const handlePullOne = async (episodeId: string) => {
     if (!projectId) return
     setPullingId(episodeId)
     try {
-      const res = await episodesApi.pull(episodeId, false, projectId, false)
+      const res = await episodesApi.pull({
+        episodeId,
+        forceRedownload: false,
+        projectId,
+        skipFrames: false,
+        skipAssets: false,
+      })
       /**
        * 与 AppLayout「从平台拉取」一致：把 POST /pull 返回的 Episode 写入全局 store。
        * 进入分镜页时即使用内存数据，不依赖 GET /episodes/:id 再读盘（避免 DATA_ROOT 不一致或竞态导致 404）。
@@ -87,12 +100,21 @@ export default function ProjectDetailPage() {
     try {
       const res = await projectsApi.pullAll(projectId, {
         forceRedownload: pullAllForce,
-        skipImages: pullAllSkipImages,
+        skipFrames: !pullAllDownloadFrames,
+        skipAssets: !pullAllDownloadAssets,
       })
       const { successCount, failedCount, failedEpisodes } = res.data
-      const modeLabel = pullAllForce ? "（强制重下载）" : ""
+      const imgParts: string[] = []
+      if (pullAllDownloadFrames) imgParts.push("首帧")
+      if (pullAllDownloadAssets) imgParts.push("资产")
+      const scopeHint =
+        imgParts.length === 0
+          ? "仅分镜数据无新图"
+          : `分镜数据+${imgParts.join("+")}`
+      const policyHint =
+        imgParts.length === 0 ? "" : pullAllForce ? " · 强制覆盖" : " · 增量"
       pushToast(
-        `完成${modeLabel}：成功 ${successCount}，失败 ${failedCount}`,
+        `完成（${scopeHint}${policyHint}）：成功 ${successCount}，失败 ${failedCount}`,
         failedCount > 0 ? "error" : "success"
       )
       if (failedEpisodes.length > 0) {
@@ -189,7 +211,11 @@ export default function ProjectDetailPage() {
                 ) : (
                   <Download className="w-4 h-4" />
                 )}
-                {pullAllForce ? "强制拉取全部" : "一键拉取全部"}
+                {!pullAllDownloadFrames && !pullAllDownloadAssets
+                  ? "拉取全部（仅分镜数据·无图）"
+                  : pullAllForce
+                    ? "拉取全部（强制覆盖）"
+                    : "一键拉取全部"}
               </Button>
               <button
                 type="button"
@@ -202,35 +228,15 @@ export default function ProjectDetailPage() {
               </button>
             </div>
             {pullAllOptionsOpen && (
-              <div className="absolute right-0 top-full mt-1 z-20 w-72 p-3 border border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] shadow-[4px_4px_0px_0px_#111111] space-y-3 box-border">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={pullAllSkipImages}
-                    onChange={(e) => {
-                      const v = e.target.checked
-                      setPullAllSkipImages(v)
-                      if (v) setPullAllForce(false)
-                    }}
-                    className="w-4 h-4 shrink-0"
-                  />
-                  <span className="text-sm font-medium">仅拉取分镜文案（不下载图片）</span>
-                </label>
-                <label
-                  className={`flex items-center gap-3 ${pullAllSkipImages ? "opacity-40 pointer-events-none" : "cursor-pointer"}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={pullAllForce}
-                    disabled={pullAllSkipImages}
-                    onChange={(e) => setPullAllForce(e.target.checked)}
-                    className="w-4 h-4 shrink-0"
-                  />
-                  <span className="text-sm font-medium">强制重新下载资产/首帧图</span>
-                </label>
-                <p className="text-xs text-[var(--color-muted)] ml-7 -mt-1">
-                  覆盖本地已有图片；在平台更新了资产后勾选此项
-                </p>
+              <div className="absolute right-0 top-full mt-1 z-20 w-[min(22rem,calc(100vw-2rem))] max-h-[min(70vh,32rem)] overflow-y-auto border border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] shadow-[4px_4px_0px_0px_#111111] box-border">
+                <PullSyncOptions
+                  downloadFrames={pullAllDownloadFrames}
+                  downloadAssets={pullAllDownloadAssets}
+                  forceOverwrite={pullAllForce}
+                  onDownloadFramesChange={setPullAllDownloadFrames}
+                  onDownloadAssetsChange={setPullAllDownloadAssets}
+                  onForceOverwriteChange={setPullAllForce}
+                />
               </div>
             )}
           </div>

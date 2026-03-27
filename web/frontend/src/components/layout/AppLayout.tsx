@@ -9,6 +9,7 @@ import { SideNavBar } from "./SideNavBar"
 import { TopNavBar } from "./TopNavBar"
 import { ContextHeaderBadge } from "./ContextHeaderBadge"
 import { Dialog, Button } from "@/components/ui"
+import { PullSyncOptions } from "@/components/business/PullSyncOptions"
 import { Toast } from "@/components/ui/Toast"
 import { useContextStore, useEpisodeStore, useToastStore, useUIStore } from "@/stores"
 import { MODAL_PULL_EPISODE } from "@/stores/uiStore"
@@ -35,8 +36,9 @@ export default function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [pullId, setPullId] = useState("")
   const [pullForce, setPullForce] = useState(false)
-  /** 仅同步 episode.json（画面描述、提示词），不下载首帧/资产图，速度更快 */
-  const [pullSkipImages, setPullSkipImages] = useState(false)
+  /** 同步内容：是否下载首帧 / 资产图（分镜文案始终写入 episode.json） */
+  const [pullDownloadFrames, setPullDownloadFrames] = useState(true)
+  const [pullDownloadAssets, setPullDownloadAssets] = useState(true)
   const [pullLoading, setPullLoading] = useState(false)
   /** 当前路由下项目的展示标题（来自 GET /api/projects/:id） */
   const [projectTitle, setProjectTitle] = useState<string | null>(null)
@@ -84,6 +86,11 @@ export default function AppLayout() {
     }
   }, [pullOpen, routeEpisodeId, pullId])
 
+  /** 未勾选任何图片类下载时，强制覆盖无意义，自动关闭 */
+  useEffect(() => {
+    if (!pullDownloadFrames && !pullDownloadAssets) setPullForce(false)
+  }, [pullDownloadFrames, pullDownloadAssets])
+
   const breadcrumbs: Crumb[] = useMemo(() => {
     const p = location.pathname
     const home: Crumb = { label: "首页", path: routes.home() }
@@ -128,7 +135,8 @@ export default function AppLayout() {
     closeModal()
     setPullId("")
     setPullForce(false)
-    setPullSkipImages(false)
+    setPullDownloadFrames(true)
+    setPullDownloadAssets(true)
   }
 
   const handlePull = async () => {
@@ -140,7 +148,12 @@ export default function AppLayout() {
         routeEpisodeId && currentEpisode?.episodeId === routeEpisodeId
           ? currentEpisode.projectId
           : routeProjectId ?? undefined
-      await pullNewEpisode(pullId.trim(), pullForce, projectId, pullSkipImages)
+      await pullNewEpisode(pullId.trim(), {
+        forceRedownload: pullForce,
+        projectId,
+        skipFrames: !pullDownloadFrames,
+        skipAssets: !pullDownloadAssets,
+      })
       handleClosePull()
     } finally {
       setPullLoading(false)
@@ -211,43 +224,14 @@ export default function AppLayout() {
               className="w-full px-3 py-2 border border-[var(--color-newsprint-black)] box-border"
             />
           </div>
-          <div className="p-3 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/50 space-y-3 box-border">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={pullSkipImages}
-                onChange={(e) => {
-                  const v = e.target.checked
-                  setPullSkipImages(v)
-                  if (v) setPullForce(false)
-                }}
-                className="w-4 h-4 shrink-0"
-              />
-              <span className="text-sm font-medium">
-                仅拉取分镜文案（不下载图片）
-              </span>
-            </label>
-            <p className="text-xs text-[var(--color-muted)] ml-7 -mt-2">
-              只写入 episode.json，含画面描述、图片/视频提示词；首帧与资产图占位路径不变，本地可无图。
-            </p>
-            <label
-              className={`flex items-center gap-3 ${pullSkipImages ? "opacity-40 pointer-events-none" : "cursor-pointer"}`}
-            >
-              <input
-                type="checkbox"
-                checked={pullForce}
-                disabled={pullSkipImages}
-                onChange={(e) => setPullForce(e.target.checked)}
-                className="w-4 h-4 shrink-0"
-              />
-              <span className="text-sm font-medium">
-                强制重新下载资产图
-              </span>
-            </label>
-            <p className="text-xs text-[var(--color-muted)] mt-1 ml-7">
-              修复资产图拉错成风格图时勾选（与「仅文案」互斥）
-            </p>
-          </div>
+          <PullSyncOptions
+            downloadFrames={pullDownloadFrames}
+            downloadAssets={pullDownloadAssets}
+            forceOverwrite={pullForce}
+            onDownloadFramesChange={setPullDownloadFrames}
+            onDownloadAssetsChange={setPullDownloadAssets}
+            onForceOverwriteChange={setPullForce}
+          />
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={handleClosePull}>
               取消
