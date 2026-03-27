@@ -67,6 +67,8 @@ class ViduClient:
         duration: int = 5,
         resolution: str = "720p",
         audio: bool = True,
+        # audio 为 True 时写入请求体；见 docs/vidu/i2v.md：all / speech_only / sound_effect_only
+        audio_type: str = "speech_only",
         seed: int = 0,
         off_peak: bool = False,
         **kwargs: Any,
@@ -81,6 +83,7 @@ class ViduClient:
             duration: 视频时长（秒）
             resolution: 分辨率
             audio: 是否音视频直出（默认 True）
+            audio_type: 音视频直出时的音频类型；默认仅人声、不要额外音效
             seed: 随机种子，0 为随机
             off_peak: 是否错峰
             **kwargs: 其他可选参数（voice_id, callback_url 等）
@@ -102,6 +105,9 @@ class ViduClient:
             "off_peak": off_peak,
             **kwargs,
         }
+        # 官方：audio 为 true 时可传 audio_type；默认仅人声，不叠加环境音效
+        if audio:
+            payload["audio_type"] = audio_type
         # 移除空值
         payload = {k: v for k, v in payload.items() if v is not None and v != ""}
         # 提交型 POST 不做盲重试：超时/断线时服务端可能已创建任务，重试会导致重复计费与重复成片
@@ -125,6 +131,8 @@ class ViduClient:
         bgm: bool = False,
         # 默认音视频直出；仅需画面时显式传 audio=False（q3 写入 payload）
         audio: bool = True,
+        # 与 img2video 一致：q3 直出时仅人声，不传则服务端等价于 all（含音效）
+        audio_type: str = "speech_only",
         is_rec: bool | None = None,
         movement_amplitude: str | None = None,
         off_peak: bool = False,
@@ -142,6 +150,7 @@ class ViduClient:
             seed: 随机种子，0 表示由服务端处理（与 i2v 行为对齐）
             bgm: 是否加 BGM（q3 上部分时长可能不生效，见文档）
             audio: 是否音视频直出（默认 True）；仅 q3 系列写入 payload，非 q3 时不发送
+            audio_type: q3 且 audio 为 True 时写入，控制人声 / 音效 / 二者
             is_rec: 是否使用推荐提示词
             movement_amplitude: auto | small | medium | large（q2/q3 上部分参数不生效）
             off_peak: 错峰
@@ -167,6 +176,8 @@ class ViduClient:
         # 文档：audio 仅 q3 支持；向 q2/q1 传 true 可能导致 400
         if (model or "").startswith("viduq3"):
             payload["audio"] = audio
+            if audio:
+                payload["audio_type"] = audio_type
         if is_rec is not None:
             payload["is_rec"] = is_rec
         if movement_amplitude:
@@ -207,7 +218,7 @@ class ViduClient:
         model: str = "viduq2",
         duration: int = 5,
         audio: bool = False,
-        audio_type: str = "all",
+        audio_type: str = "speech_only",
         resolution: str = "720p",
         aspect_ratio: str = "16:9",
         seed: int = 0,
@@ -227,7 +238,7 @@ class ViduClient:
             model: viduq2 | viduq1 | vidu2.0（不支持 viduq2-pro）
             duration: 时长（秒）
             audio: 是否音视频直出（含台词）
-            audio_type: all | speech_only | sound_effect_only
+            audio_type: all | speech_only | sound_effect_only（默认 speech_only，仅人声）
             **kwargs: 其他参数
 
         Returns:

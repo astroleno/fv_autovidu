@@ -66,7 +66,7 @@ def main():
                 duration=payload["duration"],
                 resolution=payload.get("resolution", "540p"),
                 audio=payload.get("audio", True),
-                audio_type=payload.get("audio_type", "all"),
+                audio_type=payload.get("audio_type", "speech_only"),
                 bgm=payload.get("bgm", False),
                 seed=0,
                 payload=payload.get("payload", "{}"),
