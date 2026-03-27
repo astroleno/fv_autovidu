@@ -39,6 +39,8 @@ datas = [
     (os.path.join('web', 'frontend', 'dist'), os.path.join('web', 'frontend', 'dist')),
     # 默认 YAML 配置（CLI 脚本可能读取，一并打入）
     (os.path.join('config', 'default.yaml'), 'config'),
+    # Feeling 多 Profile 模板：用户可复制为 exe 同级 config/feeling_contexts.json（或 _internal/config/）
+    (os.path.join('config', 'feeling_contexts.example.json'), 'config'),
     # .env.example 作为参考模板
     ('.env.example', '.'),
 ]

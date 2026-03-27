@@ -56,7 +56,8 @@ def validate_context(body: ValidateContextBody):
     from src.feeling.context import validate_context_login
 
     try:
-        validate_context_login(body.contextId.strip(), project_root=_PROJECT_ROOT)
+        # project_root=None：与 get_context_resolver 一致，冻结模式下按 exe 旁再 _internal 顺序查找
+        validate_context_login(body.contextId.strip(), project_root=None)
     except FileNotFoundError as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
     except ValueError as e:

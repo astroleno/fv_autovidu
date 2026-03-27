@@ -13,9 +13,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
-# 仓库根目录：web/server/services/context_service.py -> parents[3] == 项目根
-_PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
 if TYPE_CHECKING:
     from fastapi import Request
 
@@ -44,13 +41,18 @@ def feeling_context_middleware_applies_to_path(url_path: str) -> bool:
 
 def get_context_resolver():
     """
-    惰性单例：解析 config/feeling_contexts.json，项目根与 config 模块一致。
+    惰性单例：解析 config/feeling_contexts.json。
+
+    注意：不可用 __file__ 推算「仓库根」。PyInstaller 下 __file__ 位于 _internal/，
+    会导致只认打包目录而忽略 exe 同级的 config/；且与 web/server/config.py 的
+    FV_STUDIO_EXE_DIR（.env 所在根）不一致。此处传 None，由 ContextResolver 使用
+    feeling_project_root() 与 feeling_contexts_json_candidates 统一解析路径。
     """
     global _context_resolver
     if _context_resolver is None:
         from src.feeling.context import ContextResolver
 
-        _context_resolver = ContextResolver(_PROJECT_ROOT)
+        _context_resolver = ContextResolver(None)
     return _context_resolver
 
 
