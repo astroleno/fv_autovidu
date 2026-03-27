@@ -133,7 +133,7 @@ export default function TimelinePage() {
     [playableShotIds, activeShotId]
   )
 
-  const onTimeUpdate = useCallback((cur: number, _durationSec: number) => {
+  const onTimeUpdate = useCallback((cur: number) => {
     setClipPlayheadSec(cur)
   }, [])
 

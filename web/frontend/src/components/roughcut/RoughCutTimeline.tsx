@@ -210,7 +210,7 @@ export function RoughCutTimeline({
 
         {/**
          * 音轨说明（避免写「后续版本」）：BGM 本应用未做剧集级时间线挂载；
-         * STS/配音已在分镜板 DubPanel（ElevenLabs）提供，与粗剪导出为两条能力。
+         * STS/配音全量能力在后期制作页（与粗剪时间线为两条能力，此处仅占位提示）。
          */}
         <AudioPlaceholderRow
           label="A1_BGM"
@@ -220,7 +220,7 @@ export function RoughCutTimeline({
         <AudioPlaceholderRow
           label="A2_STS/VO"
           icon="🎙"
-          message="STS 换声 / TTS 已在分镜板镜头「配音」中配置；本轨为粗剪占位，成片以分镜导出为准。"
+          message="STS 换声 / TTS 请在后期制作页配置；本轨为粗剪占位，成片以该页导出/剪映流程为准。"
         />
       </div>
     </section>

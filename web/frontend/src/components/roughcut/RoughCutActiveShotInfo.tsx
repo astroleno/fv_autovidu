@@ -3,7 +3,7 @@
  *
  * 与预览并排展示当前选中镜头的完整只读信息（编号、时长、画幅、状态、
  * **首帧/尾帧缩略图**、画面描述、运镜、视频提示词、配音状态），无需跳转路由。
- * STS/TTS 任务仍在分镜板「配音」中提交；此处仅展示状态徽标与说明文案。
+ * STS/TTS 任务在后期制作页提交；此处仅展示状态徽标与说明文案。
  */
 import { DubStatusBadge } from "@/components/business/DubStatusBadge"
 import { ImagePreview } from "@/components/business/ImagePreview"
@@ -94,7 +94,7 @@ export function RoughCutActiveShotInfo({ shot, basePath, cacheBust }: RoughCutAc
             </div>
           </section>
 
-          {/* 配音：仅展示状态，任务入口在分镜板（不在此跳转） */}
+          {/* 配音：仅展示状态；全量配置与任务入口在后期制作页（此处不跳转） */}
           <div
             className="mt-3 border border-[var(--color-outline-variant)] bg-white p-2 box-border"
             style={{ boxSizing: "border-box" }}
@@ -104,7 +104,7 @@ export function RoughCutActiveShotInfo({ shot, basePath, cacheBust }: RoughCutAc
               <DubStatusBadge dub={shot.dub} />
             </div>
             <p className="mt-2 text-[10px] leading-snug text-[var(--color-muted)]">
-              STS / TTS 在分镜板镜头「配音」面板中配置与提交；此处仅同步状态。
+              STS / TTS 在后期制作页配置与提交；此处仅同步状态。
             </p>
           </div>
 
