@@ -1,0 +1,38 @@
+{
+  "environments": {
+    "dev": {
+      "label": "测试环境",
+      "baseUrl": "https://dev-video-server.feeling.ltd/api"
+    },
+    "prod": {
+      "label": "生产环境",
+      "baseUrl": "https://www.feeling.video/api"
+    }
+  },
+  "profiles": {
+    "dev_default": {
+      "label": "测试环境",
+      "envKey": "dev",
+      "identifierType": "username",
+      "credentialSource": {
+        "type": "env",
+        "identifierEnv": "FEELING_DEV_DEFAULT_USERNAME",
+        "passwordEnv": "FEELING_DEV_DEFAULT_PASSWORD"
+      },
+      "workspaceKey": "dev_default",
+      "enabled": true
+    },
+    "prod_default": {
+      "label": "生产环境",
+      "envKey": "prod",
+      "identifierType": "username",
+      "credentialSource": {
+        "type": "env",
+        "identifierEnv": "FEELING_PROD_DEFAULT_USERNAME",
+        "passwordEnv": "FEELING_PROD_DEFAULT_PASSWORD"
+      },
+      "workspaceKey": "prod_default",
+      "enabled": true
+    }
+  }
+}

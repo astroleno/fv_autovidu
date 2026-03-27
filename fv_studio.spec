@@ -41,6 +41,8 @@ datas = [
     (os.path.join('config', 'default.yaml'), 'config'),
     # Feeling 多 Profile 模板：用户可复制为 exe 同级 config/feeling_contexts.json（或 _internal/config/）
     (os.path.join('config', 'feeling_contexts.example.json'), 'config'),
+    # 多环境与 Profile 元数据（仅存 env 变量名引用；若仓库中存在则打入 _internal/config/，见下方 exists 过滤）
+    (os.path.join('config', 'feeling_contexts.json'), 'config'),
     # .env.example 作为参考模板
     ('.env.example', '.'),
 ]
