@@ -117,6 +117,12 @@ export interface JianyingExportRequest {
   draftPath: string
   /** 默认由服务端设为 1080p；一般无需传 */
   canvasSize?: "720p" | "1080p"
+  /** 字幕字号 4–16，默认 8 */
+  subtitleFontSize?: number
+  subtitleAlign?: "left" | "center" | "right"
+  subtitleAutoWrapping?: boolean
+  /** 纵向位置 -1.0～0，默认 -0.8 */
+  subtitleTransformY?: number
 }
 
 /** 剪映草稿导出响应 */

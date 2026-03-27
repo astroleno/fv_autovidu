@@ -15,13 +15,20 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pyJianYingDraft.segment import ClipSettings
 from pyJianYingDraft.text_segment import TextSegment, TextStyle
 from pyJianYingDraft.time_util import Timerange
 
 from models.schemas import Shot
+
+# 与 pyJianYingDraft.text_segment.TextStyle 文档一致：0 左 1 中 2 右
+_SUBTITLE_ALIGN_TO_INT: dict[Literal["left", "center", "right"], int] = {
+    "left": 0,
+    "center": 1,
+    "right": 2,
+}
 
 
 def subtitle_text_from_shot(shot: Shot) -> str:
@@ -61,6 +68,11 @@ def build_text_track_payload(
     canvas_w: int,
     canvas_h: int,
     segments: list[tuple[int, int, str]],
+    *,
+    font_size: float = 8.0,
+    align: Literal["left", "center", "right"] = "center",
+    auto_wrapping: bool = True,
+    transform_y: float = -0.8,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     """
     根据 (起始微秒, 持续微秒, 文本) 列表构建剪映 materials.texts、text 轨 segments 及 speeds 条目。
@@ -71,6 +83,10 @@ def build_text_track_payload(
         canvas_w: 画布宽（像素），预留与分辨率相关扩展
         canvas_h: 画布高（像素），预留与分辨率相关扩展
         segments: (start_us, duration_us, text) 与主视频各镜 target_timerange 一致
+        font_size: 字幕字号，映射 ``TextStyle.size``
+        align: 水平对齐，映射 ``TextStyle.align``（0/1/2）
+        auto_wrapping: 是否自动换行
+        transform_y: 字幕纵向位置，映射 ``ClipSettings.transform_y``
 
     Returns:
         (text_material_dicts, segment_dicts, speed_dicts)。
@@ -84,9 +100,13 @@ def build_text_track_payload(
     segment_jsons: list[dict[str, Any]] = []
     speed_materials: list[dict[str, Any]] = []
 
-    subtitle_style = TextStyle(size=8, align=1, auto_wrapping=True)
-    # 与 import_srt 默认一致：字幕靠近画面底部
-    clip = ClipSettings(transform_y=-0.8)
+    align_int = _SUBTITLE_ALIGN_TO_INT[align]
+    subtitle_style = TextStyle(
+        size=font_size,
+        align=align_int,
+        auto_wrapping=auto_wrapping,
+    )
+    clip = ClipSettings(transform_y=transform_y)
 
     for start_us, duration_us, text in segments:
         body = (text or "").strip()

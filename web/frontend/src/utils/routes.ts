@@ -47,6 +47,10 @@ export const routes = {
   videopick: (projectId: string, episodeId: string) =>
     `/project/${encodeURIComponent(projectId)}/episode/${encodeURIComponent(episodeId)}/pick`,
 
+  /** 后期制作：配音、剪映字幕与导出（单页聚合） */
+  postProduction: (projectId: string, episodeId: string) =>
+    `/project/${encodeURIComponent(projectId)}/episode/${encodeURIComponent(episodeId)}/post-production`,
+
   /**
    * 选片工作台·定位到指定镜头（shotId 为一次性启动参数，消费后由 VideoPickPage 清除）
    */

@@ -115,6 +115,19 @@ class TestBuildTextTrackPayload(unittest.TestCase):
         self.assertEqual(len(segs), 0)
         self.assertEqual(len(spds), 0)
 
+    def test_build_text_track_payload_align_changes_material(self) -> None:
+        """不同 align 应产生不同字幕素材（映射 0/1/2）。"""
+        from services.jianying_text_track import build_text_track_payload
+
+        seg = [(0, 1_000_000, "一行")]
+        left_m, _, _ = build_text_track_payload(
+            1080, 1920, seg, align="left"
+        )
+        right_m, _, _ = build_text_track_payload(
+            1080, 1920, seg, align="right"
+        )
+        self.assertNotEqual(left_m[0], right_m[0])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,7 +22,7 @@ import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 # 与 video_finalizer 一致：保证可 import src.feeling（uvicorn 仅挂 web/server 时）
 _JY_ROOT = Path(__file__).resolve().parents[3]
@@ -325,6 +325,11 @@ def _write_jianying_draft_pyjdraft(
     materials_dir: Path,
     canvas_width: int,
     canvas_height: int,
+    *,
+    subtitle_font_size: float = 8.0,
+    subtitle_align: Literal["left", "center", "right"] = "center",
+    subtitle_auto_wrapping: bool = True,
+    subtitle_transform_y: float = -0.8,
 ) -> int:
     """
     按 reference/migration-packages 与实机样本对齐的最小结构直接写
@@ -509,6 +514,10 @@ def _write_jianying_draft_pyjdraft(
         canvas_width,
         canvas_height,
         text_track_segments_spec,
+        font_size=subtitle_font_size,
+        align=subtitle_align,
+        auto_wrapping=subtitle_auto_wrapping,
+        transform_y=subtitle_transform_y,
     )
     draft_info["materials"]["texts"] = text_materials
     draft_info["materials"]["speeds"].extend(text_speed_jsons)
@@ -1037,6 +1046,10 @@ def export_jianying_draft(
             resources_dir,
             w,
             h,
+            subtitle_font_size=float(req.subtitleFontSize),
+            subtitle_align=req.subtitleAlign,
+            subtitle_auto_wrapping=req.subtitleAutoWrapping,
+            subtitle_transform_y=float(req.subtitleTransformY),
         )
 
         # 不再生成 ZIP；episode 记录仍保留 zipPath 字段以兼容旧 JSON，恒为 None
