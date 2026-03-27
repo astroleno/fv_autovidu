@@ -759,8 +759,14 @@ def promote_video(
     request: Request,
 ):
     """
-    基于预览候选的 seed 发起首尾帧精出（更高分辨率 / 不同模型）。
-    校验全部通过后才入队；任一失败返回 400，不部分提交。
+    基于预览候选的 seed 发起精出（更高分辨率 / 不同模型）。
+
+    按候选 ``VideoCandidate.mode`` 分流：
+    - ``first_frame``：仅首帧 i2v 精出，不要求尾帧；
+    - ``first_last_frame``：与现网一致，要求尾帧路径与文件存在；
+    - 其它（如 ``reference``）：本期不支持，返回 400。
+
+    校验全部通过后才入队；任一失败返回 400（detail 为分号拼接的多条说明），不部分提交。
     """
     if not req.items:
         raise HTTPException(status_code=400, detail="items 不能为空")
@@ -774,6 +780,7 @@ def promote_video(
         raise HTTPException(status_code=400, detail="剧集目录不存在")
 
     err_msgs: list[str] = []
+    # 每项通过校验后入列表；入队时使用 cand.mode（仅可能为 first_frame / first_last_frame）
     validated: list[tuple[str, str, Shot, VideoCandidate]] = []
 
     for it in req.items:
@@ -796,17 +803,30 @@ def promote_video(
         if not cand.isPreview:
             err_msgs.append(f"镜头 {it.shotId} 仅 isPreview 候选可精出")
             continue
-        if cand.mode != "first_last_frame":
+        # 共用：首帧文件必须存在（first_frame / first_last_frame 均需）
+        first_path = ep_dir / shot.firstFrame
+        if not first_path.exists():
             err_msgs.append(
-                f"镜头 {it.shotId} 精出仅支持首尾帧预览候选（mode=first_last_frame），当前为 {cand.mode}"
+                f"镜头 {it.shotId} 首帧文件不存在: {shot.firstFrame}"
             )
             continue
-        if not shot.endFrame:
-            err_msgs.append(f"镜头 {it.shotId} 缺少尾帧")
-            continue
-        end_path = ep_dir / shot.endFrame
-        if not end_path.exists():
-            err_msgs.append(f"镜头 {it.shotId} 尾帧文件不存在: {shot.endFrame}")
+        # 按预览候选 mode 分支校验；仅 first_frame 与 first_last_frame 可精出
+        if cand.mode == "first_frame":
+            pass
+        elif cand.mode == "first_last_frame":
+            if not shot.endFrame:
+                err_msgs.append(f"镜头 {it.shotId} 缺少尾帧")
+                continue
+            end_path = ep_dir / shot.endFrame
+            if not end_path.exists():
+                err_msgs.append(
+                    f"镜头 {it.shotId} 尾帧文件不存在: {shot.endFrame}"
+                )
+                continue
+        else:
+            err_msgs.append(
+                f"镜头 {it.shotId} 精出仅支持 first_frame / first_last_frame，当前为 {cand.mode}"
+            )
             continue
         validated.append((it.shotId, it.candidateId, shot, cand))
 
@@ -825,12 +845,14 @@ def promote_video(
         data_service.update_shot_status(
             req.episodeId, shot_id, "video_generating", ns
         )
+        # VideoJobSpec 第 4 元为 Vidu 模式：与候选一致（first_frame | first_last_frame）
+        job_mode: VideoMode = cand.mode
         jobs.append(
             (
                 task_id,
                 req.episodeId,
                 shot_id,
-                "first_last_frame",
+                job_mode,
                 promote_model,
                 int(shot.duration),
                 req.resolution or "1080p",
