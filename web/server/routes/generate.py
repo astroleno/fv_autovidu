@@ -299,10 +299,12 @@ def _run_tail_frame(
         with _ENDFRAME_SEM:
             from services.yunwu_service import generate_tail_frame
 
+            # 尾帧走 Yunwu：system prompt 要求静态终态、不要字幕/额外文字；
+            # 不对白块做拼接，仅传镜头级 videoPrompt（与 Vidu 口型台词语义解耦）。
             img_data = generate_tail_frame(
                 first_path,
                 shot.imagePrompt,
-                append_dialogue_for_video_prompt(shot.videoPrompt, shot),
+                shot.videoPrompt,
                 asset_paths,
             )
         post = _ts().get_task_row(task_id)
@@ -474,9 +476,12 @@ def _run_video_gen(
             )
             cand_resolution = resolution_label or resolved_resolution
             aspect = _normalize_aspect_ratio(shot.aspectRatio)
-            # 与尾帧一致：Vidu 口型/表演读取译文对白块（prompt_compose 内幂等）
+            # Vidu：在提示词末尾注入台词块（译文优先、原文兜底）及 Episode 级语种标签
             composed_video_prompt = append_dialogue_for_video_prompt(
-                shot.videoPrompt, shot
+                shot.videoPrompt,
+                shot,
+                target_locale=ep.dubTargetLocale,
+                source_locale=ep.sourceLocale,
             )
 
             from services import vidu_service
