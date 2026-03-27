@@ -2,7 +2,7 @@
  * ShotRow 列表视图行
  *
  * 列顺序：编号 | 时长（数字输入，失焦保存）| 首尾帧（悬浮大图 + 进详情）| 视频（悬浮预览 + 进详情）| 状态 |
- * 台词原文 | 译文 | 画面描述 | 图片提示词 | 视频提示词 | 资产（悬浮 + 进资产库详情）| 候选数 | 操作
+ * 台词原文 | 译文 | 视频含台词 | 画面描述 | 图片提示词 | 视频提示词 | 资产（悬浮 + 进资产库详情）| 候选数 | 操作
  *
  * 提示词列支持悬浮显示、点击编辑、失焦保存；时长写入 `shot.duration`，供后续视频生成默认秒数。
  */
@@ -14,6 +14,7 @@ import {
   StatusIndicator,
   AssetTag,
   ShotDialogueCells,
+  ShotDialogueInjectCell,
   ShotPromptCells,
   ShotDurationCell,
 } from "@/components/business"
@@ -105,6 +106,11 @@ export function ShotRow({
         </div>
       </td>
       <ShotDialogueCells
+        shot={shot}
+        episodeId={episodeId}
+        updateShot={updateShot}
+      />
+      <ShotDialogueInjectCell
         shot={shot}
         episodeId={episodeId}
         updateShot={updateShot}

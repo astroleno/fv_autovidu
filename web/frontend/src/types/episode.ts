@@ -106,6 +106,11 @@ export interface Shot {
   associatedDialogue?: AssociatedDialogue | null
   /** 目标语译文，供提示词与 TTS */
   dialogueTranslation?: string
+  /**
+   * 生成视频（Vidu）时是否将台词块拼入 composed prompt；默认 true。
+   * false 时仍保留台词字段供字幕/配音/剪映，仅不注入 Vidu。
+   */
+  includeDialogueInVideoPrompt?: boolean
 }
 
 /**

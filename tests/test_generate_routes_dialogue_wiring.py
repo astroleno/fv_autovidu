@@ -138,6 +138,77 @@ class TestGenerateRoutesDialogueWiring(unittest.TestCase):
         finally:
             shutil.rmtree(root, ignore_errors=True)
 
+    def test_run_video_gen_skips_dialogue_when_include_flag_false(self) -> None:
+        """
+        includeDialogueInVideoPrompt=False 时，应直接提交 shot.videoPrompt，不追加对白块。
+        """
+        root = Path(tempfile.mkdtemp())
+        try:
+            ep_dir = root / "ep1"
+            frame = ep_dir / "frames" / "S001.png"
+            frame.parent.mkdir(parents=True)
+            frame.write_bytes(b"\x89PNG\r\n\x1a\n")
+
+            ep = _minimal_episode()
+            shot = _minimal_shot(includeDialogueInVideoPrompt=False)
+
+            store = MagicMock()
+            store.get_task_row.return_value = None
+
+            with (
+                patch.object(generate_route, "get_task_store", return_value=store),
+                patch.object(
+                    generate_route.data_service,
+                    "get_episode",
+                    return_value=ep,
+                ),
+                patch.object(
+                    generate_route.data_service,
+                    "get_shot",
+                    return_value=shot,
+                ),
+                patch.object(
+                    generate_route.data_service,
+                    "get_episode_dir",
+                    return_value=ep_dir,
+                ),
+                patch.object(
+                    generate_route.data_service,
+                    "add_video_candidate",
+                ),
+                patch.object(
+                    generate_route.data_service,
+                    "update_shot_status",
+                ),
+                patch(
+                    "services.vidu_service.submit_img2video",
+                    return_value={"task_id": "vidu-task-2", "seed": 0},
+                ) as mock_vidu,
+            ):
+                generate_route._run_video_gen(
+                    "video-task-y",
+                    "ep1",
+                    "s1",
+                    "first_frame",
+                    None,
+                    None,
+                    None,
+                    None,
+                    0,
+                    False,
+                    None,
+                    "",
+                    namespace_root=None,
+                    task_context_id=None,
+                )
+
+            mock_vidu.assert_called_once()
+            composed = mock_vidu.call_args[0][1]
+            self.assertEqual(composed, "BASE_VIDEO_PROMPT")
+            self.assertNotIn("[Dialogue", composed)
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
     def test_run_tail_frame_passes_raw_video_prompt_to_yunwu(self) -> None:
         """
         尾帧应把 ``shot.videoPrompt`` 原样交给 Yunwu，不经过 ``append_dialogue_for_video_prompt``。
