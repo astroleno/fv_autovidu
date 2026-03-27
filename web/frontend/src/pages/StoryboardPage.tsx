@@ -3,7 +3,7 @@
  * Scene 分组 + Shot 卡片/行 + 状态筛选 + 批量操作 + 视图切换
  * 批量生成尾帧 / 批量生成视频：调用 generateApi，taskStore 轮询并在完成后 Toast
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router"
 import {
   Clapperboard,
@@ -25,8 +25,6 @@ import {
   BatchPickScopeControl,
   BatchResultSummary,
   BatchTaskProgressBanner,
-  DubPanel,
-  ExportPanel,
   MarqueeGrid,
   SceneGroup,
   STORYBOARD_COL_HEADER_LABEL,
@@ -38,7 +36,7 @@ import {
   type VideoModeSelectorResult,
 } from "@/components/business"
 import { flattenShots } from "@/types"
-import type { Episode, ShotStatus } from "@/types"
+import type { ShotStatus } from "@/types"
 import type { GenerateVideoRequest, TaskStatusResponse } from "@/types"
 import { generateApi } from "@/api/generate"
 import { routes } from "@/utils/routes"
@@ -61,7 +59,6 @@ export default function StoryboardPage() {
     loading,
     error: episodeError,
     fetchEpisodeDetail,
-    updateEpisodeLocales,
   } = useEpisodeStore()
   /** 尾帧/视频写入后 pulledAt 不变，需与 localMediaEpoch 组合才能刷新缩略图 */
   const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
@@ -103,22 +100,8 @@ export default function StoryboardPage() {
   const [summaryResults, setSummaryResults] = useState<TaskStatusResponse[]>([])
   /** 上一次批量视频请求参数，用于「重试失败镜头」保持一致 mode/model */
   const lastVideoBatchParamsRef = useRef<GenerateVideoRequest | null>(null)
-  /** 分镜「工作区」：筛选/批量/配音/镜头列表；框选模式下点击此区域外则退出框选（弹窗内点击不退出） */
+  /** 分镜「工作区」：筛选/批量/镜头列表；框选模式下点击此区域外则退出框选（弹窗内点击不退出） */
   const storyboardWorkAreaRef = useRef<HTMLDivElement>(null)
-
-  /** 剧集根级 dubTargetLocale / sourceLocale 编辑草稿（与 PATCH /episodes/:id 同步） */
-  const [dubTargetDraft, setDubTargetDraft] = useState("")
-  const [sourceLocaleDraft, setSourceLocaleDraft] = useState("")
-
-  useEffect(() => {
-    if (!currentEpisode) return
-    setDubTargetDraft(currentEpisode.dubTargetLocale ?? "")
-    setSourceLocaleDraft(currentEpisode.sourceLocale ?? "")
-  }, [
-    currentEpisode?.dubTargetLocale,
-    currentEpisode?.episodeId,
-    currentEpisode?.sourceLocale,
-  ])
 
   useEffect(() => {
     if (episodeId) {
@@ -206,42 +189,6 @@ export default function StoryboardPage() {
     [allShots, statusFilter]
   )
   const basePath = useEpisodeFileBasePath()
-
-  const saveDubLocaleIfChanged = useCallback(async () => {
-    if (!episodeId || !currentEpisode) return
-    const v = dubTargetDraft.trim()
-    if (v === (currentEpisode.dubTargetLocale ?? "").trim()) return
-    await updateEpisodeLocales(episodeId, { dubTargetLocale: v })
-  }, [currentEpisode, dubTargetDraft, episodeId, updateEpisodeLocales])
-
-  const saveSourceLocaleIfChanged = useCallback(async () => {
-    if (!episodeId || !currentEpisode) return
-    const v = sourceLocaleDraft.trim()
-    if (v === (currentEpisode.sourceLocale ?? "").trim()) return
-    await updateEpisodeLocales(episodeId, { sourceLocale: v })
-  }, [currentEpisode, episodeId, sourceLocaleDraft, updateEpisodeLocales])
-
-  const saveLocaleBar = useCallback(async () => {
-    if (!episodeId || !currentEpisode) return
-    const nextDub = dubTargetDraft.trim()
-    const nextSrc = sourceLocaleDraft.trim()
-    const patch: Partial<Pick<Episode, "dubTargetLocale" | "sourceLocale">> =
-      {}
-    if (nextDub !== (currentEpisode.dubTargetLocale ?? "").trim()) {
-      patch.dubTargetLocale = nextDub
-    }
-    if (nextSrc !== (currentEpisode.sourceLocale ?? "").trim()) {
-      patch.sourceLocale = nextSrc
-    }
-    if (Object.keys(patch).length === 0) return
-    await updateEpisodeLocales(episodeId, patch)
-  }, [
-    currentEpisode,
-    dubTargetDraft,
-    episodeId,
-    sourceLocaleDraft,
-    updateEpisodeLocales,
-  ])
 
   if (!episodeId) return null
   if (loading && !currentEpisode) {
@@ -568,66 +515,39 @@ export default function StoryboardPage() {
         </div>
       </div>
 
-      {/* 剧集级本地化标签：写入 episode.json 根字段 dubTargetLocale / sourceLocale */}
+      {/* 剧集语言：只读；编辑与配音/剪映全量能力在后期制作页（设计 §11.6） */}
       <div
-        className="mb-6 flex flex-wrap items-end gap-4 p-4 border border-[var(--color-divider)] bg-[var(--color-newsprint-off-white)]/40 box-border"
+        className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-2 p-4 border border-[var(--color-divider)] bg-[var(--color-newsprint-off-white)]/40 box-border text-sm"
         style={{ boxSizing: "border-box" }}
       >
-        <div
-          className="flex flex-col gap-1 min-w-[8rem] box-border"
-          style={{ boxSizing: "border-box" }}
-        >
-          <label
-            htmlFor="episode-dub-target-locale"
-            className="text-[10px] font-black uppercase tracking-wider text-[var(--color-muted)]"
-          >
-            配音目标语
-          </label>
-          <input
-            id="episode-dub-target-locale"
-            type="text"
-            value={dubTargetDraft}
-            onChange={(e) => setDubTargetDraft(e.target.value)}
-            onBlur={() => void saveDubLocaleIfChanged()}
-            className="px-2 py-1.5 text-sm border border-[var(--color-newsprint-black)] bg-white min-w-[12rem] box-border"
-            style={{ boxSizing: "border-box" }}
-            placeholder="如 en-US"
-            autoComplete="off"
-          />
+        <div className="flex flex-wrap gap-x-6 gap-y-1 min-w-0">
+          <p className="text-[var(--color-ink)]">
+            <span className="text-[10px] font-black uppercase text-[var(--color-muted)] mr-2">
+              配音目标语
+            </span>
+            <span className="font-mono">
+              {(currentEpisode.dubTargetLocale ?? "").trim() || "—"}
+            </span>
+          </p>
+          <p className="text-[var(--color-ink)]">
+            <span className="text-[10px] font-black uppercase text-[var(--color-muted)] mr-2">
+              原文语言
+            </span>
+            <span className="font-mono">
+              {(currentEpisode.sourceLocale ?? "").trim() || "—"}
+            </span>
+          </p>
         </div>
-        <div
-          className="flex flex-col gap-1 min-w-[8rem] box-border"
-          style={{ boxSizing: "border-box" }}
+        <Link
+          to={routes.postProduction(projectId, episodeId)}
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--color-primary)] hover:underline shrink-0"
         >
-          <label
-            htmlFor="episode-source-locale"
-            className="text-[10px] font-black uppercase tracking-wider text-[var(--color-muted)]"
-          >
-            原文语言
-          </label>
-          <input
-            id="episode-source-locale"
-            type="text"
-            value={sourceLocaleDraft}
-            onChange={(e) => setSourceLocaleDraft(e.target.value)}
-            onBlur={() => void saveSourceLocaleIfChanged()}
-            className="px-2 py-1.5 text-sm border border-[var(--color-newsprint-black)] bg-white min-w-[12rem] box-border"
-            style={{ boxSizing: "border-box" }}
-            placeholder="如 zh-CN"
-            autoComplete="off"
-          />
-        </div>
-        <button
-          type="button"
-          onClick={() => void saveLocaleBar()}
-          className="px-3 py-1.5 text-xs font-bold uppercase border border-[var(--color-newsprint-black)] bg-[var(--color-primary)] text-white hover:opacity-90 box-border"
-          style={{ boxSizing: "border-box" }}
-        >
-          保存
-        </button>
+          <Sparkles className="w-3.5 h-3.5 shrink-0" aria-hidden />
+          到后期制作修改
+        </Link>
       </div>
 
-      {/* 分镜工作区：筛选、批量、配音、镜头列表；框选模式下点击此区域外退出框选 */}
+      {/* 分镜工作区：筛选、批量、镜头列表；框选模式下点击此区域外退出框选 */}
       <div
         ref={storyboardWorkAreaRef}
         className="space-y-0 box-border"
@@ -719,7 +639,14 @@ export default function StoryboardPage() {
               <Film className="w-4 h-4" />
               批量视频·首帧模式 ({firstFrameForBatch.length})
             </Button>
-            <ExportPanel episodeId={episodeId} />
+            <Link
+              to={routes.postProduction(projectId, episodeId)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider border-2 border-[var(--color-newsprint-black)] bg-white hover:bg-[var(--color-outline-variant)] transition-colors box-border"
+              style={{ boxSizing: "border-box" }}
+            >
+              <Sparkles className="w-3.5 h-3.5 shrink-0" aria-hidden />
+              导出 / 剪映
+            </Link>
           </div>
         </div>
         </div>
@@ -728,10 +655,6 @@ export default function StoryboardPage() {
             框选模式：列表勾选首列；网格可勾选「选」或在卡片区左键拖拽矩形框选；指针靠近主内容区上下左右边缘时会自动滚动。点击本页上方剧集标题区、侧栏、或点「退出框选」结束。三项批量仅作用于「已勾选且符合条件」的镜头。
           </p>
         )}
-      </div>
-
-      <div className="mb-8">
-        <DubPanel episodeId={episodeId} />
       </div>
 
       {/* Scene 分组（框选模式下同样禁止选中表格/卡片内文案） */}
