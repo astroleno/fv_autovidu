@@ -6,6 +6,10 @@
  */
 import { useState, useRef, useLayoutEffect, useCallback } from "react"
 import type { Shot } from "@/types"
+import {
+  STORYBOARD_TABLE_INLINE_EDIT_TEXTAREA_CLASS,
+  STORYBOARD_TABLE_PREVIEW_BUTTON_CLASS,
+} from "@/components/business/storyboardFieldClasses"
 
 export type PromptFieldKey = "visualDescription" | "imagePrompt" | "videoPrompt"
 
@@ -129,7 +133,7 @@ export function ShotPromptCells({
     return (
       <td
         key={key}
-        className="py-3 px-4 text-xs text-[var(--color-muted)] max-w-[180px] align-top relative"
+        className="py-3 px-4 text-xs text-[var(--color-muted)] min-w-0 align-top relative overflow-visible"
         style={{ boxSizing: "border-box" }}
         onMouseEnter={() => setHoverKey(key)}
         onMouseLeave={() => setHoverKey(null)}
@@ -138,7 +142,7 @@ export function ShotPromptCells({
           type="button"
           data-prompt-preview
           onClick={() => beginEdit(key)}
-          className="w-full text-left truncate block cursor-text hover:bg-[var(--color-divider)]/50 -m-1 p-1 rounded"
+          className={STORYBOARD_TABLE_PREVIEW_BUTTON_CLASS}
         >
           {truncated}
         </button>
@@ -165,7 +169,7 @@ export function ShotPromptCells({
     return (
       <td
         colSpan={3}
-        className="py-3 px-4 align-top bg-[var(--color-divider)]/30"
+        className="py-3 px-4 align-top min-w-0 bg-[var(--color-divider)]/30 overflow-visible"
         style={{ boxSizing: "border-box" }}
       >
         <div className="flex flex-col gap-2 min-w-0">
@@ -193,7 +197,7 @@ export function ShotPromptCells({
                 cancelEdit()
               }
             }}
-            className="p-2 text-xs border-2 border-[var(--color-primary)] bg-[var(--color-newsprint-off-white)] resize-y focus:outline-none max-w-full select-text [user-select:text]"
+            className={STORYBOARD_TABLE_INLINE_EDIT_TEXTAREA_CLASS}
             style={{ boxSizing: "border-box", minHeight: MIN_TEXTAREA_HEIGHT_PX }}
             rows={1}
             aria-label={FIELD_LABEL[editing]}

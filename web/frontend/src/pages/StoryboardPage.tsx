@@ -15,7 +15,7 @@ import {
   Loader2,
   Package,
 } from "lucide-react"
-import { useEpisodeMediaCacheBust } from "@/hooks"
+import { useEpisodeMediaCacheBust, useStoryboardTableColumnWidths } from "@/hooks"
 import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
 import { filterShotsByBatchPick } from "@/utils/batchPick"
@@ -28,8 +28,11 @@ import {
   ExportPanel,
   MarqueeGrid,
   SceneGroup,
+  STORYBOARD_COL_HEADER_LABEL,
   ShotCard,
   ShotRow,
+  StoryboardResizableTh,
+  sumStoryboardTableWidthPx,
   VideoModeSelector,
   type VideoModeSelectorResult,
 } from "@/components/business"
@@ -76,6 +79,19 @@ export default function StoryboardPage() {
   } = useShotStore()
   const startPolling = useTaskStore((s) => s.startPolling)
   const pushToast = useToastStore((s) => s.push)
+
+  /** 列表视图列宽：拖拽调整 + localStorage 按剧集记忆 */
+  const storyboardListPickMode = batchPickMode === "manual"
+  const {
+    widths: storyboardColWidths,
+    setColumnWidthLive: onStoryboardColDrag,
+    commitColumnWidth: onStoryboardColCommit,
+    colOrder: storyboardColOrder,
+  } = useStoryboardTableColumnWidths(episodeId, storyboardListPickMode)
+  const storyboardTableWidthPx = useMemo(
+    () => sumStoryboardTableWidthPx(storyboardColOrder, storyboardColWidths),
+    [storyboardColOrder, storyboardColWidths]
+  )
 
   const [batchEndBusy, setBatchEndBusy] = useState(false)
   const [videoDialogOpen, setVideoDialogOpen] = useState(false)
@@ -522,7 +538,7 @@ export default function StoryboardPage() {
             style={{ boxSizing: "border-box" }}
           >
             <Clapperboard className="w-4 h-4 shrink-0" aria-hidden />
-            粗剪时间线
+            粗剪预览
           </Link>
           <Link
             to={routes.videopick(projectId, episodeId)}
@@ -751,43 +767,70 @@ export default function StoryboardPage() {
                 enabled={batchPickMode === "manual"}
                 onPickShotIds={addBatchPickShots}
               >
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-xs text-[var(--color-muted)] border-b border-[var(--color-divider)]">
-                      {batchPickMode === "manual" && (
-                        <th className="py-2 px-2 w-10">选</th>
-                      )}
-                      <th className="py-2 px-4">编号</th>
-                      <th className="py-2 px-4 whitespace-nowrap">时长</th>
-                      <th className="py-2 px-4 min-w-[11rem]">首尾帧</th>
-                      <th className="py-2 px-4 min-w-[6rem]">视频</th>
-                      <th className="py-2 px-4">状态</th>
-                      <th className="py-2 px-4 min-w-[10rem]">台词原文</th>
-                      <th className="py-2 px-4 min-w-[10rem]">译文</th>
-                      <th className="py-2 px-4">画面描述</th>
-                      <th className="py-2 px-4">图片提示词</th>
-                      <th className="py-2 px-4">视频提示词</th>
-                      <th className="py-2 px-4">资产</th>
-                      <th className="py-2 px-4">候选数</th>
-                      <th className="py-2 px-4">操作</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sceneShots.map((shot) => (
-                      <ShotRow
-                        key={shot.shotId}
-                        shot={shot}
-                        projectId={projectId}
-                        episodeId={episodeId!}
-                        basePath={basePath}
-                        cacheBust={cacheBust}
-                        pickMode={batchPickMode === "manual"}
-                        batchPicked={batchPickedShotIds.includes(shot.shotId)}
-                        onBatchPickToggle={() => toggleBatchPickShot(shot.shotId)}
-                      />
-                    ))}
-                  </tbody>
-                </table>
+                <div
+                  className="w-full overflow-x-auto box-border"
+                  style={{ boxSizing: "border-box" }}
+                >
+                  <table
+                    className="border-collapse"
+                    style={{
+                      tableLayout: "fixed",
+                      width: storyboardTableWidthPx,
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <colgroup>
+                      {storyboardColOrder.map((k) => (
+                        <col
+                          key={k}
+                          style={{ width: storyboardColWidths[k] }}
+                        />
+                      ))}
+                    </colgroup>
+                    <thead>
+                      <tr className="border-b border-[var(--color-divider)]">
+                        {storyboardColOrder.map((k, i) => (
+                          <StoryboardResizableTh
+                            key={k}
+                            colKey={k}
+                            widthPx={storyboardColWidths[k]}
+                            onDragWidth={onStoryboardColDrag}
+                            onCommitWidth={onStoryboardColCommit}
+                            ariaLabel={STORYBOARD_COL_HEADER_LABEL[k]}
+                            isLastColumn={
+                              i === storyboardColOrder.length - 1
+                            }
+                            showLeadingGrip={i > 0}
+                            className={
+                              k === "duration" ? "whitespace-nowrap" : ""
+                            }
+                          >
+                            {STORYBOARD_COL_HEADER_LABEL[k]}
+                          </StoryboardResizableTh>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sceneShots.map((shot) => (
+                        <ShotRow
+                          key={shot.shotId}
+                          shot={shot}
+                          projectId={projectId}
+                          episodeId={episodeId!}
+                          basePath={basePath}
+                          cacheBust={cacheBust}
+                          pickMode={batchPickMode === "manual"}
+                          batchPicked={batchPickedShotIds.includes(
+                            shot.shotId
+                          )}
+                          onBatchPickToggle={() =>
+                            toggleBatchPickShot(shot.shotId)
+                          }
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </MarqueeGrid>
             )}
           </SceneGroup>

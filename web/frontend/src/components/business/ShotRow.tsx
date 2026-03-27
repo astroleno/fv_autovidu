@@ -55,7 +55,10 @@ export function ShotRow({
       {...(pickMode ? { "data-batch-pick-item": shot.shotId } : {})}
     >
       {pickMode && (
-        <td className="py-3 px-2 align-top w-10 box-border" style={{ boxSizing: "border-box" }}>
+        <td
+          className="py-3 px-2 align-top min-w-0 box-border overflow-hidden"
+          style={{ boxSizing: "border-box" }}
+        >
           <input
             type="checkbox"
             checked={batchPicked}
@@ -65,15 +68,17 @@ export function ShotRow({
           />
         </td>
       )}
-      <td className="py-3 px-4 text-sm font-medium whitespace-nowrap">{shot.shotNumber}</td>
-      <td className="py-3 px-4 text-sm text-[var(--color-ink)] whitespace-nowrap align-top">
+      <td className="py-3 px-4 text-sm font-medium whitespace-nowrap min-w-0 overflow-hidden">
+        {shot.shotNumber}
+      </td>
+      <td className="py-3 px-4 text-sm text-[var(--color-ink)] whitespace-nowrap align-top min-w-0 overflow-visible">
         <ShotDurationCell
           shot={shot}
           episodeId={episodeId}
           updateShot={updateShot}
         />
       </td>
-      <td className="py-3 px-4 align-top min-w-[11rem] overflow-visible">
+      <td className="py-3 px-4 align-top min-w-0 overflow-visible">
         <ShotFrameCompare
           shot={shot}
           projectId={projectId}
@@ -84,7 +89,7 @@ export function ShotRow({
           showEndSkeleton={showEndSkeleton}
         />
       </td>
-      <td className="py-3 px-4 align-top overflow-visible min-w-[6rem]">
+      <td className="py-3 px-4 align-top overflow-visible min-w-0">
         <ShotRowVideoPreview
           shot={shot}
           projectId={projectId}
@@ -93,8 +98,8 @@ export function ShotRow({
           cacheBust={cacheBust}
         />
       </td>
-      <td className="py-3 px-4">
-        <div className="flex items-center gap-2">
+      <td className="py-3 px-4 min-w-0 overflow-hidden">
+        <div className="flex items-center gap-2 min-w-0">
           <StatusIndicator status={shot.status} />
           <Badge status={shot.status}>{shotStatusLabels[shot.status]}</Badge>
         </div>
@@ -128,8 +133,10 @@ export function ShotRow({
           )}
         </div>
       </td>
-      <td className="py-3 px-4 text-sm">{shot.videoCandidates.length}</td>
-      <td className="py-3 px-4">
+      <td className="py-3 px-4 text-sm min-w-0 overflow-hidden">
+        {shot.videoCandidates.length}
+      </td>
+      <td className="py-3 px-4 min-w-0 overflow-visible">
         <Link to={routes.shot(projectId, episodeId, shot.shotId)}>
           <button
             type="button"
