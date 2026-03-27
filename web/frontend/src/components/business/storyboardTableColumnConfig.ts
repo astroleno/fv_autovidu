@@ -13,6 +13,7 @@ export type StoryboardTableColKey =
   | "status"
   | "dialogue"
   | "translation"
+  | "dialogueInject"
   | "visualDesc"
   | "imagePrompt"
   | "videoPrompt"
@@ -31,6 +32,7 @@ export const STORYBOARD_COL_DEFAULTS_PX: Record<StoryboardTableColKey, number> =
     status: 112,
     dialogue: 220,
     translation: 220,
+    dialogueInject: 72,
     visualDesc: 200,
     imagePrompt: 190,
     videoPrompt: 190,
@@ -49,6 +51,7 @@ export const STORYBOARD_COL_MIN_PX: Record<StoryboardTableColKey, number> = {
   status: 80,
   dialogue: 120,
   translation: 120,
+  dialogueInject: 56,
   visualDesc: 120,
   imagePrompt: 120,
   videoPrompt: 120,
@@ -71,6 +74,7 @@ export function buildStoryboardColOrder(
     "status",
     "dialogue",
     "translation",
+    "dialogueInject",
     "visualDesc",
     "imagePrompt",
     "videoPrompt",
@@ -119,6 +123,7 @@ export const STORYBOARD_COL_HEADER_LABEL: Record<StoryboardTableColKey, string> 
     status: "状态",
     dialogue: "台词原文",
     translation: "译文",
+    dialogueInject: "视频含台词",
     visualDesc: "画面描述",
     imagePrompt: "图片提示词",
     videoPrompt: "视频提示词",

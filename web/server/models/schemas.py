@@ -120,6 +120,8 @@ class Shot(BaseModel):
     associatedDialogue: Optional[AssociatedDialogue] = None
     # 目标语译文，供 Vidu 提示词拼接与 TTS；拉取时为空，由 Web 编辑
     dialogueTranslation: str = ""
+    # 生成视频（Vidu）时是否将台词块拼入 composed prompt；默认 True；False 时仍保留 dialogue 供字幕/配音/剪映
+    includeDialogueInVideoPrompt: bool = True
 
 
 class JianyingExportRecord(BaseModel):

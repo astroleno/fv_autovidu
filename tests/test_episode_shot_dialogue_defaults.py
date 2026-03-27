@@ -36,6 +36,7 @@ def test_shot_missing_dialogue_fields_defaults() -> None:
     assert s.dialogue == ""
     assert s.dialogueTranslation == ""
     assert s.associatedDialogue is None
+    assert s.includeDialogueInVideoPrompt is True
 
 
 def test_episode_missing_locale_defaults() -> None:

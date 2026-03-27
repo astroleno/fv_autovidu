@@ -8,6 +8,7 @@
  * ## 使用组件
  * - `ShotPromptCells`：预览按钮 + 展开 textarea
  * - `ShotDialogueCells`：台词 / 译文两列预览 + 单点编辑
+ * - `ShotDialogueInjectCell`：是否将台词注入 Vidu 视频 composed prompt（checkbox）
  * - `ShotDurationCell`：「N秒」预览 + 单行输入编辑
  */
 

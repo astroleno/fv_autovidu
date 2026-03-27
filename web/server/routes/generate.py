@@ -476,13 +476,17 @@ def _run_video_gen(
             )
             cand_resolution = resolution_label or resolved_resolution
             aspect = _normalize_aspect_ratio(shot.aspectRatio)
-            # Vidu：在提示词末尾注入台词块（译文优先、原文兜底）及 Episode 级语种标签
-            composed_video_prompt = append_dialogue_for_video_prompt(
-                shot.videoPrompt,
-                shot,
-                target_locale=ep.dubTargetLocale,
-                source_locale=ep.sourceLocale,
-            )
+            # Vidu：在提示词末尾注入台词块（译文优先、原文兜底）及 Episode 级语种标签；
+            # 镜头可关闭注入（纯动作/远景等），不改 shot.videoPrompt 落库，仅影响本次 composed prompt。
+            if getattr(shot, "includeDialogueInVideoPrompt", True):
+                composed_video_prompt = append_dialogue_for_video_prompt(
+                    shot.videoPrompt,
+                    shot,
+                    target_locale=ep.dubTargetLocale,
+                    source_locale=ep.sourceLocale,
+                )
+            else:
+                composed_video_prompt = shot.videoPrompt
 
             from services import vidu_service
 

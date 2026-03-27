@@ -15,6 +15,8 @@ export type {
   ShotDialogueCellsProps,
   DialogueShotUpdates,
 } from "./ShotDialogueCells"
+export { ShotDialogueInjectCell } from "./ShotDialogueInjectCell"
+export type { ShotDialogueInjectCellProps } from "./ShotDialogueInjectCell"
 export { ShotCard } from "./ShotCard"
 export { VideoPickCard } from "./VideoPickCard"
 export type { VideoPickCardProps } from "./VideoPickCard"

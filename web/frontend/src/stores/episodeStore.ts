@@ -57,6 +57,7 @@ interface EpisodeStore {
         | "videoPrompt"
         | "dialogue"
         | "dialogueTranslation"
+        | "includeDialogueInVideoPrompt"
         | "duration"
       >
     >
