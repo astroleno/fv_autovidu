@@ -58,3 +58,16 @@ export function nextNavigatedIndex(
   }
   return null
 }
+
+/**
+ * 在镜头列表中查找目标 shotId 的索引；找不到返回 null。
+ * 深链场景应传入全量叙事序列表（flattenShots），不受 overview 筛选影响。
+ */
+export function resolveRequestedShotIndex(
+  shots: Array<{ shotId: string }>,
+  requestedShotId: string | null
+): number | null {
+  if (!requestedShotId) return null
+  const index = shots.findIndex((shot) => shot.shotId === requestedShotId)
+  return index >= 0 ? index : null
+}

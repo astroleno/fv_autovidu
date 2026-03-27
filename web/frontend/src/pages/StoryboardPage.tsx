@@ -530,7 +530,7 @@ export default function StoryboardPage() {
         {/* 子页面入口：粗剪台、资产库；看单条视频需进镜头详情（卡片可点） */}
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-bold uppercase tracking-wider">
           <span className="text-[var(--color-muted)] font-medium normal-case tracking-normal text-[13px]">
-            单镜头视频预览 / 选片：点击任意镜头卡片 → 进入镜头详情页
+            点击镜头进入选片工作台：查看候选、编辑视频提示词、快速重试
           </span>
           <Link
             to={routes.timeline(projectId, episodeId)}

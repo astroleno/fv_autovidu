@@ -25,6 +25,8 @@ export type { VideoPickFocusPanelProps } from "./VideoPickFocusPanel"
 export { VideoPickCandidateGrid } from "./VideoPickCandidateGrid"
 export { VideoPickReferencePanel } from "./VideoPickReferencePanel"
 export type { VideoPickReferencePanelProps } from "./VideoPickReferencePanel"
+export { VideoPickEditablePrompt } from "./VideoPickEditablePrompt"
+export type { VideoPickEditablePromptProps } from "./VideoPickEditablePrompt"
 export { StoryboardResizableTh } from "./StoryboardResizableTh"
 export type { StoryboardResizableThProps } from "./StoryboardResizableTh"
 export {

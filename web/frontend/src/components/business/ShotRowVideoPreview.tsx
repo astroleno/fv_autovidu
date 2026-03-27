@@ -3,7 +3,7 @@
  *
  * - 展示当前镜头的主视频缩略（优先「已选定」候选，否则第一条候选）
  * - 鼠标悬浮：在页面固定层播放静音循环预览，便于快速浏览
- * - 点击：进入镜头详情页（与首尾帧一致）
+ * - 点击：进入选片工作台 picking 深链（与首尾帧一致）
  *
  * 无候选时仍提供进入详情的文字链，便于用户去生成视频。
  */
@@ -32,7 +32,7 @@ export function ShotRowVideoPreview({
   basePath,
   cacheBust,
 }: ShotRowVideoPreviewProps) {
-  const detailPath = routes.shot(projectId, episodeId, shot.shotId)
+  const detailPath = routes.videopickShot(projectId, episodeId, shot.shotId)
   const selected = shot.videoCandidates.find((c) => c.selected)
   const primary = selected ?? shot.videoCandidates[0]
 

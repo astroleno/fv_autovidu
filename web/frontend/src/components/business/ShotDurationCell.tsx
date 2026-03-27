@@ -29,6 +29,8 @@ export interface ShotDurationCellProps {
     updates: Partial<Pick<Shot, "duration">>
   ) => Promise<void>
   className?: string
+  /** 进入/离开编辑态时回调（选片参考区用于暂停全局键盘快捷键） */
+  onEditingChange?: (editing: boolean) => void
 }
 
 function clampDuration(n: number): number {
@@ -41,6 +43,7 @@ export function ShotDurationCell({
   episodeId,
   updateShot,
   className = "",
+  onEditingChange,
 }: ShotDurationCellProps) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(String(shot.duration))
@@ -58,6 +61,10 @@ export function ShotDurationCell({
       inputRef.current?.select()
     }
   }, [editing])
+
+  useEffect(() => {
+    onEditingChange?.(editing)
+  }, [editing, onEditingChange])
 
   const commit = useCallback(async () => {
     const trimmed = draft.trim()

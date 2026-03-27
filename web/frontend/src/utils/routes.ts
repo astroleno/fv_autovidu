@@ -47,6 +47,12 @@ export const routes = {
   videopick: (projectId: string, episodeId: string) =>
     `/project/${encodeURIComponent(projectId)}/episode/${encodeURIComponent(episodeId)}/pick`,
 
+  /**
+   * 选片工作台·定位到指定镜头（shotId 为一次性启动参数，消费后由 VideoPickPage 清除）
+   */
+  videopickShot: (projectId: string, episodeId: string, shotId: string) =>
+    `${routes.videopick(projectId, episodeId)}?shotId=${encodeURIComponent(shotId)}`,
+
   /** 设置 */
   settings: () => "/settings",
 }
