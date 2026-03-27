@@ -85,7 +85,7 @@ def run_test(
             "timestamp": scene["timestamp"],
             "duration": duration,
             "audio": True,
-            "audio_type": "all",
+            "audio_type": "speech_only",
             "bgm": False,
             "subtitle": False,
         }, ensure_ascii=False)
@@ -99,7 +99,7 @@ def run_test(
                     duration=scene.get("duration") or vidu_cfg.get("duration", 5),
                     resolution=resolution or vidu_cfg.get("resolution", "720p"),
                     audio=vidu_cfg.get("audio", True),
-                    audio_type=vidu_cfg.get("audio_type", "all"),
+                    audio_type=vidu_cfg.get("audio_type", "speech_only"),
                     bgm=vidu_cfg.get("bgm", False),
                     seed=0,
                     payload=payload_str,

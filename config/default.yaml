@@ -21,7 +21,8 @@ vidu:
   resolution: "720p"
   # 音视频直出：音效+人声，不要 BGM
   audio: true
-  audio_type: "all"  # all=音效+人声 speech_only=仅人声 sound_effect_only=仅音效
+  # 仅人声，不含额外环境音效（与 Vidu audio_type=speech_only 一致）
+  audio_type: "speech_only"  # all=音效+人声 speech_only=仅人声 sound_effect_only=仅音效
   bgm: false
   # 错峰模式（更省积分，48小时内完成）
   off_peak: false

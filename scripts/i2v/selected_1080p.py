@@ -67,7 +67,7 @@ def main():
             "timestamp": scene["timestamp"],
             "duration": sel["duration"],
             "audio": True,
-            "audio_type": "all",
+            "audio_type": "speech_only",
             "bgm": False,
             "subtitle": False,
         }, ensure_ascii=False)
@@ -79,7 +79,7 @@ def main():
                 duration=sel["duration"],
                 resolution="1080p",
                 audio=True,
-                audio_type="all",
+                audio_type="speech_only",
                 bgm=False,
                 seed=sel["seed"],
                 payload=payload_str,

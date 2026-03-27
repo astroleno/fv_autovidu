@@ -132,7 +132,7 @@ def run_test(
             "timestamp": scene["timestamp"],
             "duration": scene["duration"],
             "audio": True,
-            "audio_type": "all",
+            "audio_type": "speech_only",
             "bgm": False,
             "subtitle": False,
         }, ensure_ascii=False)
@@ -141,19 +141,19 @@ def run_test(
         for p_label, prompt in [("prompt1", scene["prompt1"]), ("prompt2", scene["prompt2"])]:
             task_id = f"{shot_label}_{p_label}"
             # 构建请求 payload（不含 base64 图，便于记录）
-                req_payload = {
-                    "model": model,
-                    "prompt": prompt[:5000],
-                    "duration": scene["duration"],
-                    "resolution": resolution,
-                    "audio": True,
-                    "audio_type": "all",
-                    "bgm": False,
-                    "seed": 0,
-                    "payload": payload_str,
-                    "aspect_ratio": "9:16",
-                    "image_path": str(frame_path.relative_to(PROJECT_ROOT)),
-                }
+            req_payload = {
+                "model": model,
+                "prompt": prompt[:5000],
+                "duration": scene["duration"],
+                "resolution": resolution,
+                "audio": True,
+                "audio_type": "speech_only",
+                "bgm": False,
+                "seed": 0,
+                "payload": payload_str,
+                "aspect_ratio": "9:16",
+                "image_path": str(frame_path.relative_to(PROJECT_ROOT)),
+            }
             try:
                 resp = client.img2video_from_file(
                     image_path=frame_path,
@@ -162,7 +162,7 @@ def run_test(
                     duration=scene["duration"],
                     resolution=resolution,
                     audio=True,
-                    audio_type="all",
+                    audio_type="speech_only",
                     bgm=False,
                     seed=0,
                     payload=payload_str,
