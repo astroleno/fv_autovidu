@@ -18,15 +18,28 @@ Feeling 运行上下文：多环境 + 多 Profile 下的请求级配置解析。
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+logger = logging.getLogger(__name__)
+
 # ---------------------------------------------------------------------------
 # 项目根目录（开发模式：仓库根；冻结模式：exe 同级，与 config 一致）
 # ---------------------------------------------------------------------------
+
+def _use_packaged_path_resolution() -> bool:
+    """
+    是否按「分发包」规则解析路径（PyInstaller 等）。
+
+    仅依赖 sys.frozen 不够：少数入口下 frozen 未置位但 bootloader 已注入 _MEIPASS；
+    反之亦然。二者任一成立即视为打包运行，避免误走源码 __file__ 推导的根目录。
+    """
+    return bool(getattr(sys, "frozen", False)) or bool(getattr(sys, "_MEIPASS", None))
+
 
 def feeling_project_root() -> Path:
     """
@@ -35,7 +48,7 @@ def feeling_project_root() -> Path:
     - 若存在 FV_STUDIO_EXE_DIR（PyInstaller launcher 设置），优先使用该目录；
     - 否则以本文件向上三级定位到仓库根（src/feeling/context.py -> repo）。
     """
-    if getattr(sys, "frozen", False):
+    if _use_packaged_path_resolution():
         return Path(os.environ.get("FV_STUDIO_EXE_DIR", str(Path(sys.executable).parent)))
     return Path(__file__).resolve().parent.parent.parent
 
@@ -47,7 +60,7 @@ def _feeling_bundle_dir() -> Path | None:
     launcher.py 会设置 FV_STUDIO_BUNDLE_DIR；若未设置则回退 sys._MEIPASS，
     以便在非 launcher 入口下仍能定位随包分发的默认配置。
     """
-    if not getattr(sys, "frozen", False):
+    if not _use_packaged_path_resolution():
         return None
     raw = (os.environ.get("FV_STUDIO_BUNDLE_DIR") or "").strip()
     if raw:
@@ -56,30 +69,59 @@ def _feeling_bundle_dir() -> Path | None:
     return Path(meipass) if meipass else None
 
 
+def _dedupe_path_order(paths: list[Path]) -> list[Path]:
+    """按出现顺序去重，避免 exe/_internal 与 _MEIPASS 指向同一目录时重复探测。"""
+    seen: set[str] = set()
+    out: list[Path] = []
+    for p in paths:
+        try:
+            key = str(p.resolve()).lower()
+        except (OSError, RuntimeError):
+            key = str(p).lower()
+        if key not in seen:
+            seen.add(key)
+            out.append(p)
+    return out
+
+
 def feeling_contexts_json_candidates(project_root: Path | None = None) -> list[Path]:
     """
     按优先级返回可能的 feeling_contexts.json 绝对路径列表（用于探测首个存在的文件）。
 
-    冻结模式（与 web/server/config.py 的 .env 路径策略对齐）：
-    1. EXE 同级目录下的 config/feeling_contexts.json（用户可编辑，与 .env 放一处）
-    2. 打包目录（_internal）下的 config/feeling_contexts.json（CI/默认随包资源）
+    打包模式（与 web/server/config.py 的 .env 路径策略对齐）：
+    1. EXE 同级 config/（用户可编辑，与 .env 放一处）
+    2. EXE 同级 _internal/config/（PyInstaller --onedir 固定布局；不依赖 _MEIPASS / 环境变量）
+    3. _MEIPASS 或 FV_STUDIO_BUNDLE_DIR 下的 config/（与 2 常相同，去重）
 
-    开发模式：仅使用仓库根（显式 project_root 或 feeling_project_root()）下的 config/。
+    同时尝试文件名 feeling_contexts.json 与无扩展名 feeling_contexts（Windows 下易误保存为「无后缀」）。
 
-    说明：此前 web 层曾用 __file__ 推出「项目根」= _internal，仅命中第 2 类；
-    若用户把 JSON 放在 exe 旁（误认为与 .env 同根），会误报「未检测到」。
+    开发模式：仓库根 config/ 下上述两种文件名。
+
+    说明：仅依赖 _MEIPASS 时，若运行时未注入或路径异常，会导致找不到 _internal 内文件；
+    显式拼接 exe/_internal/config 可闭环。
     """
-    if getattr(sys, "frozen", False):
-        exe_root = Path(os.environ.get("FV_STUDIO_EXE_DIR", str(Path(sys.executable).parent)))
-        out: list[Path] = [exe_root / "config" / "feeling_contexts.json"]
-        bundle = _feeling_bundle_dir()
-        if bundle:
-            bundled = bundle / "config" / "feeling_contexts.json"
-            if bundled not in out:
-                out.append(bundled)
-        return out
-    root = Path(project_root) if project_root else feeling_project_root()
-    return [root / "config" / "feeling_contexts.json"]
+    if not _use_packaged_path_resolution():
+        root = Path(project_root) if project_root else feeling_project_root()
+        base = root / "config"
+        return _dedupe_path_order(
+            [base / "feeling_contexts.json", base / "feeling_contexts"]
+        )
+
+    exe_root = Path(os.environ.get("FV_STUDIO_EXE_DIR", str(Path(sys.executable).parent)))
+    bundle = _feeling_bundle_dir()
+    bases = _dedupe_path_order(
+        [
+            exe_root / "config",
+            exe_root / "_internal" / "config",
+            *([bundle / "config"] if bundle else []),
+        ]
+    )
+    names = ("feeling_contexts.json", "feeling_contexts")
+    out: list[Path] = []
+    for base in bases:
+        for name in names:
+            out.append(base / name)
+    return _dedupe_path_order(out)
 
 
 @dataclass(frozen=True)
@@ -129,7 +171,7 @@ class ContextResolver:
         与放置 .env 的目录一致；非冻结为仓库 config/）。
         """
         cands = feeling_contexts_json_candidates(
-            None if getattr(sys, "frozen", False) else self._project_root
+            None if _use_packaged_path_resolution() else self._project_root
         )
         return cands[0] if cands else self._project_root / "config" / "feeling_contexts.json"
 
@@ -147,14 +189,19 @@ class ContextResolver:
         if self._raw is not None and not force:
             return self._raw
         candidates = feeling_contexts_json_candidates(
-            None if getattr(sys, "frozen", False) else self._project_root
+            None if _use_packaged_path_resolution() else self._project_root
         )
         path: Path | None = next((p for p in candidates if p.is_file()), None)
         if path is None:
+            logger.warning(
+                "未找到 feeling_contexts 配置，已探测路径（按顺序）：%s",
+                "; ".join(str(p) for p in candidates[:12])
+                + ("…" if len(candidates) > 12 else ""),
+            )
             primary = self.config_path()
             extra = ""
             if len(candidates) > 1:
-                extra = f"；亦已查找打包内置路径：{candidates[1]}"
+                extra = f"；亦已查找：{candidates[1]}"
             raise FileNotFoundError(
                 f"缺少 Feeling 上下文配置：{primary}{extra}（可从 config/feeling_contexts.example.json 复制并填写）"
             )
