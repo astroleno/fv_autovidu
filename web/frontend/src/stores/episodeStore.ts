@@ -34,10 +34,13 @@ interface EpisodeStore {
   bumpLocalMediaCache: () => void
   pullNewEpisode: (
     episodeId: string,
-    forceRedownload?: boolean,
-    projectId?: string,
-    /** 仅同步文案（画面描述等），不下载首帧/资产图 */
-    skipImages?: boolean
+    options?: {
+      forceRedownload?: boolean
+      projectId?: string
+      skipImages?: boolean
+      skipFrames?: boolean
+      skipAssets?: boolean
+    }
   ) => Promise<void>
   /**
    * 更新 Shot 字段，PATCH 后按响应合并进 currentEpisode。
@@ -150,20 +153,24 @@ export const useEpisodeStore = create<EpisodeStore>((set, get) => ({
     await get().fetchEpisodeDetail(id)
   },
 
-  pullNewEpisode: async (
-    episodeId: string,
-    forceRedownload = false,
-    projectId?: string,
-    skipImages = false
-  ) => {
+  pullNewEpisode: async (episodeId, options = {}) => {
+    const {
+      forceRedownload = false,
+      projectId,
+      skipImages = false,
+      skipFrames = false,
+      skipAssets = false,
+    } = options
     set({ loading: true, error: null })
     try {
-      const res = await episodesApi.pull(
+      const res = await episodesApi.pull({
         episodeId,
         forceRedownload,
         projectId,
-        skipImages
-      )
+        skipImages,
+        skipFrames,
+        skipAssets,
+      })
       set((s) => {
         // 再次拉取同一剧集时去掉旧项，否则列表里会出现两个相同 episodeId，
         // React key 重复会导致卡片/行渲染错乱（终端里 “duplicate key” 警告）

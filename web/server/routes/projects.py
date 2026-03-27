@@ -272,10 +272,12 @@ def list_project_episodes(project_id: str, request: Request):
 
 
 class PullAllBody(BaseModel):
-    """可选：一键拉取时是否强制重下资产图、是否跳过图片。"""
+    """可选：一键拉取时的覆盖策略与首帧/资产下载范围。"""
 
     forceRedownload: bool = False
     skipImages: bool = False
+    skipFrames: bool = False
+    skipAssets: bool = False
 
 
 @router.post("/projects/{project_id}/pull-all", response_model=PullProjectResponse)
@@ -301,6 +303,8 @@ def pull_all_project_episodes(project_id: str, request: Request, body: PullAllBo
             output_root,
             client=client,
             force_redownload=opts.forceRedownload,
+            skip_frames=opts.skipFrames,
+            skip_assets=opts.skipAssets,
             skip_images=opts.skipImages,
             fs_lock_namespace=fs_tag,
         )

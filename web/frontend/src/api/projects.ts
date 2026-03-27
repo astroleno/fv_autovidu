@@ -21,13 +21,20 @@ export const projectsApi = {
 
   pullAll: (
     projectId: string,
-    opts?: { forceRedownload?: boolean; skipImages?: boolean }
+    opts?: {
+      forceRedownload?: boolean
+      skipImages?: boolean
+      skipFrames?: boolean
+      skipAssets?: boolean
+    }
   ) =>
     apiClient.post<PullProjectResponse>(
       `/projects/${encodeURIComponent(projectId)}/pull-all`,
       {
         forceRedownload: opts?.forceRedownload ?? false,
         skipImages: opts?.skipImages ?? false,
+        skipFrames: opts?.skipFrames ?? false,
+        skipAssets: opts?.skipAssets ?? false,
       },
       { timeout: LONG_REQUEST_TIMEOUT_MS }
     ),

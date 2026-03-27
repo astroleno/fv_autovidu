@@ -10,10 +10,14 @@ export interface PullEpisodeRequest {
   episodeId: string
   /** 项目 ID，拉资产必需；剧集页拉取时可自动带上传入 */
   projectId?: string
-  /** 强制重新下载资产图（修复拉成风格图时使用） */
+  /** 强制覆盖本地已有首帧与资产文件 */
   forceRedownload?: boolean
-  /** 为 true 时不下载首帧/资产图，只同步 episode.json（含画面描述、提示词） */
+  /** 兼容：为 true 时首帧与资产图均不下载，只写 episode.json */
   skipImages?: boolean
+  /** 不下载首帧图（与 skipAssets 可组合） */
+  skipFrames?: boolean
+  /** 不下载资产图（与 skipFrames 可组合） */
+  skipAssets?: boolean
 }
 
 /** 批量生成尾帧请求体 */

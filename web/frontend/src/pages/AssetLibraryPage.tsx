@@ -5,7 +5,7 @@
  *
  * 说明（与「项目/剧集拉取」关系）：
  * - 后端 pull_episode 会调用平台 get_assets 并写入 episode.assets，同时下载 assets/*.png（与首帧同属一次拉取）。
- * - 若拉取时勾选「仅同步文案、不下载图片」，则本地无 png，缩略图会加载失败（应用内会提示重新拉取）。
+ * - 若拉取时「同步内容」选「仅分镜文案」，则本地无 png，缩略图会加载失败（应用内会提示重新拉取）。
  * - 元数据能显示但无图：多为未下载文件或平台未返回可下载的 thumbnail URL。
  */
 import { useEffect, useState, useMemo, useCallback } from "react"
@@ -60,7 +60,7 @@ function AssetCardThumbnail({
         <p className="text-[10px] leading-tight text-[var(--color-muted)] font-medium">
           {!imgUrl
             ? "无本地路径：请用顶部「从平台拉取」同步本集"
-            : "图片未落盘或加载失败：请重新拉取，勿勾选「仅同步文案」"}
+            : "图片未落盘或加载失败：请重新拉取，同步内容勿选「仅分镜文案」"}
         </p>
       </div>
     )
@@ -84,7 +84,7 @@ function AssetModalImage({ src, alt }: { src: string; alt: string }) {
       <div className="w-full min-h-[200px] flex flex-col items-center justify-center border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)] p-6 box-border">
         <Package className="w-16 h-16 opacity-40 mb-3" />
         <p className="text-sm text-center text-[var(--color-muted)]">
-          本地文件不存在或无法加载。请使用顶部「从平台拉取」重新同步本集，并取消勾选「仅同步文案」；必要时勾选「强制重新下载」。
+          本地文件不存在或无法加载。请使用顶部「从平台拉取」：同步内容选「分镜文案 + 首帧 + 资产图」；若平台已更新图片，「本地已有图片时」选「强制覆盖」。
         </p>
       </div>
     )
@@ -260,7 +260,7 @@ export default function AssetLibraryPage() {
             {currentEpisode.episodeTitle} · {assets.length} 个资产
           </p>
           <p className="text-xs text-[var(--color-muted)] mt-2 max-w-2xl leading-relaxed">
-            资产列表与缩略图随「从平台拉取剧集」一并写入（同一套 pull_episode）；若仅有文字无图，多半是拉取时勾选了仅同步文案，或平台未返回可下载缩略图。
+            资产列表与缩略图随「从平台拉取」一并写入（同一套 pull_episode）；若仅有文字无图，多半是同步内容选了「仅分镜文案」，或平台未返回可下载缩略图。
           </p>
         </div>
       </div>
