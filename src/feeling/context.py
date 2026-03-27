@@ -40,6 +40,48 @@ def feeling_project_root() -> Path:
     return Path(__file__).resolve().parent.parent.parent
 
 
+def _feeling_bundle_dir() -> Path | None:
+    """
+    PyInstaller 冻结模式下「打包资源根」（通常为 exe 同级的 _internal/）。
+
+    launcher.py 会设置 FV_STUDIO_BUNDLE_DIR；若未设置则回退 sys._MEIPASS，
+    以便在非 launcher 入口下仍能定位随包分发的默认配置。
+    """
+    if not getattr(sys, "frozen", False):
+        return None
+    raw = (os.environ.get("FV_STUDIO_BUNDLE_DIR") or "").strip()
+    if raw:
+        return Path(raw)
+    meipass = getattr(sys, "_MEIPASS", None)
+    return Path(meipass) if meipass else None
+
+
+def feeling_contexts_json_candidates(project_root: Path | None = None) -> list[Path]:
+    """
+    按优先级返回可能的 feeling_contexts.json 绝对路径列表（用于探测首个存在的文件）。
+
+    冻结模式（与 web/server/config.py 的 .env 路径策略对齐）：
+    1. EXE 同级目录下的 config/feeling_contexts.json（用户可编辑，与 .env 放一处）
+    2. 打包目录（_internal）下的 config/feeling_contexts.json（CI/默认随包资源）
+
+    开发模式：仅使用仓库根（显式 project_root 或 feeling_project_root()）下的 config/。
+
+    说明：此前 web 层曾用 __file__ 推出「项目根」= _internal，仅命中第 2 类；
+    若用户把 JSON 放在 exe 旁（误认为与 .env 同根），会误报「未检测到」。
+    """
+    if getattr(sys, "frozen", False):
+        exe_root = Path(os.environ.get("FV_STUDIO_EXE_DIR", str(Path(sys.executable).parent)))
+        out: list[Path] = [exe_root / "config" / "feeling_contexts.json"]
+        bundle = _feeling_bundle_dir()
+        if bundle:
+            bundled = bundle / "config" / "feeling_contexts.json"
+            if bundled not in out:
+                out.append(bundled)
+        return out
+    root = Path(project_root) if project_root else feeling_project_root()
+    return [root / "config" / "feeling_contexts.json"]
+
+
 @dataclass(frozen=True)
 class FeelingContext:
     """
@@ -78,10 +120,22 @@ class ContextResolver:
     def __init__(self, project_root: Path | None = None) -> None:
         self._project_root = Path(project_root) if project_root else feeling_project_root()
         self._raw: dict[str, Any] | None = None
+        # load() 成功后指向实际打开的 JSON 路径（冻结模式下可能是 exe 旁或 _internal）
+        self._resolved_path: Path | None = None
 
     def config_path(self) -> Path:
-        """实际配置文件路径（可不存在，此时 resolve 会报错）。"""
-        return self._project_root / "config" / "feeling_contexts.json"
+        """
+        「首选」配置文件路径：用于错误提示与用户文档（冻结模式下指 exe 旁 config/，
+        与放置 .env 的目录一致；非冻结为仓库 config/）。
+        """
+        cands = feeling_contexts_json_candidates(
+            None if getattr(sys, "frozen", False) else self._project_root
+        )
+        return cands[0] if cands else self._project_root / "config" / "feeling_contexts.json"
+
+    def resolved_config_path(self) -> Path | None:
+        """成功 load 后指向实际读取的文件；未 load 时为 None。"""
+        return self._resolved_path
 
     def load(self, *, force: bool = False) -> dict[str, Any]:
         """
@@ -92,11 +146,19 @@ class ContextResolver:
         """
         if self._raw is not None and not force:
             return self._raw
-        path = self.config_path()
-        if not path.is_file():
+        candidates = feeling_contexts_json_candidates(
+            None if getattr(sys, "frozen", False) else self._project_root
+        )
+        path: Path | None = next((p for p in candidates if p.is_file()), None)
+        if path is None:
+            primary = self.config_path()
+            extra = ""
+            if len(candidates) > 1:
+                extra = f"；亦已查找打包内置路径：{candidates[1]}"
             raise FileNotFoundError(
-                f"缺少 Feeling 上下文配置：{path}（可从 config/feeling_contexts.example.json 复制并填写）"
+                f"缺少 Feeling 上下文配置：{primary}{extra}（可从 config/feeling_contexts.example.json 复制并填写）"
             )
+        self._resolved_path = path
         self._raw = json.loads(path.read_text(encoding="utf-8"))
         return self._raw
 

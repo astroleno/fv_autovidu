@@ -101,7 +101,12 @@ export function FeelingContextSection() {
         <h2 className="text-sm font-black uppercase tracking-wider mb-2">Feeling 环境与账号</h2>
         <p className="text-xs text-[var(--color-muted)] mb-2">
           后端未检测到 <code className="font-mono">config/feeling_contexts.json</code>
-          ，当前为<strong>全局 .env</strong>模式：请求不携带 <code className="font-mono">X-FV-Context-Id</code>
+          。Windows 打包版请确认文件位于 <strong>exe 同级的</strong>
+          <code className="font-mono">config/feeling_contexts.json</code>
+          ，或 <code className="font-mono">_internal/config/</code> 下，且扩展名为{" "}
+          <code className="font-mono">.json</code>。
+          当前为<strong>全局 .env</strong>模式（与多 Profile 无关）：<code className="font-mono">.env</code>{" "}
+          会照常加载，请求不携带 <code className="font-mono">X-FV-Context-Id</code>
           ，数据目录为扁平 <code className="font-mono">DATA_ROOT/项目/剧集</code>。
         </p>
         {contextsError ? (
