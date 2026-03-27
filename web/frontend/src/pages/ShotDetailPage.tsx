@@ -1,6 +1,6 @@
 /**
- * Shot 详情 / 视频对比页
- * 左侧 40%：首尾帧 + prompt + 资产 + 镜头信息
+ * Shot 详情 / 视频对比页（分镜表点击镜头进入）
+ * 左侧 40%：首尾帧 + prompt + 资产 + 镜头信息 + **生成视频工具条**（首帧 / 首尾帧 / 自定义参数）+ 单帧重生入口
  * 右侧 60%：候选视频列表 + 选定 + 预览候选「精出 1080p」（锁种 promote）
  */
 import { useEffect } from "react"
@@ -15,6 +15,7 @@ import {
   AssetTag,
   ShotFrameCompare,
   ShotDurationCell,
+  ShotVideoGenerateToolbar,
 } from "@/components/business"
 import { flattenShots } from "@/types"
 import { getFileUrl } from "@/utils/file"
@@ -163,6 +164,8 @@ export default function ShotDetailPage() {
             </span>
             <span>{shot.aspectRatio}</span>
           </div>
+          {/* 与选片卡同源：首帧 / 首尾帧快捷生成 + 自定义参数弹窗 */}
+          <ShotVideoGenerateToolbar shot={shot} episodeId={episodeId} />
           <Link to={routes.regen(projectId, episodeId, shotId)}>
             <Button variant="secondary" className="gap-2">
               <RotateCcw className="w-4 h-4" />
@@ -175,8 +178,11 @@ export default function ShotDetailPage() {
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold mb-4">视频候选</h3>
           {shot.videoCandidates.length === 0 ? (
-            <div className="text-[var(--color-muted)] py-8">
-              暂无视频候选，请先生成视频
+            <div className="text-[var(--color-muted)] py-8 text-sm box-border space-y-2">
+              <p>暂无视频候选。</p>
+              <p>
+                可在左侧使用「生成视频」：仅首帧、或首尾帧（需已生成尾帧）；亦可打开「自定义参数」选择模型与分辨率。
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
