@@ -18,7 +18,8 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # 项目根目录：区分冻结模式与开发模式
 # ---------------------------------------------------------------------------
-if getattr(sys, "frozen", False):
+# 与 src.feeling.context 一致：frozen 或 bootloader 注入的 _MEIPASS 均视为打包运行
+if getattr(sys, "frozen", False) or getattr(sys, "_MEIPASS", None):
     # 冻结模式：.env / data/ 应放在 exe 同级目录下，由用户自行维护
     _PROJECT_ROOT = Path(
         os.environ.get("FV_STUDIO_EXE_DIR", str(Path(sys.executable).parent))
