@@ -1,20 +1,22 @@
 /**
- * ShotDurationCell — 镜头时长（秒）可编辑单元
+ * ShotDurationCell — 镜头时长（秒）
  *
- * 用途：
- * - 分镜表 `ShotRow`「时长」列：紧凑 number 输入，失焦保存。
- * - 镜头详情页元信息区：与运镜、画幅并列展示。
+ * ## 分镜表交互
+ * - 与「画面描述 / 提示词」列一致：**默认显示纯文案**「N秒」，无边框；**点击后**出现带主色描边的输入框，失焦保存，Enter 同失焦，Esc 取消。
  *
- * 与视频生成的关系：
- * - 后端 `POST /generate/video` 若请求体 **未** 带 `duration`，则使用 `shot.duration`
- *   （见 `generate.py`：`resolved_duration = duration if duration is not None else shot.duration`）。
- * - 因此在此修改并 PATCH 成功后，后续批量/选片「再生成」会自动按新秒数提交 Vidu，
- *   无需前端在每次 `generateApi.video` 里重复传 `duration`（除非将来要做「单次覆盖」）。
+ * ## 镜头详情页
+ * - 同一套预览/编辑逻辑，可传入 `className` 覆盖预览文字色（如 `text-[var(--color-ink)]`）。
+ *
+ * ## 与视频生成的关系
+ * - 后端 `POST /generate/video` 若未带 `duration`，使用 `shot.duration`（见服务端 generate 路由）。
  */
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import type { Shot } from "@/types"
+import {
+  STORYBOARD_TABLE_INLINE_EDIT_INPUT_CLASS,
+  STORYBOARD_TABLE_PREVIEW_SHORT_CLASS,
+} from "@/components/business/storyboardFieldClasses"
 
-/** 与 Vidu 常见片段长度兼容；过短/过长易触发接口校验失败，故做夹取 */
 const MIN_SEC = 1
 const MAX_SEC = 60
 
@@ -26,7 +28,6 @@ export interface ShotDurationCellProps {
     shotId: string,
     updates: Partial<Pick<Shot, "duration">>
   ) => Promise<void>
-  /** 外层容器 class，用于分镜表 td 内紧凑布局 */
   className?: string
 }
 
@@ -41,27 +42,39 @@ export function ShotDurationCell({
   updateShot,
   className = "",
 }: ShotDurationCellProps) {
-  /** 受控输入字符串，允许中间态（如空、负号）仅在失焦时规范化 */
+  const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(String(shot.duration))
   const [saving, setSaving] = useState(false)
+  const ignoreBlurSaveRef = useRef(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    setDraft(String(shot.duration))
-  }, [shot.duration])
+    if (!editing) setDraft(String(shot.duration))
+  }, [shot.duration, editing])
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }
+  }, [editing])
 
   const commit = useCallback(async () => {
     const trimmed = draft.trim()
     if (trimmed === "") {
       setDraft(String(shot.duration))
+      setEditing(false)
       return
     }
     const parsed = Number.parseInt(trimmed, 10)
     if (Number.isNaN(parsed)) {
       setDraft(String(shot.duration))
+      setEditing(false)
       return
     }
     const next = clampDuration(parsed)
     setDraft(String(next))
+    setEditing(false)
     if (next === shot.duration) return
     setSaving(true)
     try {
@@ -73,36 +86,63 @@ export function ShotDurationCell({
     }
   }, [draft, episodeId, shot.duration, shot.shotId, updateShot])
 
+  const onBlur = () => {
+    if (ignoreBlurSaveRef.current) {
+      ignoreBlurSaveRef.current = false
+      return
+    }
+    void commit()
+  }
+
+  const cancelEdit = () => {
+    ignoreBlurSaveRef.current = true
+    setDraft(String(shot.duration))
+    setEditing(false)
+  }
+
+  const previewLabel = `${shot.duration}秒`
+
   return (
-    <div
-      className={`inline-flex items-center gap-1 flex-wrap box-border ${className}`}
-      style={{ boxSizing: "border-box" }}
-    >
-      <label className="sr-only" htmlFor={`shot-dur-${shot.shotId}`}>
-        时长（秒）
-      </label>
-      <input
-        id={`shot-dur-${shot.shotId}`}
-        type="number"
-        min={MIN_SEC}
-        max={MAX_SEC}
-        step={1}
-        value={draft}
-        disabled={saving}
-        title="写入 episode.json；未在单次生成请求里指定 duration 时，后端用此值作为 Vidu 视频时长（秒）"
-        aria-label="镜头时长（秒）"
-        className="w-14 min-w-0 rounded-sm border border-[var(--color-newsprint-black)] bg-white px-2 py-1 text-sm font-mono tabular-nums text-[var(--color-ink)] box-border disabled:opacity-60"
-        style={{ boxSizing: "border-box" }}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={() => void commit()}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault()
-            ;(e.target as HTMLInputElement).blur()
-          }
-        }}
-      />
-      <span className="text-sm text-[var(--color-muted)]">s</span>
-    </div>
+    <span className="inline-flex max-w-full min-w-0 align-middle overflow-visible">
+      {!editing ? (
+        <button
+          type="button"
+          disabled={saving}
+          title="点击编辑时长（秒）；写入 episode.json，供视频生成默认秒数"
+          aria-label={`镜头时长 ${previewLabel}，点击编辑`}
+          className={`${STORYBOARD_TABLE_PREVIEW_SHORT_CLASS} ${className}`.trim()}
+          onClick={() => {
+            ignoreBlurSaveRef.current = false
+            setDraft(String(shot.duration))
+            setEditing(true)
+          }}
+        >
+          {previewLabel}
+        </button>
+      ) : (
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={draft}
+          disabled={saving}
+          aria-label="编辑镜头时长（秒）"
+          className={`${STORYBOARD_TABLE_INLINE_EDIT_INPUT_CLASS} ${className}`.trim()}
+          onChange={(e) => setDraft(e.target.value.replace(/\D/g, ""))}
+          onBlur={onBlur}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              inputRef.current?.blur()
+            }
+            if (e.key === "Escape") {
+              e.preventDefault()
+              cancelEdit()
+            }
+          }}
+        />
+      )}
+    </span>
   )
 }

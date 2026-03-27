@@ -1,6 +1,6 @@
 /**
- * 侧边栏：项目列表、设置；在剧集上下文中追加「粗剪时间线」「分镜板/表」「选片总览」「资产库」
- * 垂直顺序：粗剪 → 分镜板/表 → 选片总览 → 资产库
+ * 侧边栏：项目列表、设置；在剧集上下文中追加「分镜板」「选片总览」「粗剪预览」「资产库」
+ * 垂直顺序（左侧面板）：分镜板 → 选片总览 → 粗剪预览 → 资产库
  *
  * 不在此重复请求 GET /episodes/:id：各剧集子页（分镜板、时间线、资产库等）已拉取详情，
  * 避免与 SideNavBar 并发双请求、404 时控制台重复报错。
@@ -109,8 +109,8 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
         ))}
 
         {/**
-         * 当前剧集子页导航（自上而下）：
-         * 粗剪时间线 → 分镜板/表（紧贴资产库上一行）→ 资产库。
+         * 当前剧集子页导航（自上而下，与产品流程一致）：
+         * 分镜板 → 选片总览 → 粗剪预览 → 资产库。
          * 折叠时仅图标，样式与主导航一致。
          */}
         {episodeId && projectId && (
@@ -119,22 +119,8 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
               collapsed ? "px-0" : ""
             }`}
           >
-            <NavLink
-              to={routes.timeline(projectId, episodeId)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
-                  isActive
-                    ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
-                    : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
-                }`
-              }
-              title={collapsed ? "粗剪时间线" : undefined}
-            >
-              <Clapperboard className="w-5 h-5 shrink-0" aria-hidden />
-              {!collapsed && <span>粗剪时间线</span>}
-            </NavLink>
             {/**
-             * 分镜板根路由：必须加 end，否则 /timeline、/assets、/shot/... 会误匹配为「当前在分镜板」
+             * 分镜板根路由：必须加 end，否则 /timeline、/videopick、/assets、/shot/... 会误匹配为「当前在分镜板」
              */}
             <NavLink
               end
@@ -146,10 +132,10 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
                     : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
                 }`
               }
-              title={collapsed ? "分镜板/表" : undefined}
+              title={collapsed ? "分镜板" : undefined}
             >
               <LayoutGrid className="w-5 h-5 shrink-0" aria-hidden />
-              {!collapsed && <span>分镜板/表</span>}
+              {!collapsed && <span>分镜板</span>}
             </NavLink>
             <NavLink
               to={routes.videopick(projectId, episodeId)}
@@ -164,6 +150,20 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
             >
               <CheckSquare className="w-5 h-5 shrink-0" aria-hidden />
               {!collapsed && <span>选片总览</span>}
+            </NavLink>
+            <NavLink
+              to={routes.timeline(projectId, episodeId)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
+                  isActive
+                    ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
+                    : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
+                }`
+              }
+              title={collapsed ? "粗剪预览" : undefined}
+            >
+              <Clapperboard className="w-5 h-5 shrink-0" aria-hidden />
+              {!collapsed && <span>粗剪预览</span>}
             </NavLink>
             <NavLink
               to={routes.assets(projectId, episodeId)}

@@ -3,6 +3,13 @@ export { AssetTag } from "./AssetTag"
 export { ShotPromptCells } from "./ShotPromptCells"
 export type { PromptFieldKey } from "./ShotPromptCells"
 export { ShotDurationCell } from "./ShotDurationCell"
+/** 分镜表「纯文案预览 / 点击编辑」共用样式（提示词 / 台词 / 时长） */
+export {
+  STORYBOARD_TABLE_INLINE_EDIT_INPUT_CLASS,
+  STORYBOARD_TABLE_INLINE_EDIT_TEXTAREA_CLASS,
+  STORYBOARD_TABLE_PREVIEW_BUTTON_CLASS,
+  STORYBOARD_TABLE_PREVIEW_SHORT_CLASS,
+} from "./storyboardFieldClasses"
 export { ShotDialogueCells } from "./ShotDialogueCells"
 export type {
   ShotDialogueCellsProps,
@@ -18,6 +25,13 @@ export type { VideoPickFocusPanelProps } from "./VideoPickFocusPanel"
 export { VideoPickCandidateGrid } from "./VideoPickCandidateGrid"
 export { VideoPickReferencePanel } from "./VideoPickReferencePanel"
 export type { VideoPickReferencePanelProps } from "./VideoPickReferencePanel"
+export { StoryboardResizableTh } from "./StoryboardResizableTh"
+export type { StoryboardResizableThProps } from "./StoryboardResizableTh"
+export {
+  STORYBOARD_COL_HEADER_LABEL,
+  sumStoryboardTableWidthPx,
+  type StoryboardTableColKey,
+} from "./storyboardTableColumnConfig"
 export { ShotRow } from "./ShotRow"
 export { ShotRowVideoPreview } from "./ShotRowVideoPreview"
 export { BatchPickScopeControl } from "./BatchPickScopeControl"

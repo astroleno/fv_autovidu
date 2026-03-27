@@ -1,3 +1,4 @@
+export { useStoryboardTableColumnWidths } from "./useStoryboardTableColumnWidths"
 export { useEpisodeMediaCacheBust } from "./useEpisodeMediaCacheBust"
 export { useEpisodeFileBasePath } from "./useEpisodeFileBasePath"
 export { usePromoteCandidate } from "./usePromoteCandidate"

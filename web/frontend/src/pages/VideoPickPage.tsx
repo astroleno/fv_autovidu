@@ -333,7 +333,7 @@ export default function VideoPickPage() {
             style={{ boxSizing: "border-box" }}
           >
             <Clapperboard className="w-4 h-4 shrink-0" aria-hidden />
-            粗剪时间线
+            粗剪预览
           </Link>
           <Link
             to={routes.assets(projectId, episodeId)}
