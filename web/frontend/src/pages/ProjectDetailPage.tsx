@@ -41,6 +41,12 @@ export default function ProjectDetailPage() {
   const pushToast = useToastStore((s) => s.push)
   const [pullingId, setPullingId] = useState<string | null>(null)
   const [pullAllBusy, setPullAllBusy] = useState(false)
+  /** 一键拉取选项面板展开状态 */
+  const [pullAllOptionsOpen, setPullAllOptionsOpen] = useState(false)
+  /** 强制重新下载资产/首帧图（覆盖本地已有文件） */
+  const [pullAllForce, setPullAllForce] = useState(false)
+  /** 仅同步分镜文案，不下载图片 */
+  const [pullAllSkipImages, setPullAllSkipImages] = useState(false)
 
   useEffect(() => {
     if (projectId) void fetchProjectEpisodes(projectId)
@@ -77,11 +83,16 @@ export default function ProjectDetailPage() {
   const handlePullAll = async () => {
     if (!projectId) return
     setPullAllBusy(true)
+    setPullAllOptionsOpen(false)
     try {
-      const res = await projectsApi.pullAll(projectId)
+      const res = await projectsApi.pullAll(projectId, {
+        forceRedownload: pullAllForce,
+        skipImages: pullAllSkipImages,
+      })
       const { successCount, failedCount, failedEpisodes } = res.data
+      const modeLabel = pullAllForce ? "（强制重下载）" : ""
       pushToast(
-        `完成：成功 ${successCount}，失败 ${failedCount}`,
+        `完成${modeLabel}：成功 ${successCount}，失败 ${failedCount}`,
         failedCount > 0 ? "error" : "success"
       )
       if (failedEpisodes.length > 0) {
@@ -163,20 +174,66 @@ export default function ProjectDetailPage() {
             />
             刷新
           </Button>
-          <Button
-            type="button"
-            variant="primary"
-            className="gap-2"
-            onClick={() => void handlePullAll()}
-            disabled={pullAllBusy}
-          >
-            {pullAllBusy ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Download className="w-4 h-4" />
+          {/* 一键拉取：主按钮 + 可展开选项面板 */}
+          <div className="relative">
+            <div className="flex">
+              <Button
+                type="button"
+                variant="primary"
+                className="gap-2"
+                onClick={() => void handlePullAll()}
+                disabled={pullAllBusy}
+              >
+                {pullAllBusy ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+                {pullAllForce ? "强制拉取全部" : "一键拉取全部"}
+              </Button>
+              <button
+                type="button"
+                onClick={() => setPullAllOptionsOpen((v) => !v)}
+                disabled={pullAllBusy}
+                className="px-2 border border-l-0 border-[var(--color-newsprint-black)] bg-[var(--color-primary)] text-white font-bold text-xs hover:bg-[var(--color-primary)]/90 transition-colors disabled:opacity-50"
+                aria-label="拉取选项"
+              >
+                ▾
+              </button>
+            </div>
+            {pullAllOptionsOpen && (
+              <div className="absolute right-0 top-full mt-1 z-20 w-72 p-3 border border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] shadow-[4px_4px_0px_0px_#111111] space-y-3 box-border">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={pullAllSkipImages}
+                    onChange={(e) => {
+                      const v = e.target.checked
+                      setPullAllSkipImages(v)
+                      if (v) setPullAllForce(false)
+                    }}
+                    className="w-4 h-4 shrink-0"
+                  />
+                  <span className="text-sm font-medium">仅拉取分镜文案（不下载图片）</span>
+                </label>
+                <label
+                  className={`flex items-center gap-3 ${pullAllSkipImages ? "opacity-40 pointer-events-none" : "cursor-pointer"}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={pullAllForce}
+                    disabled={pullAllSkipImages}
+                    onChange={(e) => setPullAllForce(e.target.checked)}
+                    className="w-4 h-4 shrink-0"
+                  />
+                  <span className="text-sm font-medium">强制重新下载资产/首帧图</span>
+                </label>
+                <p className="text-xs text-[var(--color-muted)] ml-7 -mt-1">
+                  覆盖本地已有图片；在平台更新了资产后勾选此项
+                </p>
+              </div>
             )}
-            一键拉取全部
-          </Button>
+          </div>
         </div>
       </div>
 
