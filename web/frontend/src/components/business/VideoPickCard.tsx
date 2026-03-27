@@ -324,7 +324,7 @@ export function VideoPickCard({
   }
 
   const storyboardUrl = routes.episode(projectId, episodeId)
-  const detailUrl = routes.shot(projectId, episodeId, shot.shotId)
+  const detailUrl = routes.videopickShot(projectId, episodeId, shot.shotId)
   const gridClass = candidateGridClass(shot.videoCandidates.length)
   const hasFirstFrame = Boolean(shot.firstFrame?.trim())
   const nCandidates = shot.videoCandidates.length
@@ -405,14 +405,14 @@ export function VideoPickCard({
     </p>
   ) : null
 
-  /** 右侧：无候选时的引导（prompt 已在左栏，仅强调深度编辑走详情） */
+  /** 右侧：无候选时的引导（prompt 已在左栏；深度编辑走分镜表，迭代走选片 picking） */
   const emptyCandidatesGuide = (
     <div
       className="text-xs text-[var(--color-muted)] space-y-2 py-2 box-border min-w-0"
       style={{ boxSizing: "border-box" }}
     >
       <p>
-        暂无视频候选。提示词与首尾帧已在左侧参考区；需要编辑 prompt 或更多镜头级操作请进镜头详情。
+        暂无视频候选。提示词与首尾帧已在左侧参考区；需要编辑视频提示词、发起重试请进选片工作台。
       </p>
       <div className="flex flex-wrap gap-x-3 gap-y-1">
         <Link
@@ -425,7 +425,7 @@ export function VideoPickCard({
           to={detailUrl}
           className="inline-flex items-center gap-1 font-bold text-[var(--color-primary)] underline underline-offset-2"
         >
-          镜头详情
+          选片工作台
         </Link>
       </div>
     </div>
@@ -558,7 +558,7 @@ export function VideoPickCard({
                   <span
                     className="inline-flex items-center px-2 py-0.5 border border-[var(--color-newsprint-black)] text-[10px] font-black uppercase bg-[var(--color-outline-variant)] text-[var(--color-muted)] box-border"
                     style={{ boxSizing: "border-box" }}
-                    title={`另有 ${String(extraAssetCount)} 个资产，可在镜头详情或资产库查看`}
+                    title={`另有 ${String(extraAssetCount)} 个资产，可在选片工作台或资产库查看`}
                   >
                     +{extraAssetCount}
                   </span>
@@ -679,7 +679,7 @@ export function VideoPickCard({
           className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[var(--color-newsprint-black)] hover:text-[var(--color-primary)] transition-colors"
         >
           <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden />
-          查看详情（提示词 / 资产）
+          选片工作台（提示词 / 候选 / 迭代）
         </Link>
       </footer>
     </article>

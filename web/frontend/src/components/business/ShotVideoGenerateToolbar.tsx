@@ -1,5 +1,5 @@
 /**
- * ShotVideoGenerateToolbar — 镜头详情页（分镜表点击进入）专用的「生成视频」工具条
+ * ShotVideoGenerateToolbar — 单镜头「生成视频」工具条（分镜表 / 选片参考区共用）
  *
  * 职责：
  * - 提供与 VideoPickCard / VideoPickFocusPanel **同源** 的两种快捷模式：`first_frame`（仅首帧 i2v）、
@@ -11,7 +11,7 @@
  * - 首尾帧模式需本地已有尾帧路径；否则按钮禁用，与后端校验对齐。
  * - 尾帧生成中或视频生成中时不允许再次提交，避免并发任务冲突。
  */
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Film, Loader2 } from "lucide-react"
 import type { GenerateVideoRequest } from "@/types"
 import type { Shot, VideoMode } from "@/types"
@@ -33,11 +33,14 @@ export interface ShotVideoGenerateToolbarProps {
   shot: Shot
   /** 剧集 id，用于 generateApi 与任务轮询 */
   episodeId: string
+  /** 自定义参数弹窗开关（用于与选片全局键盘快捷键互斥） */
+  onVideoDialogOpenChange?: (open: boolean) => void
 }
 
 export function ShotVideoGenerateToolbar({
   shot,
   episodeId,
+  onVideoDialogOpenChange,
 }: ShotVideoGenerateToolbarProps) {
   const currentEpisode = useEpisodeStore((s) => s.currentEpisode)
   const startPolling = useTaskStore((s) => s.startPolling)
@@ -45,6 +48,10 @@ export function ShotVideoGenerateToolbar({
 
   const [submittingVideo, setSubmittingVideo] = useState(false)
   const [videoDialogOpen, setVideoDialogOpen] = useState(false)
+
+  useEffect(() => {
+    onVideoDialogOpenChange?.(videoDialogOpen)
+  }, [videoDialogOpen, onVideoDialogOpenChange])
 
   /** 剧集级资产 id：供 VideoModeSelector 的「多参考图」模式勾选（与批量页同源） */
   const episodeAssetIds = useMemo(

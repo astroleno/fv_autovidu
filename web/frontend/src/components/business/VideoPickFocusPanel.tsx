@@ -1,43 +1,35 @@
 /**
  * VideoPickFocusPanel — 选片模式（Picking）单镜头聚焦工作台
  *
- * 布局：顶栏（模式切换、进度、仅待选开关）→ 主体左大右小（候选区 65%～75% / 参考区 25%～35%）
- * → 底栏（上一镜头 / 下一镜头 + 快捷键说明）。
+ * 布局：顶栏（进度、仅待选开关）→ 主体左大右小（候选区约 65–68% / 参考区约 32–35%）→ 底栏快捷键说明。
  *
- * 数据与筛选与 Overview 共用 filteredFlatShots；选定仍走 shotStore.selectCandidate。
+ * ## 生成与再生成
+ * 所有「生成视频 / 尾帧 / 自定义参数」已收口至右侧 `VideoPickReferencePanel`，候选区仅保留候选网格与精出按钮，
+ * 避免与参考区重复维护两套逻辑。
+ *
+ * ## 键盘
+ * `useVideoPickKeyboard` 在以下情况禁用：无当前镜头、参考区/时长编辑中、自定义参数弹窗打开（由工具条上报）。
  */
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router"
-import { ExternalLink, Film, Loader2 } from "lucide-react"
-import {
-  flattenShots,
-  type GenerateVideoRequest,
-  type Shot,
-  type VideoMode,
-} from "@/types"
+import { ExternalLink } from "lucide-react"
+import { flattenShots, type Shot } from "@/types"
 import { usePromoteCandidate, useVideoPickKeyboard } from "@/hooks"
 import {
   useEpisodeStore,
   useShotStore,
-  useTaskStore,
   useToastStore,
   useVideoPickStore,
 } from "@/stores"
 import { Button } from "@/components/ui"
-import { generateApi } from "@/api/generate"
 import { getFileUrl } from "@/utils/file"
 import { routes } from "@/utils/routes"
 import {
   getDefaultActiveCandidateId,
   nextNavigatedIndex,
 } from "@/utils/videoPickHelpers"
-import {
-  buildSingleShotVideoQuickRequest,
-  toastAfterVideoTasksSettled,
-} from "@/utils/videoQuickRegenerate"
 import { VideoPickCandidateGrid } from "./VideoPickCandidateGrid"
 import { VideoPickReferencePanel } from "./VideoPickReferencePanel"
-import { VideoModeSelector, type VideoModeSelectorResult } from "./VideoModeSelector"
 
 export interface VideoPickFocusPanelProps {
   /** 与列表页相同的筛选后扁平镜头列表（叙事顺序） */
@@ -67,9 +59,11 @@ export function VideoPickFocusPanel({
   const popUndo = useVideoPickStore((s) => s.popUndo)
 
   const { selectCandidate, clearSelectedCandidate } = useShotStore()
-  const currentEpisode = useEpisodeStore((s) => s.currentEpisode)
-  const startPolling = useTaskStore((s) => s.startPolling)
   const pushToast = useToastStore((s) => s.push)
+
+  /** 参考区：视频提示词 / 时长编辑态，或工具条弹窗 — 暂停全局快捷键 */
+  const [detailEditing, setDetailEditing] = useState(false)
+  const [videoDialogOpen, setVideoDialogOpen] = useState(false)
 
   const shot = filteredShots[currentShotIndex]
   const total = filteredShots.length
@@ -81,54 +75,23 @@ export function VideoPickFocusPanel({
     [filteredShots]
   )
 
-  /** 当前镜头在 picking 流中的「位置」与全量筛选下的已选统计 */
   const positionLabel =
     total > 0 ? `当前第 ${currentShotIndex + 1} / ${total} 个镜头` : "当前无镜头"
   const progressLabel =
     total > 0 ? `已选 ${selectedCount} / ${total}` : "已选 0 / 0"
 
-  /**
-   * 切换镜头或数据刷新后，将激活候选同步为服务端默认。
-   * 注：撤销成功后的 active 已在 handleUndo 内显式设好，避免与旧 shot 引用冲突。
-   */
   useEffect(() => {
     if (!shot) return
     setActiveCandidateId(getDefaultActiveCandidateId(shot))
   }, [shot, setActiveCandidateId])
 
-  const episodeAssetIds = useMemo(
-    () => (currentEpisode?.assets ?? []).map((a) => a.assetId),
-    [currentEpisode?.assets]
-  )
-
-  const [submittingVideo, setSubmittingVideo] = useState(false)
-  const [submittingEndframe, setSubmittingEndframe] = useState(false)
-  const [videoDialogOpen, setVideoDialogOpen] = useState(false)
-
-  const busyEnd = shot?.status === "endframe_generating"
-  const busyVid = shot?.status === "video_generating"
-  const canSubmitVideo =
-    Boolean(shot?.firstFrame?.trim()) &&
-    !busyEnd &&
-    !busyVid &&
-    !submittingVideo
-  const canEndframe =
-    Boolean(shot?.firstFrame) &&
-    !busyEnd &&
-    !busyVid &&
-    !submittingEndframe
-  const showEndSkeleton = Boolean(shot && (busyEnd || submittingEndframe))
-  /** 与后端「首尾帧需尾帧」一致；无尾帧路径时不提交 first_last_frame */
-  const hasEndFramePath = Boolean(shot?.endFrame?.trim())
+  const showEndSkeleton = Boolean(shot && (shot.status === "endframe_generating"))
 
   const { promote, isPromoting } = usePromoteCandidate({
     episodeId,
     shotId: shot?.shotId ?? "",
   })
 
-  /**
-   * 提交当前激活候选为已选；recordUndo 为 true 时写入撤销栈（用户操作或离开镜头前自动提交）
-   */
   const commitSelection = useCallback(
     async (
       targetShot: Shot,
@@ -159,14 +122,6 @@ export function VideoPickFocusPanel({
     [episodeId, pushToast, pushUndo, selectCandidate]
   )
 
-  /**
-   * 撤销：先看栈顶 → 请求成功后再 pop，避免失败丢记录。
-   * previousCandidateId 为 null 时清空已选（首次选定后的撤销）。
-   *
-   * 同步 activeCandidateId 仅限「撤销条目所属镜头 === 当前面板镜头」：
-   * 栈里可能残留其它镜头在左右键自动提交时产生的记录；若用户已切到别镜再按撤销，
-   * 服务端仍会恢复那条镜头的状态，但不得把旧镜头的候选 id 写进当前镜头的激活态。
-   */
   const handleUndo = useCallback(async () => {
     const entry = peekUndo()
     if (!entry) {
@@ -211,7 +166,6 @@ export function VideoPickFocusPanel({
     shot?.shotId,
   ])
 
-  /** 点击 / Enter 与数字键一致：激活并立即提交已选 */
   const onActivateCandidateCommit = useCallback(
     async (candidateId: string) => {
       if (!shot) return
@@ -294,9 +248,6 @@ export function VideoPickFocusPanel({
     [activeCandidateId, allIds, setActiveCandidateId, shot]
   )
 
-  /**
-   * Enter：提交当前激活候选（与 Tab 流、第 5+ 候选配套；用 getState 避免闭包陈旧）
-   */
   const onConfirmActiveCandidate = useCallback(() => {
     if (!shot) return
     const id =
@@ -308,7 +259,7 @@ export function VideoPickFocusPanel({
   }, [commitSelection, setActiveCandidateId, shot])
 
   useVideoPickKeyboard({
-    enabled: Boolean(shot) && !videoDialogOpen,
+    enabled: Boolean(shot) && !videoDialogOpen && !detailEditing,
     primaryCandidateIds: primaryIds,
     onDigitSelect,
     onTabCycle,
@@ -317,122 +268,6 @@ export function VideoPickFocusPanel({
     onExitPicking: exitPicking,
     onUndo: handleUndo,
   })
-
-  const handleEndframe = async () => {
-    if (!shot || !canEndframe) return
-    setSubmittingEndframe(true)
-    try {
-      const res = await generateApi.endframe({
-        episodeId,
-        shotIds: [shot.shotId],
-      })
-      const { tasks } = res.data
-      const ids = tasks.map((t) => t.taskId)
-      startPolling(ids, {
-        episodeId,
-        onAllSettled: () => {
-          pushToast(
-            `尾帧任务已完成（S${String(shot.shotNumber).padStart(2, "0")}）`,
-            "success"
-          )
-        },
-      })
-    } catch (e) {
-      pushToast(e instanceof Error ? e.message : "尾帧生成请求失败", "error")
-    } finally {
-      setSubmittingEndframe(false)
-    }
-  }
-
-  const handleQuickRegenerateVideo = async (mode: VideoMode) => {
-    if (!shot || !canSubmitVideo) return
-    setSubmittingVideo(true)
-    try {
-      const body = buildSingleShotVideoQuickRequest(
-        episodeId,
-        shot.shotId,
-        mode
-      )
-      const res = await generateApi.video(body)
-      const ids = res.data.tasks.map((t) => t.taskId)
-      pushToast(
-        `已提交 ${String(ids.length)} 个视频任务（S${String(shot.shotNumber).padStart(2, "0")}）`,
-        "info",
-        5000
-      )
-      startPolling(ids, {
-        episodeId,
-        onPollAborted: () => {
-          pushToast(
-            `视频任务轮询中断（S${String(shot.shotNumber).padStart(2, "0")}），请刷新页面后查看结果`,
-            "error",
-            8000
-          )
-        },
-        onAllSettled: (results) => {
-          toastAfterVideoTasksSettled(
-            results,
-            pushToast,
-            `S${String(shot.shotNumber).padStart(2, "0")}`
-          )
-        },
-      })
-    } catch (e) {
-      pushToast(e instanceof Error ? e.message : "视频生成请求失败", "error")
-    } finally {
-      setSubmittingVideo(false)
-    }
-  }
-
-  const handleVideoModeConfirm = async (result: VideoModeSelectorResult) => {
-    if (!shot || !canSubmitVideo) return
-    setSubmittingVideo(true)
-    try {
-      const body: GenerateVideoRequest = {
-        episodeId,
-        shotIds: [shot.shotId],
-        mode: result.mode,
-        model: result.model,
-        resolution: result.resolution,
-        referenceAssetIds: result.referenceAssetIds,
-        ...(result.mode === "first_last_frame" && result.isPreview
-          ? {
-              isPreview: true,
-              candidateCount: result.candidateCount ?? 1,
-            }
-          : {}),
-      }
-      const res = await generateApi.video(body)
-      const ids = res.data.tasks.map((t) => t.taskId)
-      pushToast(
-        `已提交 ${String(ids.length)} 个视频任务（S${String(shot.shotNumber).padStart(2, "0")}）`,
-        "info",
-        5000
-      )
-      startPolling(ids, {
-        episodeId,
-        onPollAborted: () => {
-          pushToast(
-            `视频任务轮询中断（S${String(shot.shotNumber).padStart(2, "0")}），请刷新页面后查看结果`,
-            "error",
-            8000
-          )
-        },
-        onAllSettled: (results) => {
-          toastAfterVideoTasksSettled(
-            results,
-            pushToast,
-            `S${String(shot.shotNumber).padStart(2, "0")}`
-          )
-        },
-      })
-      setVideoDialogOpen(false)
-    } catch (e) {
-      pushToast(e instanceof Error ? e.message : "视频生成请求失败", "error")
-    } finally {
-      setSubmittingVideo(false)
-    }
-  }
 
   if (!shot) {
     return (
@@ -451,112 +286,22 @@ export function VideoPickFocusPanel({
   }
 
   const shotLabel = `S${String(shot.shotNumber).padStart(2, "0")}`
-  const detailUrl = routes.shot(projectId, episodeId, shot.shotId)
+  const storyboardUrl = routes.episode(projectId, episodeId)
   const hasFirstFrame = Boolean(shot.firstFrame?.trim())
   const nCandidates = shot.videoCandidates.length
 
-  const regenerateToolbar = hasFirstFrame ? (
-    <div
-      className="flex flex-wrap items-center gap-2 rounded-sm border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)] p-2 box-border"
-      style={{ boxSizing: "border-box" }}
-    >
-      <span className="text-[9px] font-black uppercase text-[var(--color-muted)] shrink-0 w-full sm:w-auto">
-        {nCandidates > 0 ? "追加候选 / 再生成" : "生成视频"}
-      </span>
-      <Button
-        type="button"
-        variant="secondary"
-        disabled={!canSubmitVideo}
-        className="text-[10px] px-2 py-1.5 gap-1.5 h-auto box-border"
-        style={{ boxSizing: "border-box" }}
-        onClick={() => void handleQuickRegenerateVideo("first_frame")}
-        title="仅首帧图生视频（i2v）"
-      >
-        {submittingVideo ? (
-          <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
-        ) : (
-          <Film className="w-3.5 h-3.5 shrink-0" aria-hidden />
-        )}
-        仅首帧再生成
-      </Button>
-      <Button
-        type="button"
-        variant="secondary"
-        disabled={!canSubmitVideo || !hasEndFramePath}
-        className="text-[10px] px-2 py-1.5 gap-1.5 h-auto box-border"
-        style={{ boxSizing: "border-box" }}
-        onClick={() => void handleQuickRegenerateVideo("first_last_frame")}
-        title={
-          hasEndFramePath
-            ? "首尾帧预览档（540p+turbo+双候选）"
-            : "需要先生成尾帧后再使用首尾帧模式"
-        }
-      >
-        {submittingVideo ? (
-          <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
-        ) : (
-          <Film className="w-3.5 h-3.5 shrink-0" aria-hidden />
-        )}
-        首尾帧再生成
-      </Button>
-      <Button
-        type="button"
-        variant="secondary"
-        disabled={!canSubmitVideo}
-        className="text-[10px] px-2 py-1.5 h-auto box-border"
-        style={{ boxSizing: "border-box" }}
-        onClick={() => setVideoDialogOpen(true)}
-      >
-        自定义参数
-      </Button>
-    </div>
-  ) : null
-
-  const compareHint =
+  const fewCandidatesHint =
     hasFirstFrame && nCandidates < 2 ? (
       <div
-        className="flex flex-wrap items-center gap-2 rounded-sm border border-dashed border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/40 p-3 box-border"
+        className="rounded-sm border border-dashed border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/40 p-3 box-border"
         style={{ boxSizing: "border-box" }}
       >
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-bold text-[var(--color-newsprint-black)]">
-            当前镜头只有 {nCandidates} 个候选，暂时无法比选。
-          </p>
-          <p className="text-[10px] text-[var(--color-muted)] mt-1">
-            选片模式会展示该镜头的全部候选。要进入比选，需要先补生成更多候选视频。
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={!canSubmitVideo}
-            className="text-[10px] px-2 py-1.5 h-auto box-border"
-            style={{ boxSizing: "border-box" }}
-            onClick={() =>
-              void handleQuickRegenerateVideo(
-                hasEndFramePath ? "first_last_frame" : "first_frame"
-              )
-            }
-            title={
-              hasEndFramePath
-                ? "首尾帧预览档，一次可出 2 条候选"
-                : "无尾帧时仅首帧再生成"
-            }
-          >
-            {hasEndFramePath ? "再生成 2 个预览候选" : "再生成候选（仅首帧）"}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={!canSubmitVideo}
-            className="text-[10px] px-2 py-1.5 h-auto box-border"
-            style={{ boxSizing: "border-box" }}
-            onClick={() => setVideoDialogOpen(true)}
-          >
-            自定义生成
-          </Button>
-        </div>
+        <p className="text-[11px] font-bold text-[var(--color-newsprint-black)]">
+          当前镜头只有 {nCandidates} 个候选，暂时难以比选。
+        </p>
+        <p className="text-[10px] text-[var(--color-muted)] mt-1 leading-snug">
+          需要追加生成时请在<strong>右侧参考区</strong>使用「生成视频」工具条（仅首帧 / 首尾帧 / 自定义参数）。
+        </p>
       </div>
     ) : null
 
@@ -565,15 +310,6 @@ export function VideoPickFocusPanel({
       className="flex flex-col gap-4 min-h-0 min-w-0 box-border"
       style={{ boxSizing: "border-box" }}
     >
-      <VideoModeSelector
-        open={videoDialogOpen}
-        onClose={() => setVideoDialogOpen(false)}
-        shotCount={1}
-        episodeAssetIds={episodeAssetIds}
-        firstLastFrameAllowed={hasEndFramePath}
-        onConfirm={(r) => void handleVideoModeConfirm(r)}
-      />
-
       <header
         className="flex flex-wrap items-center gap-3 gap-y-2 border-b border-[var(--color-newsprint-black)] pb-3 box-border"
         style={{ boxSizing: "border-box" }}
@@ -610,7 +346,7 @@ export function VideoPickFocusPanel({
           style={{ boxSizing: "border-box", flexBasis: "68%" }}
           aria-label="候选视频"
         >
-          {compareHint}
+          {fewCandidatesHint}
 
           <VideoPickCandidateGrid
             shot={shot}
@@ -647,25 +383,28 @@ export function VideoPickFocusPanel({
             </div>
           ) : null}
 
-          {regenerateToolbar}
           {!hasFirstFrame ? (
-            <p className="text-[10px] text-[var(--color-muted)] box-border" style={{ boxSizing: "border-box" }}>
-              缺少首帧路径，无法在此发起视频生成；请先在分镜板或平台侧补齐首帧。
+            <p
+              className="text-[10px] text-[var(--color-muted)] box-border"
+              style={{ boxSizing: "border-box" }}
+            >
+              缺少首帧路径，无法发起视频生成；请先在分镜板或平台侧补齐首帧。
             </p>
           ) : null}
 
           <Link
-            to={detailUrl}
+            to={storyboardUrl}
             className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[var(--color-newsprint-black)] hover:text-[var(--color-primary)] transition-colors"
           >
             <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden />
-            镜头详情（完整编辑）
+            分镜表（完整编辑画面描述 / 图像提示词 / 台词）
           </Link>
         </section>
 
         <section
-          className="flex-[1_1_32%] min-w-0 flex flex-col box-border lg:max-w-md"
+          className="flex-[1_1_32%] min-w-0 flex flex-col box-border w-[22rem] max-w-[24rem] xl:w-[24rem]"
           style={{ boxSizing: "border-box", flexBasis: "32%" }}
+          aria-label="参考与迭代"
         >
           <VideoPickReferencePanel
             shot={shot}
@@ -674,9 +413,8 @@ export function VideoPickFocusPanel({
             basePath={basePath}
             cacheBust={cacheBust}
             showEndSkeleton={showEndSkeleton}
-            onRetryEndframe={
-              shot.status === "error" ? () => void handleEndframe() : undefined
-            }
+            onEditingChange={setDetailEditing}
+            onVideoDialogOpenChange={setVideoDialogOpen}
           />
         </section>
       </div>
@@ -685,7 +423,10 @@ export function VideoPickFocusPanel({
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-[var(--color-newsprint-black)] pt-3 box-border"
         style={{ boxSizing: "border-box" }}
       >
-        <div className="flex flex-wrap gap-2 box-border" style={{ boxSizing: "border-box" }}>
+        <div
+          className="flex flex-wrap gap-2 box-border"
+          style={{ boxSizing: "border-box" }}
+        >
           <Button
             type="button"
             variant="secondary"
@@ -705,7 +446,10 @@ export function VideoPickFocusPanel({
             下一镜头 →
           </Button>
         </div>
-        <p className="text-[9px] text-[var(--color-muted)] max-w-xl leading-snug box-border" style={{ boxSizing: "border-box" }}>
+        <p
+          className="text-[9px] text-[var(--color-muted)] max-w-xl leading-snug box-border"
+          style={{ boxSizing: "border-box" }}
+        >
           快捷键：1–4 选定前四个候选 · Tab 切换激活 · Enter 确认当前激活候选 · ←
           → 提交并切镜头 · Esc 返回列表 · Ctrl+Z 撤销
         </p>

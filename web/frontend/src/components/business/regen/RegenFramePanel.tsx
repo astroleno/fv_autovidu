@@ -171,16 +171,16 @@ export function RegenFramePanel({
 
   return (
     <div className="space-y-8">
-      {/* 顶栏：标题 + 返回镜头详情 */}
+      {/* 顶栏：标题 + 返回选片工作台（picking 深链） */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="text-4xl font-extrabold uppercase tracking-tighter text-[var(--color-newsprint-black)] font-headline">
           单帧重生 - {shotLabel}
         </h1>
         <Link
-          to={routes.shot(projectId, episodeId, shot.shotId)}
+          to={routes.videopickShot(projectId, episodeId, shot.shotId)}
           className="text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] underline underline-offset-4"
         >
-          ← 返回镜头详情
+          ← 返回选片工作台
         </Link>
       </div>
 

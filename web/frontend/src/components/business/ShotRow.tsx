@@ -137,12 +137,12 @@ export function ShotRow({
         {shot.videoCandidates.length}
       </td>
       <td className="py-3 px-4 min-w-0 overflow-visible">
-        <Link to={routes.shot(projectId, episodeId, shot.shotId)}>
+        <Link to={routes.videopickShot(projectId, episodeId, shot.shotId)}>
           <button
             type="button"
             className="text-xs text-[var(--color-primary)] hover:underline"
           >
-            详情
+            选片
           </button>
         </Link>
       </td>

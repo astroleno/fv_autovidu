@@ -69,7 +69,8 @@ export function ShotFrameCompare({
   showEndSkeleton = false,
   onRetryEndframe,
 }: ShotFrameCompareProps) {
-  const detailPath = routes.shot(projectId, episodeId, shot.shotId)
+  /** 进入选片 picking 深链（单镜头工作台），不再使用独立镜头详情页 */
+  const detailPath = routes.videopickShot(projectId, episodeId, shot.shotId)
   const firstFrameUrl = getFileUrl(shot.firstFrame, basePath, cacheBust)
   const endFrameUrl = shot.endFrame ? getFileUrl(shot.endFrame, basePath, cacheBust) : null
   const vc = variantClass[variant]

@@ -9,7 +9,7 @@ import ProjectDetailPage from "@/pages/ProjectDetailPage"
 import EpisodeListPage from "@/pages/EpisodeListPage"
 import StoryboardPage from "@/pages/StoryboardPage"
 import AssetLibraryPage from "@/pages/AssetLibraryPage"
-import ShotDetailPage from "@/pages/ShotDetailPage"
+import ShotDetailRedirectPage from "@/pages/ShotDetailRedirectPage"
 import RegenPage from "@/pages/RegenPage"
 import TimelinePage from "@/pages/TimelinePage"
 import VideoPickPage from "@/pages/VideoPickPage"
@@ -34,7 +34,7 @@ const router = createBrowserRouter([
       },
       {
         path: "project/:projectId/episode/:episodeId/shot/:shotId",
-        element: <ShotDetailPage />,
+        element: <ShotDetailRedirectPage />,
       },
       {
         path: "project/:projectId/episode/:episodeId/shot/:shotId/regen",

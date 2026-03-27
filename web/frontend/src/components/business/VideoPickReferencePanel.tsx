@@ -1,18 +1,36 @@
 /**
- * VideoPickReferencePanel — 选片模式右侧「参考区」
+ * VideoPickReferencePanel — 选片 picking 模式右侧「参考 + 迭代」面板
  *
- * 展示当前镜头的最小参考集：首尾帧、提示词优先级、资产、配音摘要。
- * 长文本默认截断（line-clamp），可展开（P1 要求）。
+ * ## 职责
+ * - **展示**：首尾帧对比、画面描述 / 图像提示词（只读，可展开）、资产标签、配音状态。
+ * - **可编辑**：视频提示词、时长（与分镜表同源组件，写入 episode.json）。
+ * - **操作**：生成视频工具条（与镜头详情同源 `ShotVideoGenerateToolbar`）、无尾帧时突出「生成尾帧」、单帧重生入口。
+ *
+ * ## 键盘
+ * 可编辑控件通过 `onEditingChange` / `onVideoDialogOpenChange` 向上传递，由 `VideoPickFocusPanel` 暂停 `useVideoPickKeyboard`。
+ *
+ * ## 布局
+ * 参考区宽度由父级 `VideoPickFocusPanel` 控制（约 22–24rem）；本组件内部纵向堆叠，`box-border` 防 padding 撑破。
  */
-import { useLayoutEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import { Link } from "react-router"
+import { Film, Loader2, RotateCcw } from "lucide-react"
 import type { Shot } from "@/types"
+import { useEpisodeStore, useTaskStore, useToastStore } from "@/stores"
+import { Button } from "@/components/ui"
+import { generateApi } from "@/api/generate"
+import { routes } from "@/utils/routes"
 import { ShotFrameCompare } from "./ShotFrameCompare"
 import { AssetTag } from "./AssetTag"
 import { DubStatusBadge } from "./DubStatusBadge"
+import { ShotDurationCell } from "./ShotDurationCell"
+import { ShotVideoGenerateToolbar } from "./ShotVideoGenerateToolbar"
+import { VideoPickEditablePrompt } from "./VideoPickEditablePrompt"
 
-const ASSET_PREVIEW_LIMIT = 8
+/** 资产标签预览条数：超过则显示 +N（与收口计划「>3 折叠」一致） */
+const ASSET_PREVIEW_LIMIT = 3
 
-/** 单条可展开文本字段 */
+/** 单条只读可展开文本（画面描述 / 图像提示词） */
 function ExpandablePromptBlock({
   label,
   text,
@@ -20,22 +38,9 @@ function ExpandablePromptBlock({
 }: {
   label: string
   text: string
-  /** 收起态行数，如 line-clamp-3 */
   lineClampClass: string
 }) {
   const [expanded, setExpanded] = useState(false)
-  const [overflowing, setOverflowing] = useState(false)
-  const pRef = useRef<HTMLParagraphElement>(null)
-
-  useLayoutEffect(() => {
-    const el = pRef.current
-    if (!el || expanded) {
-      setOverflowing(false)
-      return
-    }
-    setOverflowing(el.scrollHeight > el.clientHeight + 1)
-  }, [text, expanded, lineClampClass])
-
   const trimmed = text.trim()
   if (!trimmed) return null
 
@@ -48,22 +53,19 @@ function ExpandablePromptBlock({
         {label}
       </p>
       <p
-        ref={pRef}
         className={`text-[10px] text-[var(--color-ink)] leading-snug whitespace-pre-wrap break-words ${
           expanded ? "" : lineClampClass
         }`}
       >
         {trimmed}
       </p>
-      {overflowing || expanded ? (
-        <button
-          type="button"
-          className="mt-0.5 text-[10px] font-bold text-[var(--color-primary)] underline"
-          onClick={() => setExpanded((e) => !e)}
-        >
-          {expanded ? "收起" : "展开"}
-        </button>
-      ) : null}
+      <button
+        type="button"
+        className="mt-0.5 text-[10px] font-bold text-[var(--color-primary)] underline"
+        onClick={() => setExpanded((e) => !e)}
+      >
+        {expanded ? "收起" : "展开"}
+      </button>
     </div>
   )
 }
@@ -75,7 +77,10 @@ export interface VideoPickReferencePanelProps {
   basePath: string
   cacheBust?: string
   showEndSkeleton: boolean
-  onRetryEndframe?: () => void
+  /** 参考区内任一可编辑控件 focus 时为 true，用于暂停选片全局键盘 */
+  onEditingChange?: (editing: boolean) => void
+  /** 自定义参数弹窗打开时为 true */
+  onVideoDialogOpenChange?: (open: boolean) => void
 }
 
 export function VideoPickReferencePanel({
@@ -85,21 +90,74 @@ export function VideoPickReferencePanel({
   basePath,
   cacheBust,
   showEndSkeleton,
-  onRetryEndframe,
+  onEditingChange,
+  onVideoDialogOpenChange,
 }: VideoPickReferencePanelProps) {
+  const updateShot = useEpisodeStore((s) => s.updateShot)
+  const startPolling = useTaskStore((s) => s.startPolling)
+  const pushToast = useToastStore((s) => s.push)
+
+  const [promptEditing, setPromptEditing] = useState(false)
+  const [durationEditing, setDurationEditing] = useState(false)
+
+  useEffect(() => {
+    onEditingChange?.(promptEditing || durationEditing)
+  }, [promptEditing, durationEditing, onEditingChange])
+
+  const setPromptEditingCb = useCallback((v: boolean) => {
+    setPromptEditing(v)
+  }, [])
+
+  const setDurationEditingCb = useCallback((v: boolean) => {
+    setDurationEditing(v)
+  }, [])
+
   const assets = shot.assets ?? []
   const extraAssetCount = Math.max(0, assets.length - ASSET_PREVIEW_LIMIT)
 
-  const hasAnyPrompt =
-    Boolean(shot.visualDescription?.trim()) ||
-    Boolean(shot.videoPrompt?.trim()) ||
-    Boolean(shot.imagePrompt?.trim())
+  const busyEnd = shot.status === "endframe_generating"
+  const busyVid = shot.status === "video_generating"
+  const [submittingEndframe, setSubmittingEndframe] = useState(false)
+  const canEndframe =
+    Boolean(shot.firstFrame) &&
+    !busyEnd &&
+    !busyVid &&
+    !submittingEndframe
+  const hasEndFramePath = Boolean(shot.endFrame?.trim())
+  const shotLabel = `S${String(shot.shotNumber).padStart(2, "0")}`
+
+  const handleEndframe = async () => {
+    if (!canEndframe) return
+    setSubmittingEndframe(true)
+    try {
+      const res = await generateApi.endframe({
+        episodeId,
+        shotIds: [shot.shotId],
+      })
+      const { tasks } = res.data
+      const ids = tasks.map((t) => t.taskId)
+      startPolling(ids, {
+        episodeId,
+        onAllSettled: () => {
+          pushToast(`尾帧任务已完成（${shotLabel}）`, "success")
+        },
+      })
+    } catch (e) {
+      pushToast(e instanceof Error ? e.message : "尾帧生成请求失败", "error")
+    } finally {
+      setSubmittingEndframe(false)
+    }
+  }
+
+  const onCommitVideoPrompt = async (next: string) => {
+    await updateShot(episodeId, shot.shotId, { videoPrompt: next })
+  }
 
   return (
     <aside
       className="flex flex-col gap-3 min-w-0 w-full max-h-[calc(100vh-12rem)] overflow-y-auto box-border p-3 border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)]/25 rounded-sm"
       style={{ boxSizing: "border-box" }}
-      aria-label="当前镜头参考信息"
+      aria-label="当前镜头参考与迭代"
     >
       <ShotFrameCompare
         variant="pick"
@@ -109,7 +167,9 @@ export function VideoPickReferencePanel({
         basePath={basePath}
         cacheBust={cacheBust}
         showEndSkeleton={showEndSkeleton}
-        onRetryEndframe={onRetryEndframe}
+        onRetryEndframe={
+          shot.status === "error" ? () => void handleEndframe() : undefined
+        }
       />
 
       <div
@@ -117,37 +177,84 @@ export function VideoPickReferencePanel({
         style={{ boxSizing: "border-box" }}
       >
         <p className="text-[9px] font-black uppercase text-[var(--color-muted)] mb-1.5">
-          文本参考（优先级：画面描述 → 视频提示词 → 图像提示词）
+          只读参考（深度编辑请回分镜表）
         </p>
-        {!hasAnyPrompt ? (
-          <p
-            className="text-[10px] text-[var(--color-muted)] box-border"
-            style={{ boxSizing: "border-box" }}
-          >
-            暂无提示词信息
+        <div
+          className="flex flex-col gap-2 min-w-0 box-border"
+          style={{ boxSizing: "border-box" }}
+        >
+          <ExpandablePromptBlock
+            label="画面描述 visualDescription"
+            text={shot.visualDescription ?? ""}
+            lineClampClass="line-clamp-2"
+          />
+          <ExpandablePromptBlock
+            label="图像提示词 imagePrompt"
+            text={shot.imagePrompt ?? ""}
+            lineClampClass="line-clamp-2"
+          />
+        </div>
+      </div>
+
+      <VideoPickEditablePrompt
+        label="视频提示词 videoPrompt"
+        value={shot.videoPrompt ?? ""}
+        onCommit={onCommitVideoPrompt}
+        onEditingChange={setPromptEditingCb}
+      />
+
+      {/* 无尾帧时突出「生成尾帧」，满足首尾帧视频模式前置条件 */}
+      {!hasEndFramePath ? (
+        <div
+          className="rounded-sm border border-[var(--color-primary)] bg-[var(--color-primary)]/10 p-2 box-border"
+          style={{ boxSizing: "border-box" }}
+        >
+          <p className="text-[10px] font-bold text-[var(--color-newsprint-black)] mb-1.5">
+            尚未生成尾帧
           </p>
-        ) : (
-          <div
-            className="flex flex-col gap-2 min-w-0 box-border"
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={!canEndframe}
+            className="text-[10px] px-2 py-1.5 gap-1.5 h-auto w-full justify-center box-border"
             style={{ boxSizing: "border-box" }}
+            onClick={() => void handleEndframe()}
           >
-            <ExpandablePromptBlock
-              label="画面描述 visualDescription"
-              text={shot.visualDescription ?? ""}
-              lineClampClass="line-clamp-3"
-            />
-            <ExpandablePromptBlock
-              label="视频提示词 videoPrompt"
-              text={shot.videoPrompt ?? ""}
-              lineClampClass="line-clamp-3"
-            />
-            <ExpandablePromptBlock
-              label="图像提示词 imagePrompt"
-              text={shot.imagePrompt ?? ""}
-              lineClampClass="line-clamp-3"
-            />
-          </div>
-        )}
+            {submittingEndframe || busyEnd ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
+            ) : (
+              <Film className="w-3.5 h-3.5 shrink-0" aria-hidden />
+            )}
+            生成尾帧
+          </Button>
+        </div>
+      ) : null}
+
+      <div
+        className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0 box-border text-[10px] text-[var(--color-ink)]"
+        style={{ boxSizing: "border-box" }}
+      >
+        <span className="text-[9px] font-black uppercase text-[var(--color-muted)] shrink-0">
+          时长
+        </span>
+        <ShotDurationCell
+          shot={shot}
+          episodeId={episodeId}
+          updateShot={updateShot}
+          className="text-[var(--color-ink)]"
+          onEditingChange={setDurationEditingCb}
+        />
+        <span aria-hidden className="text-[var(--color-border)]">
+          |
+        </span>
+        <Link
+          to={routes.regen(projectId, episodeId, shot.shotId)}
+          className="inline-flex items-center gap-1 font-bold text-[var(--color-primary)] underline underline-offset-2 box-border"
+          style={{ boxSizing: "border-box" }}
+        >
+          <RotateCcw className="w-3 h-3 shrink-0" aria-hidden />
+          单帧重生
+        </Link>
       </div>
 
       {shot.dub != null ? (
@@ -163,7 +270,10 @@ export function VideoPickReferencePanel({
       ) : null}
 
       {assets.length > 0 ? (
-        <div className="min-w-0 box-border" style={{ boxSizing: "border-box" }}>
+        <div
+          className="min-w-0 box-border"
+          style={{ boxSizing: "border-box" }}
+        >
           <p className="text-[9px] font-black uppercase text-[var(--color-muted)] mb-1.5">
             资产
           </p>
@@ -190,6 +300,12 @@ export function VideoPickReferencePanel({
           </div>
         </div>
       ) : null}
+
+      <ShotVideoGenerateToolbar
+        shot={shot}
+        episodeId={episodeId}
+        onVideoDialogOpenChange={onVideoDialogOpenChange}
+      />
     </aside>
   )
 }
