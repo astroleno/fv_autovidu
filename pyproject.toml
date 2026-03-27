@@ -1,0 +1,16 @@
+# 项目级 pytest 配置：统一测试入口、避免「未在仓库根目录运行」导致的收集失败或 import 错误。
+#
+# 常见问题：
+# - 若在子目录运行 pytest，可能收集 0 项或 import 失败 → 请始终在仓库根执行：pytest 或 python -m pytest
+# - tests 内部分模块依赖 web/server 与仓库根（src.*）→ pythonpath 显式注入
+
+[tool.pytest.ini_options]
+# 只从 tests/ 收集，避免误扫其它目录
+testpaths = ["tests"]
+# 与 tests 内手写 sys.path 等价，便于「裸跑 pytest」与 CI 一致
+pythonpath = [".", "web/server"]
+# pytest-asyncio：显式默认 loop scope，避免未设置时的 DeprecationWarning（裸跑 pytest 时刷屏或被 -W error 当成失败）
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore::pytest.PytestDeprecationWarning:pytest_asyncio.plugin",
+]
