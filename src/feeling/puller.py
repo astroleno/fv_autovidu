@@ -705,7 +705,7 @@ def pull_episode(
                 if (
                     not skip_images
                     and frame_url
-                    and not frame_path.exists()
+                    and (force_redownload or not frame_path.exists())
                 ):
                     try:
                         client.download_file(frame_url, frame_path)
@@ -785,7 +785,7 @@ def pull_episode(
                 if (
                     not skip_images
                     and frame_url
-                    and not frame_path.exists()
+                    and (force_redownload or not frame_path.exists())
                 ):
                     try:
                         client.download_file(frame_url, frame_path)
