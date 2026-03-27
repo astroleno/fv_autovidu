@@ -15,6 +15,7 @@ import { Link } from "react-router"
 import { ExternalLink } from "lucide-react"
 import { flattenShots, type Shot } from "@/types"
 import { usePromoteCandidate, useVideoPickKeyboard } from "@/hooks"
+import { candidateCanPromoteToFullQuality } from "@/utils/videoCandidatePromote"
 import {
   useEpisodeStore,
   useShotStore,
@@ -361,10 +362,7 @@ export function VideoPickFocusPanel({
               style={{ boxSizing: "border-box" }}
             >
               {shot.videoCandidates.map((c) => {
-                const canPromote =
-                  Boolean(c.isPreview) &&
-                  c.taskStatus === "success" &&
-                  c.seed > 0
+                const canPromote = candidateCanPromoteToFullQuality(c)
                 const busy = isPromoting(c.id)
                 if (!canPromote) return null
                 return (

@@ -289,6 +289,9 @@ class ExportRoughCutResponse(BaseModel):
     exportPath: str
 
 
+JianyingSubtitleAlign = Literal["left", "center", "right"]
+
+
 class JianyingExportRequest(BaseModel):
     """
     剪映草稿导出请求。
@@ -302,6 +305,11 @@ class JianyingExportRequest(BaseModel):
     draftPath: str
     # 写入 draft_info.json 的 canvas_config；默认 1080p，前端不提供切换
     canvasSize: str = "1080p"  # 720p | 1080p
+    # 字幕轨 v1：与 pyJianYingDraft TextStyle / ClipSettings 对齐（见 jianying_text_track）
+    subtitleFontSize: int = Field(default=8, ge=4, le=16)
+    subtitleAlign: JianyingSubtitleAlign = "center"
+    subtitleAutoWrapping: bool = True
+    subtitleTransformY: float = Field(default=-0.8, ge=-1.0, le=0.0)
 
     @field_validator("draftPath")
     @classmethod

@@ -13,6 +13,7 @@ import ShotDetailRedirectPage from "@/pages/ShotDetailRedirectPage"
 import RegenPage from "@/pages/RegenPage"
 import TimelinePage from "@/pages/TimelinePage"
 import VideoPickPage from "@/pages/VideoPickPage"
+import PostProductionPage from "@/pages/PostProductionPage"
 import SettingsPage from "@/pages/SettingsPage"
 import LegacyEpisodeRedirect from "@/pages/LegacyEpisodeRedirect"
 
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "project/:projectId/episode/:episodeId/pick",
         element: <VideoPickPage />,
+      },
+      {
+        path: "project/:projectId/episode/:episodeId/post-production",
+        element: <PostProductionPage />,
       },
       { path: "settings", element: <SettingsPage /> },
       /** 旧书签 /episode/:id 及子路径 → 重定向到新 URL（无子路径与有子路径各一条） */

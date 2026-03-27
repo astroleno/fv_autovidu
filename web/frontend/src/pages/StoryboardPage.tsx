@@ -14,6 +14,7 @@ import {
   ImagePlus,
   Loader2,
   Package,
+  Sparkles,
 } from "lucide-react"
 import { useEpisodeMediaCacheBust, useStoryboardTableColumnWidths } from "@/hooks"
 import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
@@ -555,6 +556,14 @@ export default function StoryboardPage() {
           >
             <Package className="w-4 h-4 shrink-0" aria-hidden />
             资产库
+          </Link>
+          <Link
+            to={routes.postProduction(projectId, episodeId)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] hover:bg-[var(--color-outline-variant)] transition-colors box-border"
+            style={{ boxSizing: "border-box" }}
+          >
+            <Sparkles className="w-4 h-4 shrink-0" aria-hidden />
+            后期制作
           </Link>
         </div>
       </div>

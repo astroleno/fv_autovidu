@@ -17,6 +17,7 @@ import { ExternalLink, Film, Loader2 } from "lucide-react"
 import type { Shot, VideoMode } from "@/types"
 import type { GenerateVideoRequest } from "@/types"
 import { usePromoteCandidate } from "@/hooks"
+import { candidateCanPromoteToFullQuality } from "@/utils/videoCandidatePromote"
 import { useEpisodeStore, useShotStore, useTaskStore, useToastStore } from "@/stores"
 import { Button } from "@/components/ui"
 import { generateApi } from "@/api/generate"
@@ -584,10 +585,7 @@ export function VideoPickCard({
                   const videoUrl = getFileUrl(c.videoPath, basePath, cacheBust)
                   const resLabel = c.resolution?.trim() || "—"
                   const previewTag = c.isPreview ? " [预览]" : ""
-                  const canPromote =
-                    Boolean(c.isPreview) &&
-                    c.taskStatus === "success" &&
-                    c.seed > 0
+                  const canPromote = candidateCanPromoteToFullQuality(c)
                   const busy = isPromoting(c.id)
                   const newest = isPhysicallyNewest(c, shot.videoCandidates)
                   const borderSelected = c.selected
