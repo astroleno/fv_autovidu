@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { cleanup, render, screen } from "@testing-library/react"
-import { MemoryRouter, Route, Routes } from "react-router"
+import { useEffect } from "react"
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react"
+import { MemoryRouter, Route, Routes, useNavigate } from "react-router"
 
 const episodeSlice = {
   currentEpisode: {
@@ -121,6 +122,31 @@ vi.mock("@/stores", async () => {
 import { useVideoPickStore } from "@/stores"
 import VideoPickPage from "./VideoPickPage"
 
+/** 测试内捕获 `useNavigate`，便于在 act 中模拟「同集内第二次」深链导航 */
+function NavCapture({
+  assignNavigate,
+}: {
+  assignNavigate: (n: ReturnType<typeof useNavigate>) => void
+}) {
+  const navigate = useNavigate()
+  useEffect(() => {
+    assignNavigate(navigate)
+  }, [assignNavigate, navigate])
+  return null
+}
+
+function ConsumeShotIdQueryOnce() {
+  const navigate = useNavigate()
+  const currentShotIndex = useVideoPickStore((s) => s.currentShotIndex)
+
+  useEffect(() => {
+    if (currentShotIndex !== 1) return
+    navigate("/project/proj-1/episode/ep-1/pick", { replace: true })
+  }, [currentShotIndex, navigate])
+
+  return null
+}
+
 describe("VideoPickPage", () => {
   afterEach(() => {
     cleanup()
@@ -143,13 +169,57 @@ describe("VideoPickPage", () => {
         <Routes>
           <Route
             path="/project/:projectId/episode/:episodeId/pick"
-            element={<VideoPickPage />}
+            element={
+              <>
+                <ConsumeShotIdQueryOnce />
+                <VideoPickPage />
+              </>
+            }
           />
         </Routes>
       </MemoryRouter>
     )
 
     expect(await screen.findByTestId("focus-shot")).toHaveTextContent("shot-b")
-    expect(useVideoPickStore.getState().currentShotIndex).toBe(1)
+    await waitFor(() => {
+      expect(screen.getByTestId("focus-shot")).toHaveTextContent("shot-b")
+      expect(useVideoPickStore.getState().currentShotIndex).toBe(1)
+    })
+  })
+
+  it("同集内再次带 shotId 深链时切换到另一镜头（不卡在首次消费）", async () => {
+    let navigate: ReturnType<typeof useNavigate> | null = null
+    render(
+      <MemoryRouter
+        initialEntries={["/project/proj-1/episode/ep-1/pick?shotId=shot-a"]}
+      >
+        <Routes>
+          <Route
+            path="/project/:projectId/episode/:episodeId/pick"
+            element={
+              <>
+                <NavCapture assignNavigate={(n) => { navigate = n }} />
+                <ConsumeShotIdQueryOnce />
+                <VideoPickPage />
+              </>
+            }
+          />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("focus-shot")).toHaveTextContent("shot-a")
+      expect(useVideoPickStore.getState().currentShotIndex).toBe(0)
+    })
+
+    await act(async () => {
+      navigate!("/project/proj-1/episode/ep-1/pick?shotId=shot-b")
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId("focus-shot")).toHaveTextContent("shot-b")
+      expect(useVideoPickStore.getState().currentShotIndex).toBe(1)
+    })
   })
 })
