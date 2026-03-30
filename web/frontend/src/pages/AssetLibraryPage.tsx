@@ -306,19 +306,12 @@ export default function AssetLibraryPage() {
     )
   }, [currentEpisode?.characterVoices, selectedAsset])
 
-  if (!episodeId || !currentEpisode) {
-    if (loading) return <div className="p-8">加载中...</div>
-    return <div className="p-8">未找到该剧集</div>
-  }
-
-  const projectId = routeProjectId ?? currentEpisode.projectId
-  const previewAudioUrl =
-    selectedBinding?.previewAudioPath && selectedAsset
-      ? getFileUrl(selectedBinding.previewAudioPath, basePath, cacheBust)
-      : ""
-
+  /**
+   * Hooks 必须位于任意 early return 之前（react-hooks/rules-of-hooks）。
+   * 回调内对 currentEpisode / episodeId 做守卫，避免加载中误提交。
+   */
   const persistBinding = useCallback(async () => {
-    if (!selectedAsset) return
+    if (!selectedAsset || !currentEpisode || !episodeId) return
     const nextVoice = voiceDraft.trim()
     if (!nextVoice) {
       pushToast("请先为该角色选择音色", "error")
@@ -343,7 +336,7 @@ export default function AssetLibraryPage() {
       setSavingVoice(false)
     }
   }, [
-    currentEpisode.characterVoices,
+    currentEpisode,
     episodeId,
     previewTextDraft,
     pushToast,
@@ -353,7 +346,7 @@ export default function AssetLibraryPage() {
   ])
 
   const generatePreview = useCallback(async () => {
-    if (!selectedAsset) return
+    if (!selectedAsset || !episodeId) return
     const nextVoice = voiceDraft.trim()
     if (!nextVoice) {
       pushToast("请先为该角色选择音色", "error")
@@ -383,6 +376,17 @@ export default function AssetLibraryPage() {
     selectedAsset,
     voiceDraft,
   ])
+
+  if (!episodeId || !currentEpisode) {
+    if (loading) return <div className="p-8">加载中...</div>
+    return <div className="p-8">未找到该剧集</div>
+  }
+
+  const projectId = routeProjectId ?? currentEpisode.projectId
+  const previewAudioUrl =
+    selectedBinding?.previewAudioPath && selectedAsset
+      ? getFileUrl(selectedBinding.previewAudioPath, basePath, cacheBust)
+      : ""
 
   return (
     <div className="min-h-screen p-8 box-border">
