@@ -90,6 +90,19 @@ class TestGenerateRouteEntrypoints(unittest.TestCase):
         self.assertEqual(res.shotId, "shot-1")
         self.assertEqual(res.newFramePath, "frames/S001.png")
         self.assertEqual(len(background_tasks.tasks), 1)
+        store.set_task.assert_called_once()
+        args, kwargs = store.set_task.call_args
+        self.assertEqual(args[1], "processing")
+        self.assertEqual(kwargs["kind"], "regen")
+        self.assertEqual(kwargs["episode_id"], "ep-1")
+        self.assertEqual(kwargs["shot_id"], "shot-1")
+        self.assertEqual(
+            kwargs["payload"],
+            {
+                "imagePrompt": "new prompt",
+                "assetIds": [],
+            },
+        )
 
 
 if __name__ == "__main__":

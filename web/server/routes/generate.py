@@ -1005,7 +1005,18 @@ def regen_frame(
     task_id = f"regen-{uuid.uuid4().hex[:12]}"
     ns = get_namespace_data_root_optional(request)
     ctx_tid = get_context_task_id(request)
-    _ts().set_task(task_id, "processing", context_id=ctx_tid)
+    _ts().set_task(
+        task_id,
+        "processing",
+        kind="regen",
+        episode_id=req.episodeId,
+        shot_id=req.shotId,
+        payload={
+            "imagePrompt": req.imagePrompt,
+            "assetIds": req.assetIds or [],
+        },
+        context_id=ctx_tid,
+    )
     background_tasks.add_task(
         _run_regen_frame,
         task_id,

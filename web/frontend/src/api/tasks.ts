@@ -12,4 +12,8 @@ export const tasksApi = {
     apiClient.get<TaskStatusResponse[]>(
       `/tasks/batch?ids=${ids.join(",")}`
     ),
+  latestStatus: (params: { episodeId: string; shotId: string; kind: string }) =>
+    apiClient.get<TaskStatusResponse | null>(
+      `/tasks/latest-for-target?episode_id=${encodeURIComponent(params.episodeId)}&shot_id=${encodeURIComponent(params.shotId)}&kind=${encodeURIComponent(params.kind)}`
+    ),
 }

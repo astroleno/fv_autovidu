@@ -183,10 +183,15 @@ export default function VideoPickPage() {
     setAspectRatioFilter("all")
   }, [episodeId])
 
-  /** 切换剧集时清空选片模式会话态（索引、撤销栈等） */
+  /**
+   * 切换剧集时清空选片模式会话态（激活候选、撤销栈等）。
+   * 若本次是 `?shotId=` 深链进入，则保留已在 useLayoutEffect 中写入的目标索引，避免被回置为 0。
+   */
   useEffect(() => {
-    resetSessionForEpisode()
-  }, [episodeId, resetSessionForEpisode])
+    resetSessionForEpisode({
+      preserveCurrentShotIndex: Boolean(requestedShotId),
+    })
+  }, [episodeId, requestedShotId, resetSessionForEpisode])
 
   const allShots = useMemo(
     () => (currentEpisode ? flattenShots(currentEpisode) : []),

@@ -181,4 +181,7 @@ export interface TaskStatusResponse {
   progress?: number
   result?: Record<string, unknown>
   error?: string
+  createdAt?: number
+  updatedAt?: number
+  completedAt?: number
 }
