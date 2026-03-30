@@ -10,7 +10,8 @@
  * - `VideoModeSelector` 勾选「预览模式」时显式传 `isPreview + candidateCount + 540p + viduq3-turbo`；
  *   选片卡 / 分镜卡上的**一键按钮**应与该策略对齐，避免用户误以为在跑低成本预览。
  *
- * 注意：`first_frame`（仅首帧 i2v）仍由后端默认模型与分辨率处理，本工具不强行改为 540p。
+ * 注意：`first_frame`（仅首帧 i2v）未显式传 model/resolution 时，后端默认 viduq3-turbo + 540p
+ * （与弹窗/批量首帧推荐档一致）；若需其它档位请用「自定义参数」显式选择。
  */
 import type {
   GenerateVideoRequest,
@@ -19,6 +20,12 @@ import type {
 } from "@/types"
 import type { ToastType } from "@/components/ui/Toast"
 
+/** 单镜头首帧快捷档：与后端默认、参数弹窗推荐档保持一致。 */
+export const FIRST_FRAME_QUICK_DEFAULT = {
+  model: "viduq3-turbo",
+  resolution: "540p",
+} as const
+
 /** 与 VideoModeSelector 勾选「预览模式」时一致：turbo + 540p，默认每镜头 2 条候选任务 */
 export const FIRST_LAST_QUICK_PREVIEW = {
   model: "viduq3-turbo",
@@ -26,6 +33,19 @@ export const FIRST_LAST_QUICK_PREVIEW = {
   /** 与弹窗预览默认 candidateCount 对齐；仅 isPreview=true 时后端允许多于 1 */
   candidateCount: 2,
 } as const
+
+/** 单镜头工具条上展示的快捷参数摘要，避免默认档位成为“盲提”。 */
+export function getSingleVideoQuickSummaryLines(
+  hasEndFramePath: boolean
+): string[] {
+  return [
+    `仅首帧快捷: ${FIRST_FRAME_QUICK_DEFAULT.model} / ${FIRST_FRAME_QUICK_DEFAULT.resolution}`,
+    hasEndFramePath
+      ? `首尾帧快捷: ${FIRST_LAST_QUICK_PREVIEW.model} / ${FIRST_LAST_QUICK_PREVIEW.resolution} / ${String(FIRST_LAST_QUICK_PREVIEW.candidateCount)} 候选`
+      : "首尾帧快捷: 需先生成尾帧后可用",
+    "更多模型、分辨率、多参考图请点“自定义参数”。",
+  ]
+}
 
 /**
  * 构造单镜头快捷视频请求体。

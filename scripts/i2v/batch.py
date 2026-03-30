@@ -57,6 +57,8 @@ def _default_video_model(mode: VideoMode) -> str:
         return "viduq3-turbo"
     if mode == "reference":
         return "viduq2-pro"
+    if mode == "first_frame":
+        return "viduq3-turbo"
     return "viduq2-pro-fast"
 
 

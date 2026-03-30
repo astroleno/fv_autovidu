@@ -2,27 +2,24 @@
  * ShotCard Shot 卡片
  * Stitch 报纸风格：newsprint-card、灰度图、方角、UPPERCASE 标签
  * 首帧与尾帧同屏双列对比（ShotFrameCompare），便于左右对照
- * 尾帧 / 出视频：调用后端批量生成 API，并由 taskStore 轮询任务状态
+ * 尾帧 / 单镜头视频：尾帧按钮原地提交；视频入口复用统一 `ShotVideoGenerateToolbar`
  */
 import { useState } from "react"
 import { Link } from "react-router"
 import { Loader2 } from "lucide-react"
-import type { Shot, VideoMode } from "@/types"
+import type { Shot } from "@/types"
 import { Badge } from "@/components/ui"
 import { StatusIndicator } from "./StatusIndicator"
 import { DubStatusBadge } from "./DubStatusBadge"
 import { AssetTag } from "./AssetTag"
 import { ShotFrameCompare } from "./ShotFrameCompare"
 import { ShotRowVideoPreview } from "./ShotRowVideoPreview"
+import { ShotVideoGenerateToolbar } from "./ShotVideoGenerateToolbar"
 import { shotStatusLabels } from "@/utils/format"
 import { generateApi } from "@/api/generate"
 import { useTaskStore } from "@/stores/taskStore"
 import { useToastStore } from "@/stores/toastStore"
 import { routes } from "@/utils/routes"
-import {
-  buildSingleShotVideoQuickRequest,
-  toastAfterVideoTasksSettled,
-} from "@/utils/videoQuickRegenerate"
 
 interface ShotCardProps {
   shot: Shot
@@ -50,7 +47,7 @@ export function ShotCard({
   batchPicked = false,
   onBatchPickToggle,
 }: ShotCardProps) {
-  const [submitting, setSubmitting] = useState<"endframe" | "video" | null>(null)
+  const [submitting, setSubmitting] = useState<"endframe" | null>(null)
   const startPolling = useTaskStore((s) => s.startPolling)
   const pushToast = useToastStore((s) => s.push)
 
@@ -58,10 +55,6 @@ export function ShotCard({
   const busyVid = shot.status === "video_generating"
   const canEndframe =
     Boolean(shot.firstFrame) && !busyEnd && !busyVid && submitting !== "endframe"
-  const canVideo =
-    Boolean(shot.firstFrame) && !busyEnd && !busyVid && submitting !== "video"
-
-  const defaultVideoMode: VideoMode = shot.endFrame ? "first_last_frame" : "first_frame"
 
   const showEndSkeleton =
     busyEnd || shot.status === "endframe_generating" || submitting === "endframe"
@@ -84,39 +77,6 @@ export function ShotCard({
       })
     } catch (e) {
       pushToast(e instanceof Error ? e.message : "尾帧生成请求失败", "error")
-    } finally {
-      setSubmitting(null)
-    }
-  }
-
-  const shotLabel = `S${String(shot.shotNumber).padStart(2, "0")}`
-
-  const handleVideo = async () => {
-    if (!canVideo) return
-    setSubmitting("video")
-    try {
-      const body = buildSingleShotVideoQuickRequest(
-        episodeId,
-        shot.shotId,
-        defaultVideoMode
-      )
-      const res = await generateApi.video(body)
-      const ids = res.data.tasks.map((t) => t.taskId)
-      startPolling(ids, {
-        episodeId,
-        onPollAborted: () => {
-          pushToast(
-            `视频任务轮询中断（${shotLabel}），请刷新页面后查看结果`,
-            "error",
-            8000
-          )
-        },
-        onAllSettled: (results) => {
-          toastAfterVideoTasksSettled(results, pushToast, shotLabel)
-        },
-      })
-    } catch (e) {
-      pushToast(e instanceof Error ? e.message : "视频生成请求失败", "error")
     } finally {
       setSubmitting(null)
     }
@@ -214,7 +174,7 @@ export function ShotCard({
           ))}
         </div>
       )}
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-2 gap-1">
         <Link to={routes.regen(projectId, episodeId, shot.shotId)}>
           <button
             type="button"
@@ -238,21 +198,12 @@ export function ShotCard({
             "尾帧"
           )}
         </button>
-        <button
-          type="button"
-          disabled={!canVideo}
-          onClick={handleVideo}
-          className="w-full py-1.5 text-[10px] font-black uppercase tracking-wider bg-[var(--color-newsprint-black)] text-[var(--color-newsprint-off-white)] border border-[var(--color-newsprint-black)] hover:bg-[var(--color-primary)] hover:shadow-[4px_4px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {busyVid || submitting === "video" ? (
-            <span className="inline-flex items-center justify-center gap-1">
-              <Loader2 className="w-3 h-3 animate-spin" />
-              视频
-            </span>
-          ) : (
-            "出视频"
-          )}
-        </button>
+      </div>
+      <div className="mt-2">
+        <ShotVideoGenerateToolbar
+          shot={shot}
+          episodeId={episodeId}
+        />
       </div>
     </div>
   )

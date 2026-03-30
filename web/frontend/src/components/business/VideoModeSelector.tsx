@@ -4,17 +4,24 @@
  *
  * 单镜无尾帧时由父组件传入 `firstLastFrameAllowed={false}`，禁用首尾帧选项，
  * 避免用户从「自定义参数」仍选首尾帧而落到后端报错（与产品 spec 一致）。
+ *
+ * `lockedMode`：锁定为单一模式时隐藏「模式」单选，用于「批量视频·首帧模式」等需在提交前
+ * 显式选择模型/分辨率的场景（此前首帧批量曾硬编码 viduq2-pro-fast+720p，与 540p+turbo 预期不符）。
  */
 import { useEffect, useState } from "react"
 import type { VideoMode } from "@/types"
 import { Dialog, Button } from "@/components/ui"
 import { ReferenceImagePicker } from "./ReferenceImagePicker"
 
+/** 仅首帧 i2v：与产品「预览试错」一致，默认推荐 viduq3-turbo + 540p（可在下拉中改选） */
+const FIRST_FRAME_DEFAULT_MODEL = "viduq3-turbo"
+const FIRST_FRAME_DEFAULT_RESOLUTION = "540p"
+
 const MODEL_OPTIONS: Record<VideoMode, { value: string; label: string }[]> = {
   first_frame: [
-    { value: "viduq2-pro-fast", label: "viduq2-pro-fast（默认）" },
+    { value: "viduq3-turbo", label: "viduq3-turbo（默认，预览/试错）" },
+    { value: "viduq2-pro-fast", label: "viduq2-pro-fast" },
     { value: "viduq2-pro", label: "viduq2-pro" },
-    { value: "viduq3-turbo", label: "viduq3-turbo" },
     { value: "viduq3-pro", label: "viduq3-pro" },
   ],
   /**
@@ -50,6 +57,15 @@ export interface VideoModeSelectorResult {
   candidateCount?: number
 }
 
+export interface VideoModeSelectorInitialValue {
+  mode?: VideoMode
+  model?: string
+  resolution?: string
+  referenceAssetIds?: string[]
+  isPreview?: boolean
+  candidateCount?: number
+}
+
 interface VideoModeSelectorProps {
   open: boolean
   onClose: () => void
@@ -63,6 +79,15 @@ interface VideoModeSelectorProps {
    * 未传时视为 true，保持分镜批量等场景的原有默认。
    */
   firstLastFrameAllowed?: boolean
+  /**
+   * 锁定为单一模式时隐藏「模式」fieldset，仅展示模型/分辨率（及该模式下的附加项）。
+   * 例：`first_frame` 用于分镜「批量视频·首帧模式」，避免硬编码模型。
+   */
+  lockedMode?: VideoMode
+  /** 弹窗标题；不传时由 lockedMode 推导（如批量首帧视频） */
+  dialogTitle?: string
+  /** 打开时回填既有选择；用于失败重试等场景 */
+  initialValue?: VideoModeSelectorInitialValue
 }
 
 export function VideoModeSelector({
@@ -72,6 +97,9 @@ export function VideoModeSelector({
   episodeAssetIds,
   onConfirm,
   firstLastFrameAllowed = true,
+  lockedMode,
+  dialogTitle: dialogTitleProp,
+  initialValue,
 }: VideoModeSelectorProps) {
   /** 默认首尾帧 + 正式档：1080p + viduq3-pro（与预览档 540p+turbo 二选一） */
   const [mode, setMode] = useState<VideoMode>("first_last_frame")
@@ -82,17 +110,65 @@ export function VideoModeSelector({
   const [previewEnabled, setPreviewEnabled] = useState(false)
   const [candidateCount, setCandidateCount] = useState(2)
 
-  const models = MODEL_OPTIONS[mode]
+  const effectiveMode: VideoMode = lockedMode ?? mode
+  const models = MODEL_OPTIONS[effectiveMode]
+
+  /** 弹窗标题：批量尾帧完成 vs 批量首帧等 */
+  const dialogTitle =
+    dialogTitleProp ??
+    (lockedMode === "first_frame" ? "批量首帧视频" : "批量生成视频")
+
+  useEffect(() => {
+    if (!open) return
+
+    let nextMode: VideoMode =
+      lockedMode ??
+      initialValue?.mode ??
+      (firstLastFrameAllowed ? "first_last_frame" : "first_frame")
+    if (nextMode === "first_last_frame" && !firstLastFrameAllowed) {
+      nextMode = "first_frame"
+    }
+
+    const nextPreview =
+      nextMode === "first_last_frame" && Boolean(initialValue?.isPreview)
+    const fallbackModel =
+      nextMode === "first_frame"
+        ? FIRST_FRAME_DEFAULT_MODEL
+        : nextMode === "reference"
+          ? (MODEL_OPTIONS.reference[0]?.value ?? "viduq2-pro")
+          : nextPreview
+            ? "viduq3-turbo"
+            : "viduq3-pro"
+    const fallbackResolution =
+      nextMode === "first_frame"
+        ? FIRST_FRAME_DEFAULT_RESOLUTION
+        : nextMode === "reference"
+          ? "720p"
+          : nextPreview
+            ? "540p"
+            : "1080p"
+
+    setMode(nextMode)
+    setPreviewEnabled(nextPreview)
+    setModel(initialValue?.model ?? fallbackModel)
+    setResolution(initialValue?.resolution ?? fallbackResolution)
+    setReferenceAssetIds(initialValue?.referenceAssetIds ?? [])
+    setCandidateCount(initialValue?.candidateCount ?? 2)
+  }, [open, lockedMode, initialValue, firstLastFrameAllowed])
 
   const handleModeChange = (m: VideoMode) => {
     setMode(m)
-    const defaultModel = MODEL_OPTIONS[m][0]?.value ?? "viduq2-pro-fast"
-    setModel(defaultModel)
     if (m === "first_last_frame") {
-      // 进入首尾帧：默认正式档（1080p + pro），避免与预览档混淆
+      setModel("viduq3-pro")
       setResolution("1080p")
       setPreviewEnabled(false)
+    } else if (m === "first_frame") {
+      setModel(FIRST_FRAME_DEFAULT_MODEL)
+      setResolution(FIRST_FRAME_DEFAULT_RESOLUTION)
+      setPreviewEnabled(false)
     } else {
+      const defaultModel = MODEL_OPTIONS[m][0]?.value ?? "viduq2-pro"
+      setModel(defaultModel)
       setPreviewEnabled(false)
     }
   }
@@ -111,33 +187,20 @@ export function VideoModeSelector({
     }
   }
 
-  /**
-   * 弹窗打开且当前镜不允许首尾帧时：若内部状态仍为 first_last_frame（含初始默认值），
-   * 强制切到 first_frame 并同步默认模型，避免用户未改 radio 就点「开始生成」。
-   */
-  useEffect(() => {
-    if (!open || firstLastFrameAllowed) return
-    if (mode !== "first_last_frame") return
-    const dm = MODEL_OPTIONS.first_frame[0]?.value ?? "viduq2-pro-fast"
-    setMode("first_frame")
-    setModel(dm)
-    setPreviewEnabled(false)
-  }, [open, firstLastFrameAllowed, mode])
-
   const handleConfirm = () => {
-    if (mode === "first_last_frame" && !firstLastFrameAllowed) {
+    if (effectiveMode === "first_last_frame" && !firstLastFrameAllowed) {
       return
     }
     const base = {
-      mode,
+      mode: effectiveMode,
       model,
       resolution,
       referenceAssetIds:
-        mode === "reference" && referenceAssetIds.length > 0
+        effectiveMode === "reference" && referenceAssetIds.length > 0
           ? referenceAssetIds
           : undefined,
     }
-    if (mode === "first_last_frame" && previewEnabled) {
+    if (effectiveMode === "first_last_frame" && previewEnabled) {
       onConfirm({
         ...base,
         isPreview: true,
@@ -150,54 +213,62 @@ export function VideoModeSelector({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} title="批量生成视频">
+    <Dialog open={open} onClose={onClose} title={dialogTitle}>
       <div className="space-y-4 max-w-md box-border p-1">
         <p className="text-sm text-[var(--color-muted)]">
           待生成镜头数：<strong>{shotCount}</strong>
         </p>
 
-        <fieldset className="space-y-2 border border-[var(--color-newsprint-black)] p-3 box-border">
-          <legend className="text-xs font-bold uppercase px-1">模式</legend>
-          {(
-            [
-              ["first_frame", "仅首帧 i2v"],
-              ["first_last_frame", "首尾帧双图（推荐，需已生成尾帧）"],
-              ["reference", "多参考图（使用各镜头关联资产）"],
-            ] as const
-          ).map(([value, label]) => {
-            const flDisabled =
-              value === "first_last_frame" && !firstLastFrameAllowed
-            return (
-              <label
-                key={value}
-                className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm ${
-                  flDisabled
-                    ? "opacity-60 cursor-not-allowed"
-                    : "cursor-pointer"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="vid-mode"
-                  checked={mode === value}
-                  disabled={flDisabled}
-                  onChange={() => {
-                    if (!flDisabled) handleModeChange(value)
-                  }}
-                />
-                <span>{label}</span>
-                {flDisabled ? (
-                  <span
-                    className="text-[11px] text-[var(--color-muted)] w-full pl-6 box-border"
-                    style={{ boxSizing: "border-box" }}
-                  >
-                    当前镜头无尾帧路径，请先在分镜板或此处生成尾帧后再选此项。
-                  </span>
-                ) : null}
-              </label>
-            )
-          })}
-        </fieldset>
+        {!lockedMode ? (
+          <fieldset className="space-y-2 border border-[var(--color-newsprint-black)] p-3 box-border">
+            <legend className="text-xs font-bold uppercase px-1">模式</legend>
+            {(
+              [
+                ["first_frame", "仅首帧 i2v"],
+                ["first_last_frame", "首尾帧双图（推荐，需已生成尾帧）"],
+                ["reference", "多参考图（使用各镜头关联资产）"],
+              ] as const
+            ).map(([value, label]) => {
+              const flDisabled =
+                value === "first_last_frame" && !firstLastFrameAllowed
+              return (
+                <label
+                  key={value}
+                  className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm ${
+                    flDisabled
+                      ? "opacity-60 cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="vid-mode"
+                    checked={mode === value}
+                    disabled={flDisabled}
+                    onChange={() => {
+                      if (!flDisabled) handleModeChange(value)
+                    }}
+                  />
+                  <span>{label}</span>
+                  {flDisabled ? (
+                    <span
+                      className="text-[11px] text-[var(--color-muted)] w-full pl-6 box-border"
+                      style={{ boxSizing: "border-box" }}
+                    >
+                      当前镜头无尾帧路径，请先在分镜板或此处生成尾帧后再选此项。
+                    </span>
+                  ) : null}
+                </label>
+              )
+            })}
+          </fieldset>
+        ) : (
+          <p className="text-xs text-[var(--color-muted)] border border-dashed border-[var(--color-newsprint-black)] p-3 box-border">
+            {lockedMode === "first_frame"
+              ? "模式已固定为「仅首帧 i2v」。请在下方选择模型与分辨率后提交。"
+              : "模式已固定。请在下方调整模型与分辨率（及参考资产）后提交。"}
+          </p>
+        )}
 
         <div>
           <label className="block text-xs font-bold uppercase text-[var(--color-muted)] mb-1">
@@ -231,7 +302,7 @@ export function VideoModeSelector({
           </select>
         </div>
 
-        {mode === "first_last_frame" && (
+        {effectiveMode === "first_last_frame" && (
           <div className="border border-dashed border-[var(--color-newsprint-black)] p-3 box-border space-y-3">
             <label className="flex items-center gap-2 cursor-pointer text-sm">
               <input
@@ -262,7 +333,7 @@ export function VideoModeSelector({
           </div>
         )}
 
-        {mode === "reference" && episodeAssetIds.length > 0 && (
+        {effectiveMode === "reference" && episodeAssetIds.length > 0 && (
           <div className="border border-dashed border-[var(--color-newsprint-black)] p-3 box-border">
             <p className="text-xs text-[var(--color-muted)] mb-2">
               可选：全局限定参考资产（不选则每个镜头使用其关联的全部资产）
@@ -281,7 +352,7 @@ export function VideoModeSelector({
             取消
           </Button>
           <Button variant="primary" type="button" onClick={handleConfirm}>
-            开始生成
+            确认并提交
           </Button>
         </div>
       </div>
