@@ -21,6 +21,8 @@ import { PromptEditor } from "@/components/business/PromptEditor"
 import { getFileUrl } from "@/utils/file"
 import { routes } from "@/utils/routes"
 
+type RegenTaskPhase = "idle" | "submitting" | "polling" | "success" | "failed" | "aborted"
+
 /** RegenFramePanel 的入参：由 RegenPage 注入剧集与镜头上下文 */
 export interface RegenFramePanelProps {
   /** 当前剧集 ID（API 路径参数） */
@@ -78,6 +80,11 @@ export function RegenFramePanel({
    * 最近一次重生成功时刻的时间戳字符串，写入 getFileUrl 的 v= 以绕过浏览器磁盘缓存
    */
   const [frameBust, setFrameBust] = useState<string | undefined>(undefined)
+  /** 最近一次提交到后端的任务 id，供用户确认是否已入队 */
+  const [submittedTaskId, setSubmittedTaskId] = useState<string | null>(null)
+  /** 页面内常驻任务状态，避免只靠瞬时 Toast 猜测是否已提交 */
+  const [taskPhase, setTaskPhase] = useState<RegenTaskPhase>("idle")
+  const [taskMessage, setTaskMessage] = useState("")
 
   const startPolling = useTaskStore((s) => s.startPolling)
   const pushToast = useToastStore((s) => s.push)
@@ -89,6 +96,9 @@ export function RegenFramePanel({
     setPrompt(shot.imagePrompt)
     setAssetIds(shot.assets.map((a) => a.assetId))
     setFrameBust(undefined)
+    setSubmittedTaskId(null)
+    setTaskPhase("idle")
+    setTaskMessage("")
   }, [shot.shotId])
 
   const previewSrc = firstFramePreviewUrl(
@@ -120,6 +130,9 @@ export function RegenFramePanel({
 
     setBusy(true)
     setConfirmOpen(false)
+    setSubmittedTaskId(null)
+    setTaskPhase("submitting")
+    setTaskMessage("正在提交重生任务…")
     try {
       const { data } = await generateApi.regenFrame({
         episodeId,
@@ -128,21 +141,32 @@ export function RegenFramePanel({
         assetIds,
       })
       const taskId = data.taskId
+      setSubmittedTaskId(taskId)
+      setTaskPhase("polling")
+      setTaskMessage("任务已提交，正在后台生成首帧。")
       pushToast("已提交单帧重生任务，正在生成…", "info")
 
       startPolling([taskId], {
         episodeId,
         /** 连续网络失败导致轮询中止时也要解锁 UI（见 taskStore onPollAborted） */
-        onPollAborted: () => setBusy(false),
+        onPollAborted: () => {
+          setBusy(false)
+          setTaskPhase("aborted")
+          setTaskMessage("任务已提交，但状态轮询中断；可稍后刷新本页确认结果。")
+        },
         onAllSettled: (results) => {
           setBusy(false)
           const r = results[0]
           if (!r) {
+            setTaskPhase("failed")
+            setTaskMessage("未返回任务状态")
             pushToast("未返回任务状态", "error")
             return
           }
           if (r.status === "success") {
             setFrameBust(String(Date.now()))
+            setTaskPhase("success")
+            setTaskMessage("首帧已生成并落盘，左侧预览已刷新。")
             pushToast("首帧已更新；尾帧与视频候选已清空，请按需重新生成", "success")
             return
           }
@@ -150,12 +174,17 @@ export function RegenFramePanel({
             typeof r.error === "string" && r.error
               ? r.error
               : "单帧重生失败"
+          setTaskPhase("failed")
+          setTaskMessage(msg)
           pushToast(msg, "error")
         },
       })
     } catch (e) {
       setBusy(false)
-      pushToast(e instanceof Error ? e.message : "单帧重生请求失败", "error")
+      const msg = e instanceof Error ? e.message : "单帧重生请求失败"
+      setTaskPhase("failed")
+      setTaskMessage(msg)
+      pushToast(msg, "error")
     }
   }, [
     prompt,
@@ -245,10 +274,24 @@ export function RegenFramePanel({
               "生成新首帧"
             )}
           </Button>
+          <p className="text-xs text-[var(--color-muted)]">
+            点击后会先二次确认，再提交后台生成任务。
+          </p>
         </section>
 
         {/* 右栏：说明 + 成功后的结果提示（与左侧同源 URL，仅强调「已落盘」） */}
         <section className="box-border space-y-2" style={{ boxSizing: "border-box" }}>
+          {taskPhase !== "idle" ? (
+            <div className="rounded border border-[var(--color-newsprint-black)] bg-[var(--color-outline-variant)] p-4 text-sm text-[var(--color-newsprint-black)] box-border space-y-2">
+              <p className="font-semibold">任务状态</p>
+              <p>{taskMessage}</p>
+              {submittedTaskId ? (
+                <p className="text-xs text-[var(--color-muted)] break-all">
+                  Task ID: {submittedTaskId}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
           <p className="text-sm text-[var(--color-muted)]">说明</p>
           <div className="rounded border border-dashed border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] p-4 text-sm text-[var(--color-newsprint-black)] box-border leading-relaxed space-y-2">
             <p>
