@@ -393,7 +393,7 @@ def generate_endframe(
         "[尾帧] 已入队 batch episode=%s 镜头数=%d tasks=%s",
         req.episodeId,
         len(specs),
-        [t for t, _, _ in specs],
+        [spec[0] for spec in specs],
     )
     background_tasks.add_task(_run_endframe_batch_parallel, specs)
     return BatchEndframeResponse(tasks=tasks_out)
