@@ -96,6 +96,12 @@ export default function VideoPickPage() {
   const requestedShotId = searchParams.get("shotId")
   const consumedDeepLinkRef = useRef(false)
   /**
+   * 记录上一次 URL 中的 shotId 查询值（含 null），用于同集内从「无 query」再点分镜链到「新 shotId」时，
+   * 与 consumedDeepLinkRef 配合：仅当参数变为新的非空值时重新允许消费深链。
+   */
+  const prevShotIdParamRef = useRef<string | null>(null)
+  const resetSessionEpisodeRef = useRef<string | null>(null)
+  /**
    * 与 localStorage 模式恢复配合：深链处理成功时置为当前 episodeId，避免后续 effect 覆盖为 overview。
    */
   const episodeModeAppliedRef = useRef<string | null>(null)
@@ -134,6 +140,29 @@ export default function VideoPickPage() {
   }, [])
 
   /**
+   * 换集：必须在「参数追踪 / 深链消费」两个 layout 之前执行，避免沿用上集的 shot 参数基线。
+   * useLayoutEffect 保证早于下方深链逻辑与 paint，与 episodeId 变更同一帧内 URL 可能仍带 ?shotId= 对齐。
+   */
+  useLayoutEffect(() => {
+    consumedDeepLinkRef.current = false
+    prevShotIdParamRef.current = null
+  }, [episodeId])
+
+  /**
+   * 同集内第二次及以后从分镜点进（URL 再次出现 ?shotId=）：此前 consumedDeepLinkRef 已为 true，
+   * 需在消费前根据「新的 shotId 查询串」重新打开闸门；仅当 requestedShotId 相对上一快照变化且非空时重置。
+   */
+  useLayoutEffect(() => {
+    if (
+      requestedShotId &&
+      requestedShotId !== prevShotIdParamRef.current
+    ) {
+      consumedDeepLinkRef.current = false
+    }
+    prevShotIdParamRef.current = requestedShotId
+  }, [requestedShotId])
+
+  /**
    * `?shotId=` 定位：必须在同一帧内 flush 筛选再 enterPicking，避免索引用到旧筛选下的列表。
    * 先于 useEffect(localStorage 模式恢复) 执行，避免被 overview 覆盖。
    */
@@ -166,11 +195,6 @@ export default function VideoPickPage() {
     routeProjectId,
   ])
 
-  /** 换集时允许再次消费新的 `?shotId=` 深链 */
-  useEffect(() => {
-    consumedDeepLinkRef.current = false
-  }, [episodeId])
-
   useEffect(() => {
     if (episodeId) void fetchEpisodeDetail(episodeId)
   }, [episodeId, fetchEpisodeDetail])
@@ -185,9 +209,13 @@ export default function VideoPickPage() {
 
   /**
    * 切换剧集时清空选片模式会话态（激活候选、撤销栈等）。
-   * 若本次是 `?shotId=` 深链进入，则保留已在 useLayoutEffect 中写入的目标索引，避免被回置为 0。
+   * 仅在当前页面首次进入该 episode 时执行一次；
+   * 若本次是 `?shotId=` 深链进入，则保留已在 useLayoutEffect 中写入的目标索引，避免消费查询参数后又被回置为 0。
    */
   useEffect(() => {
+    if (!episodeId) return
+    if (resetSessionEpisodeRef.current === episodeId) return
+    resetSessionEpisodeRef.current = episodeId
     resetSessionForEpisode({
       preserveCurrentShotIndex: Boolean(requestedShotId),
     })
@@ -233,10 +261,6 @@ export default function VideoPickPage() {
   const showAspectRatioFilter = aspectRatioBuckets.length > 1
 
   const filteredCount = filteredFlatShots.length
-
-  useEffect(() => {
-    episodeModeAppliedRef.current = null
-  }, [episodeId])
 
   useEffect(() => {
     if (!episodeId || !currentEpisode) return
