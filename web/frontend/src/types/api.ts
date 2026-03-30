@@ -143,20 +143,24 @@ export interface JianyingDraftPathResponse {
   candidates: string[]
 }
 
-/** 配音：批量处理请求 */
+/**
+ * 配音：批量处理请求。
+ * 音色完全由服务端从 episode.json 的 dubDefaultVoiceId / dubVoiceIdOverride 解析，请求体不再传 voiceId。
+ */
 export interface DubProcessRequest {
   episodeId: string
   shotIds?: string[]
-  voiceId: string
   mode?: "sts" | "tts"
   concurrency?: number
 }
 
-/** 配音：单镜头请求 */
+/**
+ * 单镜头配音。voiceId 可选；省略或空字符串时与批量一致，仅读持久化字段。
+ */
 export interface DubProcessShotRequest {
   episodeId: string
   shotId: string
-  voiceId: string
+  voiceId?: string
   mode?: "sts" | "tts"
   ttsText?: string
 }

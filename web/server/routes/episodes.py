@@ -26,7 +26,9 @@ from services.context_service import (
 router = APIRouter()
 
 # PATCH /episodes/{id} 仅允许写入的 Episode 根字段（其余键丢弃，避免误改结构）
-_ALLOWED_EPISODE_PATCH_KEYS = frozenset({"dubTargetLocale", "sourceLocale"})
+_ALLOWED_EPISODE_PATCH_KEYS = frozenset(
+    {"dubTargetLocale", "sourceLocale", "dubDefaultVoiceId"}
+)
 
 
 @router.get("/episodes", response_model=list[dict])
@@ -52,7 +54,7 @@ def patch_episode(
     request: Request,
     body: dict = Body(default_factory=dict),
 ):
-    """部分更新 Episode（当前仅 dubTargetLocale、sourceLocale）。"""
+    """部分更新 Episode（本地化字段 + 一期 STS 集默认音色）。"""
     ns = get_namespace_data_root_optional(request)
     raw = body if isinstance(body, dict) else {}
     filtered = {k: v for k, v in raw.items() if k in _ALLOWED_EPISODE_PATCH_KEYS}

@@ -6,7 +6,7 @@
  * - 与分镜页 Dub/Export 可并存（设计 §11.2）
  */
 import { useCallback, useEffect, useState } from "react"
-import { Link, useParams } from "react-router"
+import { Link, useParams, useSearchParams } from "react-router"
 import { ArrowLeft, Loader2, Sparkles } from "lucide-react"
 import { useEpisodeStore, useToastStore } from "@/stores"
 import { DubPanel } from "@/components/business/DubPanel"
@@ -41,6 +41,10 @@ const JIANYING_DEFAULTS: EpisodeJianyingFormState = {
 }
 
 export default function PostProductionPage() {
+  const [searchParams] = useSearchParams()
+  /** 与选片页一致：?shotId= 深链至后期制作并展开该镜试听区 */
+  const highlightShotId = searchParams.get("shotId")?.trim() || undefined
+
   const { projectId: routeProjectId, episodeId } = useParams<{
     projectId?: string
     episodeId: string
@@ -82,11 +86,7 @@ export default function PostProductionPage() {
     if (!currentEpisode) return
     setDubTargetDraft(currentEpisode.dubTargetLocale ?? "")
     setSourceLocaleDraft(currentEpisode.sourceLocale ?? "")
-  }, [
-    currentEpisode?.dubTargetLocale,
-    currentEpisode?.episodeId,
-    currentEpisode?.sourceLocale,
-  ])
+  }, [currentEpisode])
 
   /** 恢复全局草稿路径 + 本集画布/字幕默认 */
   useEffect(() => {
@@ -341,7 +341,7 @@ export default function PostProductionPage() {
               保存语言
             </Button>
           </div>
-          <DubPanel episodeId={episodeId} />
+          <DubPanel episodeId={episodeId} initialHighlightShotId={highlightShotId} />
         </div>
       ) : (
         <div className="space-y-6">

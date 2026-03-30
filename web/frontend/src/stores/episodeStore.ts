@@ -57,17 +57,22 @@ interface EpisodeStore {
         | "videoPrompt"
         | "dialogue"
         | "dialogueTranslation"
+        | "dubVoiceIdOverride"
         | "includeDialogueInVideoPrompt"
         | "duration"
       >
     >
   ) => Promise<void>
   /**
-   * PATCH 剧集 dubTargetLocale / sourceLocale，用接口返回的完整 Episode 替换 store 中同 id 项。
+   * PATCH 剧集根字段：dubTargetLocale / sourceLocale / dubDefaultVoiceId。
    */
   updateEpisodeLocales: (
     episodeId: string,
-    data: { dubTargetLocale?: string; sourceLocale?: string }
+    data: {
+      dubTargetLocale?: string
+      sourceLocale?: string
+      dubDefaultVoiceId?: string
+    }
   ) => Promise<void>
 }
 
