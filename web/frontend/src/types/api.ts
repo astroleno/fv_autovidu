@@ -174,6 +174,20 @@ export interface DubProcessResponse {
   tasks: DubTaskItem[]
 }
 
+export interface AssetVoicePreviewRequest {
+  episodeId: string
+  assetId: string
+  voiceId?: string
+  previewText?: string
+}
+
+export interface AssetVoicePreviewResponse {
+  assetId: string
+  voiceId: string
+  previewText: string
+  audioPath: string
+}
+
 /** 任务状态响应 */
 export interface TaskStatusResponse {
   taskId: string

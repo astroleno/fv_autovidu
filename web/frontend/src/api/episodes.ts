@@ -8,7 +8,7 @@ import { apiClient, LONG_REQUEST_TIMEOUT_MS } from "./client"
 
 /** PATCH body：剧集根级本地化字段 + 一期 STS 集默认音色（与后端白名单一致） */
 export type EpisodePatch = Partial<
-  Pick<Episode, "dubTargetLocale" | "sourceLocale" | "dubDefaultVoiceId">
+  Pick<Episode, "dubTargetLocale" | "sourceLocale" | "dubDefaultVoiceId" | "characterVoices">
 >
 
 export const episodesApi = {

@@ -83,6 +83,15 @@ class DubStatus(BaseModel):
     processedAt: Optional[str] = None
 
 
+class CharacterVoiceBinding(BaseModel):
+    """角色资产绑定的音色信息。键由 Episode.characterVoices 的 assetId 承载。"""
+
+    voiceId: str = ""
+    previewText: str = ""
+    previewAudioPath: str = ""
+    updatedAt: str = ""
+
+
 class AssociatedDialogue(BaseModel):
     """
     Feeling 平台结构化对白（与 JSON 键 associatedDialogue 对齐）。
@@ -122,6 +131,8 @@ class Shot(BaseModel):
     dialogueTranslation: str = ""
     # 一期 STS：镜头级音色覆盖；空表示回退 Episode.dubDefaultVoiceId
     dubVoiceIdOverride: str = ""
+    # 角色级 STS：显式指定本镜说话角色对应的资产 id；空表示按 associatedDialogue.role 自动匹配资产名
+    dubSpeakerAssetId: str = ""
     # 生成视频（Vidu）时是否将台词块拼入 composed prompt；默认 True；False 时仍保留 dialogue 供字幕/配音/剪映
     includeDialogueInVideoPrompt: bool = True
 
@@ -158,6 +169,8 @@ class Episode(BaseModel):
     jianyingExport: Optional[JianyingExportRecord] = None
     # 一期 STS：剧集级默认音色；空表示尚未设置
     dubDefaultVoiceId: str = ""
+    # 角色资产绑定音色：key = assetId
+    characterVoices: dict[str, CharacterVoiceBinding] = Field(default_factory=dict)
     # 配音/本地化：目标语 BCP-47 或项目约定（如 en-US、ja）；空表示未设置
     dubTargetLocale: str = ""
     # 台词原文语言标签，供 UI 展示
@@ -377,6 +390,24 @@ class DubProcessResponse(BaseModel):
     """批量配音响应：每个分镜独立 taskId，供现有任务轮询使用。"""
 
     tasks: list[DubTaskItem] = Field(default_factory=list)
+
+
+class AssetVoicePreviewRequest(BaseModel):
+    """生成并持久化角色资产的试听音频。"""
+
+    episodeId: str
+    assetId: str
+    voiceId: str = ""
+    previewText: str = ""
+
+
+class AssetVoicePreviewResponse(BaseModel):
+    """角色资产试听生成结果。"""
+
+    assetId: str
+    voiceId: str
+    previewText: str
+    audioPath: str
 
 
 class DubEpisodeStatusResponse(BaseModel):
