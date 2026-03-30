@@ -65,6 +65,30 @@ def get_tasks_by_status(
     return [TaskRow.from_sqlite_row(r) for r in cur.fetchall()]
 
 
+def get_latest_task_for_target(
+    conn: sqlite3.Connection,
+    *,
+    episode_id: str,
+    shot_id: str,
+    kind: str,
+    context_id: str | None = None,
+) -> Optional[TaskRow]:
+    """按业务关联返回最近一条任务。"""
+    sql = [
+        "SELECT * FROM tasks",
+        "WHERE episode_id = ? AND shot_id = ? AND kind = ?",
+    ]
+    params: list[object] = [episode_id, shot_id, kind]
+    if context_id is not None:
+        sql.append("AND (context_id IS NULL OR context_id = ?)")
+        params.append(context_id)
+    sql.append("ORDER BY updated_at DESC, created_at DESC LIMIT 1")
+    row = conn.execute(" ".join(sql), tuple(params)).fetchone()
+    if row is None:
+        return None
+    return TaskRow.from_sqlite_row(row)
+
+
 def insert_task(conn: sqlite3.Connection, task: TaskRow) -> None:
     """插入新任务（若 id 已存在则抛异常由上层处理）。"""
     now = time.time()

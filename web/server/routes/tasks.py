@@ -111,6 +111,9 @@ def get_task_status(task_id: str, request: Request):
             progress=api.get("progress"),
             result=api.get("result"),
             error=api.get("error"),
+            createdAt=api.get("createdAt"),
+            updatedAt=api.get("updatedAt"),
+            completedAt=api.get("completedAt"),
         )
 
     # 兼容：历史上可能直接轮询 Vidu 返回的裸 task id（未写入本地 tasks 表）
@@ -164,6 +167,9 @@ def get_tasks_batch(
                 progress=api.get("progress"),
                 result=api.get("result"),
                 error=api.get("error"),
+                createdAt=api.get("createdAt"),
+                updatedAt=api.get("updatedAt"),
+                completedAt=api.get("completedAt"),
             )
         else:
             need_vidu.append(tid)
@@ -191,6 +197,38 @@ def get_tasks_batch(
                 pass
 
     return [by_id.get(tid, TaskStatusResponse(taskId=tid, status="pending")) for tid in task_ids]
+
+
+@router.get("/tasks/latest-for-target", response_model=TaskStatusResponse | None)
+def get_latest_task_for_target(
+    request: Request,
+    episode_id: str = Query(..., description="剧集 ID"),
+    shot_id: str = Query(..., description="镜头 ID"),
+    kind: str = Query(..., description="任务类型，如 regen / video / endframe / dub"),
+):
+    """按 episode/shot/kind 返回最近一条任务，供刷新后恢复页面内任务状态。"""
+    conn = get_connection()
+    req_ctx = get_context_task_id(request)
+    row = repository.get_latest_task_for_target(
+        conn,
+        episode_id=episode_id,
+        shot_id=shot_id,
+        kind=kind,
+        context_id=req_ctx,
+    )
+    if row is None:
+        return None
+    api = row.to_api_response()
+    return TaskStatusResponse(
+        taskId=api["taskId"],
+        status=api["status"],
+        progress=api.get("progress"),
+        result=api.get("result"),
+        error=api.get("error"),
+        createdAt=api.get("createdAt"),
+        updatedAt=api.get("updatedAt"),
+        completedAt=api.get("completedAt"),
+    )
 
 
 @router.post("/tasks/cancel-endframes", response_model=CancelEndframesResponse)

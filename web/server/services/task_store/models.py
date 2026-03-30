@@ -74,6 +74,9 @@ class TaskRow:
             "progress": self.progress,
             "result": self.result if self.result else None,
             "error": self.error,
+            "createdAt": self.created_at,
+            "updatedAt": self.updated_at,
+            "completedAt": self.completed_at,
         }
 
     @classmethod

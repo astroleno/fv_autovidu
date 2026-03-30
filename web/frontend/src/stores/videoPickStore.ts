@@ -79,7 +79,9 @@ interface VideoPickStore {
   /**
    * 切换剧集时重置镜头索引、激活候选、撤销栈（不重置 mode，避免覆盖 localStorage 恢复）
    */
-  resetSessionForEpisode: () => void
+  resetSessionForEpisode: (options?: {
+    preserveCurrentShotIndex?: boolean
+  }) => void
 }
 
 export const useVideoPickStore = create<VideoPickStore>((set, get) => ({
@@ -127,11 +129,13 @@ export const useVideoPickStore = create<VideoPickStore>((set, get) => ({
 
   clearUndo: () => set({ undoStack: [] }),
 
-  resetSessionForEpisode: () =>
-    set({
-      currentShotIndex: 0,
+  resetSessionForEpisode: (options) =>
+    set((state) => ({
+      currentShotIndex: options?.preserveCurrentShotIndex
+        ? state.currentShotIndex
+        : 0,
       activeCandidateId: null,
       pickingOnlyPending: false,
       undoStack: [],
-    }),
+    })),
 }))

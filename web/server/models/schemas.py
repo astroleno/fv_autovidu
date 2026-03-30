@@ -394,6 +394,9 @@ class TaskStatusResponse(BaseModel):
     progress: Optional[int] = None
     result: Optional[dict[str, Any]] = None
     error: Optional[str] = None
+    createdAt: Optional[float] = None
+    updatedAt: Optional[float] = None
+    completedAt: Optional[float] = None
 
 
 # ---------- 项目（Project）相关：与前端 types/project.ts 对齐 ----------

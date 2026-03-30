@@ -11,8 +11,9 @@
 import { useCallback, useEffect, useState } from "react"
 import { Link } from "react-router"
 import { Loader2 } from "lucide-react"
-import type { Shot, ShotAsset } from "@/types"
+import type { Shot, ShotAsset, TaskStatusResponse } from "@/types"
 import { generateApi } from "@/api/generate"
+import { tasksApi } from "@/api/tasks"
 import { useTaskStore, useToastStore } from "@/stores"
 import { Button, Dialog } from "@/components/ui"
 import { AssetSelector } from "@/components/business/AssetSelector"
@@ -101,6 +102,99 @@ export function RegenFramePanel({
     setTaskMessage("")
   }, [shot.shotId])
 
+  const applyRecoveredTask = useCallback((task: TaskStatusResponse) => {
+    setSubmittedTaskId(task.taskId)
+    if (task.status === "success") {
+      setBusy(false)
+      setFrameBust(String(task.completedAt ?? task.updatedAt ?? Date.now()))
+      setTaskPhase("success")
+      setTaskMessage("最近一次首帧重生已成功完成，左侧预览已按最新文件刷新。")
+      return
+    }
+    if (task.status === "failed") {
+      setBusy(false)
+      setTaskPhase("failed")
+      setTaskMessage(
+        typeof task.error === "string" && task.error
+          ? task.error
+          : "最近一次首帧重生失败"
+      )
+    }
+  }, [])
+
+  const beginPolling = useCallback(
+    (taskId: string, options?: { restored?: boolean }) => {
+      const restored = options?.restored === true
+      setBusy(true)
+      setSubmittedTaskId(taskId)
+      setTaskPhase("polling")
+      setTaskMessage(
+        restored
+          ? "检测到未完成的首帧重生任务，正在恢复状态…"
+          : "任务已提交，正在后台生成首帧。"
+      )
+      startPolling([taskId], {
+        episodeId,
+        onPollAborted: () => {
+          setBusy(false)
+          setTaskPhase("aborted")
+          setTaskMessage("任务已提交，但状态轮询中断；可稍后刷新本页确认结果。")
+        },
+        onAllSettled: (results) => {
+          setBusy(false)
+          const r = results[0]
+          if (!r) {
+            setTaskPhase("failed")
+            setTaskMessage("未返回任务状态")
+            if (!restored) pushToast("未返回任务状态", "error")
+            return
+          }
+          if (r.status === "success") {
+            setFrameBust(String(r.completedAt ?? r.updatedAt ?? Date.now()))
+            setTaskPhase("success")
+            setTaskMessage("首帧已生成并落盘，左侧预览已刷新。")
+            if (!restored) {
+              pushToast("首帧已更新；尾帧与视频候选已清空，请按需重新生成", "success")
+            }
+            return
+          }
+          const msg =
+            typeof r.error === "string" && r.error
+              ? r.error
+              : "单帧重生失败"
+          setTaskPhase("failed")
+          setTaskMessage(msg)
+          if (!restored) pushToast(msg, "error")
+        },
+      })
+    },
+    [episodeId, pushToast, startPolling]
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { data } = await tasksApi.latestStatus({
+          episodeId,
+          shotId: shot.shotId,
+          kind: "regen",
+        })
+        if (cancelled || !data) return
+        if (data.status === "processing" || data.status === "pending") {
+          beginPolling(data.taskId, { restored: true })
+          return
+        }
+        applyRecoveredTask(data)
+      } catch {
+        /* ignore recovery failure; current-page submission flow still works */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [applyRecoveredTask, beginPolling, episodeId, shot.shotId])
+
   const previewSrc = firstFramePreviewUrl(
     shot.firstFrame,
     basePath,
@@ -141,44 +235,8 @@ export function RegenFramePanel({
         assetIds,
       })
       const taskId = data.taskId
-      setSubmittedTaskId(taskId)
-      setTaskPhase("polling")
-      setTaskMessage("任务已提交，正在后台生成首帧。")
       pushToast("已提交单帧重生任务，正在生成…", "info")
-
-      startPolling([taskId], {
-        episodeId,
-        /** 连续网络失败导致轮询中止时也要解锁 UI（见 taskStore onPollAborted） */
-        onPollAborted: () => {
-          setBusy(false)
-          setTaskPhase("aborted")
-          setTaskMessage("任务已提交，但状态轮询中断；可稍后刷新本页确认结果。")
-        },
-        onAllSettled: (results) => {
-          setBusy(false)
-          const r = results[0]
-          if (!r) {
-            setTaskPhase("failed")
-            setTaskMessage("未返回任务状态")
-            pushToast("未返回任务状态", "error")
-            return
-          }
-          if (r.status === "success") {
-            setFrameBust(String(Date.now()))
-            setTaskPhase("success")
-            setTaskMessage("首帧已生成并落盘，左侧预览已刷新。")
-            pushToast("首帧已更新；尾帧与视频候选已清空，请按需重新生成", "success")
-            return
-          }
-          const msg =
-            typeof r.error === "string" && r.error
-              ? r.error
-              : "单帧重生失败"
-          setTaskPhase("failed")
-          setTaskMessage(msg)
-          pushToast(msg, "error")
-        },
-      })
+      beginPolling(taskId)
     } catch (e) {
       setBusy(false)
       const msg = e instanceof Error ? e.message : "单帧重生请求失败"
@@ -192,7 +250,7 @@ export function RegenFramePanel({
     shot.firstFrame,
     episodeId,
     assetIds,
-    startPolling,
+    beginPolling,
     pushToast,
   ])
 
