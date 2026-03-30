@@ -8,9 +8,42 @@ import { Button } from "@/components/ui"
 import { dubApi } from "@/api/dub"
 import { useTaskStore, useToastStore, useEpisodeStore } from "@/stores"
 import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
-import type { DubStatus } from "@/types"
+import type { DubStatus, Shot, ShotAsset } from "@/types"
 import { flattenShots } from "@/types"
 import { DubShotRow } from "./dub/DubShotRow"
+
+function speakerAssetIdForShot(
+  shot: Shot,
+  episodeAssets: ShotAsset[],
+): string {
+  const manual = (shot.dubSpeakerAssetId ?? "").trim()
+  if (manual) return manual
+  const role = (shot.associatedDialogue?.role ?? "").trim()
+  if (!role) return ""
+  const seen = new Set<string>()
+  for (const asset of [...(shot.assets ?? []), ...episodeAssets]) {
+    if (asset.type !== "character") continue
+    if (seen.has(asset.assetId)) continue
+    seen.add(asset.assetId)
+    if (asset.name.trim() === role) return asset.assetId
+  }
+  return ""
+}
+
+function speakerAssetsForShot(
+  shot: Shot,
+  episodeAssets: ShotAsset[],
+): ShotAsset[] {
+  const seen = new Set<string>()
+  const out: ShotAsset[] = []
+  for (const asset of [...(shot.assets ?? []), ...episodeAssets]) {
+    if (asset.type !== "character") continue
+    if (seen.has(asset.assetId)) continue
+    seen.add(asset.assetId)
+    out.push(asset)
+  }
+  return out
+}
 
 export interface DubPanelProps {
   episodeId: string
@@ -34,6 +67,7 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
   const [busyShotId, setBusyShotId] = useState<string | null>(null)
   const [savingDefaultVoice, setSavingDefaultVoice] = useState(false)
   const [savingVoiceShotId, setSavingVoiceShotId] = useState<string | null>(null)
+  const [savingSpeakerShotId, setSavingSpeakerShotId] = useState<string | null>(null)
   const [dubByShot, setDubByShot] = useState<Record<string, DubStatus | null>>({})
   const [expandedShotId, setExpandedShotId] = useState<string | null>(null)
   const [didApplyHighlight, setDidApplyHighlight] = useState(false)
@@ -42,6 +76,7 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
     if (!currentEpisode || currentEpisode.episodeId !== episodeId) return []
     return flattenShots(currentEpisode)
   }, [currentEpisode, episodeId])
+  const episodeAssets = currentEpisode?.assets ?? []
 
   const defaultVoiceId =
     currentEpisode?.episodeId === episodeId
@@ -101,16 +136,34 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
   const effectiveVoice = useCallback(
     (shotId: string) => {
       const shot = shots.find((item) => item.shotId === shotId)
+      if (!shot) return defaultVoiceId
       const override = (shot?.dubVoiceIdOverride ?? "").trim()
-      return override || defaultVoiceId
+      if (override) return override
+      const assetId = speakerAssetIdForShot(shot, episodeAssets)
+      const bound =
+        assetId && currentEpisode?.characterVoices
+          ? (currentEpisode.characterVoices[assetId]?.voiceId ?? "").trim()
+          : ""
+      return bound || defaultVoiceId
     },
-    [defaultVoiceId, shots]
+    [currentEpisode?.characterVoices, defaultVoiceId, episodeAssets, shots]
   )
 
   const setOverrideForShot = useCallback(
     async (shotId: string, voiceId: string) => {
+      const shot = shots.find((item) => item.shotId === shotId)
       const normalized = voiceId.trim()
-      const nextOverride = normalized && normalized !== defaultVoiceId ? normalized : ""
+      const inherited = shot
+        ? (() => {
+            const assetId = speakerAssetIdForShot(shot, episodeAssets)
+            const bound =
+              assetId && currentEpisode?.characterVoices
+                ? (currentEpisode.characterVoices[assetId]?.voiceId ?? "").trim()
+                : ""
+            return bound || defaultVoiceId
+          })()
+        : defaultVoiceId
+      const nextOverride = normalized && normalized !== inherited ? normalized : ""
       setSavingVoiceShotId(shotId)
       try {
         await updateShot(episodeId, shotId, {
@@ -123,7 +176,24 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
         setSavingVoiceShotId(null)
       }
     },
-    [defaultVoiceId, episodeId, pushToast, updateShot]
+    [currentEpisode?.characterVoices, defaultVoiceId, episodeAssets, episodeId, pushToast, shots, updateShot]
+  )
+
+  const setSpeakerAssetForShot = useCallback(
+    async (shotId: string, assetId: string) => {
+      setSavingSpeakerShotId(shotId)
+      try {
+        await updateShot(episodeId, shotId, {
+          dubSpeakerAssetId: assetId.trim(),
+        })
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e)
+        pushToast(`保存说话角色失败：${msg}`, "error")
+      } finally {
+        setSavingSpeakerShotId(null)
+      }
+    },
+    [episodeId, pushToast, updateShot]
   )
 
   const handleDefaultVoiceChange = useCallback(
@@ -327,6 +397,7 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
               const dub = dubByShot[shot.shotId] ?? shot.dub ?? null
               const eff = effectiveVoice(shot.shotId)
               const expanded = expandedShotId === shot.shotId
+              const speakerAssets = speakerAssetsForShot(shot, episodeAssets)
               return (
                 <DubShotRow
                   key={shot.shotId}
@@ -336,9 +407,12 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
                   basePath={basePath}
                   effectiveVoiceId={eff}
                   voices={voices}
+                  speakerAssets={speakerAssets}
+                  speakerAssetId={(shot.dubSpeakerAssetId ?? "").trim()}
                   mode={mode}
                   busy={busyShotId === shot.shotId}
                   savingVoice={savingVoiceShotId === shot.shotId}
+                  savingSpeaker={savingSpeakerShotId === shot.shotId}
                   expanded={expanded}
                   onToggleExpand={() =>
                     setExpandedShotId((prev) =>
@@ -346,6 +420,9 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
                     )
                   }
                   onVoiceChange={(v) => void setOverrideForShot(shot.shotId, v)}
+                  onSpeakerAssetChange={(assetId) =>
+                    void setSpeakerAssetForShot(shot.shotId, assetId)
+                  }
                   onDubThisShot={() => void handleDubOneShot(shot.shotId)}
                   scrollAnchor={
                     Boolean(

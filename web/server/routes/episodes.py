@@ -27,7 +27,7 @@ router = APIRouter()
 
 # PATCH /episodes/{id} 仅允许写入的 Episode 根字段（其余键丢弃，避免误改结构）
 _ALLOWED_EPISODE_PATCH_KEYS = frozenset(
-    {"dubTargetLocale", "sourceLocale", "dubDefaultVoiceId"}
+    {"dubTargetLocale", "sourceLocale", "dubDefaultVoiceId", "characterVoices"}
 )
 
 

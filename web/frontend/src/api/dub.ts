@@ -2,6 +2,8 @@
  * 配音 API：ElevenLabs STS / TTS
  */
 import type {
+  AssetVoicePreviewRequest,
+  AssetVoicePreviewResponse,
   DubProcessRequest,
   DubProcessResponse,
   DubProcessShotRequest,
@@ -44,4 +46,7 @@ export const dubApi = {
 
   processShot: (body: DubProcessShotRequest) =>
     apiClient.post<DubTaskItem>("/dub/process-shot", body),
+
+  previewAssetVoice: (body: AssetVoicePreviewRequest) =>
+    apiClient.post<AssetVoicePreviewResponse>("/dub/asset-preview", body),
 }

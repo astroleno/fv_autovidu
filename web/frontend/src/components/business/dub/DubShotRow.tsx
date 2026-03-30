@@ -4,7 +4,7 @@
 import { useEffect, useId, useRef, useState } from "react"
 import { ChevronDown, ChevronRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui"
-import type { DubStatus, Shot } from "@/types"
+import type { DubStatus, Shot, ShotAsset } from "@/types"
 import { getFileUrl } from "@/utils/file"
 
 export interface DubShotRowProps {
@@ -20,13 +20,19 @@ export interface DubShotRowProps {
   effectiveVoiceId: string
   /** 音色下拉选项 */
   voices: Array<{ voiceId: string; name: string }>
+  /** 当前镜可选的角色资产列表 */
+  speakerAssets: ShotAsset[]
+  /** 当前显式指定的说话角色资产 id；空表示自动匹配 */
+  speakerAssetId: string
   mode: "sts" | "tts"
   /** 单镜提交中 */
   busy: boolean
   savingVoice?: boolean
+  savingSpeaker?: boolean
   expanded: boolean
   onToggleExpand: () => void
   onVoiceChange: (voiceId: string) => void
+  onSpeakerAssetChange: (assetId: string) => void
   onDubThisShot: () => void
   /** 由父组件传入用于深链滚动 */
   scrollAnchor?: boolean
@@ -48,12 +54,16 @@ export function DubShotRow({
   basePath,
   effectiveVoiceId,
   voices,
+  speakerAssets,
+  speakerAssetId,
   mode,
   busy,
   savingVoice = false,
+  savingSpeaker = false,
   expanded,
   onToggleExpand,
   onVoiceChange,
+  onSpeakerAssetChange,
   onDubThisShot,
   scrollAnchor,
 }: DubShotRowProps) {
@@ -164,6 +174,33 @@ export function DubShotRow({
                 {mode === "sts" && !originalUrl && dubEligible ? (
                   <span className="ml-2">（生成后将显示提取原声与成品对比）</span>
                 ) : null}
+              </div>
+              <div className="flex flex-col gap-1 max-w-sm">
+                <label
+                  htmlFor={`speaker-asset-${shot.shotId}`}
+                  className="font-bold text-[var(--color-ink)]"
+                >
+                  说话角色资产
+                </label>
+                <select
+                  id={`speaker-asset-${shot.shotId}`}
+                  aria-label="说话角色资产"
+                  className="w-full border border-[var(--color-newsprint-black)] px-2 py-1 text-[11px] box-border"
+                  style={{ boxSizing: "border-box" }}
+                  value={speakerAssetId}
+                  onChange={(e) => onSpeakerAssetChange(e.target.value)}
+                  disabled={savingSpeaker}
+                >
+                  <option value="">自动匹配（按对白角色名）</option>
+                  {speakerAssets.map((asset) => (
+                    <option key={asset.assetId} value={asset.assetId}>
+                      {asset.name} · {asset.assetId.slice(0, 8)}…
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-[var(--color-muted)]">
+                  当对白角色名与资产名不一致，或同名角色有多个资产时，请在此显式指定。
+                </p>
               </div>
               {videoUrl ? (
                 <div className="flex flex-col gap-1 max-w-md">

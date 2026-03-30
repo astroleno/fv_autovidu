@@ -12,6 +12,7 @@ export type {
   VideoMode,
   TaskStatus,
   DubStatus,
+  CharacterVoiceBinding,
   JianyingExportRecord,
 } from "./episode"
 export { flattenShots } from "./episode"
@@ -37,6 +38,8 @@ export type {
   DubProcessShotRequest,
   DubTaskItem,
   DubProcessResponse,
+  AssetVoicePreviewRequest,
+  AssetVoicePreviewResponse,
   TaskStatusResponse,
 } from "./api"
 export type {

@@ -8,15 +8,17 @@
  * - 若拉取时「同步内容」选「仅分镜文案」，则本地无 png，缩略图会加载失败（应用内会提示重新拉取）。
  * - 元数据能显示但无图：多为未下载文件或平台未返回可下载的 thumbnail URL。
  */
-import { useEffect, useState, useMemo, useCallback } from "react"
+import { useEffect, useState, useMemo, useCallback, type ReactNode } from "react"
 import { useParams, Link, useSearchParams } from "react-router"
 import { useEpisodeMediaCacheBust } from "@/hooks"
 import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
-import { useEpisodeStore } from "@/stores"
+import { useEpisodeStore, useToastStore } from "@/stores"
 import { getFileUrl } from "@/utils/file"
-import type { ShotAsset } from "@/types"
+import type { CharacterVoiceBinding, ShotAsset } from "@/types"
 import { Package, ArrowLeft, LayoutGrid, X } from "lucide-react"
 import { routes } from "@/utils/routes"
+import { dubApi } from "@/api/dub"
+import { AssetVoicePanel } from "@/components/business/asset/AssetVoicePanel"
 
 const TYPE_FILTERS: { value: string; label: string }[] = [
   { value: "all", label: "全部" },
@@ -106,10 +108,12 @@ function AssetModalImage({ src, alt }: { src: string; alt: string }) {
 function AssetDetailModal({
   asset,
   imgUrl,
+  voicePanel,
   onClose,
 }: {
   asset: ShotAsset
   imgUrl: string
+  voicePanel?: ReactNode
   onClose: () => void
 }) {
   useEffect(() => {
@@ -180,9 +184,21 @@ function AssetDetailModal({
             {asset.prompt || "（无）"}
           </pre>
         </div>
+        {voicePanel ? (
+          <div className="p-4 border-t-2 border-[var(--color-newsprint-black)]">
+            <h3 className="text-xs font-black uppercase tracking-wider text-[var(--color-muted)] mb-3">
+              角色音色
+            </h3>
+            {voicePanel}
+          </div>
+        ) : null}
       </div>
     </div>
   )
+}
+
+function defaultPreviewText(assetName: string): string {
+  return `我是${assetName || "该角色"}，这是我的音色试听。`
 }
 
 export default function AssetLibraryPage() {
@@ -191,15 +207,52 @@ export default function AssetLibraryPage() {
     episodeId: string
   }>()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { currentEpisode, loading, fetchEpisodeDetail } = useEpisodeStore()
+  const {
+    currentEpisode,
+    loading,
+    fetchEpisodeDetail,
+    updateEpisodeLocales,
+  } = useEpisodeStore()
+  const pushToast = useToastStore((s) => s.push)
   const cacheBust = useEpisodeMediaCacheBust(currentEpisode?.pulledAt)
   const [typeFilter, setTypeFilter] = useState<string>("all")
   /** 点击资产卡片时，选中并展示大图与 metadata */
   const [selectedAsset, setSelectedAsset] = useState<ShotAsset | null>(null)
+  const [elConfigured, setElConfigured] = useState<boolean | null>(null)
+  const [voices, setVoices] = useState<Array<{ voiceId: string; name: string }>>([])
+  const [voiceDraft, setVoiceDraft] = useState("")
+  const [previewTextDraft, setPreviewTextDraft] = useState("")
+  const [savingVoice, setSavingVoice] = useState(false)
+  const [previewBusy, setPreviewBusy] = useState(false)
 
   useEffect(() => {
     if (episodeId) void fetchEpisodeDetail(episodeId)
   }, [episodeId, fetchEpisodeDetail])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const cfg = await dubApi.configured()
+        if (cancelled) return
+        setElConfigured(cfg.data.configured)
+        if (!cfg.data.configured) return
+        const res = await dubApi.voices()
+        if (cancelled) return
+        setVoices(
+          res.data.voices.map((v) => ({
+            voiceId: v.voiceId,
+            name: v.name,
+          }))
+        )
+      } catch {
+        if (!cancelled) setElConfigured(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   /** 去重后的资产列表 */
   const assets = useMemo(() => {
@@ -234,12 +287,102 @@ export default function AssetLibraryPage() {
   }, [assets, typeFilter])
   const basePath = useEpisodeFileBasePath()
 
+  const selectedBinding: CharacterVoiceBinding | undefined =
+    selectedAsset && currentEpisode?.characterVoices
+      ? currentEpisode.characterVoices[selectedAsset.assetId]
+      : undefined
+
+  useEffect(() => {
+    if (!selectedAsset) {
+      setVoiceDraft("")
+      setPreviewTextDraft("")
+      return
+    }
+    const binding =
+      currentEpisode?.characterVoices?.[selectedAsset.assetId]
+    setVoiceDraft(binding?.voiceId ?? "")
+    setPreviewTextDraft(
+      binding?.previewText?.trim() || defaultPreviewText(selectedAsset.name)
+    )
+  }, [currentEpisode?.characterVoices, selectedAsset])
+
   if (!episodeId || !currentEpisode) {
     if (loading) return <div className="p-8">加载中...</div>
     return <div className="p-8">未找到该剧集</div>
   }
 
   const projectId = routeProjectId ?? currentEpisode.projectId
+  const previewAudioUrl =
+    selectedBinding?.previewAudioPath && selectedAsset
+      ? getFileUrl(selectedBinding.previewAudioPath, basePath, cacheBust)
+      : ""
+
+  const persistBinding = useCallback(async () => {
+    if (!selectedAsset) return
+    const nextVoice = voiceDraft.trim()
+    if (!nextVoice) {
+      pushToast("请先为该角色选择音色", "error")
+      return
+    }
+    setSavingVoice(true)
+    try {
+      const nextMap = {
+        ...(currentEpisode.characterVoices ?? {}),
+        [selectedAsset.assetId]: {
+          ...(currentEpisode.characterVoices?.[selectedAsset.assetId] ?? {}),
+          voiceId: nextVoice,
+          previewText: previewTextDraft.trim() || defaultPreviewText(selectedAsset.name),
+        },
+      }
+      await updateEpisodeLocales(episodeId, { characterVoices: nextMap })
+      pushToast("角色音色绑定已保存", "success")
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      pushToast(`保存角色音色失败：${msg}`, "error")
+    } finally {
+      setSavingVoice(false)
+    }
+  }, [
+    currentEpisode.characterVoices,
+    episodeId,
+    previewTextDraft,
+    pushToast,
+    selectedAsset,
+    updateEpisodeLocales,
+    voiceDraft,
+  ])
+
+  const generatePreview = useCallback(async () => {
+    if (!selectedAsset) return
+    const nextVoice = voiceDraft.trim()
+    if (!nextVoice) {
+      pushToast("请先为该角色选择音色", "error")
+      return
+    }
+    setPreviewBusy(true)
+    try {
+      await dubApi.previewAssetVoice({
+        episodeId,
+        assetId: selectedAsset.assetId,
+        voiceId: nextVoice,
+        previewText: previewTextDraft.trim() || defaultPreviewText(selectedAsset.name),
+      })
+      await fetchEpisodeDetail(episodeId)
+      pushToast("角色试听已生成", "success")
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      pushToast(`生成角色试听失败：${msg}`, "error")
+    } finally {
+      setPreviewBusy(false)
+    }
+  }, [
+    episodeId,
+    fetchEpisodeDetail,
+    previewTextDraft,
+    pushToast,
+    selectedAsset,
+    voiceDraft,
+  ])
 
   return (
     <div className="min-h-screen p-8 box-border">
@@ -332,6 +475,24 @@ export default function AssetLibraryPage() {
         <AssetDetailModal
           asset={selectedAsset}
           imgUrl={getFileUrl(selectedAsset.localPath, basePath, cacheBust)}
+          voicePanel={
+            selectedAsset.type === "character" ? (
+              <AssetVoicePanel
+                assetName={selectedAsset.name}
+                voices={voices}
+                voiceId={voiceDraft}
+                previewText={previewTextDraft}
+                configured={elConfigured === true}
+                busy={savingVoice}
+                previewBusy={previewBusy}
+                audioSrc={previewAudioUrl}
+                onVoiceChange={setVoiceDraft}
+                onPreviewTextChange={setPreviewTextDraft}
+                onSave={() => void persistBinding()}
+                onPreview={() => void generatePreview()}
+              />
+            ) : undefined
+          }
           onClose={() => {
             setSelectedAsset(null)
             /** 关闭弹窗后去掉 URL 中的 assetId，避免刷新再次自动弹出 */

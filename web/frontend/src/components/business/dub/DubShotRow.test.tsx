@@ -5,7 +5,7 @@ import { describe, it, expect, vi, afterEach } from "vitest"
 import { cleanup, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { DubShotRow } from "./DubShotRow"
-import type { Shot } from "@/types"
+import type { Shot, ShotAsset } from "@/types"
 
 function buildShot(overrides: Partial<Shot> = {}): Shot {
   return {
@@ -43,15 +43,29 @@ describe("DubShotRow", () => {
     cleanup()
   })
 
+  const speakerAssets: ShotAsset[] = [
+    {
+      assetId: "asset-a",
+      name: "Alice",
+      type: "character",
+      localPath: "assets/a.png",
+      prompt: "",
+    },
+  ]
+
   const baseProps = {
     dub: null,
     dubEligible: true,
     basePath: "proj/ep",
     effectiveVoiceId: "voice-1",
     voices: [{ voiceId: "voice-1", name: "Voice One" }],
+    speakerAssets,
+    speakerAssetId: "",
     mode: "sts" as const,
     busy: false,
+    savingSpeaker: false,
     onVoiceChange: () => {},
+    onSpeakerAssetChange: () => {},
     onDubThisShot: () => {},
   }
 
@@ -88,5 +102,25 @@ describe("DubShotRow", () => {
     )
     await user.click(screen.getByRole("button", { name: /试听/ }))
     expect(onToggle).toHaveBeenCalledTimes(1)
+  })
+
+  it("展开时可手动指定说话角色资产", async () => {
+    const user = userEvent.setup()
+    const onSpeakerAssetChange = vi.fn()
+    render(
+      <table>
+        <tbody>
+          <DubShotRow
+            {...baseProps}
+            onSpeakerAssetChange={onSpeakerAssetChange}
+            shot={buildShot()}
+            expanded
+            onToggleExpand={() => {}}
+          />
+        </tbody>
+      </table>
+    )
+    await user.selectOptions(screen.getByLabelText(/说话角色资产/), "asset-a")
+    expect(onSpeakerAssetChange).toHaveBeenCalledWith("asset-a")
   })
 })

@@ -70,6 +70,13 @@ export interface DubStatus {
   processedAt?: string
 }
 
+export interface CharacterVoiceBinding {
+  voiceId: string
+  previewText?: string
+  previewAudioPath?: string
+  updatedAt?: string
+}
+
 /**
  * Feeling 平台结构化对白（与 episode.json / Pydantic AssociatedDialogue 对齐）
  */
@@ -108,6 +115,8 @@ export interface Shot {
   dialogueTranslation?: string
   /** 一期 STS：镜头级音色覆盖；空表示回退剧集默认音色 */
   dubVoiceIdOverride?: string
+  /** 角色级 STS：显式指定本镜说话角色对应的资产 id；空表示按 associatedDialogue.role 自动匹配 */
+  dubSpeakerAssetId?: string
   /**
    * 生成视频（Vidu）时是否将台词块拼入 composed prompt；默认 true。
    * false 时仍保留台词字段供字幕/配音/剪映，仅不注入 Vidu。
@@ -150,6 +159,8 @@ export interface Episode {
   jianyingExport?: JianyingExportRecord
   /** 一期 STS：剧集级默认音色 */
   dubDefaultVoiceId?: string
+  /** 角色资产绑定音色：key = assetId */
+  characterVoices?: Record<string, CharacterVoiceBinding>
   /** 配音目标语（BCP-47 或项目约定），空表示未设置 */
   dubTargetLocale?: string
   /** 台词原文语言，供 UI 标签 */

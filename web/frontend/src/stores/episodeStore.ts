@@ -58,13 +58,14 @@ interface EpisodeStore {
         | "dialogue"
         | "dialogueTranslation"
         | "dubVoiceIdOverride"
+        | "dubSpeakerAssetId"
         | "includeDialogueInVideoPrompt"
         | "duration"
       >
     >
   ) => Promise<void>
   /**
-   * PATCH 剧集根字段：dubTargetLocale / sourceLocale / dubDefaultVoiceId。
+   * PATCH 剧集根字段：dubTargetLocale / sourceLocale / dubDefaultVoiceId / characterVoices。
    */
   updateEpisodeLocales: (
     episodeId: string,
@@ -72,6 +73,7 @@ interface EpisodeStore {
       dubTargetLocale?: string
       sourceLocale?: string
       dubDefaultVoiceId?: string
+      characterVoices?: Episode["characterVoices"]
     }
   ) => Promise<void>
 }

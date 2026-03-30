@@ -27,6 +27,8 @@ from fastapi import APIRouter, HTTPException, Request
 from src.feeling.episode_fs_lock import episode_fs_lock
 
 from models.schemas import (
+    AssetVoicePreviewRequest,
+    AssetVoicePreviewResponse,
     DubEpisodeStatusResponse,
     DubProcessRequest,
     DubProcessResponse,
@@ -61,6 +63,53 @@ def _suffix_from_content_type(ct: str) -> str:
     if "wav" in c:
         return ".wav"
     return ".mp3"
+
+
+def _preview_text_for_asset(asset_name: str) -> str:
+    name = (asset_name or "该角色").strip()
+    return f"我是{name}，这是我的音色试听。"
+
+
+def _asset_by_id(episode: Any, asset_id: str) -> Any | None:
+    aid = (asset_id or "").strip()
+    if not aid:
+        return None
+    for asset in getattr(episode, "assets", []) or []:
+        if getattr(asset, "assetId", "") == aid:
+            return asset
+    for scene in getattr(episode, "scenes", []) or []:
+        for shot in getattr(scene, "shots", []) or []:
+            for asset in getattr(shot, "assets", []) or []:
+                if getattr(asset, "assetId", "") == aid:
+                    return asset
+    return None
+
+
+def _character_voice_binding(episode: Any, asset_id: str) -> Any | None:
+    bindings = getattr(episode, "characterVoices", None) or {}
+    return bindings.get(asset_id)
+
+
+def _speaker_asset_id_for_shot(episode: Any, shot: Any) -> str:
+    manual = (getattr(shot, "dubSpeakerAssetId", None) or "").strip()
+    if manual:
+        return manual
+    assoc = getattr(shot, "associatedDialogue", None)
+    role = (getattr(assoc, "role", None) or "").strip()
+    if not role:
+        return ""
+    seen: set[str] = set()
+    candidates = list(getattr(shot, "assets", []) or []) + list(getattr(episode, "assets", []) or [])
+    for asset in candidates:
+        aid = getattr(asset, "assetId", "")
+        if not aid or aid in seen:
+            continue
+        seen.add(aid)
+        if (getattr(asset, "type", "") or "") != "character":
+            continue
+        if (getattr(asset, "name", None) or "").strip() == role:
+            return aid
+    return ""
 
 
 def _resolve_tts_text(shot: Any, tts_text: str | None) -> str:
@@ -263,11 +312,17 @@ def _run_dub_task(
 
 def _voice_id_for_shot(episode: Any, shot: Any) -> str:
     """
-    解析单镜最终音色：Shot.dubVoiceIdOverride 优先，否则 Episode.dubDefaultVoiceId。
+    解析单镜最终音色：Shot.dubVoiceIdOverride 优先，其次角色资产绑定，其次 Episode.dubDefaultVoiceId。
     """
     shot_voice = (getattr(shot, "dubVoiceIdOverride", None) or "").strip()
     if shot_voice:
         return shot_voice
+    asset_id = _speaker_asset_id_for_shot(episode, shot)
+    if asset_id:
+        binding = _character_voice_binding(episode, asset_id)
+        bound_voice = (getattr(binding, "voiceId", None) or "").strip() if binding else ""
+        if bound_voice:
+            return bound_voice
     return (getattr(episode, "dubDefaultVoiceId", None) or "").strip()
 
 
@@ -319,6 +374,67 @@ def dub_voices():
             }
         )
     return {"voices": simplified}
+
+
+@router.post("/dub/asset-preview", response_model=AssetVoicePreviewResponse)
+def preview_asset_voice(req: AssetVoicePreviewRequest, request: Request):
+    """为角色资产生成试听音频，并将结果持久化到 Episode.characterVoices。"""
+    if not elevenlabs_service.is_configured():
+        raise HTTPException(status_code=503, detail="未配置 ELEVENLABS_API_KEY")
+    ns = get_namespace_data_root_optional(request)
+    tag = fs_lock_tag_from_namespace_root(ns)
+    episode = data_service.get_episode(req.episodeId, ns)
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    asset = _asset_by_id(episode, req.assetId)
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    if (getattr(asset, "type", None) or "") != "character":
+        raise HTTPException(status_code=400, detail="仅角色资产支持绑定音色与试听")
+
+    existing = _character_voice_binding(episode, req.assetId)
+    voice_id = (req.voiceId or "").strip() or (
+        (getattr(existing, "voiceId", None) or "").strip() if existing else ""
+    )
+    if not voice_id:
+        raise HTTPException(status_code=400, detail="请先为该角色选择音色")
+    preview_text = (req.previewText or "").strip() or (
+        (getattr(existing, "previewText", None) or "").strip() if existing else ""
+    )
+    if not preview_text:
+        preview_text = _preview_text_for_asset(getattr(asset, "name", ""))
+
+    try:
+        audio_bytes, content_type = elevenlabs_service.text_to_speech(voice_id, preview_text)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    with episode_fs_lock(req.episodeId, data_namespace=tag):
+        ep_dir = data_service.get_episode_dir(req.episodeId, ns)
+        if not ep_dir:
+            raise HTTPException(status_code=404, detail="Episode dir not found")
+        ext = _suffix_from_content_type(content_type)
+        rel = f"dub_previews/{req.assetId}_preview_{uuid.uuid4().hex[:8]}{ext}"
+        preview_path = ep_dir / rel
+        preview_path.parent.mkdir(parents=True, exist_ok=True)
+        preview_path.write_bytes(audio_bytes)
+
+        latest_episode = data_service.get_episode(req.episodeId, ns)
+        bindings = latest_episode.characterVoices if latest_episode else {}
+        bindings = dict(bindings or {})
+        bindings[req.assetId] = {
+            "voiceId": voice_id,
+            "previewText": preview_text,
+            "previewAudioPath": rel,
+            "updatedAt": _iso_now(),
+        }
+        data_service.update_episode(req.episodeId, {"characterVoices": bindings}, ns)
+    return AssetVoicePreviewResponse(
+        assetId=req.assetId,
+        voiceId=voice_id,
+        previewText=preview_text,
+        audioPath=rel,
+    )
 
 
 @router.get("/dub/status/{episode_id}", response_model=DubEpisodeStatusResponse)
