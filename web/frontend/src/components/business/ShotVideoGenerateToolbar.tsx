@@ -24,6 +24,7 @@ import {
 } from "./VideoModeSelector"
 import {
   buildSingleShotVideoQuickRequest,
+  getSingleVideoQuickSummaryLines,
   toastAfterVideoTasksSettled,
 } from "@/utils/videoQuickRegenerate"
 
@@ -71,6 +72,7 @@ export function ShotVideoGenerateToolbar({
   const hasEndFramePath = Boolean(shot.endFrame?.trim())
   const nCandidates = shot.videoCandidates.length
   const shotLabel = `S${String(shot.shotNumber).padStart(2, "0")}`
+  const quickSummaryLines = getSingleVideoQuickSummaryLines(hasEndFramePath)
 
   /**
    * 快捷生成：追加视频候选。
@@ -189,6 +191,21 @@ export function ShotVideoGenerateToolbar({
         <span className="text-[10px] font-black uppercase tracking-wide text-[var(--color-muted)]">
           {nCandidates > 0 ? "追加候选 / 再生成" : "生成视频"}
         </span>
+        <div className="rounded-sm border border-dashed border-[var(--color-newsprint-black)] bg-white/70 p-2 box-border">
+          <p className="text-[9px] font-black uppercase text-[var(--color-muted)] mb-1">
+            快捷参数
+          </p>
+          <div className="space-y-1">
+            {quickSummaryLines.map((line) => (
+              <p
+                key={line}
+                className="text-[10px] leading-relaxed text-[var(--color-ink)] box-border m-0"
+              >
+                {line}
+              </p>
+            ))}
+          </div>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
@@ -242,7 +259,7 @@ export function ShotVideoGenerateToolbar({
             ? "尾帧或视频生成中，请等待当前任务结束后再试。"
             : nCandidates > 0
               ? "在现有候选基础上再提交任务，完成后列表会增加新候选；成片落盘后会自动选中最新一条。"
-              : "快捷「首尾帧」为预览档（540p+turbo+双候选）；正式档或多参考请点「自定义参数」。无尾帧时请先在分镜或此处生成尾帧。"}
+              : "快捷按钮会按上面的默认参数直接提交；需要改模型、分辨率或参考图时请点「自定义参数」。"}
         </p>
       </div>
     </>

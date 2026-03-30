@@ -193,6 +193,9 @@ def _default_video_model(mode: VideoMode) -> str:
         return "viduq3-pro"
     if mode == "reference":
         return "viduq2-pro"
+    # 仅首帧 i2v：与产品「预览试错」一致，默认 turbo（旧版 viduq2-pro-fast 易与预期不符）
+    if mode == "first_frame":
+        return "viduq3-turbo"
     return "viduq2-pro-fast"
 
 
@@ -205,11 +208,14 @@ def _default_video_resolution(
     """
     解析 Vidu 分辨率：显式传入优先；否则按模式给默认值。
     首尾帧：预览 540p / 正式 1080p（避免 720p+turbo 这类无意义折中）。
+    仅首帧：默认 540p，与 turbo 预览档一致。
     """
     if resolution and str(resolution).strip():
         return str(resolution).strip()
     if mode == "first_last_frame":
         return "540p" if is_preview else "1080p"
+    if mode == "first_frame":
+        return "540p"
     return "720p"
 
 

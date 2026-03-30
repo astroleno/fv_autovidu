@@ -52,7 +52,15 @@ export { ImagePreview } from "./ImagePreview"
 export { PromptEditor } from "./PromptEditor"
 export { AssetSelector } from "./AssetSelector"
 export { VideoModeSelector } from "./VideoModeSelector"
-export type { VideoModeSelectorResult } from "./VideoModeSelector"
+export type {
+  VideoModeSelectorInitialValue,
+  VideoModeSelectorResult,
+} from "./VideoModeSelector"
+export { BatchOperationConfirmDialog } from "./BatchOperationConfirmDialog"
+export type {
+  BatchOperationConfirmKind,
+  BatchOperationConfirmDialogProps,
+} from "./BatchOperationConfirmDialog"
 export { ReferenceImagePicker } from "./ReferenceImagePicker"
 export { BatchResultSummary } from "./BatchResultSummary"
 export type { BatchResultSummaryProps } from "./BatchResultSummary"

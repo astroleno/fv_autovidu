@@ -1,7 +1,7 @@
 /**
  * 分镜板总览页（核心）
  * Scene 分组 + Shot 卡片/行 + 状态筛选 + 批量操作 + 视图切换
- * 批量生成尾帧 / 批量生成视频：调用 generateApi，taskStore 轮询并在完成后 Toast
+ * 批量生成尾帧 / 批量生成视频：均先弹窗确认再调用 generateApi，taskStore 轮询并在完成后 Toast
  */
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router"
@@ -33,12 +33,15 @@ import {
   StoryboardResizableTh,
   sumStoryboardTableWidthPx,
   VideoModeSelector,
+  type VideoModeSelectorInitialValue,
   type VideoModeSelectorResult,
+  BatchOperationConfirmDialog,
 } from "@/components/business"
 import { flattenShots } from "@/types"
 import type { ShotStatus } from "@/types"
 import type { GenerateVideoRequest, TaskStatusResponse } from "@/types"
 import { generateApi } from "@/api/generate"
+import { buildRetryVideoDialogConfig } from "@/utils/videoBatchRetry"
 import { routes } from "@/utils/routes"
 
 const STATUS_FILTERS: { value: ShotStatus | "all"; label: string }[] = [
@@ -93,6 +96,19 @@ export default function StoryboardPage() {
 
   const [batchEndBusy, setBatchEndBusy] = useState(false)
   const [videoDialogOpen, setVideoDialogOpen] = useState(false)
+  /** 批量尾帧：二次确认（与视频批量「先弹窗再提交」一致） */
+  const [endframeConfirmOpen, setEndframeConfirmOpen] = useState(false)
+  /**
+   * null：批量「尾帧已完成」——完整模式选择器；
+   * first_frame：批量「首帧模式」——锁定仅首帧 i2v，弹窗内自选模型/分辨率（曾硬编码 2fast+720p）。
+   */
+  const [videoDialogLockedMode, setVideoDialogLockedMode] = useState<
+    null | "first_frame"
+  >(null)
+  const [videoDialogInitialValue, setVideoDialogInitialValue] =
+    useState<VideoModeSelectorInitialValue>()
+  const [videoDialogTitle, setVideoDialogTitle] = useState<string>()
+  const [videoRetryShotIds, setVideoRetryShotIds] = useState<string[] | null>(null)
   /** 批量结果汇总弹窗（尾帧 / 视频） */
   const [summaryOpen, setSummaryOpen] = useState(false)
   const [summaryKind, setSummaryKind] = useState<"endframe" | "video">("video")
@@ -330,8 +346,11 @@ export default function StoryboardPage() {
 
   /**
    * 批量首帧视频（mode=first_frame）：目标为 firstFrameBatchShots，与尾帧是否完成无关。
+   * 模型/分辨率由 VideoModeSelector（lockedMode=first_frame）传入，与「尾帧已完成」批量一致可配置。
    */
-  const handleBatchFirstFrameVideo = async () => {
+  const handleFirstFrameBatchVideoConfirm = async (
+    result: VideoModeSelectorResult
+  ) => {
     if (!episodeId || firstFrameForBatch.length === 0) {
       if (batchPickMode === "manual" && firstFrameBatchShots.length > 0) {
         pushToast("框选模式下请勾选需要首帧视频的镜头，或改回「全部符合条件」", "info")
@@ -343,8 +362,8 @@ export default function StoryboardPage() {
         episodeId,
         shotIds: firstFrameForBatch.map((s) => s.shotId),
         mode: "first_frame",
-        model: "viduq2-pro-fast",
-        resolution: "720p",
+        model: result.model,
+        resolution: result.resolution,
       }
       lastVideoBatchParamsRef.current = body
       const res = await generateApi.video(body)
@@ -376,6 +395,78 @@ export default function StoryboardPage() {
     } catch (e) {
       pushToast(e instanceof Error ? e.message : "批量首帧视频请求失败", "error")
     }
+  }
+
+  const handleRetryVideoConfirm = async (
+    shotIds: string[],
+    result: VideoModeSelectorResult
+  ) => {
+    if (!episodeId || shotIds.length === 0) return
+    try {
+      const body: GenerateVideoRequest = {
+        episodeId,
+        shotIds,
+        mode: result.mode,
+        model: result.model,
+        resolution: result.resolution,
+        referenceAssetIds: result.referenceAssetIds,
+        ...(result.mode === "first_last_frame" && result.isPreview
+          ? {
+              isPreview: true,
+              candidateCount: result.candidateCount ?? 1,
+            }
+          : {}),
+      }
+      lastVideoBatchParamsRef.current = body
+      const res = await generateApi.video(body)
+      const taskToShot: Record<string, string> = {}
+      res.data.tasks.forEach((t) => {
+        taskToShot[t.taskId] = t.shotId
+      })
+      const ids = res.data.tasks.map((t) => t.taskId)
+      pushToast(`已重试 ${ids.length} 个视频任务；完成后会弹出汇总`, "info")
+      startPolling(ids, {
+        episodeId,
+        onAllSettled: (results) => {
+          setSummaryKind("video")
+          setSummaryTaskToShot(taskToShot)
+          setSummaryResults(results)
+          setSummaryOpen(true)
+          const nFail = results.filter((r) => r.status === "failed").length
+          pushToast(
+            nFail > 0
+              ? `重试任务已结束：${nFail} 个失败，请查看汇总`
+              : "重试任务已全部结束",
+            nFail > 0 ? "error" : "success"
+          )
+        },
+      })
+    } catch (e) {
+      pushToast(e instanceof Error ? e.message : "重试失败", "error")
+    }
+  }
+
+  const resetVideoDialogState = () => {
+    setVideoDialogOpen(false)
+    setVideoDialogLockedMode(null)
+    setVideoDialogInitialValue(undefined)
+    setVideoDialogTitle(undefined)
+    setVideoRetryShotIds(null)
+  }
+
+  const openRetryVideoDialog = (failedShotIds: string[]) => {
+    const base = lastVideoBatchParamsRef.current
+    if (!base) {
+      pushToast("无法重试：缺少上一次批量视频参数", "error")
+      return
+    }
+    const cfg = buildRetryVideoDialogConfig(base)
+    setSummaryOpen(false)
+    setVideoDialogLockedMode(cfg.lockedMode ?? null)
+    setVideoDialogInitialValue(cfg.initialValue)
+    setVideoDialogTitle(cfg.dialogTitle)
+    setVideoRetryShotIds(failedShotIds)
+    setVideoDialogOpen(true)
   }
 
   return (
@@ -413,57 +504,46 @@ export default function StoryboardPage() {
                 pushToast(e instanceof Error ? e.message : "重试失败", "error")
               )
           } else {
-            const base = lastVideoBatchParamsRef.current
-            if (!base) {
-              pushToast("无法重试：缺少上一次批量视频参数", "error")
-              return
-            }
-            void generateApi
-              .video({
-                episodeId,
-                shotIds: failedShotIds,
-                mode: base.mode,
-                model: base.model,
-                resolution: base.resolution,
-                referenceAssetIds: base.referenceAssetIds,
-                ...(base.mode === "first_last_frame" && base.isPreview
-                  ? {
-                      isPreview: true,
-                      candidateCount: base.candidateCount ?? 1,
-                    }
-                  : {}),
-              })
-              .then((res) => {
-                const taskToShot: Record<string, string> = {}
-                res.data.tasks.forEach((t) => {
-                  taskToShot[t.taskId] = t.shotId
-                })
-                startPolling(
-                  res.data.tasks.map((t) => t.taskId),
-                  {
-                    episodeId,
-                    onAllSettled: (results) => {
-                      setSummaryKind("video")
-                      setSummaryTaskToShot(taskToShot)
-                      setSummaryResults(results)
-                      setSummaryOpen(true)
-                    },
-                  }
-                )
-              })
-              .catch((e: unknown) =>
-                pushToast(e instanceof Error ? e.message : "重试失败", "error")
-              )
+            openRetryVideoDialog(failedShotIds)
           }
         }}
       />
 
+      <BatchOperationConfirmDialog
+        open={endframeConfirmOpen}
+        onClose={() => setEndframeConfirmOpen(false)}
+        kind="endframe"
+        shotCount={pendingForBatch.length}
+        onConfirm={() => {
+          setEndframeConfirmOpen(false)
+          void handleBatchEndframe()
+        }}
+      />
+
       <VideoModeSelector
+        key={videoDialogLockedMode === "first_frame" ? "sb-ff" : "sb-main"}
         open={videoDialogOpen}
-        onClose={() => setVideoDialogOpen(false)}
-        shotCount={endframeForBatch.length}
+        onClose={resetVideoDialogState}
+        shotCount={
+          videoRetryShotIds?.length
+            ? videoRetryShotIds.length
+            : videoDialogLockedMode === "first_frame"
+            ? firstFrameForBatch.length
+            : endframeForBatch.length
+        }
+        lockedMode={videoDialogLockedMode ?? undefined}
+        dialogTitle={videoDialogTitle}
+        initialValue={videoDialogInitialValue}
         episodeAssetIds={episodeAssetIds}
-        onConfirm={handleVideoModeConfirm}
+        onConfirm={(r) => {
+          if (videoRetryShotIds?.length) {
+            void handleRetryVideoConfirm(videoRetryShotIds, r)
+          } else if (videoDialogLockedMode === "first_frame") {
+            void handleFirstFrameBatchVideoConfirm(r)
+          } else {
+            void handleVideoModeConfirm(r)
+          }
+        }}
       />
 
       <BatchTaskProgressBanner />
@@ -610,7 +690,8 @@ export default function StoryboardPage() {
               variant="secondary"
               className="gap-2"
               disabled={pendingForBatch.length === 0 || batchEndBusy}
-              onClick={() => void handleBatchEndframe()}
+              onClick={() => setEndframeConfirmOpen(true)}
+              title="先确认镜头数量与说明，再提交尾帧任务"
             >
               {batchEndBusy ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -623,7 +704,13 @@ export default function StoryboardPage() {
               variant="secondary"
               className="gap-2"
               disabled={endframeForBatch.length === 0}
-              onClick={() => setVideoDialogOpen(true)}
+              onClick={() => {
+                setVideoDialogLockedMode(null)
+                setVideoDialogInitialValue(undefined)
+                setVideoDialogTitle(undefined)
+                setVideoRetryShotIds(null)
+                setVideoDialogOpen(true)
+              }}
               title="针对尾帧已完成镜头，可选首尾帧/多参考等模式"
             >
               <Film className="w-4 h-4" />
@@ -633,8 +720,14 @@ export default function StoryboardPage() {
               variant="secondary"
               className="gap-2"
               disabled={firstFrameForBatch.length === 0}
-              onClick={() => void handleBatchFirstFrameVideo()}
-              title="凡有首帧且未在生成中的镜头均可批量走首帧图生视频（含尾帧已完成等）"
+              onClick={() => {
+                setVideoDialogLockedMode("first_frame")
+                setVideoDialogInitialValue(undefined)
+                setVideoDialogTitle(undefined)
+                setVideoRetryShotIds(null)
+                setVideoDialogOpen(true)
+              }}
+              title="凡有首帧且未在生成中的镜头均可批量走首帧图生视频；打开弹窗可选模型与分辨率（默认 540p+turbo）"
             >
               <Film className="w-4 h-4" />
               批量视频·首帧模式 ({firstFrameForBatch.length})
@@ -652,7 +745,7 @@ export default function StoryboardPage() {
         </div>
         {batchPickMode === "manual" && (
           <p className="text-[10px] text-[var(--color-muted)] max-w-3xl leading-relaxed">
-            框选模式：列表勾选首列；网格可勾选「选」或在卡片区左键拖拽矩形框选；指针靠近主内容区上下左右边缘时会自动滚动。点击本页上方剧集标题区、侧栏、或点「退出框选」结束。三项批量仅作用于「已勾选且符合条件」的镜头。
+            框选模式：列表勾选首列；网格可勾选「选」或在卡片区左键拖拽矩形框选；指针靠近主内容区上下左右边缘时会自动滚动。点击本页上方剧集标题区、侧栏、或点「退出框选」结束。三项批量（尾帧 / 两路视频）均先弹窗确认再提交任务，且仅作用于「已勾选且符合条件」的镜头。
           </p>
         )}
       </div>

@@ -33,6 +33,7 @@ import { getFileUrl } from "@/utils/file"
 import { routes } from "@/utils/routes"
 import {
   buildSingleShotVideoQuickRequest,
+  getSingleVideoQuickSummaryLines,
   toastAfterVideoTasksSettled,
 } from "@/utils/videoQuickRegenerate"
 import { isPhysicallyNewest } from "@/utils/videoCandidateSort"
@@ -331,6 +332,7 @@ export function VideoPickCard({
   const nCandidates = shot.videoCandidates.length
   const assets = shot.assets ?? []
   const extraAssetCount = Math.max(0, assets.length - ASSET_PREVIEW_LIMIT)
+  const quickSummaryLines = getSingleVideoQuickSummaryLines(hasEndFramePath)
 
   /** 有首帧时才渲染：与分镜板同源按钮；无首帧时由 missingFirstFrameNote 说明 */
   const regenerateToolbar = hasFirstFrame ? (
@@ -341,6 +343,21 @@ export function VideoPickCard({
       <span className="text-[9px] font-black uppercase text-[var(--color-muted)] shrink-0 w-full sm:w-auto">
         {nCandidates > 0 ? "追加候选 / 再生成" : "生成视频"}
       </span>
+      <div className="w-full rounded-sm border border-dashed border-[var(--color-newsprint-black)] bg-white/70 p-2 box-border">
+        <p className="text-[9px] font-black uppercase text-[var(--color-muted)] mb-1">
+          快捷参数
+        </p>
+        <div className="space-y-1">
+          {quickSummaryLines.map((line) => (
+            <p
+              key={line}
+              className="text-[9px] leading-snug text-[var(--color-ink)] m-0"
+            >
+              {line}
+            </p>
+          ))}
+        </div>
+      </div>
       <Button
         type="button"
         variant="secondary"
@@ -392,7 +409,7 @@ export function VideoPickCard({
           ? "尾帧或视频生成中，请等待当前任务结束后再试。"
           : nCandidates > 0
             ? "在上方成片候选基础上再提交任务，完成后列表会增加新候选；成片落盘后会自动选中最新一条。"
-            : "首尾帧快捷为预览档（540p+turbo+双候选）；正式档或多参考请用「自定义参数」。无尾帧时请先跑尾帧再点「首尾帧再生成」。"}
+            : "快捷按钮会按上面的默认参数直接提交；需要改模型、分辨率或参考图时请点「自定义参数」。"}
       </p>
     </div>
   ) : null
