@@ -1,42 +1,63 @@
 /**
- * 配音管理面板：音色选择、STS/TTS、批量配音、轮询任务、状态摘要
+ * STS 配音工作台（一期）：集默认音色 + 单镜覆盖（持久化到 episode.json）、按镜列表、
+ * 展开试听（视频/原声/生成）、懒加载仅在展开行挂载媒体；批量/单镜调用 dub API。
  */
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Loader2, Mic } from "lucide-react"
 import { Button } from "@/components/ui"
 import { dubApi } from "@/api/dub"
 import { useTaskStore, useToastStore, useEpisodeStore } from "@/stores"
+import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import type { DubStatus } from "@/types"
+import { flattenShots } from "@/types"
+import { DubShotRow } from "./dub/DubShotRow"
 
 export interface DubPanelProps {
   episodeId: string
+  /** 与选片页一致：URL ?shotId= 深链，首次展开并滚到该行 */
+  initialHighlightShotId?: string
 }
 
-export function DubPanel({ episodeId }: DubPanelProps) {
+export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
   const pushToast = useToastStore((s) => s.push)
   const startPolling = useTaskStore((s) => s.startPolling)
   const fetchEpisodeDetail = useEpisodeStore((s) => s.fetchEpisodeDetail)
+  const updateShot = useEpisodeStore((s) => s.updateShot)
+  const updateEpisodeLocales = useEpisodeStore((s) => s.updateEpisodeLocales)
+  const currentEpisode = useEpisodeStore((s) => s.currentEpisode)
+  const basePath = useEpisodeFileBasePath()
 
   const [elOk, setElOk] = useState<boolean | null>(null)
   const [voices, setVoices] = useState<Array<{ voiceId: string; name: string }>>([])
-  const [voiceId, setVoiceId] = useState("")
   const [mode, setMode] = useState<"sts" | "tts">("sts")
-  const [busy, setBusy] = useState(false)
-  const [rows, setRows] = useState<
-    Array<{ shotId: string; dub: DubStatus | null }>
-  >([])
+  const [batchBusy, setBatchBusy] = useState(false)
+  const [busyShotId, setBusyShotId] = useState<string | null>(null)
+  const [savingDefaultVoice, setSavingDefaultVoice] = useState(false)
+  const [savingVoiceShotId, setSavingVoiceShotId] = useState<string | null>(null)
+  const [dubByShot, setDubByShot] = useState<Record<string, DubStatus | null>>({})
+  const [expandedShotId, setExpandedShotId] = useState<string | null>(null)
+  const [didApplyHighlight, setDidApplyHighlight] = useState(false)
+
+  const shots = useMemo(() => {
+    if (!currentEpisode || currentEpisode.episodeId !== episodeId) return []
+    return flattenShots(currentEpisode)
+  }, [currentEpisode, episodeId])
+
+  const defaultVoiceId =
+    currentEpisode?.episodeId === episodeId
+      ? (currentEpisode.dubDefaultVoiceId ?? "").trim()
+      : ""
 
   const refreshStatus = useCallback(async () => {
     try {
       const res = await dubApi.status(episodeId)
-      setRows(
-        res.data.shots.map((r) => ({
-          shotId: r.shotId,
-          dub: (r.dub as DubStatus | null) ?? null,
-        }))
-      )
+      const m: Record<string, DubStatus | null> = {}
+      for (const r of res.data.shots) {
+        m[r.shotId] = (r.dub as DubStatus | null) ?? null
+      }
+      setDubByShot(m)
     } catch {
-      setRows([])
+      setDubByShot({})
     }
   }, [episodeId])
 
@@ -44,6 +65,7 @@ export function DubPanel({ episodeId }: DubPanelProps) {
     void refreshStatus()
   }, [refreshStatus])
 
+  /** 拉取 ElevenLabs 配置与音色列表 */
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -54,10 +76,11 @@ export function DubPanel({ episodeId }: DubPanelProps) {
         if (!cfg.data.configured) return
         const v = await dubApi.voices()
         if (cancelled) return
-        setVoices(v.data.voices.map((x) => ({ voiceId: x.voiceId, name: x.name })))
-        if (v.data.voices.length > 0) {
-          setVoiceId(v.data.voices[0].voiceId)
-        }
+        const list = v.data.voices.map((x) => ({
+          voiceId: x.voiceId,
+          name: x.name,
+        }))
+        setVoices(list)
       } catch {
         if (!cancelled) setElOk(false)
       }
@@ -65,27 +88,62 @@ export function DubPanel({ episodeId }: DubPanelProps) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [episodeId])
 
-  const handleBatch = async () => {
-    if (!voiceId) {
-      pushToast("请选择音色", "error")
-      return
-    }
-    setBusy(true)
-    try {
-      const res = await dubApi.process({
-        episodeId,
-        voiceId,
-        mode,
-        concurrency: 2,
-      })
-      const ids = res.data.tasks.map((t) => t.taskId)
-      if (ids.length === 0) {
-        pushToast("未创建配音任务", "info")
-        return
+  /** 深链：展开并滚到目标镜（仅一次） */
+  useEffect(() => {
+    if (!initialHighlightShotId || didApplyHighlight) return
+    if (!shots.some((s) => s.shotId === initialHighlightShotId)) return
+    setExpandedShotId(initialHighlightShotId)
+    setDidApplyHighlight(true)
+  }, [initialHighlightShotId, didApplyHighlight, shots])
+
+  const effectiveVoice = useCallback(
+    (shotId: string) => {
+      const shot = shots.find((item) => item.shotId === shotId)
+      const override = (shot?.dubVoiceIdOverride ?? "").trim()
+      return override || defaultVoiceId
+    },
+    [defaultVoiceId, shots]
+  )
+
+  const setOverrideForShot = useCallback(
+    async (shotId: string, voiceId: string) => {
+      const normalized = voiceId.trim()
+      const nextOverride = normalized && normalized !== defaultVoiceId ? normalized : ""
+      setSavingVoiceShotId(shotId)
+      try {
+        await updateShot(episodeId, shotId, {
+          dubVoiceIdOverride: nextOverride,
+        })
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e)
+        pushToast(`保存本镜音色失败：${msg}`, "error")
+      } finally {
+        setSavingVoiceShotId(null)
       }
-      pushToast(`已提交 ${ids.length} 个配音任务`, "success")
+    },
+    [defaultVoiceId, episodeId, pushToast, updateShot]
+  )
+
+  const handleDefaultVoiceChange = useCallback(
+    async (vid: string) => {
+      setSavingDefaultVoice(true)
+      try {
+        await updateEpisodeLocales(episodeId, { dubDefaultVoiceId: vid.trim() })
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e)
+        pushToast(`保存集默认音色失败：${msg}`, "error")
+      } finally {
+        setSavingDefaultVoice(false)
+      }
+    },
+    [episodeId, pushToast, updateEpisodeLocales]
+  )
+
+  const pollTaskIds = useCallback(
+    (ids: string[]) => {
+      if (ids.length === 0) return
       startPolling(ids, {
         episodeId,
         onAnyTerminal: () => void refreshStatus(),
@@ -95,11 +153,66 @@ export function DubPanel({ episodeId }: DubPanelProps) {
           pushToast("配音任务已结束", "info")
         },
       })
+    },
+    [episodeId, fetchEpisodeDetail, pushToast, refreshStatus, startPolling]
+  )
+
+  const handleBatch = async () => {
+    setBatchBusy(true)
+    try {
+      const unresolved: string[] = []
+      for (const s of shots) {
+        const sel = s.videoCandidates.find((c) => c.selected)
+        if (!sel?.videoPath) continue
+        const eff = effectiveVoice(s.shotId)
+        if (!eff) unresolved.push(s.shotId)
+      }
+      if (unresolved.length > 0) {
+        pushToast(
+          `以下镜头未设置音色：${unresolved.slice(0, 3).join(", ")}${unresolved.length > 3 ? "…" : ""}`,
+          "error"
+        )
+        return
+      }
+      const res = await dubApi.process({
+        episodeId,
+        mode,
+        concurrency: 2,
+      })
+      const ids = res.data.tasks.map((t) => t.taskId)
+      if (ids.length === 0) {
+        pushToast("未创建配音任务", "info")
+        return
+      }
+      pushToast(`已提交 ${ids.length} 个配音任务`, "success")
+      pollTaskIds(ids)
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       pushToast(`配音提交失败：${msg}`, "error")
     } finally {
-      setBusy(false)
+      setBatchBusy(false)
+    }
+  }
+
+  const handleDubOneShot = async (shotId: string) => {
+    if (!effectiveVoice(shotId)) {
+      pushToast("请选择音色", "error")
+      return
+    }
+    setBusyShotId(shotId)
+    try {
+      const res = await dubApi.processShot({
+        episodeId,
+        shotId,
+        mode,
+      })
+      pushToast("已提交本镜配音", "success")
+      pollTaskIds([res.data.taskId])
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      pushToast(`本镜配音失败：${msg}`, "error")
+    } finally {
+      setBusyShotId(null)
     }
   }
 
@@ -138,20 +251,21 @@ export function DubPanel({ episodeId }: DubPanelProps) {
     >
       <div className="flex items-center gap-2 font-bold text-[var(--color-ink)] mb-3">
         <Mic className="w-4 h-4" />
-        配音管理
+        STS 配音工作台
       </div>
       <div className="flex flex-wrap gap-3 items-end mb-3">
         <div>
           <label className="block text-[10px] font-black uppercase tracking-wider mb-1">
-            音色
+            集默认音色
           </label>
           <select
             className="min-w-[12rem] border border-[var(--color-newsprint-black)] px-2 py-1.5 text-sm"
             style={{ boxSizing: "border-box" }}
-            value={voiceId}
-            onChange={(e) => setVoiceId(e.target.value)}
-            disabled={elOk !== true || voices.length === 0}
+            value={defaultVoiceId}
+            onChange={(e) => void handleDefaultVoiceChange(e.target.value)}
+            disabled={elOk !== true || voices.length === 0 || savingDefaultVoice}
           >
+            <option value="">请选择集默认音色</option>
             {voices.map((v) => (
               <option key={v.voiceId} value={v.voiceId}>
                 {v.name}
@@ -183,31 +297,66 @@ export function DubPanel({ episodeId }: DubPanelProps) {
           type="button"
           variant="secondary"
           className="gap-2"
-          disabled={busy || !voiceId}
+          disabled={batchBusy}
           onClick={() => void handleBatch()}
         >
-          {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-          批量配音
+          {batchBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+          批量配音（已选视频镜）
         </Button>
       </div>
       <p className="text-xs text-[var(--color-muted)] mb-2">
-        仅对当前<strong>已选定</strong>视频候选配音；切换候选后需重新生成。
+        仅对当前<strong>已选定</strong>视频候选配音；切换候选后需重新生成。单镜可选与集默认不同的音色（本机记忆）。
       </p>
-      <div className="max-h-40 overflow-y-auto border border-[var(--color-divider)] text-xs">
-        <table className="w-full">
+      <div className="max-h-[min(70vh,32rem)] overflow-y-auto border border-[var(--color-divider)] text-xs">
+        <table className="w-full border-collapse">
           <thead>
-            <tr className="text-left text-[var(--color-muted)] border-b border-[var(--color-divider)]">
-              <th className="py-1 px-2">Shot</th>
-              <th className="py-1 px-2">状态</th>
+            <tr className="text-left text-[var(--color-muted)] border-b border-[var(--color-divider)] bg-[var(--color-outline-variant)]/30">
+              <th className="py-2 px-2 w-8">#</th>
+              <th className="py-2 px-2">镜头</th>
+              <th className="py-2 px-2">台词摘要</th>
+              <th className="py-2 px-2 min-w-[9rem]">本镜音色</th>
+              <th className="py-2 px-2">状态</th>
+              <th className="py-2 px-2 w-16">试听</th>
+              <th className="py-2 px-2">操作</th>
             </tr>
           </thead>
           <tbody>
-            {rows.slice(0, 50).map((r) => (
-              <tr key={r.shotId} className="border-b border-[var(--color-outline-variant)]">
-                <td className="py-1 px-2 font-mono">{r.shotId.slice(0, 8)}…</td>
-                <td className="py-1 px-2">{r.dub?.status ?? "—"}</td>
-              </tr>
-            ))}
+            {shots.slice(0, 200).map((shot) => {
+              const selected = shot.videoCandidates.find((c) => c.selected)
+              const dubEligible = Boolean(selected?.videoPath)
+              const dub = dubByShot[shot.shotId] ?? shot.dub ?? null
+              const eff = effectiveVoice(shot.shotId)
+              const expanded = expandedShotId === shot.shotId
+              return (
+                <DubShotRow
+                  key={shot.shotId}
+                  shot={shot}
+                  dub={dub}
+                  dubEligible={dubEligible}
+                  basePath={basePath}
+                  effectiveVoiceId={eff}
+                  voices={voices}
+                  mode={mode}
+                  busy={busyShotId === shot.shotId}
+                  savingVoice={savingVoiceShotId === shot.shotId}
+                  expanded={expanded}
+                  onToggleExpand={() =>
+                    setExpandedShotId((prev) =>
+                      prev === shot.shotId ? null : shot.shotId
+                    )
+                  }
+                  onVoiceChange={(v) => void setOverrideForShot(shot.shotId, v)}
+                  onDubThisShot={() => void handleDubOneShot(shot.shotId)}
+                  scrollAnchor={
+                    Boolean(
+                      initialHighlightShotId &&
+                        didApplyHighlight &&
+                        shot.shotId === initialHighlightShotId
+                    )
+                  }
+                />
+              )
+            })}
           </tbody>
         </table>
       </div>

@@ -120,6 +120,8 @@ class Shot(BaseModel):
     associatedDialogue: Optional[AssociatedDialogue] = None
     # 目标语译文，供 Vidu 提示词拼接与 TTS；拉取时为空，由 Web 编辑
     dialogueTranslation: str = ""
+    # 一期 STS：镜头级音色覆盖；空表示回退 Episode.dubDefaultVoiceId
+    dubVoiceIdOverride: str = ""
     # 生成视频（Vidu）时是否将台词块拼入 composed prompt；默认 True；False 时仍保留 dialogue 供字幕/配音/剪映
     includeDialogueInVideoPrompt: bool = True
 
@@ -154,6 +156,8 @@ class Episode(BaseModel):
     # 剧集级全量资产库（供资产库页面 / RegenPage 展示），拉取时由 puller 填入
     assets: list[ShotAsset] = Field(default_factory=list)
     jianyingExport: Optional[JianyingExportRecord] = None
+    # 一期 STS：剧集级默认音色；空表示尚未设置
+    dubDefaultVoiceId: str = ""
     # 配音/本地化：目标语 BCP-47 或项目约定（如 en-US、ja）；空表示未设置
     dubTargetLocale: str = ""
     # 台词原文语言标签，供 UI 展示
@@ -345,7 +349,6 @@ class DubProcessRequest(BaseModel):
 
     episodeId: str
     shotIds: Optional[list[str]] = None
-    voiceId: str
     mode: str = "sts"  # sts | tts
     concurrency: int = 2
 
@@ -355,7 +358,10 @@ class DubProcessShotRequest(BaseModel):
 
     episodeId: str
     shotId: str
-    voiceId: str
+    voiceId: str = Field(
+        default="",
+        description="可选；空则完全由 Episode/Shot 持久化字段解析（与批量接口一致）",
+    )
     mode: str = "sts"
     ttsText: Optional[str] = None  # mode=tts 时使用；缺省可用 shot.videoPrompt
 

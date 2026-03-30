@@ -106,6 +106,8 @@ export interface Shot {
   associatedDialogue?: AssociatedDialogue | null
   /** 目标语译文，供提示词与 TTS */
   dialogueTranslation?: string
+  /** 一期 STS：镜头级音色覆盖；空表示回退剧集默认音色 */
+  dubVoiceIdOverride?: string
   /**
    * 生成视频（Vidu）时是否将台词块拼入 composed prompt；默认 true。
    * false 时仍保留台词字段供字幕/配音/剪映，仅不注入 Vidu。
@@ -146,6 +148,8 @@ export interface Episode {
   /** 剧集级全量资产库，供资产库页面 / RegenPage 使用 */
   assets?: ShotAsset[]
   jianyingExport?: JianyingExportRecord
+  /** 一期 STS：剧集级默认音色 */
+  dubDefaultVoiceId?: string
   /** 配音目标语（BCP-47 或项目约定），空表示未设置 */
   dubTargetLocale?: string
   /** 台词原文语言，供 UI 标签 */

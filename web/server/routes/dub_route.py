@@ -261,6 +261,16 @@ def _run_dub_task(
             )
 
 
+def _voice_id_for_shot(episode: Any, shot: Any) -> str:
+    """
+    解析单镜最终音色：Shot.dubVoiceIdOverride 优先，否则 Episode.dubDefaultVoiceId。
+    """
+    shot_voice = (getattr(shot, "dubVoiceIdOverride", None) or "").strip()
+    if shot_voice:
+        return shot_voice
+    return (getattr(episode, "dubDefaultVoiceId", None) or "").strip()
+
+
 def _collect_dub_shot_ids(
     episode_id: str,
     shot_ids: list[str] | None,
@@ -334,28 +344,46 @@ def dub_process(req: DubProcessRequest, request: Request):
     ns = get_namespace_data_root_optional(request)
     tag = fs_lock_tag_from_namespace_root(ns)
     ctx_tid = get_context_task_id(request)
+    episode = data_service.get_episode(req.episodeId, ns)
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
     ids = _collect_dub_shot_ids(req.episodeId, req.shotIds, ns)
     if not ids:
         raise HTTPException(status_code=400, detail="没有可配音的已选分镜")
+    shot_by_id = {
+        shot.shotId: shot
+        for scene in episode.scenes
+        for shot in scene.shots
+    }
 
     max_c = max(1, min(req.concurrency or 2, 8))
     sem = threading.Semaphore(max_c)
     tasks_out: list[DubTaskItem] = []
 
     for sid in ids:
+        shot = shot_by_id.get(sid)
+        if not shot:
+            continue
+        resolved_voice = _voice_id_for_shot(episode, shot)
+        if not resolved_voice:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Shot {sid} 未设置配音音色：请先设置集默认音色或本镜覆盖",
+            )
         task_id = f"dub-{uuid.uuid4().hex}"
         tasks_out.append(DubTaskItem(taskId=task_id, shotId=sid))
 
         def _job(
             tid: str = task_id,
             shot: str = sid,
+            voice: str = resolved_voice,
         ) -> None:
             with sem:
                 _run_dub_task(
                     tid,
                     req.episodeId,
                     shot,
-                    req.voiceId,
+                    voice,
                     req.mode,
                     None,
                     namespace_root=ns,
@@ -376,6 +404,15 @@ def dub_process_shot(req: DubProcessShotRequest, request: Request):
     ns = get_namespace_data_root_optional(request)
     tag = fs_lock_tag_from_namespace_root(ns)
     ctx_tid = get_context_task_id(request)
+    episode = data_service.get_episode(req.episodeId, ns)
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    shot = data_service.get_shot(req.episodeId, req.shotId, ns)
+    if not shot:
+        raise HTTPException(status_code=404, detail="Shot not found")
+    resolved_voice = (req.voiceId or "").strip() or _voice_id_for_shot(episode, shot)
+    if not resolved_voice:
+        raise HTTPException(status_code=400, detail="请先设置集默认音色或本镜覆盖")
     task_id = f"dub-{uuid.uuid4().hex}"
 
     def _job() -> None:
@@ -383,7 +420,7 @@ def dub_process_shot(req: DubProcessShotRequest, request: Request):
             task_id,
             req.episodeId,
             req.shotId,
-            req.voiceId,
+            resolved_voice,
             req.mode,
             req.ttsText,
             namespace_root=ns,

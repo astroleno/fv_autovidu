@@ -19,7 +19,7 @@ import {
 } from "react"
 import { flushSync } from "react-dom"
 import { Link, useNavigate, useParams, useSearchParams } from "react-router"
-import { Clapperboard, LayoutGrid, Package } from "lucide-react"
+import { Clapperboard, LayoutGrid, Mic, Package } from "lucide-react"
 import { useEpisodeMediaCacheBust } from "@/hooks"
 import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
 import {
@@ -43,6 +43,7 @@ import {
   resolveRequestedShotIndex,
 } from "@/utils/videoPickHelpers"
 import { routes } from "@/utils/routes"
+import { postProductionHrefWithShot } from "@/utils/postProductionDeepLink"
 
 /** 选片页专用筛选：与分镜板 STATUS_FILTERS 区分，不写入 shotStore，避免跨页污染 */
 type PickStatusFilter = "all" | "video_done" | "selected" | "no_video"
@@ -110,6 +111,7 @@ export default function VideoPickPage() {
     fetchEpisodeDetail,
   } = useEpisodeStore()
   const mode = useVideoPickStore((s) => s.mode)
+  const currentShotIndex = useVideoPickStore((s) => s.currentShotIndex)
   const enterPicking = useVideoPickStore((s) => s.enterPicking)
   const exitPicking = useVideoPickStore((s) => s.exitPicking)
   const resetSessionForEpisode = useVideoPickStore(
@@ -361,6 +363,12 @@ export default function VideoPickPage() {
 
   const projectId = routeProjectId ?? currentEpisode.projectId
   const totalShots = allShots.length
+  /** 选片模式中带上当前镜 shotId，与 postProductionDeepLink 单测一致 */
+  const postProductionHref = postProductionHrefWithShot(
+    projectId,
+    episodeId,
+    mode === "picking" ? filteredFlatShots[currentShotIndex]?.shotId : undefined
+  )
 
   return (
     <div
@@ -407,6 +415,14 @@ export default function VideoPickPage() {
           >
             <Package className="w-4 h-4 shrink-0" aria-hidden />
             资产库
+          </Link>
+          <Link
+            to={postProductionHref}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[var(--color-newsprint-black)] bg-transparent hover:bg-[var(--color-outline-variant)] transition-colors box-border"
+            style={{ boxSizing: "border-box" }}
+          >
+            <Mic className="w-4 h-4 shrink-0" aria-hidden />
+            后期制作
           </Link>
         </div>
       </div>
