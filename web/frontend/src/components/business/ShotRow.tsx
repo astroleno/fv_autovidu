@@ -115,12 +115,7 @@ export function ShotRow({
         episodeId={episodeId}
         updateShot={updateShot}
       />
-      <ShotPromptCells
-        shot={shot}
-        episodeId={episodeId}
-        updateShot={updateShot}
-        maxPreviewLen={40}
-      />
+      <ShotPromptCells shot={shot} episodeId={episodeId} updateShot={updateShot} />
       <td className="py-3 px-4 align-top overflow-visible">
         <div className="flex flex-wrap gap-1">
           {shot.assets.length > 0 ? (
