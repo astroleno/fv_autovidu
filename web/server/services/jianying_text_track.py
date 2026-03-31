@@ -30,6 +30,42 @@ _SUBTITLE_ALIGN_TO_INT: dict[Literal["left", "center", "right"], int] = {
     "right": 2,
 }
 
+SubtitlePositionMode = Literal["manual", "jianying_spec"]
+
+
+def estimate_subtitle_line_count(text: str) -> int:
+    """
+    统计用于「规范版」纵向公式的行数 n。
+
+    按换行符分段，忽略空行；无有效行时视为 1 行。
+    自动换行导致的行数无法在此估算，需在分镜里用真实换行分段。
+    """
+    lines = [ln for ln in text.splitlines() if ln.strip()]
+    return max(1, len(lines))
+
+
+def jianying_spec_y_pixel(n: int) -> float:
+    """
+    剪映竖屏字幕经验公式（像素位移 Y，向下为负的惯例与 ClipSettings 一致）。
+
+    公式：Y = -100n - 400，n 为字幕行数（≥1）。
+    """
+    nn = max(1, int(n))
+    return -100.0 * float(nn) - 400.0
+
+
+def y_pixel_to_clip_transform_y(y_px: float, canvas_height_px: int) -> float:
+    """
+    将像素位移转换为 pyJianYingDraft ``ClipSettings.transform_y``。
+
+    库定义：垂直位移单位为 **半个画布高**（见 ``segment.ClipSettings`` 文档）。
+    transform_y = Y_px / (canvas_height / 2)
+    """
+    half = float(canvas_height_px) / 2.0
+    if half <= 0:
+        return -0.8
+    return y_px / half
+
 
 def subtitle_text_from_shot(shot: Shot) -> str:
     """
@@ -73,6 +109,7 @@ def build_text_track_payload(
     align: Literal["left", "center", "right"] = "center",
     auto_wrapping: bool = True,
     transform_y: float = -0.8,
+    position_mode: SubtitlePositionMode = "manual",
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     """
     根据 (起始微秒, 持续微秒, 文本) 列表构建剪映 materials.texts、text 轨 segments 及 speeds 条目。
@@ -80,21 +117,21 @@ def build_text_track_payload(
     仅处理 strip 后非空的文本，与视频轨缺口镜对齐时可跳过空串不产生片段。
 
     Args:
-        canvas_w: 画布宽（像素），预留与分辨率相关扩展
-        canvas_h: 画布高（像素），预留与分辨率相关扩展
+        canvas_w: 画布宽（像素）
+        canvas_h: 画布高（像素）；规范版下用于像素 Y → transform_y 换算
         segments: (start_us, duration_us, text) 与主视频各镜 target_timerange 一致
         font_size: 字幕字号，映射 ``TextStyle.size``
         align: 水平对齐，映射 ``TextStyle.align``（0/1/2）
         auto_wrapping: 是否自动换行
-        transform_y: 字幕纵向位置，映射 ``ClipSettings.transform_y``
+        transform_y: **manual** 模式下统一使用的 ``ClipSettings.transform_y``
+        position_mode: ``manual`` 全段同一 transform_y；``jianying_spec`` 按每条字幕行数 n 使用 Y=-100n-400 再换算
 
     Returns:
         (text_material_dicts, segment_dicts, speed_dicts)。
         speed_dicts 必须与 segment.extra_material_refs 中的 speed id 一并写入 draft materials.speeds，
         否则客户端可能无法解析引用。
     """
-    # 避免未使用参数告警；后续若按分辨率缩放字幕位置可读取 canvas_w/canvas_h
-    _ = (canvas_w, canvas_h)
+    _ = canvas_w
 
     text_materials: list[dict[str, Any]] = []
     segment_jsons: list[dict[str, Any]] = []
@@ -106,7 +143,6 @@ def build_text_track_payload(
         align=align_int,
         auto_wrapping=auto_wrapping,
     )
-    clip = ClipSettings(transform_y=transform_y)
 
     for start_us, duration_us, text in segments:
         body = (text or "").strip()
@@ -114,6 +150,14 @@ def build_text_track_payload(
             continue
         if duration_us <= 0:
             continue
+
+        if position_mode == "jianying_spec":
+            n = estimate_subtitle_line_count(body)
+            y_px = jianying_spec_y_pixel(n)
+            ty = y_pixel_to_clip_transform_y(y_px, canvas_h)
+        else:
+            ty = transform_y
+        clip = ClipSettings(transform_y=ty)
 
         seg = TextSegment(
             body,

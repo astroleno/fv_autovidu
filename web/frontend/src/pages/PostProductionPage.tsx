@@ -27,6 +27,7 @@ function episodeJianyingDefaultsKey(episodeId: string): string {
 }
 
 type SubtitleAlign = "left" | "center" | "right"
+type SubtitlePositionMode = "manual" | "jianying_spec"
 
 interface EpisodeJianyingFormState {
   canvasSize: "720p" | "1080p"
@@ -34,6 +35,8 @@ interface EpisodeJianyingFormState {
   subtitleAlign: SubtitleAlign
   subtitleAutoWrapping: boolean
   subtitleTransformY: number
+  /** manual：滑块统一 transform_y；jianying_spec：按行数公式 Y=-100n-400 逐条计算 */
+  subtitlePositionMode: SubtitlePositionMode
 }
 
 const JIANYING_DEFAULTS: EpisodeJianyingFormState = {
@@ -42,6 +45,7 @@ const JIANYING_DEFAULTS: EpisodeJianyingFormState = {
   subtitleAlign: "center",
   subtitleAutoWrapping: true,
   subtitleTransformY: -0.8,
+  subtitlePositionMode: "manual",
 }
 
 /** 最近一次剪映导出成功结果（用于结果卡，非持久化） */
@@ -125,6 +129,10 @@ export default function PostProductionPage() {
           o.subtitleAlign === "right"
             ? o.subtitleAlign
             : prev.subtitleAlign,
+        subtitlePositionMode:
+          o.subtitlePositionMode === "jianying_spec" || o.subtitlePositionMode === "manual"
+            ? o.subtitlePositionMode
+            : prev.subtitlePositionMode,
       }))
     } catch {
       /* ignore */
@@ -195,6 +203,7 @@ export default function PostProductionPage() {
         subtitleAlign: jianyingForm.subtitleAlign,
         subtitleAutoWrapping: jianyingForm.subtitleAutoWrapping,
         subtitleTransformY: jianyingForm.subtitleTransformY,
+        subtitlePositionMode: jianyingForm.subtitlePositionMode,
       })
       try {
         localStorage.setItem(LS_JIANYING_DRAFT_PATH, dp)
@@ -457,27 +466,79 @@ export default function PostProductionPage() {
                 />
                 自动换行
               </label>
-              <div className="flex flex-col gap-1 sm:col-span-2">
+              <div className="flex flex-col gap-2 sm:col-span-2">
                 <label className="text-[10px] font-black uppercase text-[var(--color-muted)]">
-                  字幕纵向位置（-1～0，步进 0.05）
+                  字幕纵向位置模式
                 </label>
-                <input
-                  type="range"
-                  min={-1}
-                  max={0}
-                  step={0.05}
-                  value={jianyingForm.subtitleTransformY}
-                  onChange={(e) =>
-                    updateJianyingField({
-                      subtitleTransformY: parseFloat(e.target.value),
-                    })
-                  }
-                  className="w-full"
-                />
-                <span className="text-xs text-[var(--color-muted)]">
-                  {jianyingForm.subtitleTransformY.toFixed(2)}
-                </span>
-                <SubtitlePositionPreview transformY={jianyingForm.subtitleTransformY} />
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <label className="flex items-center gap-2 cursor-pointer box-border" style={{ boxSizing: "border-box" }}>
+                    <input
+                      type="radio"
+                      name="subtitle-position-mode"
+                      checked={jianyingForm.subtitlePositionMode === "manual"}
+                      onChange={() =>
+                        updateJianyingField({ subtitlePositionMode: "manual" })
+                      }
+                      className="accent-[var(--color-primary)]"
+                    />
+                    手动（滑块，与 pyJianYingDraft 单位一致）
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer box-border" style={{ boxSizing: "border-box" }}>
+                    <input
+                      type="radio"
+                      name="subtitle-position-mode"
+                      checked={jianyingForm.subtitlePositionMode === "jianying_spec"}
+                      onChange={() =>
+                        updateJianyingField({ subtitlePositionMode: "jianying_spec" })
+                      }
+                      className="accent-[var(--color-primary)]"
+                    />
+                    规范版（Y = -100n - 400，n 为换行分段行数）
+                  </label>
+                </div>
+                {jianyingForm.subtitlePositionMode === "manual" ? (
+                  <>
+                    <label className="text-[10px] font-black uppercase text-[var(--color-muted)] mt-1">
+                      纵向 transform_y（-1～0，步进 0.05）
+                    </label>
+                    <input
+                      type="range"
+                      min={-1}
+                      max={0}
+                      step={0.05}
+                      value={jianyingForm.subtitleTransformY}
+                      onChange={(e) =>
+                        updateJianyingField({
+                          subtitleTransformY: parseFloat(e.target.value),
+                        })
+                      }
+                      className="w-full"
+                    />
+                    <span className="text-xs text-[var(--color-muted)]">
+                      {jianyingForm.subtitleTransformY.toFixed(2)}
+                    </span>
+                    <SubtitlePositionPreview transformY={jianyingForm.subtitleTransformY} />
+                  </>
+                ) : (
+                  <div
+                    className="rounded border border-dashed border-[var(--color-primary)]/40 bg-[var(--color-newsprint-off-white)]/80 p-3 text-xs leading-relaxed text-[var(--color-muted)] space-y-2 box-border"
+                    style={{ boxSizing: "border-box" }}
+                  >
+                    <p>
+                      <strong className="text-[var(--color-newsprint-black)]">剪映经验公式</strong>
+                      ：每条字幕先数行数{" "}
+                      <code className="font-mono text-[11px]">n</code>（按换行符分段、忽略空行），再计算像素{" "}
+                      <code className="font-mono text-[11px]">Y = -100n - 400</code>
+                      ，并换算为草稿中的 <code className="font-mono text-[11px]">transform_y</code>（单位为半个画布高，随当前画布高度自动换算）。
+                    </p>
+                    <p>
+                      仅<strong>显式换行</strong>会计入行数；仅勾选「自动换行」而无换行符时，无法在此阶段估算 n，请在分镜台词里用换行表达多行。
+                    </p>
+                    <p className="text-[10px]">
+                      完整说明见仓库文档：<code className="break-all">docs/剪映字幕竖屏位置规范.md</code>
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             <Button
