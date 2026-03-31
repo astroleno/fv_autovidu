@@ -10,10 +10,11 @@
 说明：
 - 样式对齐 pyJianYingDraft.script_file.ScriptFile.import_srt 的 subtitle 习惯：居中、自动换行、底部 transform_y；
   字号按产品约定使用 8（import_srt 默认示例为 5，本仓库计划指定为 8）。
-- 纵向位置：``manual`` 为全段统一 ``transform_y``；``jianying_spec`` 为剪映经验公式 ``Y=-100n-400``（像素）再换算为
-  ``ClipSettings.transform_y``（单位为半个画布高），见 ``docs/剪映字幕竖屏位置规范.md``。
+- 纵向位置：``manual`` 为全段统一 ``transform_y``；``jianying_spec`` 为剪映经验公式 ``Y=-100n-400``，再写入
+  ``ClipSettings.transform_y``。换算与剪映**属性面板里与「整幅画布高度」相乘后得到的读数**对齐（见
+  ``y_pixel_to_clip_transform_y`` 与 ``docs/剪映字幕竖屏位置规范.md``）；**不是** ``Y/(H/2)``，否则界面会显示约 ``2Y``。
 - 规范模式字号固定为 ``JIANYING_SPEC_FONT_SIZE``（13），不随行数变化。
-- canvas_h 在规范版下参与像素 Y → transform_y 换算；canvas_w 仍保留供后续行宽相关扩展。
+- canvas_h 在规范版下参与公式像素 Y → transform_y 换算；canvas_w 仍保留供后续行宽相关扩展。
 """
 
 from __future__ import annotations
@@ -110,15 +111,21 @@ JIANYING_SPEC_FONT_SIZE: float = 13.0
 
 def y_pixel_to_clip_transform_y(y_px: float, canvas_height_px: int) -> float:
     """
-    将像素位移转换为 pyJianYingDraft ``ClipSettings.transform_y``。
+    将规范公式中的像素 Y 写入 pyJianYingDraft ``ClipSettings.transform_y``。
 
-    库定义：垂直位移单位为 **半个画布高**（见 ``segment.ClipSettings`` 文档）。
-    transform_y = Y_px / (canvas_height / 2)
+    pyJianYingDraft 文档称 ``transform_y`` 以「半画布高」为单位；若按 ``Y / (H/2)`` 写入，剪映侧
+    **与整幅高度相乘** 的读数会变成 ``2Y``（例如一行出现 **-1000** 而非公式 **-500**）。
+
+    产品约定：使剪映里与 **整画布高度 H** 相乘后的数值与经验公式 ``Y=-100n-400`` **一致**，故：
+
+        transform_y = Y_px / H
+
+    若未来剪映版本读数与草稿不一致，以实测为准。
     """
-    half = float(canvas_height_px) / 2.0
-    if half <= 0:
+    h = float(canvas_height_px)
+    if h <= 0:
         return -0.8
-    return y_px / half
+    return y_px / h
 
 
 def subtitle_text_from_shot(shot: Shot) -> str:
