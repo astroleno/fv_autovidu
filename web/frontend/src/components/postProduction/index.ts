@@ -4,4 +4,5 @@
 export { SubtitlePositionPreview } from "./SubtitlePositionPreview"
 export { JianyingSubtitleHints } from "./JianyingSubtitleHints"
 export { JianyingExportResultCard } from "./JianyingExportResultCard"
+export { JianyingSpecPreviewTable } from "./JianyingSpecPreviewTable"
 export { transformYToPreviewBottomPercent, clampTransformY } from "./subtitlePreviewLayout"
