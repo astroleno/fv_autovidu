@@ -170,7 +170,7 @@ export default function PostProductionPage() {
   const applyJianyingSpec = useCallback(() => {
     updateJianyingField({ subtitlePositionMode: "jianying_spec" })
     pushToast(
-      "已应用剪映规范：纵坐标 Y=-100n-400，字号随行数自动；导出时逐条生效",
+      "已应用剪映规范：纵坐标按 Y=-100n-400；字号固定 13；导出时逐条生效",
       "success",
       6000
     )
@@ -562,9 +562,7 @@ export default function PostProductionPage() {
                     </p>
                     <p>
                       <strong className="text-[var(--color-newsprint-black)]">字号</strong>
-                      ：随行数 n 自动设为{" "}
-                      <code className="font-mono text-[11px]">16 - 2(n-1)</code>
-                      （夹在 4～16），与下方预览表「规范字号」列一致。
+                      ：规范模式下固定为 <strong>13</strong>（与剪映侧约定一致），与行数无关；下方预览表「规范字号」列恒为 13。
                     </p>
                     <p className="text-[10px]">
                       完整说明见仓库文档：<code className="break-all">docs/剪映字幕竖屏位置规范.md</code>

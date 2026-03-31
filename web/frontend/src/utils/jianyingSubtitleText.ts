@@ -29,14 +29,9 @@ export function estimateSubtitleLineCount(text: string): number {
   return Math.max(1, lines.length)
 }
 
-/**
- * 规范版字号：与 `jianying_spec_font_size` 一致（16 起每多一行减 2，夹在 4～16）。
- */
-export function jianyingSpecFontSize(n: number): number {
-  const nn = Math.max(1, Math.floor(n))
-  const raw = 16 - 2 * (nn - 1)
-  return Math.max(4, Math.min(16, raw))
-}
+/** 剪映规范模式：与后端 `JIANYING_SPEC_FONT_SIZE` 一致，固定字号。 */
+export const JIANYING_SPEC_FONT_SIZE = 13
+
 
 /** 竖屏画布高度（与 jianying_protocol.canvas_wh_vertical_9_16 一致） */
 export function canvasHeightVertical(canvasSize: "720p" | "1080p"): number {

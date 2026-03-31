@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import {
   estimateSubtitleLineCount,
-  jianyingSpecFontSize,
+  JIANYING_SPEC_FONT_SIZE,
   jianyingSpecYAndTransformPreview,
 } from "./jianyingSubtitleText"
 
@@ -12,11 +12,9 @@ describe("estimateSubtitleLineCount", () => {
   })
 })
 
-describe("jianyingSpecFontSize", () => {
-  it("n=1→16，n=2→14，下限 4", () => {
-    expect(jianyingSpecFontSize(1)).toBe(16)
-    expect(jianyingSpecFontSize(2)).toBe(14)
-    expect(jianyingSpecFontSize(99)).toBe(4)
+describe("JIANYING_SPEC_FONT_SIZE", () => {
+  it("与后端规范固定字号一致", () => {
+    expect(JIANYING_SPEC_FONT_SIZE).toBe(13)
   })
 })
 
