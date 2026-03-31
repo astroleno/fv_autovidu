@@ -58,6 +58,12 @@ describe("estimateSubtitleLineCount / 无换行折行估算", () => {
     expect(estimateSubtitleLineCount(text)).toBeGreaterThan(3)
     expect(jianyingSpecLineCount(text)).toBe(3)
   })
+
+  it("无换行中文 13 字时按 CJK/12 估为 2 行（与剪映自动折行更一致）", () => {
+    const thirteen = "字".repeat(13)
+    expect(estimateSubtitleLineCount(thirteen)).toBe(2)
+    expect(jianyingSpecLineCount(thirteen)).toBe(2)
+  })
 })
 
 describe("formatSubtitlePreviewOneLine", () => {

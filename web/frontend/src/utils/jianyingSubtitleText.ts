@@ -44,6 +44,9 @@ export function subtitleTextFromShot(shot: Shot): string {
 /** 与后端 `_JIANYING_SPEC_WORDS_PER_LINE` 一致：约 6～8 词/行取中 */
 const WORDS_PER_LINE = 7
 
+/** 与后端 `_JIANYING_SPEC_CJK_CHARS_PER_LINE` 一致：竖屏剪映约 12～16 字/行，取 12 偏保守 */
+const CJK_CHARS_PER_LINE = 12
+
 function countLatinWords(s: string): number {
   const m = s.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g)
   return m ? m.length : 0
@@ -56,7 +59,7 @@ function countCjkChars(s: string): number {
 
 /**
  * 单行正文在剪映内自动折行时的估算行数（无 `\\n` 时）。
- * 英文按词数；汉字按「每字约半词宽」与 7 词/行对齐。
+ * 与后端 `_wrap_lines_estimate_single_block` 对齐：等效词行数与「CJK 字数/12」取较大值，减轻剪映侧多折一行而纵轴仍按 n=1 的问题。
  */
 function wrapLinesEstimateSingleBlock(text: string): number {
   const t = text.trim()
@@ -65,7 +68,12 @@ function wrapLinesEstimateSingleBlock(text: string): number {
   const cjk = countCjkChars(t)
   const equiv = words + 0.5 * cjk
   if (equiv <= 0) return Math.max(1, Math.ceil(t.length / 40))
-  return Math.max(1, Math.ceil(equiv / WORDS_PER_LINE))
+  const lineByEquiv = Math.max(1, Math.ceil(equiv / WORDS_PER_LINE))
+  if (cjk > 0) {
+    const lineByCjk = Math.max(1, Math.ceil(cjk / CJK_CHARS_PER_LINE))
+    return Math.max(lineByEquiv, lineByCjk)
+  }
+  return lineByEquiv
 }
 
 /**
