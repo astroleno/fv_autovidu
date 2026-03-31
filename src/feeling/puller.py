@@ -107,6 +107,45 @@ def _associated_dialogue_from_shot_list_item(item: dict) -> dict[str, str] | Non
     return None
 
 
+def _plain_dialogue_line_from_shot_list_item(item: dict) -> str:
+    """
+    平台有时把台词放在 ``shot_list`` 条目的纯文本字段（而非 ``associated_dialogue`` 结构体），
+    例如 ``dialogue`` / ``line`` / ``text``；与画面描述、分镜标签分栏存储时需单独读取。
+    """
+    if not isinstance(item, dict):
+        return ""
+    for key in (
+        "dialogue",
+        "Dialogue",
+        "line",
+        "text",
+        "scriptLine",
+        "subtitle",
+        "content",
+    ):
+        v = item.get(key)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+    return ""
+
+
+def _iter_shot_list_items(sh: dict) -> list[dict]:
+    """从 shot.metadata.shotMaster.raw.shot_list 取出条目列表（无则空）。"""
+    meta = sh.get("metadata")
+    if not isinstance(meta, dict):
+        return []
+    shot_master = meta.get("shotMaster")
+    if not isinstance(shot_master, dict):
+        return []
+    raw = shot_master.get("raw")
+    if not isinstance(raw, dict):
+        return []
+    lst = raw.get("shot_list")
+    if not isinstance(lst, list):
+        return []
+    return [x for x in lst if isinstance(x, dict)]
+
+
 def _get_dialogue_fields(sh: dict) -> tuple[str, dict | None]:
     """
     从 Feeling 平台单条 shot（原始 dict）提取台词行与结构化对白。
@@ -133,27 +172,36 @@ def _get_dialogue_fields(sh: dict) -> tuple[str, dict | None]:
         if isinstance(meta_early, dict):
             line = _get(meta_early, "dialogue", "Dialogue", default="") or ""
 
+    # 1b) 仍空：部分镜头仅在 metadata.shotMaster.raw.shot_list[i] 的纯文本字段存台词（无顶层 dialogue）
+    if not (line or "").strip():
+        for item in _iter_shot_list_items(sh):
+            pl = _plain_dialogue_line_from_shot_list_item(item)
+            if pl:
+                line = pl
+                break
+
     # 2) 结构化对白：顶层 associatedDialogue
     assoc: dict[str, str] | None = None
     top_assoc = sh.get("associatedDialogue")
     if isinstance(top_assoc, dict):
         assoc = _normalize_associated_dialogue_dict(top_assoc)
 
-    # 3) 仍无时：从 metadata.shotMaster.raw.shot_list 逐项取 associated_dialogue（snake_case）
+    # 3) 仍无时：从 shot_list 逐项取 associated_dialogue（结构化）
     if assoc is None:
-        meta = sh.get("metadata")
-        if isinstance(meta, dict):
-            shot_master = meta.get("shotMaster")
-            if isinstance(shot_master, dict):
-                raw = shot_master.get("raw")
-                if isinstance(raw, dict):
-                    lst = raw.get("shot_list")
-                    if isinstance(lst, list):
-                        for item in lst:
-                            cand = _associated_dialogue_from_shot_list_item(item)
-                            if cand is not None:
-                                assoc = cand
-                                break
+        for item in _iter_shot_list_items(sh):
+            cand = _associated_dialogue_from_shot_list_item(item)
+            if cand is not None:
+                assoc = cand
+                break
+
+    # 4) 分镜表「台词」列只读 Shot.dialogue：仅有结构化对白、无顶层字符串时，拼成一行展示
+    if not (line or "").strip() and assoc is not None:
+        role = (assoc.get("role") or "").strip()
+        content = (assoc.get("content") or "").strip()
+        if role and content:
+            line = f"{role}：{content}"
+        elif content:
+            line = content
 
     # 既无有效台词行也无结构化对白 → 与下游约定一致返回 ("", None)
     has_line = bool((line or "").strip())
@@ -415,20 +463,18 @@ def _score_shot_local_for_merge(shot: dict[str, Any]) -> tuple[int, int, int, in
     return (n, has_end, dub_ok, rank)
 
 
-def _collect_local_episode_merge_state(output_dir: Path, episode_id: str) -> dict[str, Any]:
+def _accumulate_episode_merge_from_root(
+    root: Path,
+    episode_id: str,
+    shots_by_id: dict[str, dict[str, Any]],
+    jianying_candidates: list[dict[str, Any]],
+) -> None:
     """
-    在 _normalize_episode_dir 删除旧目录**之前**调用：扫描 DATA_ROOT 下所有
-    ``{projectId}/{episodeId}/episode.json``，提取待合并的本地生成态。
-
-    Returns:
-        {"shots_by_id": {shotId: {合并字段…}}, "jianyingExport": dict|None}
+    从单个数据根（扁平 ``DATA_ROOT`` 或命名空间 ``DATA_ROOT/env/ws``）下扫描
+    ``{projectId}/{episodeId}/episode.json``，把本地产物字段累加到 shots_by_id。
     """
-    shots_by_id: dict[str, dict[str, Any]] = {}
-    jianying_candidates: list[dict[str, Any]] = []
-    root = Path(output_dir)
     if not root.is_dir():
-        return {"shots_by_id": {}, "jianyingExport": None}
-
+        return
     for proj_dir in sorted(root.iterdir(), key=lambda p: str(p)):
         if not proj_dir.is_dir():
             continue
@@ -466,6 +512,45 @@ def _collect_local_episode_merge_state(output_dir: Path, episode_id: str) -> dic
                     continue
                 if _score_shot_local_for_merge(snippet) > _score_shot_local_for_merge(prev):
                     shots_by_id[sid] = snippet
+
+
+def _collect_local_episode_merge_state(
+    output_dir: Path,
+    episode_id: str,
+    *,
+    merge_extra_roots: tuple[Path, ...] | None = None,
+) -> dict[str, Any]:
+    """
+    在 _normalize_episode_dir 删除旧目录**之前**调用：扫描数据根下所有
+    ``{projectId}/{episodeId}/episode.json``，提取待合并的本地生成态。
+
+    **merge_extra_roots**：
+    多上下文（命名空间）下拉取时 ``output_dir`` 常为 ``DATA_ROOT/env/ws``，而用户历史产线可能仍在
+    扁平 ``DATA_ROOT/{projectId}/{episodeId}/``。若只扫命名空间根，会读不到旧 episode.json，
+    导致尾帧 / 视频候选 / 配音等元数据合并不生效。此时应传入 ``(DATA_ROOT,)`` 再扫一层扁平根，
+    与 ``data_service._collect_episode_dirs_for_id`` 行为对齐。
+
+    Returns:
+        {"shots_by_id": {shotId: {合并字段…}}, "jianyingExport": dict|None}
+    """
+    shots_by_id: dict[str, dict[str, Any]] = {}
+    jianying_candidates: list[dict[str, Any]] = []
+    roots: list[Path] = [Path(output_dir)]
+    if merge_extra_roots:
+        roots.extend(Path(p) for p in merge_extra_roots)
+
+    seen_resolved: set[str] = set()
+    for root in roots:
+        try:
+            key = str(root.resolve())
+        except OSError:
+            key = str(root)
+        if key in seen_resolved:
+            continue
+        seen_resolved.add(key)
+        _accumulate_episode_merge_from_root(
+            root, episode_id, shots_by_id, jianying_candidates
+        )
 
     best_jy: dict[str, Any] | None = None
     for j in jianying_candidates:
@@ -525,6 +610,7 @@ def pull_episode(
     skip_assets: bool = False,
     skip_images: bool = False,
     fs_lock_namespace: str = "",
+    merge_extra_roots: tuple[Path, ...] | None = None,
 ) -> dict[str, Any]:
     """
     一键拉取 Episode 数据到本地。
@@ -546,6 +632,8 @@ def pull_episode(
         skip_assets: True 时不下载资产图
         skip_images: 兼容旧参数；为 True 时等价于 skip_frames 与 skip_assets 均为 True
         fs_lock_namespace: 多上下文时为 envKey/workspaceKey，传入 episode_fs_lock 避免跨 Profile 互锁
+        merge_extra_roots: 额外扫描的数据根（如扁平 ``DATA_ROOT``），用于合并本地产物；见
+            ``_collect_local_episode_merge_state`` 文档。
 
     Returns:
         组装好的 Episode dict（与前端 Episode 类型一致）
@@ -567,7 +655,11 @@ def pull_episode(
     # 2. 归一化目录 + 下载资源 + 写 episode.json（与同 episode 的后台 dub/finalizer 互斥）
     with episode_fs_lock(episode_id, data_namespace=fs_lock_namespace):
         # 在删旧目录前快照本地 episode.json，便于与平台新稿合并（尾帧/视频/配音/剪映导出等元数据）
-        local_merge = _collect_local_episode_merge_state(output_dir, episode_id)
+        local_merge = _collect_local_episode_merge_state(
+            output_dir,
+            episode_id,
+            merge_extra_roots=merge_extra_roots,
+        )
         ep_dir = _normalize_episode_dir(output_dir, episode_id, proj_id)
         frames_dir = ep_dir / "frames"
         assets_dir = ep_dir / "assets"

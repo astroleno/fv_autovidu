@@ -84,6 +84,12 @@ def pull_episode(req: PullEpisodeRequest, request: Request):
     # 单副本归一化：不再从旧本地目录反推 projectId，避免错误项目被固化；缺省用 proj-default
     project_id = getattr(req, "projectId", None) or "proj-default"
 
+    # 命名空间拉取时 output_root 为 DATA_ROOT/env/ws，合并快照须同时扫扁平 DATA_ROOT，
+    # 否则读不到「只在旧路径」下的 episode.json，尾帧/视频候选会丢失（见 puller._collect_local_episode_merge_state）
+    merge_extra_roots: tuple[Path, ...] | None = None
+    if ns is not None:
+        merge_extra_roots = (Path(DATA_ROOT).resolve(),)
+
     try:
         result = do_pull(
             req.episodeId,
@@ -95,6 +101,7 @@ def pull_episode(req: PullEpisodeRequest, request: Request):
             skip_images=req.skipImages,
             client=client,
             fs_lock_namespace=fs_tag,
+            merge_extra_roots=merge_extra_roots,
         )
         return Episode.model_validate(result)
     except Exception as e:

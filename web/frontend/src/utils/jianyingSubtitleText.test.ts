@@ -7,7 +7,6 @@ import {
   JIANYING_SPEC_MAX_LINES,
   jianyingSpecLineCount,
   jianyingSpecYAndTransformPreview,
-  subtitlePreviewSourceHint,
   subtitleTextFromShot,
 } from "./jianyingSubtitleText"
 
@@ -27,33 +26,43 @@ function buildShot(over: Partial<Shot>): Shot {
 }
 
 describe("subtitleTextFromShot", () => {
-  it("无台词时使用画面描述并可含换行", () => {
+  it("不使用画面描述", () => {
     const shot = buildShot({
-      visualDescription: "行一\n行二",
+      dialogue: "",
+      visualDescription: "深夜客厅沙发……",
     })
-    expect(subtitleTextFromShot(shot)).toBe("行一\n行二")
-    expect(subtitlePreviewSourceHint(shot)).toBe("来源：画面描述")
+    expect(subtitleTextFromShot(shot)).toBe("")
   })
 
-  it("接受 dialogue_translation 蛇形键（兼容旧 JSON）", () => {
+  it("接受 dialogue_translation 蛇形键", () => {
     const shot = buildShot({
       dialogue_translation: "译",
     } as Shot)
     expect(subtitleTextFromShot(shot)).toBe("译")
-    expect(subtitlePreviewSourceHint(shot)).toBeNull()
+  })
+})
+
+describe("estimateSubtitleLineCount / 无换行折行估算", () => {
+  it("显式多行按行数", () => {
+    expect(estimateSubtitleLineCount("a\nb")).toBe(2)
+  })
+
+  it("长英文无换行按约 7 词/行估算", () => {
+    const text = Array.from({ length: 21 }, (_, i) => `w${i}`).join(" ")
+    expect(estimateSubtitleLineCount(text)).toBe(3)
+    expect(jianyingSpecLineCount(text)).toBe(3)
+  })
+
+  it("长中文无换行按字宽估算并可超过 3（预览列），公式 n 封顶 3", () => {
+    const text = "字".repeat(80)
+    expect(estimateSubtitleLineCount(text)).toBeGreaterThan(3)
+    expect(jianyingSpecLineCount(text)).toBe(3)
   })
 })
 
 describe("formatSubtitlePreviewOneLine", () => {
   it("将换行显示为斜杠分隔", () => {
     expect(formatSubtitlePreviewOneLine("a\nb", 80)).toBe("a / b")
-  })
-})
-
-describe("estimateSubtitleLineCount", () => {
-  it("按换行计数，至少为 1", () => {
-    expect(estimateSubtitleLineCount("a")).toBe(1)
-    expect(estimateSubtitleLineCount("a\nb")).toBe(2)
   })
 })
 

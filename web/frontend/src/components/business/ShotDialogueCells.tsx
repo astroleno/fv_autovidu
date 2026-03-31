@@ -46,6 +46,21 @@ const COL_LABEL: Record<Exclude<EditingCol, null>, string> = {
   translation: "译文",
 }
 
+/**
+ * 分镜「台词原文」展示用：优先 `dialogue`；为空时用 `associatedDialogue` 拼一行（与 puller 落盘规则一致）。
+ * 解决平台仅下发结构化对白、或旧 episode.json 未写入顶层 dialogue 时整列空白的问题。
+ */
+export function effectiveDialogueLineForStoryboard(shot: Shot): string {
+  const raw = (shot.dialogue ?? "").trim()
+  if (raw) return shot.dialogue ?? ""
+  const ad = shot.associatedDialogue
+  if (!ad) return ""
+  const role = (ad.role ?? "").trim()
+  const content = (ad.content ?? "").trim()
+  if (role && content) return `${role}：${content}`
+  return content
+}
+
 export function ShotDialogueCells({
   shot,
   episodeId,
@@ -61,7 +76,7 @@ export function ShotDialogueCells({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const ignoreBlurSaveRef = useRef(false)
 
-  const dialogueValue = shot.dialogue ?? ""
+  const dialogueValue = effectiveDialogueLineForStoryboard(shot)
   const translationValue = shot.dialogueTranslation ?? ""
 
   const beginEdit = (col: Exclude<EditingCol, null>) => {

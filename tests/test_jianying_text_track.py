@@ -84,8 +84,8 @@ class TestSubtitleTextFromShot(unittest.TestCase):
         )
         self.assertEqual(subtitle_text_from_shot(role_only), "")
 
-    def test_subtitle_text_falls_back_to_visual_description(self) -> None:
-        """无译文/台词/结构化正文时，使用画面描述作为剪映字幕与行数依据。"""
+    def test_subtitle_text_does_not_use_visual_description(self) -> None:
+        """画面描述不是台词，不得写入字幕。"""
         from models.schemas import Shot
         from services.jianying_text_track import subtitle_text_from_shot
 
@@ -95,9 +95,10 @@ class TestSubtitleTextFromShot(unittest.TestCase):
             imagePrompt="",
             videoPrompt="",
             firstFrame="",
+            dialogue="",
             visualDescription="第一行\n第二行",
         )
-        self.assertEqual(subtitle_text_from_shot(shot), "第一行\n第二行")
+        self.assertEqual(subtitle_text_from_shot(shot), "")
 
 
 class TestJianyingSpecLineCount(unittest.TestCase):
@@ -113,6 +114,16 @@ class TestJianyingSpecLineCount(unittest.TestCase):
         from services.jianying_text_track import jianying_spec_line_count
 
         self.assertEqual(jianying_spec_line_count("无换行长句"), 1)
+
+    def test_estimate_wraps_long_english_without_newlines(self) -> None:
+        from services.jianying_text_track import (
+            estimate_subtitle_line_count,
+            jianying_spec_line_count,
+        )
+
+        text = " ".join([f"w{i}" for i in range(21)])
+        self.assertEqual(estimate_subtitle_line_count(text), 3)
+        self.assertEqual(jianying_spec_line_count(text), 3)
 
 
 class TestBuildTextTrackPayload(unittest.TestCase):
