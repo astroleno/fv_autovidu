@@ -99,7 +99,10 @@ export function canvasHeightVertical(canvasSize: "720p" | "1080p"): number {
 }
 
 /**
- * 规范版像素 Y 与 transform_y（半画布高单位）示意，用于预览表。
+ * 规范版像素 Y 与写入草稿的 transform_y 示意，用于预览表。
+ *
+ * 与后端 `y_pixel_to_clip_transform_y` 一致：transform_y = Y / H（整幅画布高），
+ * 使剪映界面与 H 相乘后的读数与公式 Y=-100n-400 一致；勿用 Y/(H/2)，否则读数约翻倍。
  */
 export function jianyingSpecYAndTransformPreview(
   n: number,
@@ -111,8 +114,7 @@ export function jianyingSpecYAndTransformPreview(
   )
   const yPixel = -100 * nn - 400
   const h = canvasHeightVertical(canvasSize)
-  const half = h / 2
-  return { yPixel, transformY: half > 0 ? yPixel / half : -0.8 }
+  return { yPixel, transformY: h > 0 ? yPixel / h : -0.8 }
 }
 
 /**

@@ -82,10 +82,10 @@ describe("jianyingSpecLineCount", () => {
 })
 
 describe("jianyingSpecYAndTransformPreview", () => {
-  it("1080p 竖屏 H=1920 时 n=1 对应 Y=-500、transform=-500/960", () => {
+  it("1080p 竖屏 H=1920 时 n=1 对应 Y=-500、transform=-500/1920（与界面读数一致）", () => {
     const p = jianyingSpecYAndTransformPreview(1, "1080p")
     expect(p.yPixel).toBe(-500)
-    expect(p.transformY).toBeCloseTo(-500 / 960, 6)
+    expect(p.transformY).toBeCloseTo(-500 / 1920, 6)
   })
 
   it("n>3 时按 n=3 计算（与五段换行 capped 一致）", () => {

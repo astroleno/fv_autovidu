@@ -187,9 +187,9 @@ class TestBuildTextTrackPayload(unittest.TestCase):
         y0 = segs[0]["clip"]["transform"]["y"]
         y1 = segs[1]["clip"]["transform"]["y"]
         self.assertNotEqual(y0, y1)
-        # n=1 → Y=-500 → transform_y = -500/960；n=2 → Y=-600 → -600/960
-        self.assertAlmostEqual(y0, -500.0 / 960.0, places=5)
-        self.assertAlmostEqual(y1, -600.0 / 960.0, places=5)
+        # n=1 → Y=-500 → transform_y = -500/H；n=2 → Y=-600（H=1920，与界面读数一致，非 Y/(H/2)）
+        self.assertAlmostEqual(y0, -500.0 / 1920.0, places=5)
+        self.assertAlmostEqual(y1, -600.0 / 1920.0, places=5)
         # 规范模式字号固定 13（material.content 为 JSON 字符串）
         s0 = json.loads(mats[0]["content"])["styles"][0]["size"]
         s1 = json.loads(mats[1]["content"])["styles"][0]["size"]
@@ -216,7 +216,7 @@ class TestBuildTextTrackPayload(unittest.TestCase):
         )
         y3 = segs3[0]["clip"]["transform"]["y"]
         self.assertAlmostEqual(y5, y3, places=5)
-        self.assertAlmostEqual(y5, -700.0 / 960.0, places=5)
+        self.assertAlmostEqual(y5, -700.0 / 1920.0, places=5)
 
     def test_manual_mode_same_transform_all_segments(self) -> None:
         from services.jianying_text_track import build_text_track_payload
