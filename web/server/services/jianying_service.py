@@ -330,6 +330,7 @@ def _write_jianying_draft_pyjdraft(
     subtitle_align: Literal["left", "center", "right"] = "center",
     subtitle_auto_wrapping: bool = True,
     subtitle_transform_y: float = -0.8,
+    subtitle_position_mode: Literal["manual", "jianying_spec"] = "manual",
 ) -> int:
     """
     按 reference/migration-packages 与实机样本对齐的最小结构直接写
@@ -518,6 +519,7 @@ def _write_jianying_draft_pyjdraft(
         align=subtitle_align,
         auto_wrapping=subtitle_auto_wrapping,
         transform_y=subtitle_transform_y,
+        position_mode=subtitle_position_mode,
     )
     draft_info["materials"]["texts"] = text_materials
     draft_info["materials"]["speeds"].extend(text_speed_jsons)
@@ -1050,6 +1052,7 @@ def export_jianying_draft(
             subtitle_align=req.subtitleAlign,
             subtitle_auto_wrapping=req.subtitleAutoWrapping,
             subtitle_transform_y=float(req.subtitleTransformY),
+            subtitle_position_mode=req.subtitlePositionMode,
         )
 
         # 不再生成 ZIP；episode 记录仍保留 zipPath 字段以兼容旧 JSON，恒为 None

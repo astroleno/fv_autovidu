@@ -121,8 +121,13 @@ export interface JianyingExportRequest {
   subtitleFontSize?: number
   subtitleAlign?: "left" | "center" | "right"
   subtitleAutoWrapping?: boolean
-  /** 纵向位置 -1.0～0，默认 -0.8 */
+  /** 纵向位置 -1.0～0，默认 -0.8；仅 manual 模式生效 */
   subtitleTransformY?: number
+  /**
+   * manual：全片统一 subtitleTransformY；
+   * jianying_spec：按剪映经验公式 Y=-100n-400（像素）再换算为 transform_y，忽略 subtitleTransformY。
+   */
+  subtitlePositionMode?: "manual" | "jianying_spec"
 }
 
 /** 剪映草稿导出响应 */

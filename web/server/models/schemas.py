@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 # ---------- 枚举 / 字面量类型 ----------
 
@@ -308,6 +308,8 @@ class ExportRoughCutResponse(BaseModel):
 
 JianyingSubtitleAlign = Literal["left", "center", "right"]
 
+JianyingSubtitlePositionMode = Literal["manual", "jianying_spec"]
+
 
 class JianyingExportRequest(BaseModel):
     """
@@ -326,7 +328,17 @@ class JianyingExportRequest(BaseModel):
     subtitleFontSize: int = Field(default=8, ge=4, le=16)
     subtitleAlign: JianyingSubtitleAlign = "center"
     subtitleAutoWrapping: bool = True
-    subtitleTransformY: float = Field(default=-0.8, ge=-1.0, le=0.0)
+    subtitleTransformY: float = Field(default=-0.8)
+    """manual 模式下为 ClipSettings.transform_y（-1.0～0）；jianying_spec 模式下忽略，由行数公式计算。"""
+    subtitlePositionMode: JianyingSubtitlePositionMode = "manual"
+    """manual：全段统一纵向位置；jianying_spec：按每条字幕行数 n 使用 Y=-100n-400 像素再换算为 transform_y。"""
+
+    @model_validator(mode="after")
+    def _validate_subtitle_transform_y_for_manual(self) -> JianyingExportRequest:
+        if self.subtitlePositionMode == "manual":
+            if self.subtitleTransformY < -1.0 or self.subtitleTransformY > 0.0:
+                raise ValueError("manual 模式下 subtitleTransformY 须在 -1.0～0.0 之间")
+        return self
 
     @field_validator("draftPath")
     @classmethod
