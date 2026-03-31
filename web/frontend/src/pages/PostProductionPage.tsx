@@ -6,8 +6,8 @@
  * - 与分镜页 Dub/Export 可并存（设计 §11.2）
  */
 import { useCallback, useEffect, useState } from "react"
-import { Link, useParams, useSearchParams } from "react-router"
-import { ArrowLeft, Loader2, Sparkles } from "lucide-react"
+import { useParams, useSearchParams } from "react-router"
+import { Loader2, Sparkles } from "lucide-react"
 import { useEpisodeStore, useToastStore } from "@/stores"
 import { DubPanel } from "@/components/business/DubPanel"
 import { JianyingExportDialog, LS_JIANYING_DRAFT_PATH } from "@/components/business/JianyingExportDialog"
@@ -18,7 +18,6 @@ import {
 } from "@/components/postProduction"
 import { Button } from "@/components/ui"
 import { exportApi } from "@/api/export"
-import { routes } from "@/utils/routes"
 import type { Episode } from "@/types"
 import { flattenShots } from "@/types"
 
@@ -58,7 +57,7 @@ export default function PostProductionPage() {
   /** 与选片页一致：?shotId= 深链至后期制作并展开该镜试听区 */
   const highlightShotId = searchParams.get("shotId")?.trim() || undefined
 
-  const { projectId: routeProjectId, episodeId } = useParams<{
+  const { episodeId } = useParams<{
     projectId?: string
     episodeId: string
   }>()
@@ -179,12 +178,6 @@ export default function PostProductionPage() {
     updateEpisodeLocales,
   ])
 
-  const projectId = routeProjectId ?? currentEpisode?.projectId ?? ""
-  const backUrl =
-    projectId && episodeId
-      ? routes.episode(projectId, episodeId)
-      : routes.home()
-
   const submitJianyingExport = async () => {
     if (!episodeId) return
     const dp = draftPath.trim()
@@ -257,13 +250,6 @@ export default function PostProductionPage() {
       style={{ boxSizing: "border-box" }}
     >
       <header className="flex flex-wrap items-start gap-4 border-b border-[var(--color-divider)] pb-6">
-        <Link
-          to={backUrl}
-          className="inline-flex items-center gap-2 text-sm font-bold text-[var(--color-primary)] hover:underline"
-        >
-          <ArrowLeft className="w-4 h-4 shrink-0" />
-          返回分镜
-        </Link>
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-newsprint-black)] flex items-center gap-2">
             <Sparkles className="w-6 h-6 shrink-0 text-[var(--color-primary)]" />
