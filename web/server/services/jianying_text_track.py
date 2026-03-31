@@ -10,7 +10,9 @@
 说明：
 - 样式对齐 pyJianYingDraft.script_file.ScriptFile.import_srt 的 subtitle 习惯：居中、自动换行、底部 transform_y；
   字号按产品约定使用 8（import_srt 默认示例为 5，本仓库计划指定为 8）。
-- canvas_w / canvas_h 入参保留给后续按分辨率微调 clip 或行宽时使用；当前 TextStyle 使用相对 max_line_width。
+- 纵向位置：``manual`` 为全段统一 ``transform_y``；``jianying_spec`` 为剪映经验公式 ``Y=-100n-400``（像素）再换算为
+  ``ClipSettings.transform_y``（单位为半个画布高），见 ``docs/剪映字幕竖屏位置规范.md``。
+- canvas_h 在规范版下参与像素 Y → transform_y 换算；canvas_w 仍保留供后续行宽相关扩展。
 """
 
 from __future__ import annotations
@@ -52,6 +54,18 @@ def jianying_spec_y_pixel(n: int) -> float:
     """
     nn = max(1, int(n))
     return -100.0 * float(nn) - 400.0
+
+
+def jianying_spec_font_size(n: int) -> float:
+    """
+    规范版字幕字号：随行数 n 略减，避免多行时占满画面。
+
+    规则：从 16 起每多一行减 2，限制在 4～16（与 API subtitleFontSize 范围一致）。
+    n=1→16，n=2→14，n=3→12，n=4→10，n≥5→8（下限 4）。
+    """
+    nn = max(1, int(n))
+    raw = 16 - 2 * (nn - 1)
+    return float(max(4, min(16, raw)))
 
 
 def y_pixel_to_clip_transform_y(y_px: float, canvas_height_px: int) -> float:
@@ -124,7 +138,8 @@ def build_text_track_payload(
         align: 水平对齐，映射 ``TextStyle.align``（0/1/2）
         auto_wrapping: 是否自动换行
         transform_y: **manual** 模式下统一使用的 ``ClipSettings.transform_y``
-        position_mode: ``manual`` 全段同一 transform_y；``jianying_spec`` 按每条字幕行数 n 使用 Y=-100n-400 再换算
+        font_size: **manual** 模式下统一字号；**jianying_spec** 下忽略，改为按行数用 `jianying_spec_font_size`
+        position_mode: ``manual`` 全段同一 transform_y 与字号；``jianying_spec`` 按每条字幕行数 n 配置 Y 与字号
 
     Returns:
         (text_material_dicts, segment_dicts, speed_dicts)。
@@ -138,7 +153,7 @@ def build_text_track_payload(
     speed_materials: list[dict[str, Any]] = []
 
     align_int = _SUBTITLE_ALIGN_TO_INT[align]
-    subtitle_style = TextStyle(
+    manual_style = TextStyle(
         size=font_size,
         align=align_int,
         auto_wrapping=auto_wrapping,
@@ -155,14 +170,20 @@ def build_text_track_payload(
             n = estimate_subtitle_line_count(body)
             y_px = jianying_spec_y_pixel(n)
             ty = y_pixel_to_clip_transform_y(y_px, canvas_h)
+            style = TextStyle(
+                size=jianying_spec_font_size(n),
+                align=align_int,
+                auto_wrapping=auto_wrapping,
+            )
         else:
             ty = transform_y
+            style = manual_style
         clip = ClipSettings(transform_y=ty)
 
         seg = TextSegment(
             body,
             Timerange(int(start_us), int(duration_us)),
-            style=subtitle_style,
+            style=style,
             clip_settings=clip,
         )
         text_materials.append(seg.export_material())

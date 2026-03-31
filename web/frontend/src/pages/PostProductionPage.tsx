@@ -13,6 +13,7 @@ import { DubPanel } from "@/components/business/DubPanel"
 import { JianyingExportDialog, LS_JIANYING_DRAFT_PATH } from "@/components/business/JianyingExportDialog"
 import {
   JianyingExportResultCard,
+  JianyingSpecPreviewTable,
   JianyingSubtitleHints,
   SubtitlePositionPreview,
 } from "@/components/postProduction"
@@ -164,6 +165,20 @@ export default function PostProductionPage() {
     },
     [persistJianyingDefaults]
   )
+
+  /** 一键切换剪映规范：Y 与字号均按每条字幕行数 n 在导出时计算（见预览表） */
+  const applyJianyingSpec = useCallback(() => {
+    updateJianyingField({ subtitlePositionMode: "jianying_spec" })
+    pushToast(
+      "已应用剪映规范：纵坐标 Y=-100n-400，字号随行数自动；导出时逐条生效",
+      "success",
+      6000
+    )
+  }, [pushToast, updateJianyingField])
+
+  const restoreManualSubtitle = useCallback(() => {
+    updateJianyingField({ subtitlePositionMode: "manual" })
+  }, [updateJianyingField])
 
   const saveLocaleBar = useCallback(async () => {
     if (!episodeId || !currentEpisode) return
@@ -422,6 +437,12 @@ export default function PostProductionPage() {
                   min={4}
                   max={16}
                   value={jianyingForm.subtitleFontSize}
+                  disabled={jianyingForm.subtitlePositionMode === "jianying_spec"}
+                  title={
+                    jianyingForm.subtitlePositionMode === "jianying_spec"
+                      ? "规范模式下字号由行数 n 自动决定"
+                      : undefined
+                  }
                   onChange={(e) =>
                     updateJianyingField({
                       subtitleFontSize: Math.min(
@@ -430,7 +451,7 @@ export default function PostProductionPage() {
                       ),
                     })
                   }
-                  className="px-2 py-1.5 text-sm border border-[var(--color-newsprint-black)] box-border"
+                  className="px-2 py-1.5 text-sm border border-[var(--color-newsprint-black)] box-border disabled:opacity-50"
                   style={{ boxSizing: "border-box" }}
                 />
               </div>
@@ -468,34 +489,39 @@ export default function PostProductionPage() {
               </label>
               <div className="flex flex-col gap-2 sm:col-span-2">
                 <label className="text-[10px] font-black uppercase text-[var(--color-muted)]">
-                  字幕纵向位置模式
+                  剪映规范（行数 → 纵轴 + 字号）
                 </label>
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <label className="flex items-center gap-2 cursor-pointer box-border" style={{ boxSizing: "border-box" }}>
-                    <input
-                      type="radio"
-                      name="subtitle-position-mode"
-                      checked={jianyingForm.subtitlePositionMode === "manual"}
-                      onChange={() =>
-                        updateJianyingField({ subtitlePositionMode: "manual" })
-                      }
-                      className="accent-[var(--color-primary)]"
-                    />
-                    手动（滑块，与 pyJianYingDraft 单位一致）
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer box-border" style={{ boxSizing: "border-box" }}>
-                    <input
-                      type="radio"
-                      name="subtitle-position-mode"
-                      checked={jianyingForm.subtitlePositionMode === "jianying_spec"}
-                      onChange={() =>
-                        updateJianyingField({ subtitlePositionMode: "jianying_spec" })
-                      }
-                      className="accent-[var(--color-primary)]"
-                    />
-                    规范版（Y = -100n - 400，n 为换行分段行数）
-                  </label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="primary"
+                    className="text-xs"
+                    onClick={() => applyJianyingSpec()}
+                  >
+                    应用剪映规范
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="text-xs"
+                    onClick={() => restoreManualSubtitle()}
+                  >
+                    恢复手动
+                  </Button>
+                  <span className="text-[11px] text-[var(--color-muted)]">
+                    当前：
+                    {jianyingForm.subtitlePositionMode === "jianying_spec"
+                      ? "已启用规范（导出按行数逐条计算）"
+                      : "手动模式"}
+                  </span>
                 </div>
+                {jianyingForm.subtitlePositionMode === "jianying_spec" &&
+                currentEpisode ? (
+                  <JianyingSpecPreviewTable
+                    episode={currentEpisode}
+                    canvasSize={jianyingForm.canvasSize}
+                  />
+                ) : null}
                 {jianyingForm.subtitlePositionMode === "manual" ? (
                   <>
                     <label className="text-[10px] font-black uppercase text-[var(--color-muted)] mt-1">
@@ -533,6 +559,12 @@ export default function PostProductionPage() {
                     </p>
                     <p>
                       仅<strong>显式换行</strong>会计入行数；仅勾选「自动换行」而无换行符时，无法在此阶段估算 n，请在分镜台词里用换行表达多行。
+                    </p>
+                    <p>
+                      <strong className="text-[var(--color-newsprint-black)]">字号</strong>
+                      ：随行数 n 自动设为{" "}
+                      <code className="font-mono text-[11px]">16 - 2(n-1)</code>
+                      （夹在 4～16），与下方预览表「规范字号」列一致。
                     </p>
                     <p className="text-[10px]">
                       完整说明见仓库文档：<code className="break-all">docs/剪映字幕竖屏位置规范.md</code>
