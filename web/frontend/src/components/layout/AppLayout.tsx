@@ -15,17 +15,7 @@ import { useContextStore, useEpisodeStore, useToastStore, useUIStore } from "@/s
 import { MODAL_PULL_EPISODE } from "@/stores/uiStore"
 import { projectsApi } from "@/api/projects"
 import { routes } from "@/utils/routes"
-
-/** 根据 pathname 判断剧集子页最后一级文案（分镜板 / 资产库 / 镜头 / …） */
-function lastEpisodeSegmentLabel(pathname: string): string {
-  const clean = pathname.split("?")[0].replace(/\/$/, "") || pathname
-  if (clean.endsWith("/timeline")) return "粗剪预览"
-  if (clean.endsWith("/regen")) return "单帧重生"
-  if (clean.endsWith("/assets")) return "资产库"
-  if (clean.includes("/shot/")) return "镜头"
-  if (/\/episode\/[^/]+$/.test(clean)) return "分镜板"
-  return ""
-}
+import { getEpisodeSubpageLabel } from "@/utils/episodeRouteLabels"
 
 interface Crumb {
   label: string
@@ -109,7 +99,7 @@ export default function AppLayout() {
 
     if (routeProjectId && routeEpisodeId && currentEpisode) {
       const pt = projectTitle || routeProjectId
-      const last = lastEpisodeSegmentLabel(p)
+      const last = getEpisodeSubpageLabel(p)
       const items: Crumb[] = [
         home,
         { label: pt, path: routes.project(routeProjectId) },
