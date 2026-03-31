@@ -149,11 +149,11 @@ class TestBuildTextTrackPayload(unittest.TestCase):
         # n=1 → Y=-500 → transform_y = -500/960；n=2 → Y=-600 → -600/960
         self.assertAlmostEqual(y0, -500.0 / 960.0, places=5)
         self.assertAlmostEqual(y1, -600.0 / 960.0, places=5)
-        # n=1 → 字号 16；n=2 → 14（material.content 为 JSON 字符串）
+        # 规范模式字号固定 13（material.content 为 JSON 字符串）
         s0 = json.loads(mats[0]["content"])["styles"][0]["size"]
         s1 = json.loads(mats[1]["content"])["styles"][0]["size"]
-        self.assertEqual(s0, 16.0)
-        self.assertEqual(s1, 14.0)
+        self.assertEqual(s0, 13.0)
+        self.assertEqual(s1, 13.0)
 
     def test_manual_mode_same_transform_all_segments(self) -> None:
         from services.jianying_text_track import build_text_track_payload

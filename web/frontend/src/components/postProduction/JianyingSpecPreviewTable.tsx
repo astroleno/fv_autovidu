@@ -5,7 +5,7 @@ import type { Episode } from "@/types"
 import { flattenShots } from "@/types"
 import {
   estimateSubtitleLineCount,
-  jianyingSpecFontSize,
+  JIANYING_SPEC_FONT_SIZE,
   jianyingSpecYAndTransformPreview,
   subtitleTextFromShot,
 } from "@/utils/jianyingSubtitleText"
@@ -42,7 +42,7 @@ export function JianyingSpecPreviewTable({
             const body = subtitleTextFromShot(shot)
             const has = body.trim().length > 0
             const n = has ? estimateSubtitleLineCount(body) : 0
-            const fs = has ? jianyingSpecFontSize(n) : 0
+            const fs = has ? JIANYING_SPEC_FONT_SIZE : 0
             const preview = has
               ? jianyingSpecYAndTransformPreview(n, canvasSize)
               : { yPixel: 0, transformY: 0 }
