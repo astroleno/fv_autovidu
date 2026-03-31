@@ -17,9 +17,9 @@ function pickShotString(shot: Shot, keys: string[]): string {
 }
 
 /**
- * 从镜头得到剪映字幕用正文（与 `jianying_text_track.subtitle_text_from_shot` 优先级一致）。
- *
- * 顺序：译文 → 原文台词 → 结构化对白 → **画面描述**（许多项目仅在 visualDescription 有文案）。
+ * 从镜头得到剪映字幕用正文（与 `jianying_text_track.subtitle_text_from_shot` 一致）。
+
+ * **不包含** `visualDescription`：画面描述不是台词，不得用于字幕与行数。
  */
 export function subtitleTextFromShot(shot: Shot): string {
   const translated = pickShotString(shot, [
@@ -38,49 +38,45 @@ export function subtitleTextFromShot(shot: Shot): string {
     if (content) return content
   }
 
-  const vis = pickShotString(shot, ["visualDescription", "visual_description"])
-  if (vis) return vis
-
   return ""
 }
 
-/**
- * 若当前字幕正文仅来自 `visualDescription`（无译文/台词/结构化对白），返回提示文案，否则返回 null。
- * 供预览表标注来源，避免误以为「台词列为空」却仍有行数。
- */
-export function subtitlePreviewSourceHint(shot: Shot): string | null {
-  if (!subtitleTextFromShot(shot).trim()) return null
-  if (pickShotString(shot, ["dialogueTranslation", "dialogue_translation"])) return null
-  if (pickShotString(shot, ["dialogue", "Dialogue"])) return null
-  const ad = shot.associatedDialogue
-  if (ad) {
-    const role = (ad.role ?? "").trim()
-    const content = (ad.content ?? "").trim()
-    if (role && content) return null
-    if (content) return null
-  }
-  if (pickShotString(shot, ["visualDescription", "visual_description"])) {
-    return "来源：画面描述"
-  }
-  return null
+/** 与后端 `_JIANYING_SPEC_WORDS_PER_LINE` 一致：约 6～8 词/行取中 */
+const WORDS_PER_LINE = 7
+
+function countLatinWords(s: string): number {
+  const m = s.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g)
+  return m ? m.length : 0
+}
+
+function countCjkChars(s: string): number {
+  const m = s.match(/[\u4e00-\u9fff]/g)
+  return m ? m.length : 0
 }
 
 /**
- * 将字幕正文压成一行展示（换行显示为「 / 」），便于在表格里看出多行分段。
+ * 单行正文在剪映内自动折行时的估算行数（无 `\\n` 时）。
+ * 英文按词数；汉字按「每字约半词宽」与 7 词/行对齐。
  */
-export function formatSubtitlePreviewOneLine(body: string, maxLen: number): string {
-  const s = body.replace(/\r?\n/g, " / ").trim()
-  if (s.length <= maxLen) return s
-  return `${s.slice(0, maxLen)}…`
+function wrapLinesEstimateSingleBlock(text: string): number {
+  const t = text.trim()
+  if (!t) return 1
+  const words = countLatinWords(t)
+  const cjk = countCjkChars(t)
+  const equiv = words + 0.5 * cjk
+  if (equiv <= 0) return Math.max(1, Math.ceil(t.length / 40))
+  return Math.max(1, Math.ceil(equiv / WORDS_PER_LINE))
 }
 
 /**
- * 按换行分段统计「原始」行数（忽略空行），至少为 1；**不含上限**。
- * 规范版公式用 `jianyingSpecLineCount`（n≤3）。
+ * 规范用「行数」估算（不含 3 行上限，供预览表「换行分段数」列）。
+ * 多行显式换行时按行数；否则按词/字宽估算自动折行行数。
  */
 export function estimateSubtitleLineCount(text: string): number {
   const lines = text.split(/\r?\n/).filter((ln) => ln.trim())
-  return Math.max(1, lines.length)
+  if (lines.length > 1) return Math.max(1, lines.length)
+  const block = lines.length === 1 ? lines[0]! : text.trim()
+  return wrapLinesEstimateSingleBlock(block)
 }
 
 /** 剪映规范：参与 Y=-100n-400 的行数 n 上限（与后端 `JIANYING_SPEC_MAX_LINES` 一致）。 */
@@ -88,9 +84,6 @@ export const JIANYING_SPEC_MAX_LINES = 3
 
 /**
  * 规范版用于纵轴公式的行数 n（1～`JIANYING_SPEC_MAX_LINES`）。
- *
- * 规则：按 `\\n` / `\\r\\n` 拆行，忽略空行；非空行数至少为 1；再 `min(行数, JIANYING_SPEC_MAX_LINES)`。
- * 无换行符的长句（仅靠剪映自动折行）在此视为 1 行。
  */
 export function jianyingSpecLineCount(text: string): number {
   const raw = estimateSubtitleLineCount(text)
@@ -99,7 +92,6 @@ export function jianyingSpecLineCount(text: string): number {
 
 /** 剪映规范模式：与后端 `JIANYING_SPEC_FONT_SIZE` 一致，固定字号。 */
 export const JIANYING_SPEC_FONT_SIZE = 13
-
 
 /** 竖屏画布高度（与 jianying_protocol.canvas_wh_vertical_9_16 一致） */
 export function canvasHeightVertical(canvasSize: "720p" | "1080p"): number {
@@ -121,4 +113,13 @@ export function jianyingSpecYAndTransformPreview(
   const h = canvasHeightVertical(canvasSize)
   const half = h / 2
   return { yPixel, transformY: half > 0 ? yPixel / half : -0.8 }
+}
+
+/**
+ * 将字幕正文压成一行展示（换行显示为「 / 」），便于在表格里看出显式分段。
+ */
+export function formatSubtitlePreviewOneLine(body: string, maxLen: number): string {
+  const s = body.replace(/\r?\n/g, " / ").trim()
+  if (s.length <= maxLen) return s
+  return `${s.slice(0, maxLen)}…`
 }

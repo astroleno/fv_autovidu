@@ -3,8 +3,8 @@
 剪映草稿字幕文本轨构建
 
 职责：
-- 从 Episode 的 Shot 抽取用于字幕展示的一行字符串：
-  优先用户编辑的 **译文** ``dialogueTranslation``，否则 **原文** ``dialogue``，再否则结构化 ``associatedDialogue``
+- 从 Episode 的 Shot 抽取字幕正文（**不含** ``visualDescription``）：
+  优先 **译文** ``dialogueTranslation``，否则 **原文** ``dialogue``，再否则结构化 ``associatedDialogue``
 - 使用已安装的 pyJianYingDraft 生成与视频主轨 target_timerange 对齐的 TextSegment 素材与片段 JSON
 
 说明：
@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import math
+import re
 from typing import Any, Literal
 
 from pyJianYingDraft.segment import ClipSettings
@@ -38,15 +40,44 @@ SubtitlePositionMode = Literal["manual", "jianying_spec"]
 # 剪映规范：参与 Y=-100n-400 的行数 n 上限（超过则按 3 代入公式）
 JIANYING_SPEC_MAX_LINES: int = 3
 
+# 无显式换行时：竖屏字幕约 6～8 英文词/行（取 7）；中文约 12～16 字/行，用「字≈半词宽」与 7 词/行对齐
+_JIANYING_SPEC_WORDS_PER_LINE: float = 7.0
+_LATIN_WORD_RE = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?")
+_CJK_RE = re.compile(r"[\u4e00-\u9fff]")
+
+
+def _wrap_lines_estimate_single_block(text: str) -> int:
+    """
+    单行正文在剪映内自动折行时的**估算行数**（无 ``\\n`` 时）。
+
+    英文按拉丁词计数除以 7；中日韩统一表意文字按「每字约半词宽」累加后再除以 7；
+    其余符号/数字等仅在无词无字时按字符长度粗算。
+    """
+    t = text.strip()
+    if not t:
+        return 1
+    words = len(_LATIN_WORD_RE.findall(t))
+    cjk = len(_CJK_RE.findall(t))
+    equiv = float(words) + 0.5 * float(cjk)
+    if equiv <= 0:
+        return max(1, math.ceil(len(t) / 40.0))
+    return max(1, int(math.ceil(equiv / _JIANYING_SPEC_WORDS_PER_LINE)))
+
 
 def estimate_subtitle_line_count(text: str) -> int:
     """
-    按换行符统计「物理行」数量（忽略空行），至少为 1。
+    规范用「行数」估算（**不**含 3 行上限，供预览表「换行分段数」列）。
 
-    不含上限；规范模式请用 `jianying_spec_line_count`。
+    - 若有多条**显式**非空换行：行数 = 非空行条数。
+    - 若整段无换行或仅一行：按 `_wrap_lines_estimate_single_block` 估算自动折行后的行数。
+
+    参与公式时再取 ``min(本值, JIANYING_SPEC_MAX_LINES)``，见 `jianying_spec_line_count`。
     """
     lines = [ln for ln in text.splitlines() if ln.strip()]
-    return max(1, len(lines))
+    if len(lines) > 1:
+        return max(1, len(lines))
+    block = lines[0] if lines else text.strip()
+    return _wrap_lines_estimate_single_block(block)
 
 
 def jianying_spec_line_count(text: str) -> int:
@@ -54,14 +85,12 @@ def jianying_spec_line_count(text: str) -> int:
     规范版用于纵轴公式的行数 n（1～``JIANYING_SPEC_MAX_LINES``）。
 
     **如何确定**：
-    1. 将字幕正文按换行符 ``\\n`` / ``\\r\\n`` 拆成多行，去掉仅含空白的行为空行；
-    2. 非空行的条数即为原始行数；若没有任何非空行（不应出现，因空字幕不会生成片段），按 1；
-    3. **n = min(原始行数, JIANYING_SPEC_MAX_LINES)** — 产品约定最多按 3 行代入公式。
+    1. 先求 `estimate_subtitle_line_count`（显式换行优先，否则按词/字宽估算折行行数）；
+    2. **n = min(上值, JIANYING_SPEC_MAX_LINES)**。
 
-    仅「自动换行」、没有在文案里打换行符时，整段视为 **1 行**，无法按视觉折行推算；需在分镜台词里手动换行。
+    画面描述等非台词字段不参与字幕正文，见 `subtitle_text_from_shot`。
     """
-    raw = len([ln for ln in text.splitlines() if ln.strip()])
-    n = max(1, raw)
+    n = estimate_subtitle_line_count(text)
     return min(n, JIANYING_SPEC_MAX_LINES)
 
 
@@ -94,16 +123,17 @@ def y_pixel_to_clip_transform_y(y_px: float, canvas_height_px: int) -> float:
 
 def subtitle_text_from_shot(shot: Shot) -> str:
     """
-    从分镜得到单行字幕文案（与 Vidu/TTS 共用「译文」字段时，剪映也优先展示译文）。
+    从分镜得到剪映字幕用正文（与 Vidu/TTS 一致：优先译文）。
 
     优先级：
-    1. 非空 `shot.dialogueTranslation`（strip 后）— 用户在本机填写的目标语字幕
-    2. 非空 `shot.dialogue`（strip 后）— 平台拉取的原文台词行
-    3. `shot.associatedDialogue`：role 与 content 均非空时格式化为「角色：内容」；否则仅返回非空的 content
-    4. 非空 `shot.visualDescription` — 平台仅有画面描述、未单独填台词时，用于字幕与行数预览（与前端预览表一致）
+    1. 非空 `shot.dialogueTranslation`（strip 后）
+    2. 非空 `shot.dialogue`（strip 后）
+    3. `shot.associatedDialogue`：role 与 content 均非空时「角色：内容」；否则仅非空 content
+
+    **不包含** `visualDescription`：画面描述不是台词，不得写入字幕轨或用于行数预览。
 
     Returns:
-        无可用文案时返回空字符串。
+        无可用台词时返回空字符串。
     """
     translated = (shot.dialogueTranslation or "").strip()
     if translated:
@@ -121,10 +151,6 @@ def subtitle_text_from_shot(shot: Shot) -> str:
             return f"{role}：{content}"
         if content:
             return content
-
-    vis = (shot.visualDescription or "").strip()
-    if vis:
-        return vis
 
     return ""
 

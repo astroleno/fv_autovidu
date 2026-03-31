@@ -9,7 +9,6 @@ import {
   JIANYING_SPEC_FONT_SIZE,
   jianyingSpecLineCount,
   jianyingSpecYAndTransformPreview,
-  subtitlePreviewSourceHint,
   subtitleTextFromShot,
 } from "@/utils/jianyingSubtitleText"
 
@@ -54,7 +53,6 @@ export function JianyingSpecPreviewTable({
             const preview = has
               ? jianyingSpecYAndTransformPreview(nFormula, canvasSize)
               : { yPixel: 0, transformY: 0 }
-            const sourceHint = subtitlePreviewSourceHint(shot)
             const previewOneLine = has
               ? formatSubtitlePreviewOneLine(body, 72)
               : ""
@@ -66,14 +64,7 @@ export function JianyingSpecPreviewTable({
                 <td className="py-1.5 px-2">{shot.shotNumber}</td>
                 <td className="py-1.5 px-2 text-[var(--color-newsprint-black)]">
                   {has ? (
-                    <span className="inline-flex flex-col gap-0.5">
-                      <span className="break-words leading-snug">{previewOneLine}</span>
-                      {sourceHint ? (
-                        <span className="text-[9px] text-[var(--color-muted)]">
-                          {sourceHint}
-                        </span>
-                      ) : null}
-                    </span>
+                    <span className="break-words leading-snug">{previewOneLine}</span>
                   ) : (
                     "—"
                   )}
@@ -91,10 +82,10 @@ export function JianyingSpecPreviewTable({
         </tbody>
       </table>
       <p className="p-2 text-[10px] text-[var(--color-muted)] leading-snug box-border">
-        无可用字幕文案时整行显示「—」。正文优先级：译文 → 台词原文 → 结构化对白 →
-        <strong className="text-[var(--color-newsprint-black)]">画面描述</strong>
-        （平台未单独填台词时）。换行分段数按正文中的换行符统计；多行在「字幕预览」列以「 / 」连接以便辨认。公式用
-        n = min(分段数, 3)。仅靠剪映内自动换行、未在文案里打换行时，分段数为 1。
+        无台词（译文/原文/结构化对白）时整行显示「—」。换行分段数：有显式换行时按非空行数；无换行时按约
+        <strong className="text-[var(--color-newsprint-black)]">7 英文词/行</strong>
+        与汉字「约两字等效一词宽」估算自动折行行数（与剪映竖屏常见密度接近）。公式用 n = min(估算行数,
+        3)。「字幕预览」中多行显式换行以「 / 」连接。
       </p>
     </div>
   )

@@ -61,6 +61,7 @@ def test_get_dialogue_fields_shot_list_scans_non_first_item() -> None:
     """
     shot_list 中首条无 associated_dialogue 时，继续向后扫描；
     且支持项内 snake_case ``associated_dialogue``。
+    仅有结构化对白时，会拼成一行写入 dialogue 供分镜表展示。
     """
     sh = {
         "metadata": {
@@ -75,5 +76,23 @@ def test_get_dialogue_fields_shot_list_scans_non_first_item() -> None:
         },
     }
     d, ad = puller._get_dialogue_fields(sh)
-    assert d == ""
+    assert d == "B：第二镜"
     assert ad == {"role": "B", "content": "第二镜"}
+
+
+def test_get_dialogue_fields_shot_list_plain_dialogue_string() -> None:
+    """部分镜头台词仅在 shot_list[].dialogue 纯文本，无顶层 dialogue。"""
+    sh = {
+        "metadata": {
+            "shotMaster": {
+                "raw": {
+                    "shot_list": [
+                        {"dialogue": "物业这边登记一下。"},
+                    ],
+                },
+            },
+        },
+    }
+    d, ad = puller._get_dialogue_fields(sh)
+    assert d == "物业这边登记一下。"
+    assert ad is None

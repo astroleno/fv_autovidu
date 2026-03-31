@@ -186,6 +186,57 @@ class TestPullerLocalMerge(unittest.TestCase):
         self.assertEqual(sh["associatedDialogue"]["role"], "卡尔")
         self.assertEqual(sh["associatedDialogue"]["content"], "Hi")
 
+    def test_collect_merge_state_scans_extra_flat_root(self) -> None:
+        """命名空间根下无旧稿时，须从扁平 DATA_ROOT 合并尾帧/候选（与 data_service 列表行为一致）。"""
+        import tempfile
+
+        from src.feeling.puller import _collect_local_episode_merge_state
+
+        root = Path(tempfile.mkdtemp())
+        try:
+            ns = root / "dev" / "ws1"
+            ns.mkdir(parents=True)
+            flat = root / "proj-default" / "ep-merge-extra"
+            flat.mkdir(parents=True)
+            ep_body = {
+                "episodeId": "ep-merge-extra",
+                "projectId": "proj-default",
+                "scenes": [
+                    {
+                        "sceneId": "s1",
+                        "sceneNumber": 1,
+                        "title": "",
+                        "shots": [
+                            {
+                                "shotId": "sh-flat",
+                                "endFrame": "endframes/x.png",
+                                "videoCandidates": [{"id": "c1", "videoPath": "videos/a.mp4"}],
+                            }
+                        ],
+                    }
+                ],
+            }
+            (flat / "episode.json").write_text(
+                json.dumps(ep_body, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            # 仅扫命名空间根：无 episode
+            only_ns = _collect_local_episode_merge_state(ns, "ep-merge-extra")
+            self.assertEqual(only_ns["shots_by_id"], {})
+            # 附加扁平根：能合并到 sh-flat
+            merged = _collect_local_episode_merge_state(
+                ns,
+                "ep-merge-extra",
+                merge_extra_roots=(root,),
+            )
+            self.assertIn("sh-flat", merged["shots_by_id"])
+            self.assertEqual(
+                merged["shots_by_id"]["sh-flat"]["endFrame"],
+                "endframes/x.png",
+            )
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
 
 if __name__ == "__main__":
     unittest.main()

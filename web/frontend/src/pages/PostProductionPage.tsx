@@ -552,13 +552,15 @@ export default function PostProductionPage() {
                   >
                     <p>
                       <strong className="text-[var(--color-newsprint-black)]">剪映经验公式</strong>
-                      ：每条字幕先数行数{" "}
-                      <code className="font-mono text-[11px]">n</code>（按换行符分段、忽略空行），再计算像素{" "}
+                      ：字幕正文仅来自分镜<strong>译文 / 台词 / 结构化对白</strong>（不含画面描述）。行数{" "}
+                      <code className="font-mono text-[11px]">n</code>
+                      ：有显式换行时按非空行计；无换行时按约 <strong>7 英文词/行</strong> 与汉字宽度估算折行行数，再取{" "}
+                      <code className="font-mono text-[11px]">min(n, 3)</code>。像素{" "}
                       <code className="font-mono text-[11px]">Y = -100n - 400</code>
-                      ，并换算为草稿中的 <code className="font-mono text-[11px]">transform_y</code>（单位为半个画布高，随当前画布高度自动换算）。
+                      ，并换算为 <code className="font-mono text-[11px]">transform_y</code>（半个画布高）。
                     </p>
                     <p>
-                      仅<strong>显式换行</strong>会计入行数；仅勾选「自动换行」而无换行符时，无法在此阶段估算 n，请在分镜台词里用换行表达多行。
+                      需在剪映里与手动换行完全一致时，请在台词中自行插入换行符；否则使用上述估算以贴近竖屏自动折行。
                     </p>
                     <p>
                       <strong className="text-[var(--color-newsprint-black)]">字号</strong>
