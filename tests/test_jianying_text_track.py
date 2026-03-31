@@ -125,6 +125,17 @@ class TestJianyingSpecLineCount(unittest.TestCase):
         self.assertEqual(estimate_subtitle_line_count(text), 3)
         self.assertEqual(jianying_spec_line_count(text), 3)
 
+    def test_estimate_cjk_wrap_matches_jianying_more_than_equiv_only(self) -> None:
+        """无 \\n 时：仅等效词/7 会低估中文行数；与 CJK/12 取 max 后 13 字应估为 2 行。"""
+        from services.jianying_text_track import (
+            estimate_subtitle_line_count,
+            jianying_spec_line_count,
+        )
+
+        thirteen = "字" * 13
+        self.assertEqual(estimate_subtitle_line_count(thirteen), 2)
+        self.assertEqual(jianying_spec_line_count(thirteen), 2)
+
 
 class TestBuildTextTrackPayload(unittest.TestCase):
     """验证 pyJianYingDraft 生成的素材与片段数量。"""

@@ -41,8 +41,10 @@ SubtitlePositionMode = Literal["manual", "jianying_spec"]
 # 剪映规范：参与 Y=-100n-400 的行数 n 上限（超过则按 3 代入公式）
 JIANYING_SPEC_MAX_LINES: int = 3
 
-# 无显式换行时：竖屏字幕约 6～8 英文词/行（取 7）；中文约 12～16 字/行，用「字≈半词宽」与 7 词/行对齐
+# 无显式换行时：竖屏字幕约 6～8 英文词/行（取 7）；中文另按「约 12 字/行」与等效词估算取 max，避免低估行数
 _JIANYING_SPEC_WORDS_PER_LINE: float = 7.0
+# 与剪映竖屏字幕 max_line_width + 字号 13 下常见折行密度对齐（文档 12～16 字/行，取偏保守 12）
+_JIANYING_SPEC_CJK_CHARS_PER_LINE: float = 12.0
 _LATIN_WORD_RE = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?")
 _CJK_RE = re.compile(r"[\u4e00-\u9fff]")
 
@@ -51,8 +53,11 @@ def _wrap_lines_estimate_single_block(text: str) -> int:
     """
     单行正文在剪映内自动折行时的**估算行数**（无 ``\\n`` 时）。
 
-    英文按拉丁词计数除以 7；中日韩统一表意文字按「每字约半词宽」累加后再除以 7；
-    其余符号/数字等仅在无词无字时按字符长度粗算。
+    1. **等效词行数**：拉丁词 + 中日韩按「每字半词宽」累加后除以 7（与旧逻辑兼容）。
+    2. **纯表意字行数**（仅当正文含 CJK 时）：``ceil(CJK字数 / 12)``，与竖屏剪映实际折行更贴近；
+       仅用 (1) 时常见「前端/数据里一行、剪映里两行」，导致纵轴仍按 n=1。
+
+    最终取 ``max(1, (1), (2))``，减少与剪映自动换行不一致带来的 Y 偏差。
     """
     t = text.strip()
     if not t:
@@ -62,7 +67,14 @@ def _wrap_lines_estimate_single_block(text: str) -> int:
     equiv = float(words) + 0.5 * float(cjk)
     if equiv <= 0:
         return max(1, math.ceil(len(t) / 40.0))
-    return max(1, int(math.ceil(equiv / _JIANYING_SPEC_WORDS_PER_LINE)))
+    line_by_equiv = max(1, int(math.ceil(equiv / _JIANYING_SPEC_WORDS_PER_LINE)))
+    if cjk > 0:
+        line_by_cjk = max(
+            1,
+            int(math.ceil(float(cjk) / _JIANYING_SPEC_CJK_CHARS_PER_LINE)),
+        )
+        return max(line_by_equiv, line_by_cjk)
+    return line_by_equiv
 
 
 def estimate_subtitle_line_count(text: str) -> int:
@@ -70,7 +82,7 @@ def estimate_subtitle_line_count(text: str) -> int:
     规范用「行数」估算（**不**含 3 行上限，供预览表「换行分段数」列）。
 
     - 若有多条**显式**非空换行：行数 = 非空行条数。
-    - 若整段无换行或仅一行：按 `_wrap_lines_estimate_single_block` 估算自动折行后的行数。
+    - 若整段无换行或仅一行：按 `_wrap_lines_estimate_single_block` 估算剪映内自动折行后的行数（等效词与 CJK/字每行取 max）。
 
     参与公式时再取 ``min(本值, JIANYING_SPEC_MAX_LINES)``，见 `jianying_spec_line_count`。
     """
