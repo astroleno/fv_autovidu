@@ -8,42 +8,15 @@ import { Button } from "@/components/ui"
 import { dubApi } from "@/api/dub"
 import { useTaskStore, useToastStore, useEpisodeStore } from "@/stores"
 import { useEpisodeFileBasePath } from "@/hooks/useEpisodeFileBasePath"
-import type { DubStatus, Shot, ShotAsset } from "@/types"
+import type { DubStatus } from "@/types"
 import { flattenShots } from "@/types"
 import { DubShotRow } from "./dub/DubShotRow"
-
-function speakerAssetIdForShot(
-  shot: Shot,
-  episodeAssets: ShotAsset[],
-): string {
-  const manual = (shot.dubSpeakerAssetId ?? "").trim()
-  if (manual) return manual
-  const role = (shot.associatedDialogue?.role ?? "").trim()
-  if (!role) return ""
-  const seen = new Set<string>()
-  for (const asset of [...(shot.assets ?? []), ...episodeAssets]) {
-    if (asset.type !== "character") continue
-    if (seen.has(asset.assetId)) continue
-    seen.add(asset.assetId)
-    if (asset.name.trim() === role) return asset.assetId
-  }
-  return ""
-}
-
-function speakerAssetsForShot(
-  shot: Shot,
-  episodeAssets: ShotAsset[],
-): ShotAsset[] {
-  const seen = new Set<string>()
-  const out: ShotAsset[] = []
-  for (const asset of [...(shot.assets ?? []), ...episodeAssets]) {
-    if (asset.type !== "character") continue
-    if (seen.has(asset.assetId)) continue
-    seen.add(asset.assetId)
-    out.push(asset)
-  }
-  return out
-}
+import { DubEpisodeSummary } from "./dub/DubEpisodeSummary"
+import {
+  effectiveVoiceIdForShot,
+  speakerAssetIdForShot,
+  speakerAssetsForShot,
+} from "./dub/dubVoiceResolve"
 
 export interface DubPanelProps {
   episodeId: string
@@ -137,16 +110,14 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
     (shotId: string) => {
       const shot = shots.find((item) => item.shotId === shotId)
       if (!shot) return defaultVoiceId
-      const override = (shot?.dubVoiceIdOverride ?? "").trim()
-      if (override) return override
-      const assetId = speakerAssetIdForShot(shot, episodeAssets)
-      const bound =
-        assetId && currentEpisode?.characterVoices
-          ? (currentEpisode.characterVoices[assetId]?.voiceId ?? "").trim()
-          : ""
-      return bound || defaultVoiceId
+      return effectiveVoiceIdForShot(
+        shot,
+        currentEpisode ?? null,
+        episodeAssets,
+        defaultVoiceId,
+      )
     },
-    [currentEpisode?.characterVoices, defaultVoiceId, episodeAssets, shots]
+    [currentEpisode, defaultVoiceId, episodeAssets, shots],
   )
 
   const setOverrideForShot = useCallback(
@@ -323,6 +294,14 @@ export function DubPanel({ episodeId, initialHighlightShotId }: DubPanelProps) {
         <Mic className="w-4 h-4" />
         STS 配音工作台
       </div>
+      {currentEpisode && currentEpisode.episodeId === episodeId ? (
+        <DubEpisodeSummary
+          episode={currentEpisode}
+          shots={shots}
+          voices={voices}
+          dubByShot={dubByShot}
+        />
+      ) : null}
       <div className="flex flex-wrap gap-3 items-end mb-3">
         <div>
           <label className="block text-[10px] font-black uppercase tracking-wider mb-1">
