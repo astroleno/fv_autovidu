@@ -21,23 +21,27 @@ export type StoryboardTableColKey =
   | "candidates"
   | "actions"
 
-/** 初始列宽（px），台词/描述类默认略宽便于扫读 */
+/**
+ * 初始列宽（px）。
+ * - 编号/时长/视频/状态/候选等偏窄，为横向腾出空间给描述与提示词列（可换行后仍占宽度）。
+ * - **画面描述 / 图片提示词 / 视频提示词** 三列默认同宽，便于扫读与拖拽对齐。
+ */
 export const STORYBOARD_COL_DEFAULTS_PX: Record<StoryboardTableColKey, number> =
   {
     pick: 44,
-    number: 52,
-    duration: 84,
+    number: 46,
+    duration: 64,
     frames: 200,
-    video: 128,
-    status: 112,
+    video: 112,
+    status: 96,
     dialogue: 220,
     translation: 220,
-    dialogueInject: 72,
+    dialogueInject: 64,
     visualDesc: 200,
-    imagePrompt: 190,
-    videoPrompt: 190,
+    imagePrompt: 200,
+    videoPrompt: 200,
     assets: 168,
-    candidates: 72,
+    candidates: 60,
     actions: 80,
   }
 

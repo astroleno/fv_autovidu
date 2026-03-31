@@ -1,14 +1,15 @@
 /**
  * ShotPromptCells
  * 分镜表一行中的「画面描述 | 图片提示词 | 视频提示词」三列。
- * - 预览：三格独立，悬浮显示全文
+ * - 预览：三格独立，**最多 5 行**、高度与首尾帧缩略图（7.5rem）对齐；超出省略号；悬浮可看全文
  * - 编辑：合并为一格 colSpan=3，textarea 按内容自适应宽高
  */
 import { useState, useRef, useLayoutEffect, useCallback } from "react"
 import type { Shot } from "@/types"
 import {
   STORYBOARD_TABLE_INLINE_EDIT_TEXTAREA_CLASS,
-  STORYBOARD_TABLE_PREVIEW_BUTTON_CLASS,
+  STORYBOARD_TABLE_PREVIEW_PROMPT_BUTTON_CLASS,
+  STORYBOARD_TABLE_PREVIEW_PROMPT_CLIPPED_TEXT_CLASS,
 } from "@/components/business/storyboardFieldClasses"
 
 export type PromptFieldKey = "visualDescription" | "imagePrompt" | "videoPrompt"
@@ -33,7 +34,6 @@ interface ShotPromptCellsProps {
     shotId: string,
     updates: Partial<Record<PromptFieldKey, string>>
   ) => Promise<void>
-  maxPreviewLen?: number
 }
 
 function getFieldValue(shot: Shot, key: PromptFieldKey): string {
@@ -54,7 +54,6 @@ export function ShotPromptCells({
   shot,
   episodeId,
   updateShot,
-  maxPreviewLen = 40,
 }: ShotPromptCellsProps) {
   const [editing, setEditing] = useState<PromptFieldKey | null>(null)
   const [editDraft, setEditDraft] = useState("")
@@ -124,11 +123,8 @@ export function ShotPromptCells({
 
   const renderPreviewTd = (key: PromptFieldKey) => {
     const value = getFieldValue(shot, key)
+    /** 空字段仍显示「-」，与台词列一致 */
     const displayText = value || "-"
-    const truncated =
-      displayText.length > maxPreviewLen
-        ? displayText.slice(0, maxPreviewLen) + "…"
-        : displayText
 
     return (
       <td
@@ -142,9 +138,11 @@ export function ShotPromptCells({
           type="button"
           data-prompt-preview
           onClick={() => beginEdit(key)}
-          className={STORYBOARD_TABLE_PREVIEW_BUTTON_CLASS}
+          className={STORYBOARD_TABLE_PREVIEW_PROMPT_BUTTON_CLASS}
         >
-          {truncated}
+          <span className={STORYBOARD_TABLE_PREVIEW_PROMPT_CLIPPED_TEXT_CLASS}>
+            {displayText}
+          </span>
         </button>
         {hoverKey === key && (
           <div
