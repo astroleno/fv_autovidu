@@ -1,6 +1,6 @@
 /**
- * 侧边栏：项目列表、设置；在剧集上下文中追加「分镜板」「选片总览」「粗剪预览」「资产库」
- * 垂直顺序（左侧面板）：分镜板 → 选片总览 → 粗剪预览 → 资产库
+ * 侧边栏：项目列表、设置；在剧集上下文中追加本集子导航。
+ * 垂直顺序（左侧面板，自上而下）：资产库 → 分镜板 → 选片总览 → 后期制作 → 粗剪预览。
  *
  * 不在此重复请求 GET /episodes/:id：各剧集子页（分镜板、时间线、资产库等）已拉取详情，
  * 避免与 SideNavBar 并发双请求、404 时控制台重复报错。
@@ -16,6 +16,7 @@ import {
   Clapperboard,
   LayoutGrid,
   CheckSquare,
+  Sparkles,
 } from "lucide-react"
 import { useEpisodeStore } from "@/stores"
 import { routes } from "@/utils/routes"
@@ -56,6 +57,7 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
   return (
     <aside
       className={`${width} h-screen sticky left-0 top-0 flex flex-col border-r border-[var(--color-newsprint-black)] bg-[var(--color-newsprint-off-white)] transition-all duration-300 shrink-0 box-border py-6`}
+      style={{ boxSizing: "border-box" }}
     >
       {/* Logo */}
       <div className="px-5 mb-6 flex items-center gap-3">
@@ -109,18 +111,34 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
         ))}
 
         {/**
-         * 当前剧集子页导航（自上而下，与产品流程一致）：
-         * 分镜板 → 选片总览 → 粗剪预览 → 资产库。
-         * 折叠时仅图标，样式与主导航一致。
+         * 当前剧集子页导航：独立 `<nav aria-label>` 便于无障碍与单测断言顺序。
+         * 顺序：资产库 → 分镜板 → 选片 → 后期制作 → 粗剪（与产品拍板一致）。
          */}
         {episodeId && projectId && (
-          <div
-            className={`mt-4 border-t border-[var(--color-newsprint-black)] pt-4 space-y-1 ${
+          <nav
+            aria-label="剧集导航"
+            className={`mt-4 border-t border-[var(--color-newsprint-black)] pt-4 space-y-1 box-border ${
               collapsed ? "px-0" : ""
             }`}
+            style={{ boxSizing: "border-box" }}
           >
+            <NavLink
+              to={routes.assets(projectId, episodeId)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
+                  isActive
+                    ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
+                    : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
+                }`
+              }
+              style={{ boxSizing: "border-box" }}
+              title={collapsed ? `资产库 (${assetCount})` : undefined}
+            >
+              <Package className="w-5 h-5 shrink-0" aria-hidden />
+              {!collapsed && <span>资产库 ({assetCount})</span>}
+            </NavLink>
             {/**
-             * 分镜板根路由：必须加 end，否则 /timeline、/videopick、/assets、/shot/... 会误匹配为「当前在分镜板」
+             * 分镜板根路由：必须加 end，否则 /timeline、/pick、/assets、/shot/... 会误匹配为「当前在分镜板」
              */}
             <NavLink
               end
@@ -132,6 +150,7 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
                     : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
                 }`
               }
+              style={{ boxSizing: "border-box" }}
               title={collapsed ? "分镜板" : undefined}
             >
               <LayoutGrid className="w-5 h-5 shrink-0" aria-hidden />
@@ -146,10 +165,26 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
                     : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
                 }`
               }
+              style={{ boxSizing: "border-box" }}
               title={collapsed ? "选片总览" : undefined}
             >
               <CheckSquare className="w-5 h-5 shrink-0" aria-hidden />
               {!collapsed && <span>选片总览</span>}
+            </NavLink>
+            <NavLink
+              to={routes.postProduction(projectId, episodeId)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
+                  isActive
+                    ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
+                    : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
+                }`
+              }
+              style={{ boxSizing: "border-box" }}
+              title={collapsed ? "后期制作" : undefined}
+            >
+              <Sparkles className="w-5 h-5 shrink-0" aria-hidden />
+              {!collapsed && <span>后期制作</span>}
             </NavLink>
             <NavLink
               to={routes.timeline(projectId, episodeId)}
@@ -160,26 +195,13 @@ export function SideNavBar({ collapsed, onToggle, taskCount = 0 }: SideNavBarPro
                     : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
                 }`
               }
+              style={{ boxSizing: "border-box" }}
               title={collapsed ? "粗剪预览" : undefined}
             >
               <Clapperboard className="w-5 h-5 shrink-0" aria-hidden />
               {!collapsed && <span>粗剪预览</span>}
             </NavLink>
-            <NavLink
-              to={routes.assets(projectId, episodeId)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 text-xs uppercase tracking-widest font-bold transition-colors box-border border ${
-                  isActive
-                    ? "bg-[var(--color-primary)] text-white border-[var(--color-newsprint-black)]"
-                    : "text-[var(--color-newsprint-black)] border-transparent hover:border-[var(--color-newsprint-black)]"
-                }`
-              }
-              title={collapsed ? `资产库 (${assetCount})` : undefined}
-            >
-              <Package className="w-5 h-5 shrink-0" aria-hidden />
-              {!collapsed && <span>资产库 ({assetCount})</span>}
-            </NavLink>
-          </div>
+          </nav>
         )}
       </nav>
 

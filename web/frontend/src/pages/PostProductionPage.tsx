@@ -11,6 +11,11 @@ import { ArrowLeft, Loader2, Sparkles } from "lucide-react"
 import { useEpisodeStore, useToastStore } from "@/stores"
 import { DubPanel } from "@/components/business/DubPanel"
 import { JianyingExportDialog, LS_JIANYING_DRAFT_PATH } from "@/components/business/JianyingExportDialog"
+import {
+  JianyingExportResultCard,
+  JianyingSubtitleHints,
+  SubtitlePositionPreview,
+} from "@/components/postProduction"
 import { Button } from "@/components/ui"
 import { exportApi } from "@/api/export"
 import { routes } from "@/utils/routes"
@@ -40,6 +45,14 @@ const JIANYING_DEFAULTS: EpisodeJianyingFormState = {
   subtitleTransformY: -0.8,
 }
 
+/** 最近一次剪映导出成功结果（用于结果卡，非持久化） */
+interface LastJianyingExportState {
+  primaryPath: string
+  draftDir: string
+  exportedShots: number
+  exportedAt: string
+}
+
 export default function PostProductionPage() {
   const [searchParams] = useSearchParams()
   /** 与选片页一致：?shotId= 深链至后期制作并展开该镜试听区 */
@@ -66,6 +79,8 @@ export default function PostProductionPage() {
   )
   const [jianyingBusy, setJianyingBusy] = useState(false)
   const [pathDialogOpen, setPathDialogOpen] = useState(false)
+  const [lastJianyingExport, setLastJianyingExport] =
+    useState<LastJianyingExportState | null>(null)
 
   /** 关闭「侦测路径」弹窗后同步全局草稿路径到输入框 */
   useEffect(() => {
@@ -193,6 +208,15 @@ export default function PostProductionPage() {
       } catch {
         /* ignore */
       }
+      const primary =
+        (res.data.jianyingCopyPath && res.data.jianyingCopyPath.trim()) ||
+        res.data.draftDir
+      setLastJianyingExport({
+        primaryPath: primary,
+        draftDir: res.data.draftDir,
+        exportedShots: res.data.exportedShots,
+        exportedAt: res.data.exportedAt,
+      })
       pushToast(
         `剪映草稿已导出：${res.data.jianyingCopyPath ?? res.data.draftDir}`,
         "success",
@@ -348,6 +372,7 @@ export default function PostProductionPage() {
           <p className="text-[11px] text-[var(--color-muted)] leading-relaxed">
             草稿根目录为<strong>本机全局</strong>；画布与字幕默认按本集记忆。
           </p>
+          <JianyingSubtitleHints />
           <div
             className="grid gap-4 p-4 border border-[var(--color-divider)] bg-white box-border"
             style={{ boxSizing: "border-box" }}
@@ -466,6 +491,7 @@ export default function PostProductionPage() {
                 <span className="text-xs text-[var(--color-muted)]">
                   {jianyingForm.subtitleTransformY.toFixed(2)}
                 </span>
+                <SubtitlePositionPreview transformY={jianyingForm.subtitleTransformY} />
               </div>
             </div>
             <Button
@@ -480,6 +506,14 @@ export default function PostProductionPage() {
               ) : null}
               导出到剪映目录
             </Button>
+            {lastJianyingExport ? (
+              <JianyingExportResultCard
+                primaryPath={lastJianyingExport.primaryPath}
+                draftDir={lastJianyingExport.draftDir}
+                exportedShots={lastJianyingExport.exportedShots}
+                exportedAt={lastJianyingExport.exportedAt}
+              />
+            ) : null}
           </div>
         </div>
       )}
