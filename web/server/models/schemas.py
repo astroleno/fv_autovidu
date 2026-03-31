@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import AliasChoices, BaseModel, Field, field_validator, model_validator
 
 # ---------- 枚举 / 字面量类型 ----------
 
@@ -107,15 +107,19 @@ class AssociatedDialogue(BaseModel):
 class Shot(BaseModel):
     """单镜头。"""
 
-    shotId: str
-    shotNumber: int
-    visualDescription: str = ""  # 画面描述，平台 visualDescription
-    imagePrompt: str
-    videoPrompt: str
+    shotId: str = Field(validation_alias=AliasChoices("shotId", "shot_id"))
+    shotNumber: int = Field(validation_alias=AliasChoices("shotNumber", "shot_number"))
+    # 兼容磁盘/第三方 JSON 中的 snake_case 与平台别名字段
+    visualDescription: str = Field(
+        default="",
+        validation_alias=AliasChoices("visualDescription", "visual_description"),
+    )
+    imagePrompt: str = Field(validation_alias=AliasChoices("imagePrompt", "image_prompt"))
+    videoPrompt: str = Field(validation_alias=AliasChoices("videoPrompt", "video_prompt"))
     duration: int = 5
     cameraMovement: str = "push_in"
     aspectRatio: str = "9:16"
-    firstFrame: str
+    firstFrame: str = Field(validation_alias=AliasChoices("firstFrame", "first_frame"))
     assets: list[ShotAsset] = Field(default_factory=list)
     status: ShotStatus = "pending"
     # 使用 Optional 而非 str | None，兼容 Python 3.9 + Pydantic 对注解的解析
@@ -124,11 +128,20 @@ class Shot(BaseModel):
     dub: Optional[DubStatus] = None
     # --- 台词与本地化（与 puller / episode.json / 前端 Shot 一致）---
     # 平台原文台词行（字幕、编剧语言）
-    dialogue: str = ""
+    dialogue: str = Field(
+        default="",
+        validation_alias=AliasChoices("dialogue", "Dialogue"),
+    )
     # 结构化对白；无有效 role/content 时 JSON 中省略或为 null
-    associatedDialogue: Optional[AssociatedDialogue] = None
+    associatedDialogue: Optional[AssociatedDialogue] = Field(
+        default=None,
+        validation_alias=AliasChoices("associatedDialogue", "associated_dialogue"),
+    )
     # 目标语译文，供 Vidu 提示词拼接与 TTS；拉取时为空，由 Web 编辑
-    dialogueTranslation: str = ""
+    dialogueTranslation: str = Field(
+        default="",
+        validation_alias=AliasChoices("dialogueTranslation", "dialogue_translation"),
+    )
     # 一期 STS：镜头级音色覆盖；空表示回退 Episode.dubDefaultVoiceId
     dubVoiceIdOverride: str = ""
     # 角色级 STS：显式指定本镜说话角色对应的资产 id；空表示按 associatedDialogue.role 自动匹配资产名

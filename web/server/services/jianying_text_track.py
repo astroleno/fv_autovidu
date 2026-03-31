@@ -35,25 +35,43 @@ _SUBTITLE_ALIGN_TO_INT: dict[Literal["left", "center", "right"], int] = {
 
 SubtitlePositionMode = Literal["manual", "jianying_spec"]
 
+# 剪映规范：参与 Y=-100n-400 的行数 n 上限（超过则按 3 代入公式）
+JIANYING_SPEC_MAX_LINES: int = 3
+
 
 def estimate_subtitle_line_count(text: str) -> int:
     """
-    统计用于「规范版」纵向公式的行数 n。
+    按换行符统计「物理行」数量（忽略空行），至少为 1。
 
-    按换行符分段，忽略空行；无有效行时视为 1 行。
-    自动换行导致的行数无法在此估算，需在分镜里用真实换行分段。
+    不含上限；规范模式请用 `jianying_spec_line_count`。
     """
     lines = [ln for ln in text.splitlines() if ln.strip()]
     return max(1, len(lines))
+
+
+def jianying_spec_line_count(text: str) -> int:
+    """
+    规范版用于纵轴公式的行数 n（1～``JIANYING_SPEC_MAX_LINES``）。
+
+    **如何确定**：
+    1. 将字幕正文按换行符 ``\\n`` / ``\\r\\n`` 拆成多行，去掉仅含空白的行为空行；
+    2. 非空行的条数即为原始行数；若没有任何非空行（不应出现，因空字幕不会生成片段），按 1；
+    3. **n = min(原始行数, JIANYING_SPEC_MAX_LINES)** — 产品约定最多按 3 行代入公式。
+
+    仅「自动换行」、没有在文案里打换行符时，整段视为 **1 行**，无法按视觉折行推算；需在分镜台词里手动换行。
+    """
+    raw = len([ln for ln in text.splitlines() if ln.strip()])
+    n = max(1, raw)
+    return min(n, JIANYING_SPEC_MAX_LINES)
 
 
 def jianying_spec_y_pixel(n: int) -> float:
     """
     剪映竖屏字幕经验公式（像素位移 Y，向下为负的惯例与 ClipSettings 一致）。
 
-    公式：Y = -100n - 400，n 为字幕行数（≥1）。
+    公式：Y = -100n - 400，n 为规范行数（1～3，见 `jianying_spec_line_count`）。
     """
-    nn = max(1, int(n))
+    nn = max(1, min(int(n), JIANYING_SPEC_MAX_LINES))
     return -100.0 * float(nn) - 400.0
 
 
@@ -81,7 +99,8 @@ def subtitle_text_from_shot(shot: Shot) -> str:
     优先级：
     1. 非空 `shot.dialogueTranslation`（strip 后）— 用户在本机填写的目标语字幕
     2. 非空 `shot.dialogue`（strip 后）— 平台拉取的原文台词行
-    3. `shot.associatedDialogue`：role 与 content 均非空时格式化为「角色：内容」；否则仅返回非空的 content（仅 role 无 content 时返回空）
+    3. `shot.associatedDialogue`：role 与 content 均非空时格式化为「角色：内容」；否则仅返回非空的 content
+    4. 非空 `shot.visualDescription` — 平台仅有画面描述、未单独填台词时，用于字幕与行数预览（与前端预览表一致）
 
     Returns:
         无可用文案时返回空字符串。
@@ -95,16 +114,19 @@ def subtitle_text_from_shot(shot: Shot) -> str:
         return line
 
     ad = shot.associatedDialogue
-    if ad is None:
-        return ""
+    if ad is not None:
+        role = (ad.role or "").strip()
+        content = (ad.content or "").strip()
+        if role and content:
+            return f"{role}：{content}"
+        if content:
+            return content
 
-    role = (ad.role or "").strip()
-    content = (ad.content or "").strip()
-    if not role and not content:
-        return ""
-    if role and content:
-        return f"{role}：{content}"
-    return content
+    vis = (shot.visualDescription or "").strip()
+    if vis:
+        return vis
+
+    return ""
 
 
 def build_text_track_payload(
@@ -132,7 +154,7 @@ def build_text_track_payload(
         auto_wrapping: 是否自动换行
         transform_y: **manual** 模式下统一使用的 ``ClipSettings.transform_y``
         font_size: **manual** 模式下统一字号；**jianying_spec** 下忽略请求体字号，固定为 `JIANYING_SPEC_FONT_SIZE`（13）
-        position_mode: ``manual`` 全段同一 transform_y 与字号；``jianying_spec`` 纵坐标按行数 n，字号固定
+        position_mode: ``manual`` 全段同一 transform_y 与字号；``jianying_spec`` 纵坐标按 ``jianying_spec_line_count``（n≤3），字号固定
 
     Returns:
         (text_material_dicts, segment_dicts, speed_dicts)。
@@ -160,7 +182,7 @@ def build_text_track_payload(
             continue
 
         if position_mode == "jianying_spec":
-            n = estimate_subtitle_line_count(body)
+            n = jianying_spec_line_count(body)
             y_px = jianying_spec_y_pixel(n)
             ty = y_pixel_to_clip_transform_y(y_px, canvas_h)
             style = TextStyle(

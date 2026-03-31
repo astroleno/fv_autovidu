@@ -84,6 +84,36 @@ class TestSubtitleTextFromShot(unittest.TestCase):
         )
         self.assertEqual(subtitle_text_from_shot(role_only), "")
 
+    def test_subtitle_text_falls_back_to_visual_description(self) -> None:
+        """无译文/台词/结构化正文时，使用画面描述作为剪映字幕与行数依据。"""
+        from models.schemas import Shot
+        from services.jianying_text_track import subtitle_text_from_shot
+
+        shot = Shot(
+            shotId="s1",
+            shotNumber=1,
+            imagePrompt="",
+            videoPrompt="",
+            firstFrame="",
+            visualDescription="第一行\n第二行",
+        )
+        self.assertEqual(subtitle_text_from_shot(shot), "第一行\n第二行")
+
+
+class TestJianyingSpecLineCount(unittest.TestCase):
+    """规范版行数 n：换行分段后封顶为 3。"""
+
+    def test_jianying_spec_line_count_caps_at_3(self) -> None:
+        from services.jianying_text_track import jianying_spec_line_count
+
+        self.assertEqual(jianying_spec_line_count("a\nb\nc"), 3)
+        self.assertEqual(jianying_spec_line_count("a\nb\nc\nd\ne"), 3)
+
+    def test_jianying_spec_line_count_single_line(self) -> None:
+        from services.jianying_text_track import jianying_spec_line_count
+
+        self.assertEqual(jianying_spec_line_count("无换行长句"), 1)
+
 
 class TestBuildTextTrackPayload(unittest.TestCase):
     """验证 pyJianYingDraft 生成的素材与片段数量。"""
@@ -154,6 +184,28 @@ class TestBuildTextTrackPayload(unittest.TestCase):
         s1 = json.loads(mats[1]["content"])["styles"][0]["size"]
         self.assertEqual(s0, 13.0)
         self.assertEqual(s1, 13.0)
+
+    def test_jianying_spec_five_explicit_lines_same_y_as_three(self) -> None:
+        """5 段换行仍按 n=3 代入公式，与 3 行文案纵轴一致。"""
+        from services.jianying_text_track import build_text_track_payload
+
+        body = "a\nb\nc\nd\ne"
+        _, segs, _ = build_text_track_payload(
+            1080,
+            1920,
+            [(0, 1_000_000, body)],
+            position_mode="jianying_spec",
+        )
+        y5 = segs[0]["clip"]["transform"]["y"]
+        _, segs3, _ = build_text_track_payload(
+            1080,
+            1920,
+            [(0, 1_000_000, "a\nb\nc")],
+            position_mode="jianying_spec",
+        )
+        y3 = segs3[0]["clip"]["transform"]["y"]
+        self.assertAlmostEqual(y5, y3, places=5)
+        self.assertAlmostEqual(y5, -700.0 / 960.0, places=5)
 
     def test_manual_mode_same_transform_all_segments(self) -> None:
         from services.jianying_text_track import build_text_track_payload
