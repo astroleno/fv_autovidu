@@ -10,19 +10,26 @@ import {
   subtitleTextFromShot,
 } from "./jianyingSubtitleText"
 
+/**
+ * 构造满足 Shot 必填字段的最小合法对象，便于单测覆盖字幕解析逻辑。
+ * 注意：`Partial<Shot>` 与展开合并时，若缺少 duration 等必填项，TS 会报类型错误。
+ */
 function buildShot(over: Partial<Shot>): Shot {
-  return {
+  const base: Shot = {
     shotId: "s",
     shotNumber: 1,
     imagePrompt: "",
     videoPrompt: "",
+    duration: 5,
+    cameraMovement: "",
+    aspectRatio: "9:16",
     firstFrame: "",
     assets: [],
     status: "pending",
     endFrame: null,
     videoCandidates: [],
-    ...over,
   }
+  return { ...base, ...over }
 }
 
 describe("subtitleTextFromShot", () => {
@@ -35,9 +42,8 @@ describe("subtitleTextFromShot", () => {
   })
 
   it("接受 dialogue_translation 蛇形键", () => {
-    const shot = buildShot({
-      dialogue_translation: "译",
-    } as Shot)
+    // 平台/JSON 可能仅带蛇形键；subtitleTextFromShot 内按字符串键读取，此处用断言模拟扩展字段
+    const shot = { ...buildShot({}), dialogue_translation: "译" } as Shot
     expect(subtitleTextFromShot(shot)).toBe("译")
   })
 })
