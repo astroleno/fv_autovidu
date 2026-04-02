@@ -57,12 +57,12 @@ jobs:
         with:
           node-version: '20'
 
-      # 版本须与仓库根 package.json 的 packageManager（pnpm@10.x）一致；
-      # lockfile 为 pnpm 9+ 格式（lockfileVersion: '9.0'），与 pnpm 8 生成的 v6 不兼容。
+      # pnpm 版本仅由仓库根 package.json 的 packageManager 指定；勿在此再写 version，
+      # 否则 pnpm/action-setup 会报「Multiple versions of pnpm specified」。
+      # lockfile 须为 pnpm 9+（lockfileVersion: '9.0'），与 pnpm 8 的 v6 不兼容。
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.32.1
           run_install: false
 
       - name: Get pnpm store directory
