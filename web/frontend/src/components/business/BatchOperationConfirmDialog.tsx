@@ -4,14 +4,14 @@
  * 与 `VideoModeSelector`（先选参数再点「开始生成」）并列：尾帧批量无模型/分辨率等额外项，
  * 但仍需二次确认镜头数量与操作说明，避免误触大量任务。
  *
- * 使用场景：`StoryboardPage` 批量生成尾帧；后续若有其它无参批量（如仅确认数量）可扩展 `kind`。
+ * 使用场景：`StoryboardPage` 批量生成尾帧、万相组图重生；其它无参批量可继续扩展 `kind`。
  *
  * 提交流程：用户点「确认并提交」后由父组件关闭本弹窗再调 API，加载态留在工具栏按钮（与视频批量一致）。
  */
 import { Dialog, Button } from "@/components/ui"
 
 /** 当前支持的批量操作类型（用于标题与说明文案） */
-export type BatchOperationConfirmKind = "endframe"
+export type BatchOperationConfirmKind = "endframe" | "wan27_batch"
 
 export interface BatchOperationConfirmDialogProps {
   /** 是否显示弹窗 */
@@ -34,6 +34,8 @@ function titleForKind(kind: BatchOperationConfirmKind): string {
   switch (kind) {
     case "endframe":
       return "确认批量生成尾帧"
+    case "wan27_batch":
+      return "确认万相组图重生首帧"
     default:
       return "确认批量操作"
   }
@@ -47,6 +49,8 @@ function descriptionForKind(
   switch (kind) {
     case "endframe":
       return `即将为 ${shotCount} 个镜头提交尾帧生成任务。提交后将进入任务轮询，完成后会弹出结果汇总。`
+    case "wan27_batch":
+      return `即将通过阿里云万相 2.7 组图接口，按叙事顺序一次性重生 ${shotCount} 个镜头的首帧（覆盖原 PNG）。需已配置 DASHSCOPE_API_KEY；提交后轮询任务，完成后刷新缩略图。`
     default:
       return `即将处理 ${shotCount} 个镜头，请确认后继续。`
   }

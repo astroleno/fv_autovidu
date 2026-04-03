@@ -28,6 +28,8 @@ export type {
   PromoteVideoRequest,
   RegenFrameRequest,
   RegenFrameResponse,
+  RegenBatchWan27Request,
+  RegenBatchWan27Response,
   SelectCandidateRequest,
   ExportRoughCutRequest,
   ExportRoughCutResponse,

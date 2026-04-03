@@ -94,6 +94,21 @@ export interface RegenFrameResponse {
   newFramePath: string
 }
 
+/** 万相 2.7 组图批量重生首帧（1～12 镜，顺序与 shotIds 一致） */
+export interface RegenBatchWan27Request {
+  episodeId: string
+  shotIds: string[]
+  assetIds?: string[]
+  model?: string
+  size?: string
+}
+
+export interface RegenBatchWan27Response {
+  taskId: string
+  episodeId: string
+  shotCount: number
+}
+
 /** 选定候选视频请求体 */
 export interface SelectCandidateRequest {
   candidateId: string

@@ -9,6 +9,7 @@ import {
   Clapperboard,
   CheckSquare,
   Grid3X3,
+  Images,
   List,
   Film,
   ImagePlus,
@@ -95,6 +96,9 @@ export default function StoryboardPage() {
   )
 
   const [batchEndBusy, setBatchEndBusy] = useState(false)
+  /** 万相 2.7 组图批量首帧：确认弹窗与请求中状态 */
+  const [wan27ConfirmOpen, setWan27ConfirmOpen] = useState(false)
+  const [wan27Busy, setWan27Busy] = useState(false)
   const [videoDialogOpen, setVideoDialogOpen] = useState(false)
   /** 批量尾帧：二次确认（与视频批量「先弹窗再提交」一致） */
   const [endframeConfirmOpen, setEndframeConfirmOpen] = useState(false)
@@ -469,6 +473,69 @@ export default function StoryboardPage() {
     setVideoDialogOpen(true)
   }
 
+  /**
+   * 万相组图：与「批量视频·首帧模式」共用同一批目标镜头（有首帧、非尾帧/视频生成中），
+   * 叙事顺序与 flattenShots 一致；仅支持 1～12 镜一批。
+   */
+  const handleWan27BatchToolbarClick = () => {
+    const n = firstFrameForBatch.length
+    if (n < 1) {
+      if (batchPickMode === "manual" && firstFrameBatchShots.length > 0) {
+        pushToast(
+          "框选模式下请勾选需要万相组图重生的镜头，或改回「全部符合条件」",
+          "info"
+        )
+      }
+      return
+    }
+    if (n > 12) {
+      pushToast(
+        "万相组图一批最多 12 个镜头，请减少勾选或分批提交",
+        "error"
+      )
+      return
+    }
+    setWan27ConfirmOpen(true)
+  }
+
+  const handleWan27BatchConfirm = async () => {
+    if (!episodeId || firstFrameForBatch.length === 0) return
+    setWan27ConfirmOpen(false)
+    setWan27Busy(true)
+    try {
+      const res = await generateApi.regenBatchWan27({
+        episodeId,
+        shotIds: firstFrameForBatch.map((s) => s.shotId),
+      })
+      pushToast(
+        `已提交万相组图任务（${res.data.shotCount} 镜），完成后将刷新首帧`,
+        "info"
+      )
+      startPolling([res.data.taskId], {
+        episodeId,
+        onAllSettled: (results) => {
+          const failed = results.filter((r) => r.status === "failed")
+          if (failed.length > 0) {
+            const msg =
+              typeof failed[0].error === "string" && failed[0].error
+                ? failed[0].error
+                : "万相组图重生失败"
+            pushToast(msg, "error")
+          } else {
+            pushToast("万相组图重生已完成", "success")
+          }
+        },
+      })
+    } catch (e) {
+      pushToast(
+        e instanceof Error ? e.message : "万相组图请求失败",
+        "error"
+      )
+    } finally {
+      setWan27Busy(false)
+    }
+  }
+
   return (
     <div className="p-8">
       <BatchResultSummary
@@ -517,6 +584,16 @@ export default function StoryboardPage() {
         onConfirm={() => {
           setEndframeConfirmOpen(false)
           void handleBatchEndframe()
+        }}
+      />
+
+      <BatchOperationConfirmDialog
+        open={wan27ConfirmOpen}
+        onClose={() => setWan27ConfirmOpen(false)}
+        kind="wan27_batch"
+        shotCount={firstFrameForBatch.length}
+        onConfirm={() => {
+          void handleWan27BatchConfirm()
         }}
       />
 
@@ -732,6 +809,20 @@ export default function StoryboardPage() {
               <Film className="w-4 h-4" />
               批量视频·首帧模式 ({firstFrameForBatch.length})
             </Button>
+            <Button
+              variant="secondary"
+              className="gap-2"
+              disabled={firstFrameForBatch.length === 0 || wan27Busy}
+              onClick={() => handleWan27BatchToolbarClick()}
+              title="DashScope 万相 2.7 组图：按叙事顺序一次重生 1～12 个镜头首帧（需 DASHSCOPE_API_KEY）；与云雾单帧重生不同"
+            >
+              {wan27Busy ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Images className="w-4 h-4" />
+              )}
+              万相组图重生 ({firstFrameForBatch.length})
+            </Button>
             <Link
               to={routes.postProduction(projectId, episodeId)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider border-2 border-[var(--color-newsprint-black)] bg-white hover:bg-[var(--color-outline-variant)] transition-colors box-border"
@@ -745,7 +836,7 @@ export default function StoryboardPage() {
         </div>
         {batchPickMode === "manual" && (
           <p className="text-[10px] text-[var(--color-muted)] max-w-3xl leading-relaxed">
-            框选模式：列表勾选首列；网格可勾选「选」或在卡片区左键拖拽矩形框选；指针靠近主内容区上下左右边缘时会自动滚动。点击本页上方剧集标题区、侧栏、或点「退出框选」结束。三项批量（尾帧 / 两路视频）均先弹窗确认再提交任务，且仅作用于「已勾选且符合条件」的镜头。
+            框选模式：列表勾选首列；网格可勾选「选」或在卡片区左键拖拽矩形框选；指针靠近主内容区上下左右边缘时会自动滚动。点击本页上方剧集标题区、侧栏、或点「退出框选」结束。尾帧、两路视频与万相组图等批量操作均先弹窗确认再提交任务，且仅作用于「已勾选且符合条件」的镜头。
           </p>
         )}
       </div>
