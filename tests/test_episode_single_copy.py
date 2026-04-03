@@ -205,6 +205,19 @@ class TestEpDirWritePathsUseFsLock(unittest.TestCase):
         self.assertGreater(lock_pos, y, "应先 Yunwu 再持锁写首帧")
         self.assertIn("ep_dir_write = data_service.get_episode_dir", body)
 
+    def test_regen_batch_wan27_lock_after_dashscope(self) -> None:
+        """万相组图：模型调用在锁外，落盘与 update_shot 在 episode_fs_lock 内。"""
+        repo = Path(__file__).resolve().parent.parent
+        path = repo / "web" / "server" / "routes" / "generate.py"
+        text = path.read_text(encoding="utf-8")
+        start = text.index("def _run_regen_batch_wan27")
+        end = text.index("@router.post(\"/generate/regen-frame\"", start)
+        body = text[start:end]
+        api = body.find("run_wan27_sequential_for_shots(")
+        lock_pos = body.find("with episode_fs_lock(episode_id, **lock_kw):")
+        self.assertGreaterEqual(api, 0)
+        self.assertGreater(lock_pos, api, "应先 DashScope 再持锁写首帧")
+
     def test_export_rough_cut_wrapped_in_lock(self) -> None:
         repo = Path(__file__).resolve().parent.parent
         path = repo / "web" / "server" / "routes" / "export_route.py"

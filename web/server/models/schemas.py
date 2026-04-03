@@ -300,6 +300,28 @@ class RegenFrameResponse(BaseModel):
     newFramePath: str
 
 
+class RegenBatchWan27Request(BaseModel):
+    """
+    万相 2.7 异步组图批量重生首帧。
+
+    ``shotIds`` 顺序有意义：与返回图片顺序一一对应写回各镜 ``firstFrame``。
+    """
+
+    episodeId: str
+    shotIds: list[str]
+    assetIds: list[str] = Field(default_factory=list)
+    model: str = "wan2.7-image-pro"
+    size: str = "2K"
+
+
+class RegenBatchWan27Response(BaseModel):
+    """万相组图批量任务已入队。"""
+
+    taskId: str
+    episodeId: str
+    shotCount: int
+
+
 class SelectCandidateRequest(BaseModel):
     """选定候选视频请求。"""
 
