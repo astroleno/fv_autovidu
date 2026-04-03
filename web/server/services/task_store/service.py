@@ -29,6 +29,8 @@ def infer_kind_from_task_id(task_id: str) -> str:
         return "endframe"
     if tid.startswith("regen-"):
         return "regen"
+    if tid.startswith("wan27-"):
+        return "regen_wan27_batch"
     if tid.startswith("dub-"):
         return "dub"
     return "unknown"

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-生成路由：POST endframe, video, regen-frame
+生成路由：POST endframe, video, regen-frame, regen-batch-wan27
 
 异步触发生成任务，立即返回 taskId 供前端轮询。
 尾帧批量：每个 shot 独立 task；视频批量：按 mode 分发 Vidu（i2v / 首尾帧 start-end2video / 多参考图 reference2video）。
@@ -41,6 +41,8 @@ from models.schemas import (
     GenerateVideoRequest,
     GenerateVideoResponse,
     PromoteVideoRequest,
+    RegenBatchWan27Request,
+    RegenBatchWan27Response,
     RegenFrameRequest,
     RegenFrameResponse,
     Shot,
@@ -995,6 +997,121 @@ def _run_regen_frame(
         _ts().set_task(task_id, "failed", error=str(e), context_id=task_context_id)
 
 
+def _run_regen_batch_wan27(
+    task_id: str,
+    episode_id: str,
+    shot_ids: list[str],
+    asset_ids: list[str],
+    model: str,
+    size: str,
+    *,
+    namespace_root: Path | None = None,
+    task_context_id: str | None = None,
+) -> None:
+    """
+    万相 2.7 组图异步批量重生：锁外调用 DashScope；锁内按序写回各镜首帧并清空尾帧/视频候选。
+
+    资产解析与单帧重生一致：以 ``shot_ids[0]`` 对应镜头为基准调用 ``_resolve_regen_asset_paths``。
+    v1 不修改各镜 ``imagePrompt``，避免与用户在其它入口编辑的文案漂移。
+    """
+    fs_tag = fs_lock_tag_from_namespace_root(namespace_root)
+    lock_kw: dict[str, str] = {"data_namespace": fs_tag} if fs_tag else {}
+    try:
+        ep = data_service.get_episode(episode_id, namespace_root)
+        if not ep:
+            _ts().set_task(
+                task_id, "failed", error="Episode not found", context_id=task_context_id
+            )
+            return
+        ep_dir = data_service.get_episode_dir(episode_id, namespace_root)
+        if not ep_dir:
+            _ts().set_task(
+                task_id, "failed", error="Episode dir not found", context_id=task_context_id
+            )
+            return
+
+        ordered: list[Shot] = []
+        for sid in shot_ids:
+            sh = data_service.get_shot(episode_id, sid, namespace_root)
+            if not sh:
+                _ts().set_task(
+                    task_id,
+                    "failed",
+                    error=f"Shot not found: {sid}",
+                    context_id=task_context_id,
+                )
+                return
+            first_path = ep_dir / sh.firstFrame
+            if not first_path.exists():
+                _ts().set_task(
+                    task_id,
+                    "failed",
+                    error=f"First frame not found for shot {sid}: {sh.firstFrame}",
+                    context_id=task_context_id,
+                )
+                return
+            ordered.append(sh)
+
+        api_key = (os.environ.get("DASHSCOPE_API_KEY") or "").strip()
+        if not api_key:
+            _ts().set_task(
+                task_id,
+                "failed",
+                error="DASHSCOPE_API_KEY not set",
+                context_id=task_context_id,
+            )
+            return
+
+        first_shot = ordered[0]
+        asset_paths = _resolve_regen_asset_paths(ep, first_shot, asset_ids or [], ep_dir)
+
+        from src.wan27.client import resolve_base_url
+        from services.wan27_batch_service import run_wan27_sequential_for_shots
+
+        img_list = run_wan27_sequential_for_shots(
+            api_key=api_key,
+            base_url=resolve_base_url(),
+            model=model,
+            size=size,
+            ordered_shots=ordered,
+            ref_asset_paths=asset_paths,
+        )
+
+        with episode_fs_lock(episode_id, **lock_kw):
+            ep_dir_write = data_service.get_episode_dir(episode_id, namespace_root)
+            if not ep_dir_write:
+                _ts().set_task(
+                    task_id,
+                    "failed",
+                    error="Episode dir not found after Wan27 batch",
+                    context_id=task_context_id,
+                )
+                return
+            for sh, blob in zip(ordered, img_list):
+                frame_path = ep_dir_write / sh.firstFrame
+                frame_path.parent.mkdir(parents=True, exist_ok=True)
+                frame_path.write_bytes(blob)
+                data_service.update_shot(
+                    episode_id,
+                    sh.shotId,
+                    {
+                        "endFrame": None,
+                        "videoCandidates": [],
+                        "status": "pending",
+                    },
+                    namespace_root,
+                )
+
+        _ts().set_task(
+            task_id,
+            "success",
+            result={"shotIds": shot_ids, "imageCount": len(img_list)},
+            context_id=task_context_id,
+        )
+    except Exception as e:
+        _ts().set_task(task_id, "failed", error=str(e), context_id=task_context_id)
+
+
 @router.post("/generate/regen-frame", response_model=RegenFrameResponse)
 def regen_frame(
     req: RegenFrameRequest,
@@ -1032,4 +1149,54 @@ def regen_frame(
         taskId=task_id,
         shotId=req.shotId,
         newFramePath=shot.firstFrame if shot else "",
+    )
+
+
+@router.post("/generate/regen-batch-wan27", response_model=RegenBatchWan27Response)
+def regen_batch_wan27(
+    req: RegenBatchWan27Request,
+    background_tasks: BackgroundTasks,
+    request: Request,
+):
+    """
+    万相 2.7 组图：按顺序对 1～12 个镜头重生首帧，异步任务 + taskId 轮询。
+    """
+    n = len(req.shotIds)
+    if not 1 <= n <= 12:
+        raise HTTPException(
+            status_code=400,
+            detail="万相组图一批仅支持 1～12 个镜头",
+        )
+    task_id = f"wan27-{uuid.uuid4().hex[:12]}"
+    ns = get_namespace_data_root_optional(request)
+    ctx_tid = get_context_task_id(request)
+    _ts().set_task(
+        task_id,
+        "processing",
+        kind="regen_wan27_batch",
+        episode_id=req.episodeId,
+        shot_id=req.shotIds[0],
+        payload={
+            "shotIds": req.shotIds,
+            "assetIds": req.assetIds or [],
+            "model": req.model,
+            "size": req.size,
+        },
+        context_id=ctx_tid,
+    )
+    background_tasks.add_task(
+        _run_regen_batch_wan27,
+        task_id,
+        req.episodeId,
+        req.shotIds,
+        req.assetIds or [],
+        req.model,
+        req.size,
+        namespace_root=ns,
+        task_context_id=ctx_tid,
+    )
+    return RegenBatchWan27Response(
+        taskId=task_id,
+        episodeId=req.episodeId,
+        shotCount=n,
     )
