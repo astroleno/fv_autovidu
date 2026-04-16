@@ -96,5 +96,41 @@ export function normalizeEditMapSd2V3(parsed) {
   }
 
   root.blocks = blocks;
+
+  // ── 时长守恒后置校验 ──
+  // sum(block durations) 必须等于 target_duration_sec，
+  // 且 total_duration_sec 必须等于最后一组的 end_sec。
+  // 若 LLM 抄了 target 而未真正求和，此处纠正 total_duration_sec
+  // 并在 diagnosis 中标记 duration_sum_check。
+  const targetDur = typeof metaIn.target_duration_sec === 'number'
+    ? metaIn.target_duration_sec
+    : 0;
+  let actualSum = 0;
+  let lastEnd = 0;
+  for (const blk of blocks) {
+    const t = /** @type {{ time?: { duration?: number, end_sec?: number } }} */ (blk).time;
+    if (t) {
+      actualSum += typeof t.duration === 'number' ? t.duration : 0;
+      lastEnd = typeof t.end_sec === 'number' ? t.end_sec : lastEnd;
+    }
+  }
+
+  if (actualSum > 0 && actualSum !== targetDur) {
+    console.warn(
+      `[normalizeEditMapSd2V3] duration_sum_check FAIL: sum(blocks)=${actualSum} ≠ target=${targetDur}`
+    );
+  }
+  if (actualSum > 0) {
+    metaIn.total_duration_sec = actualSum;
+  }
+
+  const diag = app.diagnosis && typeof app.diagnosis === 'object'
+    ? /** @type {Record<string, unknown>} */ (app.diagnosis)
+    : {};
+  diag.duration_sum_check = actualSum > 0 && actualSum === targetDur && actualSum === lastEnd;
+  if (app.diagnosis && typeof app.diagnosis === 'object') {
+    Object.assign(app.diagnosis, { duration_sum_check: diag.duration_sum_check });
+  }
+
   return parsed;
 }

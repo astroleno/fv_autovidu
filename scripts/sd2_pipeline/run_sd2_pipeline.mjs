@@ -38,6 +38,9 @@
  * --prompter-prompt <path>：覆盖 SD2Prompter 系统提示词（默认 prompt/.../2_SD2Prompter-v2.md；也可用环境变量 SD2_PROMPTER_PROMPT）。
  * --sd2-version v2|v3：v3 使用 EditMap/Director/Prompter v3 提示词与 Markdown+appendix 管线（默认 v2）。
  * --edit-map-input <path>：直接复制为输出目录下的 edit_map_input.json，跳过 prepare_editmap_input（可与 --episode-json 同用）。
+ * --yunwu：EditMap 第一步走云雾（默认 YUNWU_MODEL=Opus 等），Director/Prompter 仍走 SD2_LLM_*。
+ *           传 --yunwu 时若未设 --downstream-model，自动将本进程 SD2_LLM_MODEL=qwen-plus，避免与 Opus 混用同 env。
+ * --downstream-model <id>：显式指定 Director / Prompter / Block 链用的模型（写入 SD2_LLM_MODEL），例如 qwen-plus、qwen-turbo。
  */
 import { spawnSync } from 'child_process';
 import fs from 'fs';
@@ -285,6 +288,22 @@ async function main() {
   }
 
   const useYunwu = Boolean(args.yunwu);
+  const downstreamModelCli =
+    typeof args['downstream-model'] === 'string' && args['downstream-model'].trim()
+      ? String(args['downstream-model']).trim()
+      : '';
+  if (downstreamModelCli) {
+    process.env.SD2_LLM_MODEL = downstreamModelCli;
+    console.log(
+      `[run_sd2_pipeline] 下游 Block 链 / Director / Prompter：SD2_LLM_MODEL=${downstreamModelCli}`,
+    );
+  } else if (useYunwu) {
+    process.env.SD2_LLM_MODEL = 'qwen-plus';
+    console.log(
+      '[run_sd2_pipeline] --yunwu：EditMap 使用云雾；下游已设 SD2_LLM_MODEL=qwen-plus（可加 --downstream-model 覆盖）',
+    );
+  }
+
   if (!skipEditmap) {
     const editMapScript =
       sd2Version === 'v3'

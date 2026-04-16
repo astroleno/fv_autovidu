@@ -114,6 +114,13 @@ v3.0
 
 **下游校验铁律**：`markdown_body` 中的骨架行数量必须等于 `appendix.block_index` 的长度；不一致则产物作废。
 
+**时长守恒硬校验（三重一致）**：
+1. `sum(所有 block_index[].duration)` **必须等于** `episodeDuration`
+2. `appendix.meta.total_duration_sec` **必须等于** 最后一组的 `end_sec`
+3. 以上两个值必须彼此相等
+- ⚠️ **禁止将 target_duration_sec 直接抄入 total_duration_sec**——total 必须从 block_index 实际求和得出
+- 任一不等 → `diagnosis.duration_sum_check = false` → 产物作废
+
 ### 1.2 对白提取与时长预估
 
 **台词时长基准公式**:
@@ -137,6 +144,14 @@ v3.0
 #### 2.1 资产白名单铁律
 
 **核心铁律：所有资产 ID 必须且只能从 assetManifest 中原样选取。**
+
+#### 2.0.1 asset_tag_mapping 全量继承铁律
+
+`appendix.meta.asset_tag_mapping` **必须包含 referenceAssets 中的全部资产**，按 referenceAssets 的原始顺序编号 @图1, @图2, ..., @图N。
+- 禁止跳号、禁止只映射"本集用到的资产"而丢弃其余
+- 每个 mapping 条目的 `asset_description` 必须是**有意义的视觉特征描述**（如"50 岁中年女性，眼角细纹，朴素布衫"），禁止写"资产「XX」（来源资产列表）"这类无信息量的占位文字
+- `tag` 编号 = referenceAssets 数组下标 + 1，全局唯一，全集不变
+- 校验：`asset_tag_mapping.length == referenceAssets.length`，否则产物作废
 
 三条禁令:
 1. **禁止污染 id**: 不可拼接角色名+状态
@@ -169,6 +184,17 @@ v3.0
 - `Cliff`: 集尾悬停，卡在关键动作前一拍
 
 **Hook 质量门（强制）**: Hook 不是"视觉好看"，而是**让观众不划走的叙事冲突/威胁/悬念/反差**。0-3 秒必须抛出最强异常，让观众不划走。
+
+**Hook 合格标准**（满足至少 1 项）：
+- 直接冲突：角色之间的对抗、揭露、打脸等即时冲突
+- 强悬念：让观众产生"接下来会怎样"的疑问（如寻人启事 + 当事人擦肩而过）
+- 反差/认知颠覆：外在身份与隐藏实力的反差、前后因果不一致
+- 危机/威胁：角色面临即时危险或不可逆的后果
+
+**Hook 不合格的反面例子**：
+- ❌ 仅有视觉上好看的画面（逆光剪影、慢动作走路）但没有叙事信息量
+- ❌ 纯环境建立（走廊、办公室全景）但没有冲突/悬念植入
+- ❌ 仅有人物出场但没有"为什么观众要继续看"的理由
 
 **反转时序硬约束**：首个 Reversal 必须出现在**总时长前 40%** 以内。
 
@@ -231,6 +257,7 @@ v3.0
 - `beat_density_check`: 爆点密度是否达标（120s 单集 ≥ 3 小爆点 + 1 强爆点）
 - `max_block_duration_check`: **所有组时长 ≤ 16s**。逐条扫描 `block_index`，任何 `duration > 16` 即为 false → 必须拆分该组后重新输出
 - `min_block_duration_check`: 所有组时长 ≥ 5s
+- `duration_sum_check`: **sum(block_index.duration) == target_duration_sec == total_duration_sec == 最后一组 end_sec**。三重一致校验，不一致则产物作废
 - `warning_msg`: 任一检查为 false 时的具体补强建议
 
 ---
@@ -287,9 +314,10 @@ v3.0
 **情绪主体：** {角色名}（{为什么是 TA}）
 
 **光影基准：**
-- {场景主光源描述}
-- {角色光影设计}
-- {与其他场次的光影对比关系}
+- 主光源：{单一光源名称+方向，如"晨光从门口方向斜射入"}
+- 光质：{柔和/硬朗/弥散} + {色温倾向，如"暖黄"/"冷白"}
+- ⚠️ 若描述了光影，句末必须加"光线稳定"
+- ⚠️ 禁止同一场次内两个色温对立光源；禁止描写"色调变冷/变暖"
 
 ---
 
@@ -310,6 +338,22 @@ v3.0
 **主角反应节点：** {观众必须看到的核心反应瞬间}
 
 **⚠️ 时长压缩建议：** {如果对白超长，给出具体压缩策略}
+
+| 光影：{主光源描述}。光线稳定 | BGM/音效：{具体声音链，用→连接时序，如"门把转动声→高跟鞋踩地板声→文件翻页声→空调嗡鸣"} |
+
+---
+
+## 【强制约束模板】（每组 Markdown 正文开头必须包含此行，下游 Director/Prompter 原样继承）
+
+```
+强制约束：{renderingStyle}，极致写实画面，{aspectRatio}画幅，肤质细腻逼真，动作自然流畅，画面稳定无抖动，禁止水印，禁止字幕，禁止在画面中显示任何文字。
+```
+
+**说明**：
+- `{renderingStyle}` 从 `parsed_brief.renderingStyle` 取值（如"电影级真人实拍"）
+- `{aspectRatio}` 从 `parsed_brief.aspectRatio` 取值（如"竖屏构图9:16"）
+- **"禁止字幕，禁止在画面中显示任何文字"是不可删除的硬约束**——SD2 引擎会将文字描述渲染为画面内烧录字幕
+- 此行必须出现在每组的场景/道具描述之后、第一个时间片之前
 
 ---
 
@@ -401,6 +445,7 @@ v3.0
     "beat_density_check": true,
     "max_block_duration_check": true,
     "min_block_duration_check": true,
+    "duration_sum_check": true,
     "warning_msg": null,
     "missing_manifest_assets": []
   }
@@ -455,7 +500,7 @@ LLM 返回单个 JSON 对象（`jsonObject: true`）：
 | `appendix.meta.title` | String | ✓ | 中文标题 |
 | `appendix.meta.genre` | Enum | ✓ | 题材类型 |
 | `appendix.meta.target_duration_sec` | Int | ✓ | 等于输入 episodeDuration |
-| `appendix.meta.total_duration_sec` | Int | ✓ | 等于最后一组 end_sec |
+| `appendix.meta.total_duration_sec` | Int | ✓ | **从 block_index 求和得出**，等于最后一组 end_sec，等于 target_duration_sec。禁止抄 target |
 | `appendix.meta.parsed_brief` | Object/null | - | directorBrief 解析结果 |
 | `appendix.meta.asset_tag_mapping[]` | Array[Object] | ✓ | 全局资产→@图N 映射表 |
 | `appendix.meta.asset_tag_mapping[].tag` | String | ✓ | 如 `@图1` |
@@ -495,6 +540,12 @@ LLM 返回单个 JSON 对象（`jsonObject: true`）：
 8. 填写 **尾部校验块**（组数校验 + 禁用词扫描）
 9. 构建 `appendix.block_index`（每组的时间、检索键）
 10. **逐条扫描 block_index：任何 duration > 16 或 duration < 5 → 必须拆分/合并后重新执行步骤 4-9**
-11. 构建 `appendix.diagnosis`（全部诊断项，含 max_block_duration_check / min_block_duration_check）
-12. **先写完 markdown_body 正文，再从正文中提取 appendix JSON**——确保两者一致
-13. 输出 `{ "markdown_body": "...", "appendix": {...} }`
+11. **时长守恒三重校验**：
+    - 计算 `sum = block_index.reduce((s, b) => s + b.duration, 0)`
+    - 确认 `sum == target_duration_sec`
+    - 确认 `block_index[最后一个].end_sec == sum`
+    - 将 `sum` 写入 `total_duration_sec`（**禁止抄 target_duration_sec**）
+    - 任一不等 → 回到步骤 5 重新分配时长
+12. 构建 `appendix.diagnosis`（全部诊断项，含 max_block_duration_check / min_block_duration_check / duration_sum_check）
+13. **先写完 markdown_body 正文，再从正文中提取 appendix JSON**——确保两者一致
+14. 输出 `{ "markdown_body": "...", "appendix": {...} }`
