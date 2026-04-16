@@ -58,8 +58,16 @@ class FeelingClient:
         """
         self.base_url = (base_url or os.environ.get("FEELING_API_BASE", "")).rstrip("/")
         self._phone = phone or os.environ.get("FEELING_PHONE", "")
-        self._username = username or os.environ.get("FEELING_USERNAME", "")
-        self._password = password or os.environ.get("FEELING_PASSWORD", "")
+        # 与 config/feeling_contexts.json 中 dev_default 等 Profile 的 credentialSource 对齐：
+        # 仅配置 FEELING_DEV_DEFAULT_* 时 CLI/puller 也能登录，无需再复制一份 FEELING_USERNAME/PASSWORD
+        self._username = username or os.environ.get("FEELING_USERNAME", "") or os.environ.get(
+            "FEELING_DEV_DEFAULT_USERNAME", ""
+        )
+        self._password = (
+            password
+            or os.environ.get("FEELING_PASSWORD", "")
+            or os.environ.get("FEELING_DEV_DEFAULT_PASSWORD", "")
+        )
         self._access_token: str | None = None
         self._refresh_token: str | None = None
         self._token_expires_at: float = 0.0  # 绝对时间戳
@@ -269,6 +277,9 @@ class FeelingClient:
         self._ensure_token()
         url = f"{self.base_url}/storyboard/episodes/{episode_id}/scenes"
         resp = self._session.get(url, timeout=30)
+        # 部分环境未部署 scenes 路由时返回 404，与「无场景」等价，交由 GET /shots 兜底组装分镜表
+        if resp.status_code == 404:
+            return []
         resp.raise_for_status()
         data = resp.json()
         raw = data.get("data", data.get("scenes", [])) if isinstance(data, dict) else data
