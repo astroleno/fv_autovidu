@@ -16,29 +16,53 @@ loadEnvFromDotenv();
 /** @typedef {{ role: 'system' | 'user' | 'assistant'; content: string }} YunwuChatMessage */
 
 /**
- * 解析云雾网关返回的 assistant 文本。
- * 部分思考模型可能在 `message` 上附带额外字段，仍以 `content` 为主。
+ * @typedef {object} YunwuExtractResult
+ * @property {string} text          - assistant 返回文本
+ * @property {string} finishReason  - "stop" | "length" | "content_filter" | ""
+ * @property {{ prompt: number, completion: number, total: number } | null} usage
+ */
+
+/**
+ * 解析云雾网关返回的 assistant 文本及元信息。
+ * 同时提取 finish_reason 和 usage，用于截断检测与 token 预算诊断。
  *
  * @param {unknown} data
- * @returns {string}
+ * @returns {YunwuExtractResult}
  */
-function extractAssistantText(data) {
+function extractAssistantResult(data) {
+  /** @type {YunwuExtractResult} */
+  const empty = { text: '', finishReason: '', usage: null };
   if (!data || typeof data !== 'object') {
-    return '';
+    return empty;
   }
-  const choices = /** @type {{ choices?: unknown }} */ (data).choices;
+
+  const root = /** @type {Record<string, unknown>} */ (data);
+  const choices = root.choices;
   if (!Array.isArray(choices) || choices.length === 0) {
-    return '';
+    return empty;
   }
-  const first = choices[0];
+  const first = /** @type {Record<string, unknown>} */ (choices[0]);
   if (!first || typeof first !== 'object') {
-    return '';
+    return empty;
   }
-  const msg = /** @type {{ message?: { content?: unknown } } } */ (first).message;
-  if (!msg || typeof msg.content !== 'string') {
-    return '';
+
+  const msg = /** @type {{ content?: unknown }} */ (first.message);
+  const text = msg && typeof msg.content === 'string' ? msg.content.trim() : '';
+  const finishReason = typeof first.finish_reason === 'string' ? first.finish_reason : '';
+
+  /** @type {{ prompt: number, completion: number, total: number } | null} */
+  let usage = null;
+  const u = root.usage;
+  if (u && typeof u === 'object') {
+    const uu = /** @type {Record<string, unknown>} */ (u);
+    usage = {
+      prompt: typeof uu.prompt_tokens === 'number' ? uu.prompt_tokens : 0,
+      completion: typeof uu.completion_tokens === 'number' ? uu.completion_tokens : 0,
+      total: typeof uu.total_tokens === 'number' ? uu.total_tokens : 0,
+    };
   }
-  return msg.content.trim();
+
+  return { text, finishReason, usage };
 }
 
 /**
@@ -52,7 +76,7 @@ function extractAssistantText(data) {
  * @param {number} [opts.temperature]
  * @param {boolean} [opts.jsonObject] 是否请求 `response_format: json_object`
  * @param {boolean} [opts.enableThinking] 是否设置 `extra_body.enable_thinking`
- * @param {number} [opts.maxTokens] 上限 tokens，默认读 `YUNWU_MAX_OUTPUT_TOKENS`
+ * @param {number} [opts.maxTokens] 上限 tokens；未传时读 `YUNWU_MAX_OUTPUT_TOKENS`（默认 65536）
  * @param {number} [opts.timeoutMs] 超时毫秒，默认读 `YUNWU_TIMEOUT_MS` 或 900000
  * @param {number} [opts.maxRetries] 失败重试次数
  * @returns {Promise<string>}
@@ -68,6 +92,8 @@ export async function callYunwuChatCompletions({
   maxTokens,
   timeoutMs,
   maxRetries = 3,
+  // eslint-disable-next-line no-unused-vars
+  _returnMeta = false,
 }) {
   const resolvedKey =
     apiKey ||
@@ -95,7 +121,7 @@ export async function callYunwuChatCompletions({
     256,
     maxTokens !== undefined
       ? maxTokens
-      : parseInt(process.env.YUNWU_MAX_OUTPUT_TOKENS || '16384', 10),
+      : parseInt(process.env.YUNWU_MAX_OUTPUT_TOKENS || '65536', 10),
   );
 
   const resolvedTimeout =
@@ -147,13 +173,39 @@ export async function callYunwuChatCompletions({
       if (data.error && data.error.message) {
         throw new Error(data.error.message);
       }
-      const text = extractAssistantText(data);
-      if (!text) {
+      const result = extractAssistantResult(data);
+
+      if (result.usage) {
+        console.log(
+          `[yunwu_chat] token 用量: prompt=${result.usage.prompt} completion=${result.usage.completion} total=${result.usage.total}`,
+        );
+      }
+
+      if (result.finishReason === 'length') {
+        const err = new Error(
+          `[yunwu_chat] 输出被截断 (finish_reason=length)。` +
+            `completion_tokens=${result.usage?.completion ?? '?'}, max_tokens=${resolvedMaxTokens}。` +
+            `thinking 模型的 max_tokens 预算同时包含 thinking + response token，` +
+            `当 thinking chain 过长时 response 被截断。` +
+            `建议：1) 调大 YUNWU_EDITMAP_MAX_TOKENS  2) 使用 --no-thinking 重试  3) 缩短 system prompt`,
+        );
+        /** @type {Record<string, unknown>} */
+        (err).finishReason = 'length';
+        /** @type {Record<string, unknown>} */
+        (err).partialText = result.text;
+        throw err;
+      }
+
+      if (!result.text) {
         throw new Error('云雾返回空 content，请检查模型名与网关是否匹配');
       }
-      return text;
+      return result.text;
     } catch (e) {
-      lastErr = e instanceof Error ? e : new Error(String(e));
+      const wrapped = e instanceof Error ? e : new Error(String(e));
+      if (/** @type {Record<string, unknown>} */ (wrapped).finishReason === 'length') {
+        throw wrapped;
+      }
+      lastErr = wrapped;
       const delayMs = 500 * 2 ** attempt;
       await new Promise((r) => setTimeout(r, delayMs));
     }

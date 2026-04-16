@@ -36,7 +36,7 @@
  * --dry-run：不调用任何 LLM；需已有 edit_map_sd2.json。
  * --yunwu 时可选 --no-thinking：关闭云雾思考模式，减少输出被截断导致 EditMap JSON 不完整（与 jsonrepair 容错配合）。
  * --prompter-prompt <path>：覆盖 SD2Prompter 系统提示词（默认 prompt/.../2_SD2Prompter-v2.md；也可用环境变量 SD2_PROMPTER_PROMPT）。
- * --sd2-version v2|v3：v3 使用 EditMap/Director/Prompter v3 提示词与 Markdown+appendix 管线（默认 v2）。
+ * --sd2-version v2|v3|v4：v3/v4 使用 Markdown+appendix 管线；v4 另含知识切片注入与 continuity（见 SD2Workflow-v4-接入指南.md）（默认 v2）。
  * --edit-map-input <path>：直接复制为输出目录下的 edit_map_input.json，跳过 prepare_editmap_input（可与 --episode-json 同用）。
  * --yunwu：EditMap 第一步走云雾（默认 YUNWU_MODEL=Opus 等），Director/Prompter 仍走 SD2_LLM_*。
  *           传 --yunwu 时若未设 --downstream-model，自动将本进程 SD2_LLM_MODEL=qwen-plus，避免与 Opus 混用同 env。
@@ -49,6 +49,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 
 import { resolveSd2StyleHints } from './lib/edit_map_style_hints.mjs';
 import { buildAllDirectorPayloadsV3 } from './lib/sd2_v3_payloads.mjs';
+import { buildAllDirectorPayloadsV4 } from './lib/sd2_v4_payloads.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -190,10 +191,13 @@ async function main() {
     typeof args['sd2-version'] === 'string' && args['sd2-version'].trim()
       ? String(args['sd2-version']).trim().toLowerCase()
       : 'v2';
-  const sd2Version = sd2VersionRaw === 'v3' ? 'v3' : 'v2';
+  const sd2Version =
+    sd2VersionRaw === 'v4' ? 'v4' : sd2VersionRaw === 'v3' ? 'v3' : 'v2';
 
-  if (sd2Version === 'v3' && skipDirector && !skipPrompter) {
-    throw new Error('SD2 v3 不支持仅跳过 Director 仍跑 Prompter；请去掉 --skip-director 或加上 --skip-prompter');
+  if ((sd2Version === 'v3' || sd2Version === 'v4') && skipDirector && !skipPrompter) {
+    throw new Error(
+      'SD2 v3/v4 不支持仅跳过 Director 仍跑 Prompter；请去掉 --skip-director 或加上 --skip-prompter',
+    );
   }
 
   fs.mkdirSync(outRoot, { recursive: true });
@@ -306,13 +310,17 @@ async function main() {
 
   if (!skipEditmap) {
     const editMapScript =
-      sd2Version === 'v3'
+      sd2Version === 'v4'
         ? useYunwu
-          ? 'call_yunwu_editmap_sd2_v3.mjs'
-          : 'call_editmap_sd2_v3.mjs'
-        : useYunwu
-          ? 'call_yunwu_editmap_sd2.mjs'
-          : 'call_editmap_sd2.mjs';
+          ? 'call_yunwu_editmap_sd2_v4.mjs'
+          : 'call_editmap_sd2_v4.mjs'
+        : sd2Version === 'v3'
+          ? useYunwu
+            ? 'call_yunwu_editmap_sd2_v3.mjs'
+            : 'call_editmap_sd2_v3.mjs'
+          : useYunwu
+            ? 'call_yunwu_editmap_sd2.mjs'
+            : 'call_editmap_sd2.mjs';
     console.log(
       `[run_sd2_pipeline] LLM 生成 edit_map_sd2.json（${sd2Version}，${useYunwu ? 'Yunwu/Opus' : 'DashScope'}）…`,
     );
@@ -366,7 +374,17 @@ async function main() {
 
   if (!dryRun && !skipDirector) {
     console.log('[run_sd2_pipeline] 构建 sd2_director_payloads.json …');
-    if (sd2Version === 'v3') {
+    if (sd2Version === 'v4') {
+      const editMapForPayload = JSON.parse(fs.readFileSync(editMapOut, 'utf8'));
+      const data = buildAllDirectorPayloadsV4({
+        editMap: editMapForPayload,
+        kbDir: kbDirRel,
+        renderingStyle,
+        aspectRatio: aspectRatioArg,
+        maxExamples: 2,
+      });
+      fs.writeFileSync(directorPayloads, JSON.stringify(data, null, 2) + '\n', 'utf8');
+    } else if (sd2Version === 'v3') {
       const editMapForPayload = JSON.parse(fs.readFileSync(editMapOut, 'utf8'));
       const data = buildAllDirectorPayloadsV3({
         editMap: editMapForPayload,
@@ -393,14 +411,19 @@ async function main() {
     console.log('[run_sd2_pipeline] skip-director：跳过 SD2Director，payload 不含 sd2_director');
   }
 
-  const skipPayArgsMerge = sd2Version === 'v3' && (skipDirector || skipPrompter);
+  const skipPayArgsMerge =
+    (sd2Version === 'v3' || sd2Version === 'v4') && (skipDirector || skipPrompter);
 
   if (useBlockChain) {
     console.log(
       '[run_sd2_pipeline] 各 Block 内 Director→Prompter 串联；Block 间错峰并发（stagger-ms）…',
     );
     const chainScript =
-      sd2Version === 'v3' ? 'call_sd2_block_chain_v3.mjs' : 'call_sd2_block_chain.mjs';
+      sd2Version === 'v4'
+        ? 'call_sd2_block_chain_v4.mjs'
+        : sd2Version === 'v3'
+          ? 'call_sd2_block_chain_v3.mjs'
+          : 'call_sd2_block_chain.mjs';
     /** @type {string[]} */
     const chainArgs = [
       path.join('scripts', 'sd2_pipeline', chainScript),
@@ -435,7 +458,11 @@ async function main() {
     if (!dryRun && !skipDirector && skipPrompter) {
       console.log('[run_sd2_pipeline] LLM SD2Director（仅导演，随后写 payload，不跑 Prompter）…');
       const directorScript =
-        sd2Version === 'v3' ? 'call_sd2_director_v3.mjs' : 'call_sd2_director.mjs';
+        sd2Version === 'v4'
+          ? 'call_sd2_director_v4.mjs'
+          : sd2Version === 'v3'
+            ? 'call_sd2_director_v3.mjs'
+            : 'call_sd2_director.mjs';
       runNode([
         path.join('scripts', 'sd2_pipeline', directorScript),
         '--payloads',
@@ -463,9 +490,9 @@ async function main() {
         payArgs.push('--director-json', directorAll);
       }
       runNode(payArgs);
-    } else if (sd2Version === 'v3') {
+    } else if (sd2Version === 'v3' || sd2Version === 'v4') {
       console.log(
-        '[run_sd2_pipeline] v3：已跳过 build_sd2_prompter_payload（v3 与 v2 合并字段不兼容，请用默认 Block 链或仅 EditMap）',
+        '[run_sd2_pipeline] v3/v4：已跳过 build_sd2_prompter_payload（与 v2 合并字段不兼容，请用默认 Block 链或仅 EditMap）',
       );
     }
   }
@@ -487,7 +514,11 @@ async function main() {
   if (!useBlockChain) {
     console.log('[run_sd2_pipeline] LLM 生成各 Block 三段式提示词（分阶段并发）…');
     const prompterScript =
-      sd2Version === 'v3' ? 'call_sd2_prompter_v3.mjs' : 'call_sd2_prompter.mjs';
+      sd2Version === 'v4'
+        ? 'call_sd2_prompter_v4.mjs'
+        : sd2Version === 'v3'
+          ? 'call_sd2_prompter_v3.mjs'
+          : 'call_sd2_prompter.mjs';
     /** @type {string[]} */
     const proArgs = [
       path.join('scripts', 'sd2_pipeline', prompterScript),
