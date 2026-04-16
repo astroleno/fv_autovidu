@@ -19,7 +19,9 @@
  *   YUNWU_API_KEY       必填
  *   YUNWU_BASE_URL      默认 https://yunwu.ai/v1
  *   YUNWU_MODEL         默认 claude-opus-4-6-thinking
- *   YUNWU_MAX_OUTPUT_TOKENS  默认 16384
+ *   YUNWU_EDITMAP_MAX_TOKENS 默认 200000（EditMap 专供；thinking 占 completion 预算）
+ *   YUNWU_EDITMAP_MAX_RETRY_CAP 截断重试时 max_tokens 上限，默认 262144
+ *   YUNWU_MAX_OUTPUT_TOKENS  默认见 yunwu_chat.mjs（非 EditMap 单次调用）
  *   YUNWU_TIMEOUT_MS    默认 900000（15 分钟）
  */
 import fs from 'fs';
@@ -108,12 +110,14 @@ async function main() {
   );
   console.log('[call_yunwu_editmap_sd2_v3] 生成 EditMap-SD2 v3 …');
 
+  /** EditMap v3 单次需输出超长 markdown_body + appendix JSON；Opus/thinking 易占满输出预算，默认给足 max_tokens */
   const editMapMaxTokens = Math.max(
-    8192,
-    parseInt(process.env.YUNWU_EDITMAP_MAX_TOKENS || '65536', 10),
+    32768,
+    parseInt(process.env.YUNWU_EDITMAP_MAX_TOKENS || '200000', 10),
   );
+  console.log(`[call_yunwu_editmap_sd2_v3] max_tokens=${editMapMaxTokens}（YUNWU_EDITMAP_MAX_TOKENS）`);
 
-  const raw = await callYunwuChatCompletions({
+  const chatOpts = {
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMessage },
@@ -123,7 +127,37 @@ async function main() {
     jsonObject: true,
     enableThinking: !noThinking,
     maxTokens: editMapMaxTokens,
-  });
+  };
+
+  let raw = '';
+  try {
+    raw = await callYunwuChatCompletions(chatOpts);
+  } catch (firstErr) {
+    const fr = /** @type {Error & { finishReason?: string }} */ (firstErr);
+    const isLengthTruncation = fr.finishReason === 'length';
+
+    /** 保持 thinking，仅提高 max_tokens 再试一次（thinking 会占用 completion 预算） */
+    if (isLengthTruncation) {
+      const cap = Math.max(
+        editMapMaxTokens,
+        parseInt(process.env.YUNWU_EDITMAP_MAX_RETRY_CAP || '262144', 10),
+      );
+      const bumped = Math.min(Math.floor(editMapMaxTokens * 1.5), cap);
+      if (bumped > editMapMaxTokens) {
+        console.warn(
+          `[call_yunwu_editmap_sd2_v3] finish_reason=length，保持 thinking=true，将 max_tokens ${editMapMaxTokens}→${bumped} 重试一次…`,
+        );
+        raw = await callYunwuChatCompletions({
+          ...chatOpts,
+          maxTokens: bumped,
+        });
+      } else {
+        throw firstErr;
+      }
+    } else {
+      throw firstErr;
+    }
+  }
 
   let parsed;
   try {
@@ -135,6 +169,14 @@ async function main() {
   }
 
   normalizeEditMapSd2V3(parsed);
+
+  const blocks = /** @type {{ blocks?: unknown }} */ (parsed).blocks;
+  if (!Array.isArray(blocks) || blocks.length === 0) {
+    throw new Error(
+      'EditMap v3 归一化后 blocks[] 为空：常见原因为云雾返回 JSON 在 markdown_body 处被截断，未含 appendix.block_index。可尝试：' +
+        '调大 YUNWU_EDITMAP_MAX_TOKENS / YUNWU_EDITMAP_MAX_RETRY_CAP，或先用 DashScope：node scripts/sd2_pipeline/call_editmap_sd2_v3.mjs',
+    );
+  }
 
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(parsed, null, 2) + '\n', 'utf8');

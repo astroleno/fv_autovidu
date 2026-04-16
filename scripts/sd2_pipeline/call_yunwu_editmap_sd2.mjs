@@ -19,7 +19,8 @@
  *   YUNWU_API_KEY       必填
  *   YUNWU_BASE_URL      默认 https://yunwu.ai/v1
  *   YUNWU_MODEL         默认 claude-opus-4-6-thinking
- *   YUNWU_MAX_OUTPUT_TOKENS  默认 16384
+ *   YUNWU_EDITMAP_MAX_TOKENS 默认 131072（与 v3 对齐）
+ *   YUNWU_MAX_OUTPUT_TOKENS  见 yunwu_chat（非 EditMap 单次）
  *   YUNWU_TIMEOUT_MS    默认 900000（15 分钟）
  */
 import fs from 'fs';
@@ -109,9 +110,10 @@ async function main() {
   console.log('[call_yunwu_editmap_sd2] 生成 EditMap-SD2 …');
 
   const editMapMaxTokens = Math.max(
-    8192,
-    parseInt(process.env.YUNWU_EDITMAP_MAX_TOKENS || '65536', 10),
+    32768,
+    parseInt(process.env.YUNWU_EDITMAP_MAX_TOKENS || '131072', 10),
   );
+  console.log(`[call_yunwu_editmap_sd2] max_tokens=${editMapMaxTokens}（YUNWU_EDITMAP_MAX_TOKENS）`);
 
   const raw = await callYunwuChatCompletions({
     messages: [
