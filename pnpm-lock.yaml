@@ -8,6 +8,9 @@ devDependencies:
   concurrently:
     specifier: ^9.0.0
     version: 9.2.1
+  jsonrepair:
+    specifier: ^3.13.3
+    version: 3.13.3
 
 packages:
 
@@ -86,6 +89,11 @@ packages:
   /is-fullwidth-code-point@3.0.0:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
     engines: {node: '>=8'}
+    dev: true
+
+  /jsonrepair@3.13.3:
+    resolution: {integrity: sha512-BTznj0owIt2CBAH/LTo7+1I5pMvl1e1033LRl/HUowlZmJOIhzC0zbX5bxMngLkfT4WnzPP26QnW5wMr2g9tsQ==}
+    hasBin: true
     dev: true
 
   /require-directory@2.1.1:
