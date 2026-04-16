@@ -1,0 +1,32 @@
+{
+  "episodeId": "smoke-chain",
+  "assets": [
+    {
+      "name": "林晚",
+      "type": "character",
+      "prompt": "年轻女医生，短发，急诊室制服"
+    },
+    {
+      "name": "急诊大厅",
+      "type": "location",
+      "prompt": "现代医院急诊大厅，冷白灯光，深夜"
+    }
+  ],
+  "scenes": [
+    {
+      "title": "急诊入口",
+      "shots": [
+        {
+          "duration": 8,
+          "visualDescription": "林晚推开急诊玻璃门，快步走入，镜头跟拍。",
+          "dialogue": ""
+        },
+        {
+          "duration": 7,
+          "visualDescription": "林晚停在分诊台前，抬头扫视候诊区。",
+          "dialogue": "伤员在哪？"
+        }
+      ]
+    }
+  ]
+}
