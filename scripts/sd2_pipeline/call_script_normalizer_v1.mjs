@@ -1,0 +1,285 @@
+#!/usr/bin/env node
+/**
+ * Stage 0 · ScriptNormalizer v1 调度器（stub · Phase 1）。
+ *
+ * 职责：
+ *   - 读取 `edit_map_input.json`（与 EditMap 共用，契约见 prepare_editmap_input.mjs）；
+ *   - 以 `prompt/1_SD2Workflow/0_ScriptNormalizer/ScriptNormalizer-v1.md` 为 system prompt；
+ *   - 调用 LLM 产出 `normalizedScriptPackage.json`（契约见 docs/stage0-normalizer/01_schema.json）；
+ *   - 写入 `--output` 指定路径；上游由 run_sd2_pipeline.mjs 透传给 EditMap v5
+ *     的 `--normalized-package` 参数。
+ *
+ * Phase 1 红线（00 计划 §五）：
+ *   - 不引入严格 schema 校验（Phase 1.5 再加）；LLM 输出只做最小存在性检查；
+ *   - 任何失败都以 **非零 exit** 结束；上游捕获后按"Stage 0 失败兜底"跳过（EditMap 按原 v5 跑）；
+ *   - 不修改 edit_map_input.json，也不污染任何下游契约；Stage 0 的产物是**附加输入**。
+ *
+ * 用法：
+ *   node scripts/sd2_pipeline/call_script_normalizer_v1.mjs \
+ *     --input  output/sd2/<id>/edit_map_input.json \
+ *     --output output/sd2/<id>/normalized_script_package.json \
+ *     [--prompt-file /custom/ScriptNormalizer-v1.md] \
+ *     [--yunwu]       # 可选：走云雾 OpenAI 兼容 API（默认走 DashScope llm_client）
+ */
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { createHash } from 'crypto';
+
+import {
+  callLLM,
+  getResolvedLlmBaseUrl,
+  getResolvedLlmModel,
+  parseJsonFromModelText,
+} from './lib/llm_client.mjs';
+import {
+  callYunwuChatCompletions,
+  getYunwuResolvedDefaults,
+} from './lib/yunwu_chat.mjs';
+import { getScriptNormalizerV1PromptPath } from './lib/sd2_prompt_paths_v5.mjs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SCRIPT_TAG = 'call_script_normalizer_v1';
+
+/**
+ * 解析轻量 `--key value` / `--flag` 形式的 CLI 参数。
+ *
+ * @param {string[]} argv
+ * @returns {Record<string, string | boolean>}
+ */
+function parseArgs(argv) {
+  /** @type {Record<string, string | boolean>} */
+  const out = {};
+  for (let i = 0; i < argv.length; i += 1) {
+    const a = argv[i];
+    if (!a.startsWith('--')) {
+      continue;
+    }
+    const key = a.slice(2);
+    const next = argv[i + 1];
+    if (!next || next.startsWith('--')) {
+      out[key] = true;
+    } else {
+      out[key] = next;
+      i += 1;
+    }
+  }
+  return out;
+}
+
+/**
+ * 从 edit_map_input.json 抽出 Stage 0 所需白名单字段。
+ * 为什么要白名单：00 计划 §附录 A.2 明确要求 input_echo 只包含以下字段，
+ * 避免把 CLI 风格字段（renderingStyle / artStyle 等）污染进 Stage 0 的输入回显。
+ *
+ * @param {Record<string, unknown>} src
+ * @returns {Record<string, unknown>}
+ */
+function extractNormalizerInput(src) {
+  /** @type {Record<string, unknown>} */
+  const out = {};
+  for (const key of [
+    'globalSynopsis',
+    'scriptContent',
+    'assetManifest',
+    'referenceAssets',
+    'episodeDuration',
+    'shotHint',
+    'motionBias',
+    'genre',
+    'targetBlockCount',
+    'avgShotDuration',
+    'workflowControls',
+  ]) {
+    if (key in src) {
+      out[key] = src[key];
+    }
+  }
+  return out;
+}
+
+/**
+ * 以 scriptContent 为主、其余为辅，生成 source_script_hash（8 位 sha256 前缀）。
+ * 为什么只取前 8 位：人眼可读、冲突率对 Phase 1 足够低；
+ * Phase 2 引入 schema 校验后会切到完整 sha256。
+ *
+ * @param {Record<string, unknown>} input
+ * @returns {string}
+ */
+function computeSourceHash(input) {
+  const payload = JSON.stringify({
+    scriptContent: input.scriptContent ?? '',
+    globalSynopsis: input.globalSynopsis ?? '',
+    episodeDuration: input.episodeDuration ?? null,
+  });
+  const h = createHash('sha256').update(payload).digest('hex');
+  return h.slice(0, 8);
+}
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+
+  const inputPath =
+    typeof args.input === 'string' ? path.resolve(process.cwd(), args.input) : '';
+  if (!inputPath || !fs.existsSync(inputPath)) {
+    console.error(`[${SCRIPT_TAG}] 请指定有效 --input edit_map_input.json`);
+    process.exit(2);
+  }
+
+  const outPath =
+    typeof args.output === 'string'
+      ? path.resolve(process.cwd(), args.output)
+      : path.join(path.dirname(inputPath), 'normalized_script_package.json');
+
+  const promptPath =
+    typeof args['prompt-file'] === 'string'
+      ? path.resolve(process.cwd(), args['prompt-file'])
+      : getScriptNormalizerV1PromptPath();
+
+  if (!fs.existsSync(promptPath)) {
+    console.error(
+      `[${SCRIPT_TAG}] ScriptNormalizer-v1.md 不存在：${promptPath}\n` +
+        '请从 feeling_video_prompt 同步 prompt/1_SD2Workflow/0_ScriptNormalizer/',
+    );
+    process.exit(3);
+  }
+
+  const systemPrompt = fs.readFileSync(promptPath, 'utf8');
+  const rawInput = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+  if (!rawInput || typeof rawInput !== 'object') {
+    console.error(`[${SCRIPT_TAG}] --input 不是合法 JSON 对象`);
+    process.exit(2);
+  }
+  const inputEcho = extractNormalizerInput(
+    /** @type {Record<string, unknown>} */ (rawInput),
+  );
+
+  const sourceHash = computeSourceHash(inputEcho);
+  const packageId = `normpkg-${sourceHash}-${Date.now().toString(36)}`;
+
+  /**
+   * Phase 1 mode 判定：
+   *   - 有 scriptContent → 'loose'（宽松模式，按剧本松紧度自适应，计算 tightness_score）；
+   *   - 只有 globalSynopsis / 无剧本正文 → 'strict'（严格模式，禁止自行发明节拍）；
+   *   - 详见 00 计划 §七。
+   * 这里把 mode 塞进 user message 交给 LLM，最终写入 package 的 mode 字段。
+   */
+  const mode =
+    typeof inputEcho.scriptContent === 'string' &&
+    inputEcho.scriptContent.trim().length > 0
+      ? 'loose'
+      : 'strict';
+
+  const userMessage = [
+    '你是 SD2 Stage 0 · ScriptNormalizer。请严格按系统提示输出唯一一个 JSON 对象',
+    '（符合 `normalizedScriptPackage` 契约），不要 Markdown 围栏。',
+    '',
+    `输入 hash: ${sourceHash}`,
+    `package_id 建议: ${packageId}`,
+    `mode 建议: ${mode}（Phase 1：loose=有 scriptContent；strict=仅总纲）`,
+    '',
+    '【输入 JSON】',
+    JSON.stringify(inputEcho, null, 2),
+  ].join('\n');
+
+  const useYunwu = Boolean(args.yunwu);
+  let raw = '';
+  try {
+    if (useYunwu) {
+      const defaults = getYunwuResolvedDefaults();
+      const modelOverride = typeof args.model === 'string' ? args.model : undefined;
+      const noThinking = args['no-thinking'] === true;
+      console.log(
+        `[${SCRIPT_TAG}] 云雾 LLM：model=${modelOverride || defaults.model} base=${defaults.baseUrl} thinking=${!noThinking}`,
+      );
+      raw = await callYunwuChatCompletions({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage },
+        ],
+        model: modelOverride,
+        temperature: 0.1,
+        jsonObject: true,
+        enableThinking: !noThinking,
+        maxTokens: Math.max(
+          16384,
+          parseInt(process.env.YUNWU_NORMALIZER_MAX_TOKENS || '65536', 10),
+        ),
+      });
+    } else {
+      console.log(
+        `[${SCRIPT_TAG}] 调用 LLM：model=${getResolvedLlmModel()} base=${getResolvedLlmBaseUrl()}`,
+      );
+      raw = await callLLM({
+        systemPrompt,
+        userMessage,
+        temperature: 0.1,
+        jsonObject: true,
+      });
+    }
+  } catch (err) {
+    console.error(
+      `[${SCRIPT_TAG}] Stage 0 LLM 调用失败（上游按 Phase 1 兜底跳过）：`,
+      err instanceof Error ? err.message : err,
+    );
+    process.exit(4);
+  }
+
+  /** @type {unknown} */
+  let parsed;
+  try {
+    parsed = parseJsonFromModelText(raw);
+  } catch (err) {
+    console.error(`[${SCRIPT_TAG}] JSON 解析失败，原始前 800 字：`);
+    console.error(raw.slice(0, 800));
+    process.exit(5);
+  }
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    console.error(`[${SCRIPT_TAG}] LLM 输出不是合法 JSON 对象，放弃。`);
+    process.exit(6);
+  }
+
+  /**
+   * Phase 1 最小字段回填：
+   *   - 若 LLM 漏写 package_id / source_script_hash / mode / input_echo，
+   *     调度器补上这些 deterministic 字段，避免 schema 最小契约被破坏。
+   *   - meta.schema_version / meta.generated_at 同理。
+   * 这里**只补缺**、不覆盖 LLM 的产出（LLM 可能按 tightness 重新选择了 mode）。
+   */
+  const pkg = /** @type {Record<string, unknown>} */ (parsed);
+  if (typeof pkg.package_id !== 'string' || !pkg.package_id) {
+    pkg.package_id = packageId;
+  }
+  if (typeof pkg.source_script_hash !== 'string' || !pkg.source_script_hash) {
+    pkg.source_script_hash = sourceHash;
+  }
+  if (typeof pkg.mode !== 'string') {
+    pkg.mode = mode;
+  }
+  if (!pkg.input_echo || typeof pkg.input_echo !== 'object') {
+    pkg.input_echo = inputEcho;
+  }
+  if (!pkg.meta || typeof pkg.meta !== 'object') {
+    pkg.meta = {};
+  }
+  const metaObj = /** @type {Record<string, unknown>} */ (pkg.meta);
+  if (typeof metaObj.schema_version !== 'string') {
+    metaObj.schema_version = 'v1';
+  }
+  if (typeof metaObj.generated_at !== 'string') {
+    metaObj.generated_at = new Date().toISOString();
+  }
+
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.writeFileSync(outPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
+  console.log(`[${SCRIPT_TAG}] 已写入 ${outPath}（package_id=${pkg.package_id}）`);
+}
+
+const _e = process.argv[1];
+if (_e && pathToFileURL(path.resolve(_e)).href === import.meta.url) {
+  main().catch((err) => {
+    console.error(`[${SCRIPT_TAG}]`, err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
+}

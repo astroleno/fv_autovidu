@@ -1,0 +1,15 @@
+{
+  "skills": ["generating-sd2-storyboards"],
+  "name": "eval-03-retry",
+  "description": "触发 thinking 重试策略：验证第 1 次 thinking ON、第 2 次自动 OFF。",
+  "user_query": "(人为构造场景) 故意把 YUNWU_EDITMAP_MAX_TOKENS 临时调到 4000 再跑 eval-01，观察 generate.mjs 是否按预期进入重试分支。",
+  "expected_behavior": [
+    "第 1 次运行 generate.mjs 内部传 YUNWU_EDITMAP_MAX_TOKENS=32000 且不含 --no-thinking",
+    "第 1 次因 EditMap JSON 截断导致体检失败（checkArtifacts 返回 reason='edit_map_sd2.json 解析失败（可能被截断）'）",
+    "第 2 次自动重试，命令行含 --no-thinking 且环境变量 YUNWU_EDITMAP_MAX_TOKENS=48000",
+    "第 2 次如果仍失败，脚本 exit 3 并打印 troubleshooting.md 路径",
+    "Claude 不应擅自在第 1 次就添加 --no-thinking（违反 thinking 默认策略）"
+  ],
+  "expected_exit_code": "0 或 3",
+  "notes": "本 eval 偏白盒，主要用于回归测试 thinking 策略是否被误改。人工读 generate.mjs 源码 + 日志即可验证。"
+}

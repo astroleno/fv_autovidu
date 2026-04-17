@@ -1,9 +1,39 @@
-# injection_map.yaml -- 知识切片路由映射表
+# injection_map.yaml — 知识切片路由映射表 v2.0
 # 编排层按此表机械执行：路由标签 -> 命中切片 -> 拼接注入
-# 版本：v1.0
-# 日期：2026-04-16
+# 版本：v2.0
+# 日期：2026-04-17
+# 契约源：prompt/1_SD2Workflow/docs/v5/07_v5-schema-冻结.md
+#
+# 说明：
+#   - `director.*` 匹配字段来自 EditMap appendix 中的 `block_index[i].routing`。
+#   - `prompter.*` 的 `aspect_ratio` 匹配字段来自 `meta.video.aspect_ratio`。
+#   - `psychology_group` 为编排层派生字段（由 `meta.psychology_plan[].group` 按 block 复制到 `routing.psychology_group`），
+#     不属于 07 schema 的正式字段，LLM 侧无感知。
+#   - 单份切片正文长度必须 ≤ `max_tokens × 0.9`（超限 → CI 不通过）。
+#
+# ========================================================================
+# ⚠️ editmap/ 切片 · 不进本文件（v5 架构决策）
+# ========================================================================
+# 4_KnowledgeSlices/editmap/ 下的 6 份编剧方法论切片（dramatic_action,
+# character_want_need, subtext_and_signals, hook_strategies,
+# two_track_pacing, proof_and_info_gap）**不登记为 consumer**，
+# 也不占 `max_total_tokens_per_consumer` 预算。
+#
+# 原因：
+#   - EditMap 是 pipeline 的路由器——`routing.structural/satisfaction/
+#     psychology/shot_hint/paywall_level` 全部由 EditMap 一次性产出，
+#     供下游 Director / Prompter 做条件注入。
+#   - 路由器自己不能被自己路由（"要识别才能加载，要加载才能识别"的死循环），
+#     因此 editmap/ 方法论必须在任何路由判断**之前**就已进入 EditMap 视野。
+#   - 结论：pipeline 在构建 EditMap system prompt 时直接
+#     `fs.readdirSync('editmap/')` 静态拼接（见 `call_editmap_sd2_v5.mjs`），
+#     editmap/ 整体 token 硬限 ≤ 4000。
+#
+# 详细机制、拼接顺序、token 预算规则见：
+#   prompt/1_SD2Workflow/docs/v5/08_v5-编剧方法论切片.md
+# ========================================================================
 
-version: "1.0"
+version: "2.0"
 
 # ===== 按消费者分组 =====
 
@@ -13,44 +43,163 @@ director:
     - slice_id: structure_constraints
       path: director/structure_constraints.md
       max_tokens: 500
+      priority: 10
+
+    - slice_id: status_visual_mapping
+      path: director/status_visual_mapping.md
+      max_tokens: 500
+      priority: 15
 
   # 条件注入（路由标签命中时注入）
   conditional:
-    # -- 按 structural_tags 匹配 --
+    # --- v4 保留：结构范式示例 ---
     - slice_id: structure_fewshot
       path: director/structure_fewshot.md
       max_tokens: 800
+      priority: 20
       match:
-        structural_tags:
+        structural:
           any_of: ["beat_escalation", "emotion_turning", "crisis_burst"]
 
-    # -- 以下为 P1 扩展预留位 --
-    # - slice_id: emotion_gear
-    #   path: director/emotion_gear.md
-    #   max_tokens: 600
-    #   match:
-    #     structural_tags:
-    #       any_of: ["emotion_pivot", "emotion_buildup"]
+    # --- T05 · 爽点母题微切片（4 份，按 satisfaction_motif 命中）---
+    - slice_id: satisfaction.status_reversal
+      path: director/satisfaction/status_reversal.md
+      max_tokens: 300
+      priority: 30
+      match:
+        satisfaction:
+          any_of: ["status_reversal"]
 
-    # - slice_id: action_4phase
-    #   path: director/action_4phase.md
-    #   max_tokens: 600
-    #   match:
-    #     scene_bucket: "action"
+    - slice_id: satisfaction.control
+      path: director/satisfaction/control.md
+      max_tokens: 300
+      priority: 30
+      match:
+        satisfaction:
+          any_of: ["control"]
 
-    # - slice_id: closed_space_guide
-    #   path: director/closed_space_guide.md
-    #   max_tokens: 500
-    #   match:
-    #     structural_tags:
-    #       any_of: ["interior_pressure", "enclosed_space"]
+    - slice_id: satisfaction.exclusive_favor
+      path: director/satisfaction/exclusive_favor.md
+      max_tokens: 300
+      priority: 30
+      match:
+        satisfaction:
+          any_of: ["exclusive_favor"]
 
-    # - slice_id: hook_cliff_visual
-    #   path: director/hook_cliff_visual.md
-    #   max_tokens: 600
-    #   match:
-    #     structural_tags:
-    #       any_of: ["hook_opening", "cliff_ending"]
+    - slice_id: satisfaction.instant_justice
+      path: director/satisfaction/instant_justice.md
+      max_tokens: 300
+      priority: 30
+      match:
+        satisfaction:
+          any_of: ["instant_justice"]
+
+    # --- T06 · 心理学功能组微切片（6 份，按 psychology_group 命中）---
+    - slice_id: psychology.hook
+      path: director/psychology/hook.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["hook"]
+
+    - slice_id: psychology.retention
+      path: director/psychology/retention.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["retention"]
+
+    - slice_id: psychology.payoff
+      path: director/psychology/payoff.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["payoff"]
+
+    - slice_id: psychology.bonding
+      path: director/psychology/bonding.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["bonding"]
+
+    - slice_id: psychology.relationship
+      path: director/psychology/relationship.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["relationship"]
+
+    - slice_id: psychology.conversion
+      path: director/psychology/conversion.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["conversion"]
+
+    # --- T07 · 镜头大类微切片（4 份，按 shot_hint 命中）---
+    - slice_id: shot_codes.A_event
+      path: director/shot_codes/A_event.md
+      max_tokens: 240
+      priority: 50
+      match:
+        shot_hint:
+          any_of: ["A_event"]
+
+    - slice_id: shot_codes.B_emotion
+      path: director/shot_codes/B_emotion.md
+      max_tokens: 240
+      priority: 50
+      match:
+        shot_hint:
+          any_of: ["B_emotion"]
+
+    - slice_id: shot_codes.C_transition
+      path: director/shot_codes/C_transition.md
+      max_tokens: 240
+      priority: 50
+      match:
+        shot_hint:
+          any_of: ["C_transition"]
+
+    - slice_id: shot_codes.D_welfare
+      path: director/shot_codes/D_welfare.md
+      max_tokens: 240
+      priority: 50
+      match:
+        shot_hint:
+          any_of: ["D_welfare"]
+
+    # --- T12 · 付费级别微切片（3 份，仅尾组会命中非 none）---
+    - slice_id: paywall.soft
+      path: director/paywall/soft.md
+      max_tokens: 480
+      priority: 60
+      match:
+        paywall_level:
+          equals: "soft"
+
+    - slice_id: paywall.hard
+      path: director/paywall/hard.md
+      max_tokens: 480
+      priority: 60
+      match:
+        paywall_level:
+          equals: "hard"
+
+    - slice_id: paywall.final_cliff
+      path: director/paywall/final_cliff.md
+      max_tokens: 480
+      priority: 60
+      match:
+        paywall_level:
+          equals: "final_cliff"
 
 prompter:
   # 无条件注入（每次 Prompter 调用都带）
@@ -58,38 +207,54 @@ prompter:
     - slice_id: iron_rules_full
       path: prompter/iron_rules_full.md
       max_tokens: 600
+      priority: 10
 
-  # 条件注入
+    - slice_id: avsplit_template
+      path: prompter/avsplit_template.md
+      max_tokens: 500
+      priority: 15
+
+  # 条件注入（按 meta.video.aspect_ratio 命中）
   conditional:
-    # -- 按画幅匹配 --
     - slice_id: vertical_physical_rules
       path: prompter/vertical_physical_rules.md
       max_tokens: 400
+      priority: 20
       match:
-        aspect_ratio: "9:16"
+        aspect_ratio:
+          equals: "9:16"
 
-    # -- 以下为 P1 扩展预留位 --
-    # - slice_id: action_physical_vocab
-    #   path: prompter/action_physical_vocab.md
-    #   max_tokens: 300
-    #   match:
-    #     scene_bucket: "action"
+    - slice_id: vertical_grammar
+      path: prompter/vertical_grammar.md
+      max_tokens: 500
+      priority: 25
+      match:
+        aspect_ratio:
+          equals: "9:16"
 
 # ===== 全局规则 =====
 
 rules:
-  # 同一消费者的切片拼接上限（超过则按 priority 截断）
-  max_total_tokens_per_consumer: 2000
+  # 每个消费者的切片拼接上限（超过则按优先级截断）
+  max_total_tokens_per_consumer:
+    director: 3000
+    prompter: 2000
 
-  # 优先级：always > conditional；conditional 内 priority 越小越优先
+  # 优先级：always 先于 conditional；conditional 内 priority 越小越优先
   # 冲突处理：同一字段被多个切片覆盖时，priority 小的生效
   priority_order: "always_first_then_by_priority_asc"
 
   # mixed 场景：scene_bucket == "mixed" 时
   # 编排层从两个最相关主桶各取 1 个 FSKB 示例
-  # knowledge_slices 按 structural_tags 正常匹配，不做特殊处理
+  # knowledge_slices 按 routing.* 正常匹配，不做特殊处理
   mixed_bucket_strategy: "fskb_dual_bucket_slice_normal"
 
-  # aspect_ratio 追加规则：当 parsedBrief.aspectRatio == "9:16" 时
+  # aspect_ratio 追加规则：当 meta.video.aspect_ratio == "9:16" 时
   # 自动追加匹配 aspect_ratio: "9:16" 的全部切片
   aspect_ratio_auto_append: true
+
+  # 截断策略：总预算超限时，按优先级从低到高裁切 conditional 切片
+  # 同时在 meta.routing_trace[] 里写入被截切片 ID 以备审计
+  overflow_policy:
+    behavior: "drop_low_priority_conditional_first"
+    emit_trace_field: "meta.routing_trace[].truncated"
