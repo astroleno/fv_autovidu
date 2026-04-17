@@ -8,6 +8,8 @@
  *   - 调用 LLM 产出 `normalizedScriptPackage.json`（契约见 docs/stage0-normalizer/01_schema.json）；
  *   - 写入 `--output` 指定路径；上游由 run_sd2_pipeline.mjs 透传给 EditMap v5
  *     的 `--normalized-package` 参数。
+ *   - 默认走 DashScope（lib/llm_client · SD2_LLM_MODEL，如 qwen-plus），与 EditMap 云雾 Opus 解耦。
+ *     编排层默认不传 `--yunwu`；若需 Stage 0 也走云雾，设 env SD2_NORMALIZER_USE_YUNWU=1 且流水线带 --yunwu。
  *
  * Phase 1 红线（00 计划 §五）：
  *   - 不引入严格 schema 校验（Phase 1.5 再加）；LLM 输出只做最小存在性检查；
@@ -187,10 +189,22 @@ async function main() {
   try {
     if (useYunwu) {
       const defaults = getYunwuResolvedDefaults();
-      const modelOverride = typeof args.model === 'string' ? args.model : undefined;
+      /**
+       * v5.0 HOTFIX · H5：Stage 0 默认模型锁定到 claude-opus-4-6-thinking。
+       *   起因：Yunwu 侧 claude-opus-4-7 在 2026-04 之后出现配额/可用性波动
+       *   （v5d 日志里出现 HTTP 429 model_not_found），为避免 Stage 0 成为最脆弱的一环，
+       *   优先级：`--model` CLI 覆盖 > `SD2_NORMALIZER_MODEL` 环境变量 > 硬编码 4.6 > Yunwu defaults。
+       *   如需回到 4.7，请显式 `--model claude-opus-4-7-thinking`。
+       */
+      const modelOverride =
+        typeof args.model === 'string'
+          ? args.model
+          : typeof process.env.SD2_NORMALIZER_MODEL === 'string' && process.env.SD2_NORMALIZER_MODEL.trim().length > 0
+            ? process.env.SD2_NORMALIZER_MODEL.trim()
+            : 'claude-opus-4-6-thinking';
       const noThinking = args['no-thinking'] === true;
       console.log(
-        `[${SCRIPT_TAG}] 云雾 LLM：model=${modelOverride || defaults.model} base=${defaults.baseUrl} thinking=${!noThinking}`,
+        `[${SCRIPT_TAG}] 云雾 LLM：model=${modelOverride} (defaults.model=${defaults.model}) base=${defaults.baseUrl} thinking=${!noThinking}`,
       );
       raw = await callYunwuChatCompletions({
         messages: [

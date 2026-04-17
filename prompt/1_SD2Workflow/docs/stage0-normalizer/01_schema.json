@@ -351,7 +351,15 @@
         "action_verb_count": { "type": "integer", "minimum": 0 },
         "beat_type_hint": {
           "type": "string",
-          "description": "仅作提示，不决定 EditMap 的 structural_tags / routing.structural（§五 红线）。"
+          "enum": [
+            "dialogue_exchange",
+            "action_reaction",
+            "monologue",
+            "descriptive",
+            "transition",
+            "scene_break"
+          ],
+          "description": "机械性段落类型（§3.2）。严禁叙事/功能枚举（hook / confrontation / reveal / payoff / cliff 等），那是 EditMap routing.structural 的职责（§五 红线）。"
         },
         "ambiguity_flags": {
           "type": "array",

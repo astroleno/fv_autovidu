@@ -83,6 +83,7 @@ function getBlockIndexRow(editMap, blockId) {
 
 /**
  * 相邻块是否必须串行：仅当二者 scene_run_id 相同且均非空时，后一块依赖前一块的 Director appendix。
+ * 任一侧缺失或为空 → 不强制串行（可并行）。
  * @param {unknown} prevRow
  * @param {unknown} curRow
  */
@@ -96,7 +97,7 @@ function adjacentBlocksRequireSerial(prevRow, curRow) {
       ? String(/** @type {{ scene_run_id?: unknown }} */ (curRow).scene_run_id ?? '').trim()
       : '';
   if (!pr || !cr) {
-    return true;
+    return false;
   }
   return pr === cr;
 }
@@ -269,10 +270,10 @@ async function main() {
     const prevRow = index > 0 ? getBlockIndexRow(editMap, list[index - 1].block_id) : null;
     const biRow = getBlockIndexRow(editMap, blockId);
 
-    /** 仅当须衔接上一块 continuity 时才 await 上一块 Director（同 scene_run_id 或 --serial；缺 id 保守串行） */
+    /** 仅当须衔接上一块 continuity 时才 await 上一块 Director（同 scene_run_id 且均非空，或 --serial） */
     const mustWaitForPrevDirector =
       index > 0 &&
-      (forceSerial || (prevRow && biRow ? adjacentBlocksRequireSerial(prevRow, biRow) : true));
+      (forceSerial || (prevRow && biRow ? adjacentBlocksRequireSerial(prevRow, biRow) : false));
 
     if (mustWaitForPrevDirector) {
       await done[index - 1];
