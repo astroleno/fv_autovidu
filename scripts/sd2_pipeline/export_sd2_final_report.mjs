@@ -219,8 +219,15 @@ function buildMarkdownReport(report) {
     }
     lines.push('');
     const bMapping = /** @type {{ asset_tag_mapping?: unknown }} */ (b).asset_tag_mapping;
-    const isBlockLocal = bMapping && typeof bMapping === 'object' && !Array.isArray(bMapping);
-    lines.push(`#### asset_tag_mapping${isBlockLocal ? '（Block 内局部映射）' : '（全局映射）'}`);
+    const mappingSource = /** @type {{ asset_tag_mapping_source?: string }} */ (b).asset_tag_mapping_source;
+    const sourceLabel = mappingSource === 'block_local'
+      ? '（Block 内局部映射）'
+      : mappingSource === 'global'
+        ? '（全局映射）'
+        : mappingSource === 'none'
+          ? '（无映射）'
+          : '';
+    lines.push(`#### asset_tag_mapping${sourceLabel}`);
     lines.push('');
     lines.push('```json');
     lines.push(JSON.stringify(bMapping ?? [], null, 2));
@@ -331,8 +338,9 @@ async function main() {
     const inner = payloadRow && payloadRow.payload;
 
     /**
-     * v4 优先使用 Prompter 输出的 block_asset_mapping（Block 内重编号的局部映射）；
-     * 若不存在则回退到 payload 中的全局 asset_tag_mapping。
+     * v4 优先使用 Prompter 输出的 block_asset_mapping（Block 内重编号的局部映射，dict 形态：
+     *   { "@图1": { asset_id, asset_type }, ... }）；
+     * 若不存在则回退到 payload 中的全局 asset_tag_mapping（list 形态）。
      */
     const blockLocalMapping = /** @type {{ block_asset_mapping?: unknown }} */ (result).block_asset_mapping;
     const mapping = (blockLocalMapping && typeof blockLocalMapping === 'object')
@@ -341,6 +349,33 @@ async function main() {
           ? /** @type {Record<string, unknown>} */ (inner).asset_tag_mapping
             ?? /** @type {Record<string, unknown>} */ (inner).assetTagMapping
           : undefined);
+
+    /**
+     * 归一化：无论 Prompter 给的是 dict（{ "@图1": {...} }）还是 list（[{ tag: "@图1", ... }]），
+     * 都统一为 list 形态便于报告消费。dict 键按 @图N 数字排序。
+     * @returns {Array<Record<string, unknown>>}
+     */
+    const normalizeMapping = () => {
+      if (Array.isArray(mapping)) {
+        return /** @type {Array<Record<string, unknown>>} */ (mapping);
+      }
+      if (mapping && typeof mapping === 'object') {
+        const entries = Object.entries(/** @type {Record<string, unknown>} */ (mapping));
+        entries.sort((a, b) => {
+          const na = Number((a[0].match(/\d+/) || ['0'])[0]);
+          const nb = Number((b[0].match(/\d+/) || ['0'])[0]);
+          return na - nb;
+        });
+        return entries.map(([tag, info]) => {
+          const rec = (info && typeof info === 'object')
+            ? /** @type {Record<string, unknown>} */ (info)
+            : {};
+          return { tag, ...rec };
+        });
+      }
+      return [];
+    };
+    const normalizedMapping = normalizeMapping();
 
     /** v2 通过 edit_map_block.assets_required 读取；v3 没有此嵌套结构 */
     const editBlock =
@@ -352,12 +387,21 @@ async function main() {
         ? /** @type {{ assets_required?: unknown }} */ (editBlock).assets_required
         : undefined;
 
+    /**
+     * 标记 mapping 来源，供 markdown 渲染时区分"Block 内局部映射"与"全局映射"
+     * @type {'block_local' | 'global' | 'none'}
+     */
+    const mappingSource = blockLocalMapping && typeof blockLocalMapping === 'object'
+      ? 'block_local'
+      : (normalizedMapping.length > 0 ? 'global' : 'none');
+
     blocksOut.push({
       block_id: blockId,
       time: /** @type {{ time?: unknown }} */ (result).time ?? null,
       sd2_prompt: sd2Prompt,
       assets_used_tags_from_time_slices: tagsUnique,
-      asset_tag_mapping: Array.isArray(mapping) ? mapping : [],
+      asset_tag_mapping: normalizedMapping,
+      asset_tag_mapping_source: mappingSource,
       assets_required: assetsRequired ?? null,
       few_shot_refs:
         /** @type {{ few_shot_refs?: unknown }} */ (result).few_shot_refs ?? null,

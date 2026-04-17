@@ -1,0 +1,15 @@
+{
+  "skills": ["generating-sd2-storyboards"],
+  "name": "eval-02-full-brief",
+  "description": "完整 brief：验证题材、风格、镜头数等参数能正确透传到 EditMap。",
+  "user_query": "把这集剧本转分镜。剧本路径 skills/generating-sd2-storyboards/test-fixtures/minimal-script.md，资产路径 skills/generating-sd2-storyboards/test-fixtures/minimal-assets.json。brief：单集总时长 90 秒；目标镜头数约 30。都市律政情感短剧，真人电影风格。冷调偏青，高反差，低饱和。",
+  "expected_behavior": [
+    "Claude 调用 generate.mjs 时把 brief 整句原样作为 --brief 传入，不要拆字段",
+    "产物 edit_map_input.json 的 directorBrief 字段包含原 brief 文本",
+    "产物 edit_map_sd2.json 的 meta.genre 或 renderingStyle 反映 brief 的题材/风格",
+    "sd2_final_report.json 的 summary.blockCount ≥ 4",
+    "sd2_final_report.json 的 summary.totalDurationSec 接近 90（±10% 容差）"
+  ],
+  "expected_exit_code": 0,
+  "notes": "brief 的结构化抽取由 EditMap LLM 在 prompt 侧完成，本 skill 不做二次解析。"
+}

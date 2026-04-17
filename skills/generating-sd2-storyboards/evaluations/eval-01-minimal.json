@@ -1,0 +1,17 @@
+{
+  "skills": ["generating-sd2-storyboards"],
+  "name": "eval-01-minimal",
+  "description": "最小输入：走完整链路一次，验证 skill 能从零到产物。",
+  "user_query": "帮我把这份剧本转成分镜。剧本在 skills/generating-sd2-storyboards/test-fixtures/minimal-script.md，资产在 skills/generating-sd2-storyboards/test-fixtures/minimal-assets.json，brief：单集总时长 60 秒。",
+  "expected_behavior": [
+    "Claude 识别到这是 generating-sd2-storyboards 的典型触发场景",
+    "Claude 调用 skills/generating-sd2-storyboards/scripts/generate.mjs",
+    "命令中包含 --script / --brief / --assets-file 三个 flag",
+    "命令中不包含 --no-thinking（第 1 次运行保持 thinking ON）",
+    "命令中不包含任何 SKILL.md 未提及的额外 flag",
+    "产物目录 output/sd2/<slug>/ 下存在 sd2_final_report.md 和 sd2_final_report.json",
+    "Claude 汇报时给出产物目录路径、blockCount、总时长"
+  ],
+  "expected_exit_code": 0,
+  "notes": "本 eval 依赖真实 LLM（YUNWU + DashScope），耗时 5~10 分钟。首次跑通后可用作基线。"
+}

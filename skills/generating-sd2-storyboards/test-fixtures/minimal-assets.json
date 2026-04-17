@@ -1,0 +1,27 @@
+[
+  {
+    "name": "林川",
+    "type": "character",
+    "description": "男主，32 岁，律师，西装，神情冷峻。"
+  },
+  {
+    "name": "周雅",
+    "type": "character",
+    "description": "女主，30 岁，公司法务，职业套装，长发，眉眼温和。"
+  },
+  {
+    "name": "办公室",
+    "type": "scene",
+    "description": "现代商务办公室，落地窗，原木办公桌，暖色灯光。"
+  },
+  {
+    "name": "咖啡馆",
+    "type": "scene",
+    "description": "安静的独立咖啡馆，角落小桌，黄色暖灯，窗外车流。"
+  },
+  {
+    "name": "合同文件",
+    "type": "prop",
+    "description": "A4 双面装订合同，黑色夹子。"
+  }
+]

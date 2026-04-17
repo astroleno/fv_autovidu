@@ -1,0 +1,566 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://feeling.video/schemas/normalizedScriptPackage/v1.0.json",
+  "title": "normalizedScriptPackage",
+  "description": "Stage 0 · ScriptNormalizer 事实归一化产物。与 SD2Workflow v5 的 07_schema 严格正交：本 schema 只描述 Stage 0 输出，v5 EditMap 将其作为附加输入消费。冻结范围见 docs/stage0-normalizer/00_ScriptNormalizer-v1-计划.md §附录A。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "package_id",
+    "source_script_hash",
+    "input_echo",
+    "mode",
+    "character_registry",
+    "scene_timeline",
+    "beat_ledger",
+    "temporal_model",
+    "state_ledger",
+    "meta"
+  ],
+
+  "properties": {
+    "package_id": {
+      "type": "string",
+      "pattern": "^NSP_[A-Za-z0-9_]+$",
+      "description": "全局唯一包 ID，格式 NSP_<slug>。"
+    },
+    "source_script_hash": {
+      "type": "string",
+      "minLength": 8,
+      "description": "scriptContent 原文的稳定哈希（建议 sha256 前 16–64 位），用于回归追溯。"
+    },
+    "tightness_score": {
+      "type": "integer",
+      "minimum": -3,
+      "maximum": 3,
+      "description": "§七 启发式松紧度打分；mode=lightweight_override 时可省略，其他模式必填（见 allOf 条件）。"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["lightweight", "standard", "heavy"],
+      "description": "Stage 0 运行模式。D2 默认启用三值；由 §七 启发式或 directorBrief.scriptTypeHint 映射得到。"
+    },
+
+    "input_echo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brief_whitelist"],
+      "description": "§5.5 强制：仅回显 directorBrief 白名单字段 + episodeDuration，防止越界读取导演意图字段。",
+      "properties": {
+        "brief_whitelist": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "允许读取的 directorBrief 字段白名单，其他字段一律不得出现。",
+          "properties": {
+            "genre": {
+              "type": "string",
+              "description": "EditMap 主解析结果的旁读（如 mystery / romance / commerce / longform）。"
+            },
+            "scriptTypeHint": {
+              "type": "string",
+              "enum": ["A", "B", "C", "auto"],
+              "description": "A=标准台本 / B=小说稿 / C=混合 / auto=交给启发式。"
+            }
+          }
+        },
+        "episode_duration_sec": {
+          "type": "number",
+          "minimum": 0,
+          "description": "pipeline 层传入的目标集时长。"
+        }
+      }
+    },
+
+    "character_registry": {
+      "type": "object",
+      "description": "以 CHAR_ID 为 key 的角色注册表；§3.1。",
+      "minProperties": 0,
+      "patternProperties": {
+        "^CHAR_[A-Z0-9_]+$": { "$ref": "#/definitions/CharacterEntry" }
+      },
+      "additionalProperties": false
+    },
+
+    "scene_timeline": {
+      "type": "array",
+      "description": "场次顺序表；§3.2。",
+      "items": { "$ref": "#/definitions/SceneEntry" }
+    },
+
+    "beat_ledger": {
+      "type": "array",
+      "description": "最小叙事单元账本；§3.3。EditMap 可直接聚合成 block，不再在 LLM 里切 beat。",
+      "items": { "$ref": "#/definitions/BeatEntry" }
+    },
+
+    "temporal_model": {
+      "type": "object",
+      "description": "双时间轴建模；§3.4。screen_time 为屏幕时长，story_elapsed 为剧情内时间，display_order vs story_order 正交展开。",
+      "additionalProperties": false,
+      "required": [
+        "episodes_target_screen_sec",
+        "episodes_estimated_screen_sec",
+        "drift_ratio",
+        "beats",
+        "block_suggestion"
+      ],
+      "properties": {
+        "episodes_target_screen_sec": { "type": "number", "minimum": 0 },
+        "episodes_estimated_screen_sec": { "type": "number", "minimum": 0 },
+        "drift_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "description": "|estimated - target| / target；> drift_alert_threshold (0.1) 需告警。"
+        },
+        "beats": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/TemporalBeat" }
+        },
+        "block_suggestion": {
+          "type": "array",
+          "description": "可选的聚合建议，EditMap 可采纳可重排；不是硬约束。",
+          "items": { "$ref": "#/definitions/BlockSuggestion" }
+        }
+      }
+    },
+
+    "state_ledger": {
+      "type": "object",
+      "description": "状态账本；§3.5 + D4 默认全量（人物 + 道具 + 场景）。",
+      "additionalProperties": false,
+      "required": ["character_states", "prop_states", "scene_states"],
+      "properties": {
+        "character_states": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/CharacterStateTrack" }
+        },
+        "prop_states": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/PropStateTrack" }
+        },
+        "scene_states": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/SceneStateTrack" }
+        }
+      }
+    },
+
+    "ambiguity_report": {
+      "type": "array",
+      "description": "歧义告警；§3.6。Stage 0 拒绝臆测，任何不确定项都在此显式登记。",
+      "items": { "$ref": "#/definitions/AmbiguityItem" }
+    },
+
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generated_at", "normalizer_version"],
+      "properties": {
+        "generated_at": { "type": "string", "format": "date-time" },
+        "normalizer_version": {
+          "type": "string",
+          "const": "v1.0",
+          "description": "硬字段常量；主版本跳跃（v2）必须在 v5.2+ 独立 PR。"
+        },
+        "bible_ref": {
+          "type": "string",
+          "description": "0_BibleSchema 快照的引用键（如 bible_hash / bible_version）。"
+        }
+      }
+    }
+  },
+
+  "allOf": [
+    {
+      "description": "D2 条件：非 lightweight 模式必须给出 tightness_score。",
+      "if": { "properties": { "mode": { "const": "lightweight" } } },
+      "then": {},
+      "else": { "required": ["tightness_score"] }
+    }
+  ],
+
+  "definitions": {
+
+    "CharacterEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_name",
+        "bible_ref",
+        "aliases_in_script",
+        "faction",
+        "first_seen_seg",
+        "present_in_segs"
+      ],
+      "properties": {
+        "canonical_name": { "type": "string", "minLength": 1 },
+        "bible_ref": {
+          "type": "string",
+          "description": "0_BibleSchema.characters[].id；新角色未入 Bible 时允许空串。"
+        },
+        "aliases_in_script": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "剧本里出现的全部别名（含代词投射），允许 []。"
+        },
+        "pronoun_bindings": {
+          "type": "array",
+          "description": "代词消解证据链；mode=lightweight 可省略，standard/heavy 必填（见顶层 allOf）。",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["seg_id", "token", "confidence", "rationale"],
+            "properties": {
+              "seg_id": { "type": "string" },
+              "token": { "type": "string" },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+              "rationale": { "type": "string" }
+            }
+          }
+        },
+        "faction": {
+          "type": "string",
+          "enum": ["protagonist", "antagonist", "neutral", "unknown"]
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["to", "type", "source"],
+            "properties": {
+              "to": { "type": "string", "pattern": "^CHAR_[A-Z0-9_]+$" },
+              "type": { "type": "string" },
+              "source": { "type": "string", "enum": ["bible", "script_inferred"] },
+              "evidence_seg": { "type": "string" }
+            }
+          }
+        },
+        "first_seen_seg": { "type": "string" },
+        "present_in_segs": { "type": "array", "items": { "type": "string" } },
+        "default_state": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "初始出场状态提示；仅作 hint，最终状态以 state_ledger.character_states 为准。"
+        }
+      }
+    },
+
+    "SceneEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scene_id",
+        "scene_run_id",
+        "place",
+        "time_of_day",
+        "is_continuous_from_prev",
+        "seg_range",
+        "cum_screen_start",
+        "cum_screen_end",
+        "story_time_mode"
+      ],
+      "properties": {
+        "scene_id": { "type": "string", "pattern": "^SC_[A-Za-z0-9_]+$" },
+        "scene_run_id": { "type": "string", "description": "沿用 v5 scene_run_id 语义。" },
+        "place": { "type": "string" },
+        "time_of_day": {
+          "type": "string",
+          "enum": ["dawn", "morning", "noon", "afternoon", "dusk", "night", "unknown"]
+        },
+        "is_continuous_from_prev": { "type": "boolean" },
+        "seg_range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "type": "string" },
+          "description": "[首 SEG_id, 末 SEG_id]。"
+        },
+        "cum_screen_start": { "type": "number", "minimum": 0 },
+        "cum_screen_end": { "type": "number", "minimum": 0 },
+        "story_time_start_iso": {
+          "anyOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        },
+        "story_time_mode": {
+          "type": "string",
+          "enum": ["present", "flashback", "dream", "parallel", "ellipsis"]
+        }
+      }
+    },
+
+    "BeatEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beat_id",
+        "scene_id",
+        "raw_excerpt",
+        "segments",
+        "participants",
+        "core_action",
+        "dialogue_char_count",
+        "action_verb_count"
+      ],
+      "properties": {
+        "beat_id": { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+        "scene_id": { "type": "string", "pattern": "^SC_[A-Za-z0-9_]+$" },
+        "raw_excerpt": { "type": "string", "minLength": 1 },
+        "segments": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "participants": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^CHAR_[A-Z0-9_]+$" }
+        },
+        "core_action": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["actor", "verb", "modality"],
+          "properties": {
+            "actor": { "type": "string", "pattern": "^CHAR_[A-Z0-9_]+$" },
+            "verb": { "type": "string", "minLength": 1 },
+            "object": {
+              "anyOf": [
+                { "type": "string" },
+                { "type": "null" }
+              ],
+              "description": "动作作用对象：CHAR_ID / PROP_ID / 自然语言 / null（不及物）。"
+            },
+            "modality": {
+              "type": "string",
+              "enum": ["verbal", "physical", "internal"]
+            }
+          }
+        },
+        "reaction_subject": {
+          "anyOf": [
+            { "type": "string", "pattern": "^CHAR_[A-Z0-9_]+$" },
+            { "type": "null" }
+          ]
+        },
+        "mandatory_on_screen": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^CHAR_[A-Z0-9_]+$" }
+        },
+        "dialogue_char_count": { "type": "integer", "minimum": 0 },
+        "action_verb_count": { "type": "integer", "minimum": 0 },
+        "beat_type_hint": {
+          "type": "string",
+          "description": "仅作提示，不决定 EditMap 的 structural_tags / routing.structural（§五 红线）。"
+        },
+        "ambiguity_flags": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^AMB_[A-Za-z0-9_]+$" }
+        }
+      }
+    },
+
+    "TemporalBeat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["beat_id", "display_order", "story_order", "screen_time_sec"],
+      "properties": {
+        "beat_id": { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+        "display_order": { "type": "integer", "minimum": 0 },
+        "story_order": { "type": "integer", "minimum": 0 },
+        "screen_time_sec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["est", "min", "max", "breakdown"],
+          "properties": {
+            "est": { "type": "number", "minimum": 0 },
+            "min": { "type": "number", "minimum": 0 },
+            "max": { "type": "number", "minimum": 0 },
+            "breakdown": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "prelude_sec",
+                "dialogue_sec",
+                "action_sec",
+                "reaction_buffer_sec",
+                "transition_cost_sec"
+              ],
+              "properties": {
+                "prelude_sec": { "type": "number", "minimum": 0 },
+                "dialogue_sec": { "type": "number", "minimum": 0 },
+                "action_sec": { "type": "number", "minimum": 0 },
+                "reaction_buffer_sec": { "type": "number", "minimum": 0 },
+                "transition_cost_sec": { "type": "number", "minimum": 0 }
+              }
+            }
+          }
+        },
+        "story_elapsed_sec": {
+          "anyOf": [
+            { "type": "number", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "time_mode": {
+          "type": "string",
+          "enum": ["present", "flashback", "dream", "parallel", "ellipsis"],
+          "description": "D3 默认可选，缺省按 present 处理。"
+        }
+      }
+    },
+
+    "BlockSuggestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["block_hint_id", "beats", "sum_screen_sec", "in_4_15s_window", "scene_continuous"],
+      "properties": {
+        "block_hint_id": { "type": "string", "pattern": "^BH_[A-Za-z0-9_]+$" },
+        "beats": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" }
+        },
+        "sum_screen_sec": { "type": "number", "minimum": 0 },
+        "in_4_15s_window": { "type": "boolean" },
+        "scene_continuous": { "type": "boolean" }
+      }
+    },
+
+    "CharacterStateTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["char_id", "transitions"],
+      "properties": {
+        "char_id": { "type": "string", "pattern": "^CHAR_[A-Z0-9_]+$" },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from_beat", "to_beat", "field", "old", "new", "evidence_seg", "confidence"],
+            "properties": {
+              "from_beat": {
+                "anyOf": [
+                  { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+                  { "type": "null" }
+                ]
+              },
+              "to_beat": {
+                "anyOf": [
+                  { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+                  { "type": "null" }
+                ]
+              },
+              "field": {
+                "type": "string",
+                "description": "如 outfit_tag / injury_tag / emotional_state / position 等。"
+              },
+              "old": {},
+              "new": {},
+              "evidence_seg": { "type": "string" },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        }
+      }
+    },
+
+    "PropStateTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prop_id", "canonical_name", "first_seen_beat", "holdings"],
+      "properties": {
+        "prop_id": { "type": "string", "pattern": "^PROP_[A-Z0-9_]+$" },
+        "canonical_name": { "type": "string", "minLength": 1 },
+        "first_seen_beat": { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+        "holdings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from_beat", "to_beat", "holder", "status"],
+            "properties": {
+              "from_beat": { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+              "to_beat": {
+                "anyOf": [
+                  { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+                  { "type": "null" }
+                ],
+                "description": "null 表示持有关系延续到全剧结束。"
+              },
+              "holder": {
+                "anyOf": [
+                  { "type": "string", "pattern": "^CHAR_[A-Z0-9_]+$" },
+                  { "type": "null" }
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["In_Hand", "In_Scene", "Stashed", "Lost", "Destroyed"]
+              },
+              "location_hint": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "SceneStateTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scene_id", "chaos_transitions"],
+      "properties": {
+        "scene_id": { "type": "string", "pattern": "^SC_[A-Za-z0-9_]+$" },
+        "chaos_transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["at_beat", "from", "to", "evidence_seg"],
+            "properties": {
+              "at_beat": { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+              "from": { "type": "string", "enum": ["Orderly", "Neutral", "Messy", "Destroyed"] },
+              "to": { "type": "string", "enum": ["Orderly", "Neutral", "Messy", "Destroyed"] },
+              "evidence_seg": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "AmbiguityItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "detail", "picked", "confidence"],
+      "anyOf": [
+        { "required": ["seg_id"] },
+        { "required": ["beat_id"] }
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^AMB_[A-Za-z0-9_]+$" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "pronoun_resolution",
+            "alias_merge",
+            "time_mode_uncertain",
+            "scene_continuity",
+            "prop_holder_unknown",
+            "action_attribution"
+          ]
+        },
+        "seg_id": { "type": "string" },
+        "beat_id": { "type": "string", "pattern": "^BT_[A-Za-z0-9_]+$" },
+        "detail": { "type": "string", "minLength": 1 },
+        "candidates": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "picked": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "suggest_human_review": { "type": "boolean" }
+      }
+    }
+  }
+}
