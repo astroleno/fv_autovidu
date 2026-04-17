@@ -1,0 +1,95 @@
+# injection_map.yaml -- 知识切片路由映射表
+# 编排层按此表机械执行：路由标签 -> 命中切片 -> 拼接注入
+# 版本：v1.0
+# 日期：2026-04-16
+
+version: "1.0"
+
+# ===== 按消费者分组 =====
+
+director:
+  # 无条件注入（每次 Director 调用都带）
+  always:
+    - slice_id: structure_constraints
+      path: director/structure_constraints.md
+      max_tokens: 500
+
+  # 条件注入（路由标签命中时注入）
+  conditional:
+    # -- 按 structural_tags 匹配 --
+    - slice_id: structure_fewshot
+      path: director/structure_fewshot.md
+      max_tokens: 800
+      match:
+        structural_tags:
+          any_of: ["beat_escalation", "emotion_turning", "crisis_burst"]
+
+    # -- 以下为 P1 扩展预留位 --
+    # - slice_id: emotion_gear
+    #   path: director/emotion_gear.md
+    #   max_tokens: 600
+    #   match:
+    #     structural_tags:
+    #       any_of: ["emotion_pivot", "emotion_buildup"]
+
+    # - slice_id: action_4phase
+    #   path: director/action_4phase.md
+    #   max_tokens: 600
+    #   match:
+    #     scene_bucket: "action"
+
+    # - slice_id: closed_space_guide
+    #   path: director/closed_space_guide.md
+    #   max_tokens: 500
+    #   match:
+    #     structural_tags:
+    #       any_of: ["interior_pressure", "enclosed_space"]
+
+    # - slice_id: hook_cliff_visual
+    #   path: director/hook_cliff_visual.md
+    #   max_tokens: 600
+    #   match:
+    #     structural_tags:
+    #       any_of: ["hook_opening", "cliff_ending"]
+
+prompter:
+  # 无条件注入（每次 Prompter 调用都带）
+  always:
+    - slice_id: iron_rules_full
+      path: prompter/iron_rules_full.md
+      max_tokens: 600
+
+  # 条件注入
+  conditional:
+    # -- 按画幅匹配 --
+    - slice_id: vertical_physical_rules
+      path: prompter/vertical_physical_rules.md
+      max_tokens: 400
+      match:
+        aspect_ratio: "9:16"
+
+    # -- 以下为 P1 扩展预留位 --
+    # - slice_id: action_physical_vocab
+    #   path: prompter/action_physical_vocab.md
+    #   max_tokens: 300
+    #   match:
+    #     scene_bucket: "action"
+
+# ===== 全局规则 =====
+
+rules:
+  # 同一消费者的切片拼接上限（超过则按 priority 截断）
+  max_total_tokens_per_consumer: 2000
+
+  # 优先级：always > conditional；conditional 内 priority 越小越优先
+  # 冲突处理：同一字段被多个切片覆盖时，priority 小的生效
+  priority_order: "always_first_then_by_priority_asc"
+
+  # mixed 场景：scene_bucket == "mixed" 时
+  # 编排层从两个最相关主桶各取 1 个 FSKB 示例
+  # knowledge_slices 按 structural_tags 正常匹配，不做特殊处理
+  mixed_bucket_strategy: "fskb_dual_bucket_slice_normal"
+
+  # aspect_ratio 追加规则：当 parsedBrief.aspectRatio == "9:16" 时
+  # 自动追加匹配 aspect_ratio: "9:16" 的全部切片
+  aspect_ratio_auto_append: true

@@ -60,7 +60,7 @@ function collectUniqueAssetTagsFromSlices(result) {
   /** @type {Set<string>} */
   const set = new Set();
   if (!Array.isArray(slices)) {
-    return collectAssetTagsFromSd2PromptText(result);
+    return [];
   }
   for (const s of slices) {
     if (!s || typeof s !== 'object') {
@@ -73,36 +73,6 @@ function collectUniqueAssetTagsFromSlices(result) {
     for (const t of tags) {
       set.add(String(t).trim());
     }
-  }
-  const fromSlices = [...set].sort((a, b) => a.localeCompare(b));
-  if (fromSlices.length > 0) {
-    return fromSlices;
-  }
-  return collectAssetTagsFromSd2PromptText(result);
-}
-
-/**
- * v3 等无 time_slices 时：从 sd2_prompt 正文中提取 @图xxx / @asset 类标签。
- * @param {unknown} result
- * @returns {string[]}
- */
-function collectAssetTagsFromSd2PromptText(result) {
-  if (!result || typeof result !== 'object') {
-    return [];
-  }
-  const prompt = String(
-    /** @type {{ sd2_prompt?: unknown }} */ (result).sd2_prompt ?? '',
-  );
-  if (!prompt.trim()) {
-    return [];
-  }
-  /** @type {Set<string>} */
-  const set = new Set();
-  const re = /@图[^\s\u3000，。；、]+/g;
-  let m = re.exec(prompt);
-  while (m) {
-    set.add(m[0].trim());
-    m = re.exec(prompt);
   }
   return [...set].sort((a, b) => a.localeCompare(b));
 }
@@ -218,12 +188,10 @@ function buildMarkdownReport(report) {
       lines.push(`- **few_shot_refs**：${few.map(String).join(', ')}`);
     }
     lines.push('');
-    const bMapping = /** @type {{ asset_tag_mapping?: unknown }} */ (b).asset_tag_mapping;
-    const isBlockLocal = bMapping && typeof bMapping === 'object' && !Array.isArray(bMapping);
-    lines.push(`#### asset_tag_mapping${isBlockLocal ? '（Block 内局部映射）' : '（全局映射）'}`);
+    lines.push('#### asset_tag_mapping');
     lines.push('');
     lines.push('```json');
-    lines.push(JSON.stringify(bMapping ?? [], null, 2));
+    lines.push(JSON.stringify(/** @type {{ asset_tag_mapping?: unknown }} */ (b).asset_tag_mapping ?? [], null, 2));
     lines.push('```');
     lines.push('');
     lines.push('#### assets_required（EditMap）');
@@ -329,20 +297,10 @@ async function main() {
 
     const payloadRow = payloadByBlock.get(blockId);
     const inner = payloadRow && payloadRow.payload;
-
-    /**
-     * v4 优先使用 Prompter 输出的 block_asset_mapping（Block 内重编号的局部映射）；
-     * 若不存在则回退到 payload 中的全局 asset_tag_mapping。
-     */
-    const blockLocalMapping = /** @type {{ block_asset_mapping?: unknown }} */ (result).block_asset_mapping;
-    const mapping = (blockLocalMapping && typeof blockLocalMapping === 'object')
-      ? blockLocalMapping
-      : (inner && typeof inner === 'object'
-          ? /** @type {Record<string, unknown>} */ (inner).asset_tag_mapping
-            ?? /** @type {Record<string, unknown>} */ (inner).assetTagMapping
-          : undefined);
-
-    /** v2 通过 edit_map_block.assets_required 读取；v3 没有此嵌套结构 */
+    const mapping =
+      inner && typeof inner === 'object'
+        ? /** @type {{ asset_tag_mapping?: unknown }} */ (inner).asset_tag_mapping
+        : undefined;
     const editBlock =
       inner && typeof inner === 'object'
         ? /** @type {{ edit_map_block?: unknown }} */ (inner).edit_map_block
