@@ -154,6 +154,26 @@ async function main() {
 
   annotateNormalizerRef(parsed, normalizedPackage, normalizedPackagePath);
 
+  // ── v5.0 HOTFIX · H1：maxBlock 硬门（与 Yunwu 版一致） ──
+  //   DashScope 版没有自检 retry 机制，所以这里只做单次硬门；
+  //   任何 block.duration > 15s → 拒绝写盘 + exit 7。
+  {
+    const finalValidation = /** @type {Record<string, unknown>} */ (parsed)._validation;
+    if (finalValidation && typeof finalValidation === 'object') {
+      const fv = /** @type {{
+        max_block_duration_check?: boolean,
+        over_limit_blocks?: string[],
+      }} */ (finalValidation);
+      if (fv.max_block_duration_check === false) {
+        const overList = Array.isArray(fv.over_limit_blocks) ? fv.over_limit_blocks.join(', ') : '未知';
+        console.error(
+          `[${SCRIPT_TAG}] ❌ 硬门失败：max_block_duration_check=false（${overList} 超过 15s 硬上限）。拒绝写盘。`,
+        );
+        process.exit(7);
+      }
+    }
+  }
+
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(parsed, null, 2) + '\n', 'utf8');
   console.log(`[${SCRIPT_TAG}] 已写入 ${outPath}`);

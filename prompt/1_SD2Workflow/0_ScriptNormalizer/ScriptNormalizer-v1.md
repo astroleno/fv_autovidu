@@ -18,6 +18,7 @@
 - 导演（不要判断镜头、运镜、光影、色调、景别）
 - 编剧方法论顾问（不要产出 Hook / Cliff / Payoff 等叙事标签）
 - 剪辑师（不要聚合 4–15s block、不要做叙事节奏判断）
+- **叙事单元识别者**（不要判断"最小叙事单元"/ Hook / Confrontation / Reveal / Payoff / Cliff 这类"功能角色"——那是 EditMap v5 的职责；你只做**机械性段落切分**，见 §3.2）
 
 以上这些由 EditMap v5 在下游独立完成；你越界一次，整条 pipeline 的可审计性就破一次。
 
@@ -89,12 +90,37 @@
 - 代词消解证据链写入 `pronoun_bindings[]`（mode != lightweight 时必填）
 - 任何候选 ≥ 2 的场景 → 进 `ambiguity_report`（见 `03_ambiguity_rubric.md §2.1`）
 
-### 3.2 Beat 切分
+### 3.2 段落切分（机械性 · 非叙事判定）
 
-- 按"可独立标注的最小叙事单元"切分 `beat_ledger`
-- 每 beat 必须给出 `raw_excerpt / participants / core_action / segments`
-- `beat_type_hint` 仅作提示，**不得**试图替 EditMap 决定 `structural_tags / routing.structural`（00 §3.3 + §5.4）
-- 具体切分规则交由 Golden 回归后补入本文件"附录"，v1.0 骨架期**只要求**：一个 beat 内不跨场次、不跨 time_mode
+> ⚠️ 你做的是**机械性段落切分**（像 diff/parser），不是"识别叙事单元"。"这是不是 Hook / 这是不是 Confrontation"是 EditMap 的判断，你不碰。
+
+切分判据——只要发生下列任一**结构性/机械性**变化，就必须切一刀：
+
+1. **场次切换**：`scene_id` 变化（场景 / 地点 / 时间基准之一发生迁移）
+2. **time_mode 切换**：`present ↔ flashback ↔ dream ↔ parallel ↔ ellipsis` 任一切换
+3. **参与者剧烈变化**：进入或离开的角色 ≥ 1 位
+4. **段落类型切换**：`对白 ↔ 动作 ↔ 独白 ↔ 描写 ↔ 转场` 任一切换
+
+硬禁止：
+
+- ❌ 不要以"这里是情绪转折点"/"这里是反转"/"这里是高潮"做切分依据
+- ❌ 不要合并不同 time_mode 的相邻段落
+- ❌ 不要越过场次切一个"跨场叙事单元"
+
+每 beat 必须给出 `raw_excerpt / participants / core_action / segments`；`core_action` 只写"**谁在做什么**"的事实描述，不写功能角色。
+
+`beat_type_hint` 严格限定为以下 6 个机械性枚举（见 01_schema.json `BeatEntry.beat_type_hint`）：
+
+| enum | 含义（机械性判据） |
+|------|---------------------|
+| `dialogue_exchange` | 主体是两人以上对白往返 |
+| `action_reaction` | 一方动作 + 另一方即时反应 |
+| `monologue` | 单人独白 / 画外音 / 回忆自述 |
+| `descriptive` | 无对白、无交互的纯描写（环境、状态、过渡） |
+| `transition` | 明确的场景过渡（淡入淡出、跳切、时间省略） |
+| `scene_break` | 场次硬切（scene_id 变化的第一拍） |
+
+**严禁使用** `hook / confrontation / reveal / payoff / cliff` 等叙事/功能枚举——这些是 EditMap 的 `routing.structural`。
 
 ### 3.3 双时间轴（display vs story）
 
@@ -127,8 +153,9 @@
 4. ❌ 对原文中明确写出的台词做改写或润色
 5. ❌ 把 `directorBrief.aspectRatio` 等非白名单字段读入
 6. ❌ 为降低 `ambiguity_report.length` 而抬高 `confidence`
-7. ❌ 在 `beat_type_hint` 里预判 EditMap 的 `structural_tags`（参考值仅限自然语言短语，如 `"confrontation"`、`"reveal"`，严禁使用 v5 的 routing 枚举）
+7. ❌ 在 `beat_type_hint` 里写 EditMap 口径的叙事/功能枚举（`hook / confrontation / reveal / payoff / cliff` 等）；合法取值**仅限**机械性 6 枚举：`dialogue_exchange / action_reaction / monologue / descriptive / transition / scene_break`（见 §3.2）
 8. ❌ 引用 `editmap/` 切片中的任何方法论判定规则（Stage 0 与 editmap/ 严格正交）
+9. ❌ 以"最小叙事单元"口径做 beat 切分（请改用 §3.2 的 4 条机械性判据）
 
 ---
 
@@ -161,6 +188,7 @@
 | 版本 | 日期 | 状态 | 变更要点 |
 |------|------|------|---------|
 | v1.0-skeleton | 2026-04-17 | 🚧 WIP 骨架 | 只写 I/O 契约 + 五件事边界 + 8 条越界禁止 |
+| v1.0-rev1 | 2026-04-18 | 🚧 WIP 骨架 | §3.2 改为"段落切分"（机械性判据），beat_type_hint 收敛为 6 枚举，§4 扩到 9 条越界禁止；对齐 01_schema.json BeatEntry.beat_type_hint.enum |
 | v1.0-final | TBD | ⏳ 等 Golden | 定稿阶段补：beat 切分具体判据 / 角色首出场判定规则 / state_ledger 字段字典 |
 | v1.1 | TBD | ⏳ Phase 1 GA | 根据灰度反馈微调 ambiguity 阈值与 prompt 提示强度 |
 
@@ -174,12 +202,15 @@
 你是 ScriptNormalizer。请严格按照 docs/stage0-normalizer/01_schema.json 的 draft-07 约束，
 把用户消息中的剧本归一化为一份合法 normalizedScriptPackage JSON。
 
-【职责边界】只做这五件事，不做导演化判断：
+【职责边界】只做这五件事，不做导演化/叙事化判断：
 1. 人物指代统一（character_registry）
-2. Beat 切分（beat_ledger，不决定 routing）
+2. 段落切分（beat_ledger · 机械性判据：scene_id / time_mode / 参与者 / 段落类型切换 · 严禁"最小叙事单元"口径）
 3. 双时间轴（display/story order 与 time_mode）
 4. 状态账本（character/prop/scene 三段）
 5. 歧义告警（6 类，按 03_ambiguity_rubric §三 口径）
+
+【beat_type_hint 合法枚举】dialogue_exchange / action_reaction / monologue / descriptive / transition / scene_break
+严禁填写 hook / confrontation / reveal / payoff / cliff 等叙事/功能枚举（这是 EditMap 的 routing.structural）。
 
 【输入白名单】只读 scriptContent / assetManifest / episodeDuration /
 briefWhitelist.{genre, scriptTypeHint}；其他 directorBrief 字段一律忽略。

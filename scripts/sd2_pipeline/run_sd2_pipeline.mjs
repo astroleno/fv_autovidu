@@ -44,6 +44,8 @@
  * --yunwu：EditMap 第一步走云雾（默认 YUNWU_MODEL=Opus 等），Director/Prompter 仍走 SD2_LLM_*。
  *           传 --yunwu 时若未设 --downstream-model，自动将本进程 SD2_LLM_MODEL=qwen-plus，避免与 Opus 混用同 env。
  * --downstream-model <id>：显式指定 Director / Prompter / Block 链用的模型（写入 SD2_LLM_MODEL），例如 qwen-plus、qwen-turbo。
+ * --normalizer（仅 v5）：Stage 0 ScriptNormalizer 默认走 DashScope（同上 SD2_LLM_MODEL，如 qwen-plus），与 EditMap 云雾 Opus 解耦。
+ *           若需 Stage 0 也走云雾，设环境变量 SD2_NORMALIZER_USE_YUNWU=1（且本进程带 --yunwu）。
  */
 import { spawnSync } from 'child_process';
 import fs from 'fs';
@@ -353,12 +355,24 @@ async function main() {
         path.resolve(process.cwd(), args['normalizer-prompt']),
       );
     }
-    if (useYunwu) {
+    /**
+     * Stage 0 固定走 DashScope（lib/llm_client · SD2_LLM_MODEL，如 qwen-plus），与 EditMap 云雾 Opus 解耦。
+     * 需要 Stage 0 也走云雾时，可显式 env SD2_NORMALIZER_USE_YUNWU=1（见下方）。
+     */
+    if (process.env.SD2_NORMALIZER_USE_YUNWU === '1' && useYunwu) {
       stage0Args.push('--yunwu');
     }
     if (args['no-thinking'] === true) {
       stage0Args.push('--no-thinking');
     }
+    // ── v5.0 HOTFIX · H6：Stage 0 失败不再自动降级 ──
+    //   原方案：try/catch 吞掉异常 → EditMap 按原 v5 行为跑（00 计划 §九 兜底）。
+    //   新方案：Stage 0 是用户显式 opt-in 的能力（--normalizer），一旦失败，
+    //          应当让 pipeline 直接非零退出，而不是悄悄走回原 v5 路径。
+    //          原因：v5d 的日志显示降级之后 EditMap 拿到的还是原输入，
+    //               导致 "stage0 on / stage0 off" 的产物看起来差不多，失败被淹没。
+    //   如果确实希望容忍 Stage 0 失败（例如 CI 灰度阶段），请取消 --normalizer
+    //   或者显式把 SD2_NORMALIZER_FALLBACK=1 设上（仅作为临时逃生口）。
     try {
       runNode(stage0Args);
       if (fs.existsSync(normalizerOut)) {
@@ -367,15 +381,24 @@ async function main() {
           `[run_sd2_pipeline] Stage 0 产物就绪，将透传给 EditMap：${normalizerOut}`,
         );
       } else {
-        console.warn(
-          `[run_sd2_pipeline] Stage 0 完成但产物未找到 (${normalizerOut})，按 Phase 1 兜底跳过。`,
-        );
+        const msg = `[run_sd2_pipeline] Stage 0 完成但产物未找到 (${normalizerOut})`;
+        if (process.env.SD2_NORMALIZER_FALLBACK === '1') {
+          console.warn(`${msg} — SD2_NORMALIZER_FALLBACK=1 生效，按原 v5 行为继续。`);
+        } else {
+          console.error(`${msg}。请检查 ScriptNormalizer-v1.md 或 --model 参数后重试。`);
+          process.exit(8);
+        }
       }
     } catch (err) {
-      console.warn(
-        '[run_sd2_pipeline] Stage 0 失败，按 00 计划 §九 兜底：EditMap 继续按原 v5 行为运行。',
-        err instanceof Error ? err.message : err,
-      );
+      const msg = `[run_sd2_pipeline] Stage 0 失败：${err instanceof Error ? err.message : err}`;
+      if (process.env.SD2_NORMALIZER_FALLBACK === '1') {
+        console.warn(`${msg} — SD2_NORMALIZER_FALLBACK=1 生效，按原 v5 行为继续。`);
+      } else {
+        console.error(
+          `${msg}\n  → pipeline 非零退出（不降级）。常见原因：Yunwu 模型配额/限流、prompt 未同步、LLM 输出非合法 JSON。\n  → 紧急兜底：重跑时追加 env SD2_NORMALIZER_FALLBACK=1（仅临时使用）。`,
+        );
+        process.exit(9);
+      }
     }
   } else if (Boolean(args.normalizer) && sd2Version !== 'v5') {
     console.warn(

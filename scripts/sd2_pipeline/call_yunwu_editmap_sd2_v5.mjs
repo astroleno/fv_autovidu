@@ -358,6 +358,33 @@ async function main() {
 
   annotateNormalizerRef(parsed, normalizedPackage, normalizedPackagePath);
 
+  // ── v5.0 HOTFIX · H1：maxBlock 硬门最终校验 ──
+  //   位置：retry 流程之后、写盘之前。
+  //   为什么加：retry 链路里只做了 console.warn 保留首次结果，导致
+  //   B08 这类 20s 超时的产物仍会被写盘 + 进入下游 Director/Prompter，
+  //   最终在交付物里留下不符合 SD2 引擎硬上限的 block。
+  //   统一行为：只要最终产物 max_block_duration_check=false，拒绝写盘并非零 exit。
+  //   如何补救：上游 run_sd2_pipeline.mjs 捕获非零 exit 后应让用户回到 Stage 0
+  //             重新生成（或调整 episodeShotCount / targetBlockCount 参数），
+  //             而不是自动降级。
+  {
+    const finalValidation = /** @type {Record<string, unknown>} */ (parsed)._validation;
+    if (finalValidation && typeof finalValidation === 'object') {
+      const fv = /** @type {{
+        max_block_duration_check?: boolean,
+        over_limit_blocks?: string[],
+      }} */ (finalValidation);
+      if (fv.max_block_duration_check === false) {
+        const overList = Array.isArray(fv.over_limit_blocks) ? fv.over_limit_blocks.join(', ') : '未知';
+        console.error(
+          `[${SCRIPT_TAG}] ❌ 硬门失败：max_block_duration_check=false（${overList} 超过 15s 硬上限）。` +
+            `retry 仍未改善，拒绝写盘。请调整 episodeShotCount/targetBlockCount 或修剧本后重试。`,
+        );
+        process.exit(7);
+      }
+    }
+  }
+
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(parsed, null, 2) + '\n', 'utf8');
   console.log(`[${SCRIPT_TAG}] 已写入 ${outPath}`);

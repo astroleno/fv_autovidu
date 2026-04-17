@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * SD2 v5：每 Block 内 Director → Prompter；Block 间调度规则（与 v4 相同）：
- *   - 同 scene_run_id 串行（需 continuity_out）；不同 scene_run_id 可并行。
+ *   - 二者 scene_run_id 相同且均非空 → 串行（需 continuity_out）；否则可并行（含未填 id 时）。
  *
  * 与 v4 的差异：
  *   1. 用 lib/knowledge_slices_v5.mjs 的 canonical routing 匹配器（structural /
@@ -287,7 +287,8 @@ function extractPayoffReactionShots(co) {
 }
 
 /**
- * 两块是否必须串行：仅当 scene_run_id 相同且均非空时。
+ * 两块是否必须串行：仅当 scene_run_id 相同且均非空时，后一块才依赖前一块 Director appendix。
+ * 任一侧缺失或为空 → 不强制与前一块串行（可并行），便于 EditMap 未填 scene_run_id 时仍全量并行。
  * @param {unknown} prevRow
  * @param {unknown} curRow
  */
@@ -301,7 +302,7 @@ function adjacentBlocksRequireSerial(prevRow, curRow) {
       ? String(/** @type {{ scene_run_id?: unknown }} */ (curRow).scene_run_id ?? '').trim()
       : '';
   if (!pr || !cr) {
-    return true;
+    return false;
   }
   return pr === cr;
 }
@@ -527,7 +528,7 @@ async function main() {
       const mustWaitForPrevDirector =
         index > 0 &&
         (forceSerial ||
-          (prevRow && biRow ? adjacentBlocksRequireSerial(prevRow, biRow) : true));
+          (prevRow && biRow ? adjacentBlocksRequireSerial(prevRow, biRow) : false));
 
       if (mustWaitForPrevDirector) {
         await done[index - 1];
@@ -681,19 +682,41 @@ async function main() {
           const reportedOk =
             ratioOkRaw === true ||
             (typeof ratioOkRaw === 'string' && ratioOkRaw.toLowerCase() === 'true');
+
+          // ── v5.0 HOTFIX · H3：假绿覆盖 ──
+          //   以 actual 推算真值 `check = (actual + eps >= target)`，覆盖 LLM 自报。
+          //   原因：v5d 的 B07 出现 `actual=0 / check=true` 这种"自欺欺人"样本，
+          //   下游 (iron_rule_checklist / export_sd2_final_report) 都会被这个字段骗过，
+          //   所以在编排层一律以 actual 反推真值写回 continuity_out。
+          //   如需调整 target 的取数来源（当前走 meta.paywall_scaffolding.protagonist_shot_ratio.per_block_min），
+          //   请同步更新上方 pbMeta 分支。
+          const derivedOk = ratioActual + 1e-9 >= target;
+          co.protagonist_shot_ratio_check = derivedOk;
+          if (reportedOk !== derivedOk) {
+            routingWarnings.push({
+              code: 'protagonist_shot_ratio_check_overridden',
+              severity: 'info',
+              block_id: blockId,
+              actual: { reported: reportedOk, derived: derivedOk, ratio_actual: ratioActual },
+              expected: { per_block_min: target },
+              message: `block ${blockId} LLM 自报 protagonist_shot_ratio_check=${reportedOk}，编排层按 actual=${ratioActual} 反推覆盖为 ${derivedOk}`,
+            });
+          }
+
           if (ratioActual + 1e-9 < target) {
-            // 低于目标；若 LLM 仍报 ratio_ok=true，视为 false-green
+            // 低于目标；若 LLM 仍报 ratio_ok=true，视为 false-green（仍保留警告，但 check 已被覆盖）
             routingWarnings.push({
               code: 'protagonist_shot_ratio_below_min',
               severity: 'warn',
               block_id: blockId,
               actual: {
                 protagonist_shot_ratio_actual: ratioActual,
-                protagonist_shot_ratio_check: reportedOk,
+                protagonist_shot_ratio_check: derivedOk,
+                llm_reported_check: reportedOk,
               },
               expected: { per_block_min: target },
               message: reportedOk
-                ? `block ${blockId} protagonist_shot_ratio_actual=${ratioActual} < ${target} 但 protagonist_shot_ratio_check=true（假绿）`
+                ? `block ${blockId} protagonist_shot_ratio_actual=${ratioActual} < ${target} 但 LLM 自报 check=true（已被编排层覆盖为 ${derivedOk}）`
                 : `block ${blockId} protagonist_shot_ratio_actual=${ratioActual} 低于 per_block_min=${target}`,
             });
           }
@@ -777,12 +800,13 @@ async function main() {
       });
       const prParsed = parseJsonFromModelText(prRaw);
 
-      /** ── @图N 标签后校验（与 v4 相同） ── */
+      /** ── @图N 标签后校验 + 修正（v5.0 HOTFIX · H4） ── */
       if (prParsed && typeof prParsed === 'object') {
-        const sd2Prompt =
+        const sd2PromptOrig =
           typeof /** @type {{ sd2_prompt?: string }} */ (prParsed).sd2_prompt === 'string'
             ? /** @type {{ sd2_prompt: string }} */ (prParsed).sd2_prompt
             : '';
+        let sd2Prompt = sd2PromptOrig;
 
         if (sd2Prompt) {
           const bareNamePattern = /(?<!@图\d+)([\u4e00-\u9fff]{2,4})（\1）/g;
@@ -793,24 +817,49 @@ async function main() {
             );
           }
 
-          const largeTagPattern = /@图(\d+)/g;
-          let tagMatch = largeTagPattern.exec(sd2Prompt);
           const presentCount =
             biRow && typeof biRow === 'object' && Array.isArray(/** @type {Record<string, unknown>} */ (biRow).present_asset_ids)
               ? /** @type {{ present_asset_ids: unknown[] }} */ (biRow).present_asset_ids.length
               : 8;
-          while (tagMatch) {
-            const num = parseInt(tagMatch[1], 10);
-            if (num > presentCount + 2) {
-              console.warn(
-                `[call_sd2_block_chain_v5] ${blockId} ⚠ 检测到可疑全局编号 @图${num}（本 Block present_asset_ids 仅 ${presentCount} 个）`,
-              );
-              break;
+
+          // ── v5.0 HOTFIX · H4：@图 全局编号漂移的"修"而非"警" ──
+          //   v5d 的 B01 出现 `@图16` 这种远超局部 present_asset_ids 上限的编号，
+          //   直接进入下游会污染交付物。因此在此统一扫描：
+          //     - num ∈ [1, presentCount] → 保留
+          //     - num > presentCount（并给 2 的容差，应对 LLM 轻微越界）→ 替换为
+          //       `@图DROP{num}`（显式占位符 + 记录 drift_tags）+ 升级为 warn
+          //   替换而非删除的理由：保留编号以便事后审计，并让 export_sd2_final_report
+          //   在 `assets_used_tags_from_time_slices` 里显式暴露"漂移"。
+          const driftTags = [];
+          sd2Prompt = sd2Prompt.replace(/@图(\d+)/g, (match, numStr) => {
+            const num = parseInt(numStr, 10);
+            if (!Number.isFinite(num) || num <= presentCount + 2) {
+              return match;
             }
-            tagMatch = largeTagPattern.exec(sd2Prompt);
+            driftTags.push(num);
+            return `@图DROP${num}`;
+          });
+
+          if (driftTags.length > 0) {
+            const uniqDrift = [...new Set(driftTags)].sort((a, b) => a - b);
+            /** @type {{ sd2_prompt: string }} */ (prParsed).sd2_prompt = sd2Prompt;
+            routingWarnings.push({
+              code: 'asset_tag_drift',
+              severity: 'warn',
+              block_id: blockId,
+              actual: {
+                present_asset_count: presentCount,
+                drifted_tags: uniqDrift.map((n) => `@图${n}`),
+                replaced_with: uniqDrift.map((n) => `@图DROP${n}`),
+              },
+              expected: { local_tag_range: `@图1..@图${presentCount}` },
+              message: `block ${blockId} Prompter 输出越界资产编号 ${uniqDrift.map((n) => `@图${n}`).join('、')}（本 Block 局部仅 ${presentCount} 个），已替换为 @图DROP* 占位符`,
+            });
           }
 
-          const allTags = [...sd2Prompt.matchAll(/@图(\d+)/g)].map((m) => parseInt(m[1], 10));
+          const allTags = [...sd2Prompt.matchAll(/@图(\d+)/g)]
+            .map((m) => parseInt(m[1], 10))
+            .filter((n) => Number.isFinite(n) && n <= presentCount + 2);
           if (allTags.length > 0) {
             const unique = [...new Set(allTags)].sort((a, b) => a - b);
             if (unique[0] !== 1) {
@@ -826,7 +875,7 @@ async function main() {
                 break;
               }
             }
-          } else {
+          } else if (driftTags.length === 0) {
             console.warn(`[call_sd2_block_chain_v5] ${blockId} ⚠ sd2_prompt 中未检测到任何 @图N 标签`);
           }
 

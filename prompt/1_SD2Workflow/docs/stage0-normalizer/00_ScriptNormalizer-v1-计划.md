@@ -53,7 +53,7 @@
 **只做、且只做这五件事**（不做"大而全的剧本知识图谱"）：
 
 1. **人物指代统一**：所有出场人物绑定唯一 `CHAR_ID`，合并别名/代词
-2. **Beat 切分**：按"可独立标注的最小叙事单元"切分为 `beat_ledger`
+2. **段落切分（机械性）**：按机械性判据切分为 `beat_ledger`——scene_id 变化 / time_mode 切换 / 参与者剧烈变化 / 段落类型切换（对白↔动作↔独白↔描写↔转场）。**严禁**以"最小叙事单元"、"功能角色"等叙事口径做切分（那是 EditMap 的职责）。
 3. **双时间轴**：`display_order` vs `story_order` + `screen_time_sec` vs `story_elapsed`
 4. **状态账本**：角色 / 道具 / 场景的可追踪状态变化
 5. **歧义告警**：任何 Stage 0 无法确定的条目都显式报出来，而不是猜
@@ -129,9 +129,32 @@
 ]
 ```
 
-### 3.3 `beat_ledger` —— 叙事单元账本
+### 3.3 `beat_ledger` —— 机械性段落账本（**非**叙事单元表）
 
-**解决**：给 EditMap 一份"已经切好的、带 raw_excerpt 和参与方"的最小叙事单元表。EditMap 的职责从"切"变成"聚合 + 导演化标注"。
+**解决**：给 EditMap 一份**已经机械切好的、带 raw_excerpt 和参与方的段落流水**。EditMap 的职责从"判断哪里该切"变成"在这些机械段上做叙事/导演化聚合与标注"。
+
+**切分判据**（严格 · 4 条 or 关系；任一触发即切）：
+
+1. `scene_id` 变化（场次切换）
+2. `time_mode` 切换（present ↔ flashback ↔ dream ↔ parallel ↔ ellipsis）
+3. 参与者剧烈变化（进入或离开 ≥ 1 位）
+4. 段落类型切换（对白 ↔ 动作 ↔ 独白 ↔ 描写 ↔ 转场）
+
+**禁止**：
+
+- ❌ 以"最小叙事单元"、"情绪转折点"、"反转/高潮"作为切分依据
+- ❌ `beat_type_hint` 使用 `hook / confrontation / reveal / payoff / cliff` 等叙事枚举
+
+**`beat_type_hint` 合法取值**（由 01_schema.json 强制 enum，与 ScriptNormalizer-v1.md §3.2 对齐）：
+
+| enum | 含义 |
+|------|------|
+| `dialogue_exchange` | 两人以上对白往返 |
+| `action_reaction` | 一方动作 + 另一方即时反应 |
+| `monologue` | 单人独白 / 画外音 / 回忆自述 |
+| `descriptive` | 无对白、无交互的纯描写 |
+| `transition` | 明确过渡（淡入淡出、跳切、时间省略） |
+| `scene_break` | 场次硬切（scene_id 变化的第一拍） |
 
 ```jsonc
 "beat_ledger": [
@@ -151,13 +174,16 @@
     "mandatory_on_screen": ["CHAR_SU","CHAR_LI"],  // 这一 beat 哪些角色必须出镜
     "dialogue_char_count": 9,
     "action_verb_count": 2,
-    "beat_type_hint": "confrontation",   // 仅 hint，最终归类仍由 EditMap 决定
+    "beat_type_hint": "dialogue_exchange",  // 机械性 6 枚举之一；严禁 confrontation/hook/payoff 等叙事枚举
     "ambiguity_flags": []                // 命中歧义则引用 ambiguity_report 的 id
   }
 ]
 ```
 
-> **重要边界**：`beat_type_hint` 只给提示，不替 EditMap 决定 `structural_tags` / `routing.structural`。v5 合同不受影响。
+> **重要边界**：
+> 1. `beat_type_hint` 只给**机械性**段落类型提示（6 枚举），不替 EditMap 决定 `structural_tags` / `routing.structural`；
+> 2. `beat_ledger[]` 的"切点"只反映**结构/机械性**变化，EditMap 仍有权在这些机械段上做**叙事聚合**（合并多个 beat 到一个 block，或再切分）；
+> 3. v5 合同不受影响——下游看到的仍然是 EditMap 产出的 `block_index[]`，不直接消费 `beat_ledger[]`。
 
 ### 3.4 `temporal_model` —— 双时间轴（核心创新）
 

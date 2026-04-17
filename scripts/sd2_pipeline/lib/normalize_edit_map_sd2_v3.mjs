@@ -5,14 +5,38 @@
  * - 顶层 `blocks[]`：由 `appendix.block_index` 合成，每块带 `few_shot_retrieval` 与 `_v3_edit_map_markdown`（当前组段落）
  * - `sd2_version: 'v3'`
  *
+ * v5.0-rev1 双格式兼容（2026-04-17）：
+ * 本仓 v3/v4 时期 markdown_body 用 `### 段落 N（第 G 组）` 做分段标题；
+ * 但 EditMap v5 的实际产出改用自由格式的 `### B{NN}` 子标题（每个 block 一节）。
+ * 本函数同时支持两种格式：优先按 blockId 匹配 v5 `### B{NN}`，匹配失败再回退到 v3 `### 段落 N`；
+ * 两种都匹配不到时，仍保持旧行为（返回空串，调用方会回退到整段 markdown）。
+ *
  * @param {string} markdownBody
  * @param {number} groupNum 1-based，与 block_index 顺序一致
+ * @param {string} [blockId] 形如 `"B01"`；若给出，优先按 v5 `### B{NN}` 格式切片
  * @returns {string}
  */
-export function extractEditMapParagraphForGroup(markdownBody, groupNum) {
+export function extractEditMapParagraphForGroup(markdownBody, groupNum, blockId) {
   if (!markdownBody || typeof markdownBody !== 'string' || groupNum < 1) {
     return '';
   }
+
+  // ── 优先路径：v5 `### B{NN}` 切片（需要已知 blockId） ──
+  if (typeof blockId === 'string' && /^B\d+$/.test(blockId)) {
+    const v5HeaderRe = new RegExp(`^###\\s*${blockId}\\b`, 'm');
+    const v5Chunks = markdownBody.split(/(?=^###\s*B\d+\b)/m);
+    for (const chunk of v5Chunks) {
+      if (v5HeaderRe.test(chunk)) {
+        // 去掉本块的 `### B{NN}` 首行；向后切到下一个 `## ` 大标题为止
+        // （不再依赖 v3 的 `## 【尾部校验块】` 锚点——v5 尾部校验块已被 diagnosis/appendix 吸收）
+        const body = chunk.replace(/^###\s*B\d+[^\n]*\n?/, '');
+        const cut = body.split(/\n## /)[0];
+        return cut.trim();
+      }
+    }
+  }
+
+  // ── 回退路径：v3 `### 段落 N（第 G 组）` 切片 ──
   const g = groupNum;
   const headerRe = new RegExp(`^###\\s*段落\\s*\\d+\\s*（第${g}组）`, 'm');
   const chunks = markdownBody.split(/(?=^###\s*段落\s*\d+\s*（第\d+组）)/m);
@@ -80,7 +104,8 @@ export function normalizeEditMapSd2V3(parsed) {
     const start = typeof b.start_sec === 'number' ? b.start_sec : 0;
     const end = typeof b.end_sec === 'number' ? b.end_sec : start;
     const dur = typeof b.duration === 'number' ? b.duration : Math.max(0, end - start);
-    const sectionMd = extractEditMapParagraphForGroup(md, idx) || md.slice(0, 8000);
+    // v5.0-rev1：传 id 走 v5 `### B{NN}` 切片；匹配不到会自动回退到 v3 `### 段落 N`；仍不到则整段 md
+    const sectionMd = extractEditMapParagraphForGroup(md, idx, id) || md.slice(0, 8000);
 
     blocks.push({
       id,
@@ -98,14 +123,21 @@ export function normalizeEditMapSd2V3(parsed) {
   root.blocks = blocks;
 
   // ── skeleton_integrity_check：block_index 数量 vs markdown 段落数 ──
-  const paragraphMatches = md.match(/^###\s*段落\s*\d+/gm);
-  const paragraphCount = paragraphMatches ? paragraphMatches.length : 0;
+  // v5.0-rev1：v3 `### 段落 N`；v5 自由格式改用 `### B{NN}`。双格式各数一次、取较大值。
+  const v3Paragraphs = md.match(/^###\s*段落\s*\d+/gm) || [];
+  const v5Paragraphs = md.match(/^###\s*B\d+\b/gm) || [];
+  const paragraphCount = Math.max(v3Paragraphs.length, v5Paragraphs.length);
+  const paragraphFormat = v5Paragraphs.length >= v3Paragraphs.length ? 'v5(### B\\d+)' : 'v3(### 段落 N)';
   const blockCount = blocks.length;
   const skeletonOk = paragraphCount > 0 && blockCount === paragraphCount;
 
   if (!skeletonOk && paragraphCount > 0) {
     console.warn(
-      `[normalizeEditMapSd2V3] skeleton_integrity_check FAIL: block_index=${blockCount} ≠ markdown段落=${paragraphCount}`
+      `[normalizeEditMapSd2V3] skeleton_integrity_check FAIL: block_index=${blockCount} ≠ markdown段落=${paragraphCount}（format=${paragraphFormat}）`
+    );
+  } else if (!skeletonOk && paragraphCount === 0) {
+    console.warn(
+      `[normalizeEditMapSd2V3] skeleton_integrity_check FAIL: markdown_body 未找到 v3 '### 段落 N' 也未找到 v5 '### B{NN}' 标题；block_count=${blockCount}`
     );
   }
 
