@@ -134,15 +134,35 @@ export function normalizeEditMapSd2V3(parsed) {
     metaIn.total_duration_sec = actualSum;
   }
 
+  // ── max_block_duration_check：单组不得超过 16s（Hook/Cliff 不得超过 10s） ──
+  /** @type {string[]} */
+  const overLimitBlocks = [];
+  const MAX_BLOCK_DUR = 15;
+  for (const blk of blocks) {
+    const t = /** @type {{ time?: { duration?: number }, id?: string }} */ (blk).time;
+    const blkId = /** @type {{ id?: string }} */ (blk).id || '?';
+    if (t && typeof t.duration === 'number' && t.duration > MAX_BLOCK_DUR) {
+      overLimitBlocks.push(`${blkId}=${t.duration}s`);
+    }
+  }
+  const maxBlockDurationOk = overLimitBlocks.length === 0;
+  if (!maxBlockDurationOk) {
+    console.warn(
+      `[normalizeEditMapSd2V3] max_block_duration_check FAIL: ${overLimitBlocks.join(', ')} 超过 ${MAX_BLOCK_DUR}s 上限`
+    );
+  }
+
   const diag = app.diagnosis && typeof app.diagnosis === 'object'
     ? /** @type {Record<string, unknown>} */ (app.diagnosis)
     : {};
   diag.duration_sum_check = durationOk;
   diag.skeleton_integrity_check = skeletonOk;
+  diag.max_block_duration_check = maxBlockDurationOk;
   if (app.diagnosis && typeof app.diagnosis === 'object') {
     Object.assign(app.diagnosis, {
       duration_sum_check: durationOk,
       skeleton_integrity_check: skeletonOk,
+      max_block_duration_check: maxBlockDurationOk,
     });
   }
 
@@ -150,6 +170,8 @@ export function normalizeEditMapSd2V3(parsed) {
   root._validation = {
     duration_sum_check: durationOk,
     skeleton_integrity_check: skeletonOk,
+    max_block_duration_check: maxBlockDurationOk,
+    over_limit_blocks: overLimitBlocks,
     block_count: blockCount,
     paragraph_count: paragraphCount,
     actual_duration_sum: actualSum,
