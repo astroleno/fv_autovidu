@@ -161,12 +161,122 @@ export function loadNormalizedPackage(absPath) {
 }
 
 /**
+ * v5.0-rev6 · user prompt 瘦身（方案 A · 挂载时 trim）
+ *
+ * 背景：Stage 0 产物里有两块"对 EditMap 无增量价值"的冗余：
+ *   1. `input_echo` —— 原 edit_map_input 的完整回显。但 EditMap user prompt
+ *      本体就是 edit_map_input，所以这段是**同一份数据出现两次**。
+ *   2. `beat_ledger[*].raw_excerpt` —— 每个 beat 的原剧本片段全文。但 user
+ *      prompt 里 `scriptContent` 已经给了**完整剧本**，这段也是冗余回显。
+ *   3. `beat_ledger[*].segments[]` —— 把 raw_excerpt 按自然段拆成逐 seg 的
+ *      content 字段，内容等价于 raw_excerpt 切片，也是冗余。
+ *
+ * 实测（leji-v5i 真实数据）：
+ *   - 未 trim：user prompt ≈ 37,966 chars
+ *   - trim 后：user prompt ≈ 20,000 chars（降 47%）
+ *
+ * 保留（这些字段 EditMap 真的用）：
+ *   - package 元信息：package_id, source_script_hash, mode, meta
+ *   - 全量保留：character_registry / scene_timeline / temporal_model /
+ *     state_ledger / ambiguity_report
+ *   - beat_ledger[*] 内：beat_id / display_order / story_order / time_mode /
+ *     scene_id / participants / core_action / beat_type_hint
+ *
+ * 返回值是**浅拷贝**后新对象，不修改入参；失败时返回原值（兜底）。
+ *
+ * @param {unknown | null} normalizedPackage Stage 0 产物
+ * @returns {unknown | null} 瘦身后的 package（或原值）
+ */
+/**
+ * scene_timeline 条目级瘦身。
+ *
+ * 背景：leji-v5k 实测 Stage 0（qwen-plus）出现 schema 漂移 —— `beat_ledger` 丢失，
+ * 内容被错塞进 `scene_timeline[*]`，导致 scene_timeline 膨胀到 34K chars，user prompt
+ * 被打到 51K。此处做"可恢复的兜底裁剪"：当单条 scene_timeline 项超过 ~1500 字节时，
+ * 只保留 EditMap 真正会看的锚点字段（scene_id / start_sec / end_sec / location /
+ * time_marker / participants），其余一律丢弃，避免 user prompt 被 Stage 0 漂移污染。
+ *
+ * @param {unknown} scene  scene_timeline[i]
+ * @returns {unknown}      裁剪后（或原样）的 scene 条目
+ */
+function trimSceneTimelineEntry(scene) {
+  if (!scene || typeof scene !== 'object' || Array.isArray(scene)) return scene;
+  const s = /** @type {Record<string, unknown>} */ (scene);
+  const approxSize = JSON.stringify(s).length;
+  // 单条 > 1500 字节视为异常膨胀，砍成锚点最小集
+  if (approxSize <= 1500) return s;
+  return {
+    scene_id: s.scene_id,
+    start_sec: s.start_sec,
+    end_sec: s.end_sec,
+    location: s.location,
+    time_marker: s.time_marker,
+    participants: s.participants,
+    __trimmed_by_editmap_slices__: {
+      reason: 'scene_entry_size_exceeded',
+      original_size_bytes: approxSize,
+    },
+  };
+}
+
+function trimNormalizedPackageForEditMap(normalizedPackage) {
+  if (!normalizedPackage || typeof normalizedPackage !== 'object' || Array.isArray(normalizedPackage)) {
+    return normalizedPackage;
+  }
+  try {
+    const src = /** @type {Record<string, unknown>} */ (normalizedPackage);
+    /** @type {Record<string, unknown>} */
+    const out = {};
+    for (const [key, val] of Object.entries(src)) {
+      if (key === 'input_echo') {
+        continue;
+      }
+      if (key === 'beat_ledger' && Array.isArray(val)) {
+        out.beat_ledger = val.map((beat) => {
+          if (!beat || typeof beat !== 'object') return beat;
+          const b = /** @type {Record<string, unknown>} */ (beat);
+          return {
+            beat_id: b.beat_id,
+            display_order: b.display_order,
+            story_order: b.story_order,
+            time_mode: b.time_mode,
+            scene_id: b.scene_id,
+            participants: b.participants,
+            core_action: b.core_action,
+            beat_type_hint: b.beat_type_hint,
+          };
+        });
+        continue;
+      }
+      // v5.0-rev6：scene_timeline 溢出兜底（leji-v5k 实测 Stage 0 漂移时单条可达 3K+）
+      if (key === 'scene_timeline' && Array.isArray(val)) {
+        out.scene_timeline = val.map(trimSceneTimelineEntry);
+        continue;
+      }
+      out[key] = val;
+    }
+    return out;
+  } catch (err) {
+    console.warn(
+      `[editmap_slices_v5] trimNormalizedPackageForEditMap 失败，退回原包: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
+    return normalizedPackage;
+  }
+}
+
+/**
  * 把 Stage 0 产物挂到 user payload 顶层 `__NORMALIZED_SCRIPT_PACKAGE__` 字段。
  *
  * 选择顶层下划线大写字段名的原因：
  *   1. 不与 `scriptContent / assetManifest / episodeDuration` 等正式输入字段冲突；
  *   2. 明显"元数据/外部挂载"的视觉信号，避免 EditMap 把它当作剧本正文的一部分；
  *   3. 双下划线前后缀让它不会被脑补为 Schema 硬字段。
+ *
+ * v5.0-rev6：挂载前先 `trimNormalizedPackageForEditMap` 去掉 input_echo /
+ * beat_ledger.raw_excerpt / beat_ledger.segments 等对 EditMap 无增量的字段，
+ * 避免 user prompt 被冗余内容放大到 38K chars。详见函数注释。
  *
  * @param {unknown} inputObj            原始 edit_map_input
  * @param {unknown | null} normalizedPackage Stage 0 产物
@@ -176,10 +286,11 @@ export function mergeNormalizedPackageIntoPayload(inputObj, normalizedPackage) {
   if (!normalizedPackage) {
     return inputObj;
   }
+  const trimmed = trimNormalizedPackageForEditMap(normalizedPackage);
   if (inputObj && typeof inputObj === 'object' && !Array.isArray(inputObj)) {
-    return { ...inputObj, __NORMALIZED_SCRIPT_PACKAGE__: normalizedPackage };
+    return { ...inputObj, __NORMALIZED_SCRIPT_PACKAGE__: trimmed };
   }
-  return { __INPUT__: inputObj, __NORMALIZED_SCRIPT_PACKAGE__: normalizedPackage };
+  return { __INPUT__: inputObj, __NORMALIZED_SCRIPT_PACKAGE__: trimmed };
 }
 
 /**

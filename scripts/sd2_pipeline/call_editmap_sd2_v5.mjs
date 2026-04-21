@@ -140,17 +140,10 @@ async function main() {
   }
 
   /**
-   * v5.0 HOTFIX：workflowControls 驱动 normalize 派生镜头预算；
-   * 缺失时走 parsed_brief / target_duration_sec 回退链（见 normalize_edit_map_sd2_v5.mjs）。
+   * v5.0-rev3 · Scheme B：normalize 不再接收 workflowControls。
+   * 镜头预算推导链路：meta.target_shot_count（LLM 自填） > meta.parsed_brief（LLM 解析 brief） > meta.video（兜底）。
    */
-  const workflowControls =
-    inputObj &&
-    typeof inputObj === 'object' &&
-    inputObj.workflowControls &&
-    typeof inputObj.workflowControls === 'object'
-      ? inputObj.workflowControls
-      : undefined;
-  normalizeEditMapSd2V5(parsed, { workflowControls });
+  normalizeEditMapSd2V5(parsed);
 
   annotateNormalizerRef(parsed, normalizedPackage, normalizedPackagePath);
 

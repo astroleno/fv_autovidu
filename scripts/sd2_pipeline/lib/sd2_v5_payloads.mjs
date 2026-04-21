@@ -17,6 +17,11 @@
  *   - prevBlockContext 计算（同场才串行）
  */
 import { createRequire } from 'module';
+import {
+  planShotSlotsFromBlockIndex,
+  SEEDANCE_MIN_SHOT_SEC,
+  DEFAULT_AVG_SHOT_SEC,
+} from './shot_slot_planner.mjs';
 
 const require = createRequire(import.meta.url);
 const {
@@ -208,6 +213,53 @@ export function buildDirectorPayloadV5({
 
   const pickedMeta = pickMetaForBlock(meta, blockId);
 
+  /**
+   * v5.0-rev8 · 镜头槽位确定性派生
+   * ─────────────────────────────────────────────────────────────
+   * 方案 A（架构反转）：把"决定镜头数 / 每片时长 / shot_code"从 LLM 手里
+   * 抢回 pipeline，交给 shot_slot_planner 确定性派生。
+   * Director LLM 的职责收窄为 slot-fill（填画面/台词/音效），结构由 pipeline
+   * 保证。这解决了 leji-v5m/n/o 观测到的"镜头数系统性低于预算"根因（LLM
+   * 同时扛 7 件事 → attention split + risk aversion → 压缩镜头数）。
+   */
+  const isLastBlock =
+    Array.isArray(rows) && rows.length > 0
+      ? (() => {
+          const lastRow = /** @type {Record<string, unknown>} */ (rows[rows.length - 1] || {});
+          const lastId =
+            typeof lastRow.block_id === 'string'
+              ? lastRow.block_id
+              : typeof lastRow.id === 'string'
+              ? lastRow.id
+              : '';
+          return lastId === blockId;
+        })()
+      : false;
+
+  /**
+   * v5.0-rev9 · 密度上下文：从 meta.target_shot_count 派生 avgShotSec 传给 planner。
+   * ───────────────────────────────────────────────────────────────────────────
+   * brief 三种输入态 → EditMap/normalize 已写入 meta.target_shot_count.avg_shot_duration_sec：
+   *   ① brief 明写密度（"每镜 2s"）→ avg = 2
+   *   ② brief 明写镜头数（"60 镜"） → avg = episodeDuration / 60
+   *   ③ brief 啥都没写              → avg = DEFAULT_AVG_SHOT_SEC (= 2)
+   * 这里把该 avg 透传给 planner；minShotSec 固定用 Seedance 物理下限（1s）。
+   */
+  const tsc =
+    meta.target_shot_count && typeof meta.target_shot_count === 'object'
+      ? /** @type {Record<string, unknown>} */ (meta.target_shot_count)
+      : null;
+  /** @type {number} */
+  const avgShotSec =
+    tsc && typeof tsc.avg_shot_duration_sec === 'number' && Number.isFinite(tsc.avg_shot_duration_sec)
+      ? /** @type {number} */ (tsc.avg_shot_duration_sec)
+      : DEFAULT_AVG_SHOT_SEC;
+
+  const shotSlotsResult = planShotSlotsFromBlockIndex(bi, isLastBlock, {
+    minShotSec: SEEDANCE_MIN_SHOT_SEC,
+    avgShotSec,
+  });
+
   // aspectRatio 回退链：显式传参 > meta.video.aspect_ratio > "9:16"
   const video =
     meta.video && typeof meta.video === 'object'
@@ -248,6 +300,17 @@ export function buildDirectorPayloadV5({
         meta.target_shot_count && typeof meta.target_shot_count === 'object'
           ? /** @type {Record<string, unknown>} */ (meta.target_shot_count)
           : null,
+
+      /**
+       * v5.0-rev8 · shot_slots（Director 新的 slot-fill 输入源）
+       * ─────────────────────────────────────────────────────────
+       * - slots: 固定 slot 数 = shot_slot_planner 派生结果；LLM 必须按顺序填每个 slot。
+       * - meta:  { count, clamped_by, distribution_strategy } 审计字段。
+       * - 缺失条件：block 无 shot_budget_hint（EditMap 没派生成功），此时为 null，
+       *   Director prompt 侧 fallback 到旧 §I.0 tolerance 路径。
+       */
+      shotSlots: shotSlotsResult ? shotSlotsResult.slots : null,
+      shotSlotsMeta: shotSlotsResult ? shotSlotsResult.meta : null,
     },
   };
 }

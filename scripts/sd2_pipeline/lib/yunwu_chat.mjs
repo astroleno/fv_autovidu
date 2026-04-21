@@ -10,6 +10,7 @@
  * 避免在非云雾环境下误传 `extra_body`。
  */
 import { loadEnvFromDotenv } from './load_env.mjs';
+import { extractJsonFromReasoningLoose } from './yunwu_reasoning_json_extract.mjs';
 
 loadEnvFromDotenv();
 
@@ -21,6 +22,83 @@ loadEnvFromDotenv();
  * @property {string} finishReason  - "stop" | "length" | "content_filter" | ""
  * @property {{ prompt: number, completion: number, total: number } | null} usage
  */
+
+/**
+ * 从 OpenAI 兼容的 `message` 对象取出可拼接的正文。
+ * 部分网关（含思考链 / 多段）会把 `content` 设为 string[] 或 `{type,text}[]`，
+ * 仅读 `message.content` 字符串会得到空串，误判为「云雾返回空 content」。
+ *
+ * @param {unknown} msg
+ * @returns {string}
+ */
+function normalizeAssistantMessageContent(msg) {
+  if (!msg || typeof msg !== 'object') {
+    return '';
+  }
+  const m = /** @type {Record<string, unknown>} */ (msg);
+  const c = m.content;
+  if (typeof c === 'string') {
+    return c.trim();
+  }
+  if (Array.isArray(c)) {
+    const parts = [];
+    for (const part of c) {
+      if (typeof part === 'string') {
+        parts.push(part);
+      } else if (part && typeof part === 'object') {
+        const p = /** @type {Record<string, unknown>} */ (part);
+        if (typeof p.text === 'string') {
+          parts.push(p.text);
+        }
+      }
+    }
+    return parts.join('').trim();
+  }
+  return '';
+}
+
+/**
+ * @param {unknown} msg
+ * @returns {string[]}  便于空内容时打诊断日志（不记录正文，只记录有哪些键）
+ */
+function messageDebugKeys(msg) {
+  if (!msg || typeof msg !== 'object') {
+    return [];
+  }
+  return Object.keys(/** @type {Record<string, unknown>} */ (msg));
+}
+
+/**
+ * 空 content 时拼进 Error，便于对照网关真实 JSON（无需另开抓包）。
+ *
+ * @param {unknown} data
+ * @returns {string}
+ */
+function formatYunwuEmptyContentDebug(data) {
+  try {
+    const root =
+      data && typeof data === 'object'
+        ? /** @type {Record<string, unknown>} */ (data)
+        : {};
+    const choices = root.choices;
+    const ch0 = Array.isArray(choices) && choices.length > 0 ? choices[0] : null;
+    const first =
+      ch0 && typeof ch0 === 'object'
+        ? /** @type {Record<string, unknown>} */ (ch0)
+        : null;
+    const msg =
+      first && first.message && typeof first.message === 'object'
+        ? /** @type {Record<string, unknown>} */ (first.message)
+        : null;
+    const keys = msg ? messageDebugKeys(msg) : [];
+    const fr =
+      first && typeof first.finish_reason === 'string' ? first.finish_reason : '';
+    const snip = JSON.stringify(data).slice(0, 1500);
+    return `finish_reason=${fr}; message 键=[${keys.join(', ')}]; 响应前1500字: ${snip}`;
+  } catch {
+    return '(无法序列化诊断)';
+  }
+}
 
 /**
  * 解析云雾网关返回的 assistant 文本及元信息。
@@ -47,7 +125,29 @@ function extractAssistantResult(data) {
   }
 
   const msg = /** @type {{ content?: unknown }} */ (first.message);
-  const text = msg && typeof msg.content === 'string' ? msg.content.trim() : '';
+  const fromContent = normalizeAssistantMessageContent(msg);
+  let text = fromContent;
+  /**
+   * thinking 模型：正文可能在 reasoning_content（content 仅 "\\n"）。
+   * 先尝试整段以 JSON 开头；否则从 reasoning 内抽取 ```json``` / markdown_body 锚点 / 首段平衡 `{…}`。
+   */
+  if (!fromContent.trim() && msg && typeof msg === 'object') {
+    const r = /** @type {Record<string, unknown>} */ (msg).reasoning_content;
+    if (typeof r === 'string') {
+      const t = r.trim();
+      if (t.length > 0 && (t.startsWith('{') || t.startsWith('['))) {
+        text = t;
+      } else if (t.length > 0) {
+        const extracted = extractJsonFromReasoningLoose(r);
+        if (extracted) {
+          text = extracted;
+          console.warn(
+            '[yunwu_chat] assistant.content 为空或仅空白，已从 reasoning_content 抽取 JSON（thinking 网关兼容）',
+          );
+        }
+      }
+    }
+  }
   const finishReason = typeof first.finish_reason === 'string' ? first.finish_reason : '';
 
   /** @type {{ prompt: number, completion: number, total: number } | null} */
@@ -187,7 +287,7 @@ export async function callYunwuChatCompletions({
             `completion_tokens=${result.usage?.completion ?? '?'}, max_tokens=${resolvedMaxTokens}。` +
             `thinking 模型的 max_tokens 预算同时包含 thinking + response token，` +
             `当 thinking chain 过长时 response 被截断。` +
-            `建议：1) 调大 YUNWU_EDITMAP_MAX_TOKENS  2) 使用 --no-thinking 重试  3) 缩短 system prompt`,
+            `建议：1) 调大 YUNWU_EDITMAP_MAX_TOKENS  2) 缩短 system prompt 或输入体积  3) 确认网关未把正文仅放在 reasoning`,
         );
         /** @type {Record<string, unknown>} */
         (err).finishReason = 'length';
@@ -197,7 +297,9 @@ export async function callYunwuChatCompletions({
       }
 
       if (!result.text) {
-        throw new Error('云雾返回空 content，请检查模型名与网关是否匹配');
+        throw new Error(
+          `云雾返回空 content，请检查模型名与网关是否匹配。诊断: ${formatYunwuEmptyContentDebug(data)}`,
+        );
       }
       return result.text;
     } catch (e) {
