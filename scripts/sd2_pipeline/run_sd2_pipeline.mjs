@@ -701,6 +701,7 @@ async function main() {
         'skip-segment-coverage-hard',
         'skip-info-density-hard',
         'skip-dialogue-fidelity-hard',
+        'skip-prompter-selfcheck-hard',
         'skip-style-inference',
       ]) {
         if (args[flag] === true) chainArgs.push(`--${flag}`);

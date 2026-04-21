@@ -83,6 +83,7 @@ function collectUniqueAssetTagsFromSlices(result) {
 
 /**
  * v3 等无 time_slices 时：从 sd2_prompt 正文中提取 @图xxx / @asset 类标签。
+ * v6 Prompter 输出 shots[]，每个 shot 有 sd2_prompt，这里会自动把它们聚合后扫描。
  * @param {unknown} result
  * @returns {string[]}
  */
@@ -90,21 +91,114 @@ function collectAssetTagsFromSd2PromptText(result) {
   if (!result || typeof result !== 'object') {
     return [];
   }
-  const prompt = String(
-    /** @type {{ sd2_prompt?: unknown }} */ (result).sd2_prompt ?? '',
-  );
-  if (!prompt.trim()) {
+  const { sd2Prompt } = extractV6ResultView(result);
+  if (!sd2Prompt.trim()) {
     return [];
   }
   /** @type {Set<string>} */
   const set = new Set();
   const re = /@图[^\s\u3000，。；、]+/g;
-  let m = re.exec(prompt);
+  let m = re.exec(sd2Prompt);
   while (m) {
     set.add(m[0].trim());
-    m = re.exec(prompt);
+    m = re.exec(sd2Prompt);
   }
   return [...set].sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * v6 Prompter 输出形态兼容层：
+ *   - v5 及更早：顶层 `sd2_prompt` 字符串 + 顶层 `time` 对象；
+ *   - v6：顶层 `shots[]`（每个 shot 有 sd2_prompt / timecode / duration_sec）
+ *         + 顶层 `global_prefix` / `global_suffix`（可选）。
+ *
+ * 返回一个归一化的视图：
+ *   - `sd2Prompt`：完整拼接后的 sd2_prompt（给 Markdown 展示用）；
+ *   - `time`：{ start_sec, end_sec, duration } 元组；v6 从 shots 首末 timecode 推导，失败回退 0；
+ *   - `shape`：'v6' 或 'legacy'，用于调试。
+ *
+ * @param {unknown} result
+ * @returns {{ sd2Prompt: string, time: { start_sec: number, end_sec: number, duration: number } | null, shape: 'v6' | 'legacy' }}
+ */
+function extractV6ResultView(result) {
+  if (!result || typeof result !== 'object') {
+    return { sd2Prompt: '', time: null, shape: 'legacy' };
+  }
+  const r = /** @type {Record<string, unknown>} */ (result);
+  const shots = Array.isArray(r.shots) ? /** @type {unknown[]} */ (r.shots) : null;
+
+  if (shots && shots.length > 0) {
+    const prefix = typeof r.global_prefix === 'string' ? r.global_prefix : '';
+    const suffix = typeof r.global_suffix === 'string' ? r.global_suffix : '';
+    const shotPrompts = shots.map((s) =>
+      s && typeof s === 'object' && typeof /** @type {{ sd2_prompt?: unknown }} */ (s).sd2_prompt === 'string'
+        ? /** @type {{ sd2_prompt: string }} */ (s).sd2_prompt
+        : '',
+    );
+    const body = shotPrompts.filter((x) => x && x.trim()).join('\n\n');
+    const merged = [prefix, body, suffix].filter((x) => x && x.trim()).join('\n\n');
+    const time = extractTimeFromShots(shots);
+    return { sd2Prompt: merged, time, shape: 'v6' };
+  }
+
+  const legacyPrompt = typeof r.sd2_prompt === 'string' ? r.sd2_prompt : '';
+  const legacyTime =
+    r.time && typeof r.time === 'object'
+      ? /** @type {{ start_sec?: number, end_sec?: number, duration?: number }} */ (r.time)
+      : null;
+  return {
+    sd2Prompt: legacyPrompt,
+    time: legacyTime
+      ? {
+          start_sec: typeof legacyTime.start_sec === 'number' ? legacyTime.start_sec : 0,
+          end_sec: typeof legacyTime.end_sec === 'number' ? legacyTime.end_sec : 0,
+          duration: typeof legacyTime.duration === 'number' ? legacyTime.duration : 0,
+        }
+      : null,
+    shape: 'legacy',
+  };
+}
+
+/**
+ * 从 shots[] 的 timecode 字段推导 block 级时间窗口。
+ *
+ * timecode 规范格式："HH:MM–HH:MM" 或 "MM:SS–MM:SS"（常见是 "00:00–00:03"）。
+ * 支持中英文破折号（– / - / —）。任一解析失败即回退到累加 duration_sec。
+ *
+ * @param {unknown[]} shots
+ * @returns {{ start_sec: number, end_sec: number, duration: number }}
+ */
+function extractTimeFromShots(shots) {
+  let startSec = 0;
+  let endSec = 0;
+  let durationSum = 0;
+  let startParsed = false;
+  let endParsed = false;
+
+  for (let i = 0; i < shots.length; i += 1) {
+    const s = shots[i];
+    if (!s || typeof s !== 'object') continue;
+    const dur = /** @type {{ duration_sec?: unknown }} */ (s).duration_sec;
+    if (typeof dur === 'number' && Number.isFinite(dur) && dur > 0) durationSum += dur;
+
+    const tc = /** @type {{ timecode?: unknown }} */ (s).timecode;
+    if (typeof tc !== 'string') continue;
+    const m = tc.match(/^\s*(\d{1,2}):(\d{2})\s*[–—-]\s*(\d{1,2}):(\d{2})\s*$/);
+    if (!m) continue;
+    const s0 = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+    const s1 = parseInt(m[3], 10) * 60 + parseInt(m[4], 10);
+    if (!startParsed) {
+      startSec = s0;
+      startParsed = true;
+    }
+    endSec = s1;
+    endParsed = true;
+  }
+
+  if (startParsed && endParsed && endSec > startSec) {
+    return { start_sec: startSec, end_sec: endSec, duration: endSec - startSec };
+  }
+  return { start_sec: 0, end_sec: durationSum, duration: durationSum };
 }
 
 /**
@@ -145,6 +239,103 @@ function readJsonIfExists(filePath) {
   } catch {
     return null;
   }
+}
+
+/**
+ * 从 Prompter v6 单 block 输出里摘取五铁律 / 段级覆盖 / 高潮签名自检，
+ * 用于 final report 的"是否可交付"一栏。缺失字段一律返回 null（Markdown 渲染时显示"—"）。
+ *
+ * 这些字段的硬门阈值见 prompt/1_SD2Workflow/2_SD2Prompter/2_SD2Prompter-v6.md §B。
+ *
+ * @param {unknown} result
+ * @returns {{
+ *   dialogue_fidelity_ratio: number | null,
+ *   kva_coverage_ratio: number | null,
+ *   rhythm_density_pass: boolean | null,
+ *   five_stage_all_pass: boolean | null,
+ *   climax_major_pass: boolean | null,
+ *   climax_closing_pass: boolean | null,
+ *   segment_coverage_ratio: number | null,
+ *   segment_pass_l2: boolean | null,
+ *   segment_pass_l3: boolean | null,
+ * }}
+ */
+function extractV6SelfChecks(result) {
+  const empty = {
+    dialogue_fidelity_ratio: null,
+    kva_coverage_ratio: null,
+    rhythm_density_pass: null,
+    five_stage_all_pass: null,
+    climax_major_pass: null,
+    climax_closing_pass: null,
+    segment_coverage_ratio: null,
+    segment_pass_l2: null,
+    segment_pass_l3: null,
+  };
+  if (!result || typeof result !== 'object') return empty;
+  const r = /** @type {Record<string, unknown>} */ (result);
+
+  const dlg = /** @type {{ fidelity_ratio?: unknown }} */ (r.dialogue_fidelity_check || {});
+  const kvaRatio = typeof r.kva_coverage_ratio === 'number' ? r.kva_coverage_ratio : null;
+  const rhy = /** @type {{ pass?: unknown }} */ (r.rhythm_density_check || {});
+  const fiveStage = Array.isArray(r.five_stage_check) ? r.five_stage_check : null;
+  const climax = /** @type {{ major_climax?: { pass?: unknown, applicable?: unknown }, closing_hook?: { pass?: unknown, applicable?: unknown } }} */ (
+    r.climax_signature_check || {}
+  );
+  const segCov = /** @type {{ coverage_ratio?: unknown, pass_l2?: unknown, pass_l3?: unknown }} */ (
+    r.segment_coverage_overall || {}
+  );
+
+  return {
+    dialogue_fidelity_ratio: typeof dlg.fidelity_ratio === 'number' ? dlg.fidelity_ratio : null,
+    kva_coverage_ratio: kvaRatio,
+    rhythm_density_pass: typeof rhy.pass === 'boolean' ? rhy.pass : null,
+    // five_stage 的通过准则：全部 pass=true（不适用算 pass）
+    five_stage_all_pass: fiveStage
+      ? fiveStage.every((it) =>
+          it && typeof it === 'object' && /** @type {{ pass?: unknown }} */ (it).pass !== false,
+        )
+      : null,
+    climax_major_pass:
+      climax.major_climax && typeof climax.major_climax === 'object'
+        ? climax.major_climax.applicable === false || climax.major_climax.pass === true
+          ? true
+          : climax.major_climax.pass === false
+            ? false
+            : null
+        : null,
+    climax_closing_pass:
+      climax.closing_hook && typeof climax.closing_hook === 'object'
+        ? climax.closing_hook.applicable === false || climax.closing_hook.pass === true
+          ? true
+          : climax.closing_hook.pass === false
+            ? false
+            : null
+        : null,
+    segment_coverage_ratio: typeof segCov.coverage_ratio === 'number' ? segCov.coverage_ratio : null,
+    segment_pass_l2: typeof segCov.pass_l2 === 'boolean' ? segCov.pass_l2 : null,
+    segment_pass_l3: typeof segCov.pass_l3 === 'boolean' ? segCov.pass_l3 : null,
+  };
+}
+
+/**
+ * 把 0~1 的比例渲染成 "0.67" 形式；null 渲染成 "—"。
+ * @param {number | null} r
+ * @returns {string}
+ */
+function fmtRatio(r) {
+  return r === null || r === undefined || Number.isNaN(r) ? '—' : Number(r).toFixed(2);
+}
+
+/**
+ * 把通过状态渲染成 ✅ / ❌ / —；null 表示 LLM 未输出此字段。
+ * @param {boolean | null} v
+ * @returns {string}
+ */
+function markPass(v) {
+  if (v === true) return '✅';
+  if (v === false) return '❌';
+  return '—';
 }
 
 /**
@@ -207,12 +398,28 @@ function buildMarkdownReport(report) {
     const time = /** @type {{ time?: { start_sec?: number, end_sec?: number, duration?: number } }} */ (b).time;
     const t0 = time && typeof time.start_sec === 'number' ? time.start_sec : 0;
     const t1 = time && typeof time.end_sec === 'number' ? time.end_sec : 0;
+    const shape = /** @type {{ prompt_shape?: string }} */ (b).prompt_shape;
     lines.push(`### ${bid}`);
     lines.push('');
-    lines.push(`- **时间**：${t0}s – ${t1}s`);
+    lines.push(`- **时间**：${t0}s – ${t1}s${shape === 'v6' ? '（推导自 shots[].timecode）' : ''}`);
     lines.push(
       `- **时间片用到的 @图 标签（去重）**：${(/** @type {{ assets_used_tags_from_time_slices?: string[] }} */ (b).assets_used_tags_from_time_slices || []).join('、') || '（无）'}`,
     );
+    const selfChecks = /** @type {{ v6_self_checks?: ReturnType<typeof extractV6SelfChecks> }} */ (b).v6_self_checks;
+    if (selfChecks) {
+      lines.push('');
+      lines.push('#### v6 Prompter 自检摘要');
+      lines.push('');
+      lines.push('| 维度 | 值 | 通过 |');
+      lines.push('|---|---|---|');
+      lines.push(`| dialogue_fidelity.fidelity_ratio | ${fmtRatio(selfChecks.dialogue_fidelity_ratio)} | ${markPass(selfChecks.dialogue_fidelity_ratio === 1)} |`);
+      lines.push(`| kva_coverage_ratio (P0) | ${fmtRatio(selfChecks.kva_coverage_ratio)} | ${markPass(selfChecks.kva_coverage_ratio === 1)} |`);
+      lines.push(`| rhythm_density_check.pass | — | ${markPass(selfChecks.rhythm_density_pass)} |`);
+      lines.push(`| five_stage_check[].pass 全通过 | — | ${markPass(selfChecks.five_stage_all_pass)} |`);
+      lines.push(`| climax_signature.major_climax.pass | — | ${markPass(selfChecks.climax_major_pass)} |`);
+      lines.push(`| climax_signature.closing_hook.pass | — | ${markPass(selfChecks.climax_closing_pass)} |`);
+      lines.push(`| segment_coverage_overall.coverage_ratio | ${fmtRatio(selfChecks.segment_coverage_ratio)} | ${markPass(selfChecks.segment_pass_l2)} (L2) / ${markPass(selfChecks.segment_pass_l3)} (L3) |`);
+    }
     const few = /** @type {{ few_shot_refs?: unknown }} */ (b).few_shot_refs;
     if (Array.isArray(few) && few.length) {
       lines.push(`- **few_shot_refs**：${few.map(String).join(', ')}`);
@@ -328,9 +535,8 @@ async function main() {
       continue;
     }
 
-    const sd2Prompt = String(
-      /** @type {{ sd2_prompt?: unknown }} */ (result).sd2_prompt ?? '',
-    );
+    const view = extractV6ResultView(result);
+    const sd2Prompt = view.sd2Prompt;
 
     const tagsUnique = collectUniqueAssetTagsFromSlices(result);
 
@@ -397,7 +603,8 @@ async function main() {
 
     blocksOut.push({
       block_id: blockId,
-      time: /** @type {{ time?: unknown }} */ (result).time ?? null,
+      time: view.time,
+      prompt_shape: view.shape,
       sd2_prompt: sd2Prompt,
       assets_used_tags_from_time_slices: tagsUnique,
       asset_tag_mapping: normalizedMapping,
@@ -407,6 +614,8 @@ async function main() {
         /** @type {{ few_shot_refs?: unknown }} */ (result).few_shot_refs ?? null,
       sd2_prompt_issues:
         /** @type {{ sd2_prompt_issues?: unknown }} */ (result).sd2_prompt_issues ?? null,
+      // v6：把 Prompter 自检字段原样透传到 report，Markdown 构造时再摘要
+      v6_self_checks: extractV6SelfChecks(result),
     });
   }
 
