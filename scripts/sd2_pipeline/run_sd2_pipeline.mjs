@@ -56,6 +56,7 @@ import { resolveSd2StyleHints } from './lib/edit_map_style_hints.mjs';
 import { buildAllDirectorPayloadsV3 } from './lib/sd2_v3_payloads.mjs';
 import { buildAllDirectorPayloadsV4 } from './lib/sd2_v4_payloads.mjs';
 import { buildAllDirectorPayloadsV5 } from './lib/sd2_v5_payloads.mjs';
+import { buildAllDirectorPayloadsV6 } from './lib/sd2_v6_payloads.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -203,16 +204,18 @@ async function main() {
       ? String(args['sd2-version']).trim().toLowerCase()
       : 'v2';
   const sd2Version =
-    sd2VersionRaw === 'v5'
-      ? 'v5'
-      : sd2VersionRaw === 'v4'
-        ? 'v4'
-        : sd2VersionRaw === 'v3'
-          ? 'v3'
-          : 'v2';
+    sd2VersionRaw === 'v6'
+      ? 'v6'
+      : sd2VersionRaw === 'v5'
+        ? 'v5'
+        : sd2VersionRaw === 'v4'
+          ? 'v4'
+          : sd2VersionRaw === 'v3'
+            ? 'v3'
+            : 'v2';
 
   const isMdPipeline =
-    sd2Version === 'v3' || sd2Version === 'v4' || sd2Version === 'v5';
+    sd2Version === 'v3' || sd2Version === 'v4' || sd2Version === 'v5' || sd2Version === 'v6';
 
   if (isMdPipeline && skipDirector && !skipPrompter) {
     throw new Error(
@@ -366,21 +369,31 @@ async function main() {
   }
 
   /**
-   * Stage 0 · ScriptNormalizer（v5 专用 · opt-in）：
-   *   - 仅当 `--sd2-version v5 --normalizer` 同时成立才执行；
-   *   - dry-run / skip-editmap 时跳过（没有 LLM 或已有成品 edit_map，就没必要重跑 Stage 0）；
-   *   - 失败时（非零 exit）按 00 计划 §九 兜底：警告、继续，EditMap 按原 v5 行为运行；
-   *   - 成功时产物路径通过 `--normalized-package` 透传给 EditMap。
-   * 本路径**不**触发任何 Director / Prompter 改动（Phase 1 红线：Stage 0 仅供 EditMap）。
+   * Stage 0 · ScriptNormalizer：
+   *   - v5：opt-in（需 `--normalizer`），调度 `call_script_normalizer_v1.mjs`；
+   *   - v6：**默认开启**（剧本真相源由 Normalizer v2 提供，scriptChunk 依赖它）；
+   *         可通过 `--no-normalizer` 强制关闭（降级到 v5 行为，所有 v6 硬门自动 skip）；
+   *         调度 `call_script_normalizer_v2.mjs`（产物多出 KVA / structure_hints / dialogue_char_count）。
+   *   - dry-run / skip-editmap 时跳过（没有 LLM 或已有成品 edit_map）；
+   *   - 失败时按 SD2_NORMALIZER_FALLBACK 环境变量决定降级/退出。
    */
+  const normalizerExplicitOff = args['no-normalizer'] === true;
   const enableNormalizer =
-    sd2Version === 'v5' && Boolean(args.normalizer) && !dryRun && !skipEditmap;
+    !dryRun && !skipEditmap &&
+    (
+      (sd2Version === 'v5' && Boolean(args.normalizer)) ||
+      (sd2Version === 'v6' && !normalizerExplicitOff)
+    );
   let normalizerArtifactPath = '';
   if (enableNormalizer) {
-    console.log('[run_sd2_pipeline] Stage 0 · ScriptNormalizer v1（opt-in）…');
+    const normalizerScript =
+      sd2Version === 'v6' ? 'call_script_normalizer_v2.mjs' : 'call_script_normalizer_v1.mjs';
+    console.log(
+      `[run_sd2_pipeline] Stage 0 · ScriptNormalizer（${sd2Version === 'v6' ? 'v2 默认开启' : 'v1 opt-in'}）…`,
+    );
     /** @type {string[]} */
     const stage0Args = [
-      path.join('scripts', 'sd2_pipeline', 'call_script_normalizer_v1.mjs'),
+      path.join('scripts', 'sd2_pipeline', normalizerScript),
       '--input',
       editMapInput,
       '--output',
@@ -437,32 +450,44 @@ async function main() {
         process.exit(9);
       }
     }
-  } else if (Boolean(args.normalizer) && sd2Version !== 'v5') {
+  } else if (Boolean(args.normalizer) && sd2Version !== 'v5' && sd2Version !== 'v6') {
     console.warn(
-      `[run_sd2_pipeline] --normalizer 仅在 --sd2-version v5 下生效（当前 ${sd2Version}），已忽略。`,
+      `[run_sd2_pipeline] --normalizer 仅在 --sd2-version v5/v6 下生效（当前 ${sd2Version}），已忽略。`,
+    );
+  } else if (sd2Version === 'v6' && normalizerExplicitOff) {
+    console.warn(
+      '[run_sd2_pipeline] v6 --no-normalizer：Stage 0 已跳过。scriptChunk/KVA/对白保真等 v6 硬门将自动 skip（降级到 v5 行为）。',
     );
   }
 
   if (!skipEditmap) {
     /**
-     * EditMap 脚本路由：v5/v4/v3/v2 各有一份；每份再细分云雾（Yunwu/Opus）和 DashScope。
+     * EditMap 脚本路由：v6/v5/v4/v3/v2 各有一份；每份再细分云雾（Yunwu/Opus）和 DashScope。
+     * v6 暂不提供 Yunwu 版本（LLM 端统一 DashScope，通过下游 `--downstream-model` 切换）。
      */
+    if (sd2Version === 'v6' && useYunwu) {
+      console.warn(
+        '[run_sd2_pipeline] v6 EditMap 暂未提供云雾版本，自动回退到 DashScope（call_editmap_sd2_v6.mjs）。',
+      );
+    }
     const editMapScript =
-      sd2Version === 'v5'
-        ? useYunwu
-          ? 'call_yunwu_editmap_sd2_v5.mjs'
-          : 'call_editmap_sd2_v5.mjs'
-        : sd2Version === 'v4'
+      sd2Version === 'v6'
+        ? 'call_editmap_sd2_v6.mjs'
+        : sd2Version === 'v5'
           ? useYunwu
-            ? 'call_yunwu_editmap_sd2_v4.mjs'
-            : 'call_editmap_sd2_v4.mjs'
-          : sd2Version === 'v3'
+            ? 'call_yunwu_editmap_sd2_v5.mjs'
+            : 'call_editmap_sd2_v5.mjs'
+          : sd2Version === 'v4'
             ? useYunwu
-              ? 'call_yunwu_editmap_sd2_v3.mjs'
-              : 'call_editmap_sd2_v3.mjs'
-            : useYunwu
-              ? 'call_yunwu_editmap_sd2.mjs'
-              : 'call_editmap_sd2.mjs';
+              ? 'call_yunwu_editmap_sd2_v4.mjs'
+              : 'call_editmap_sd2_v4.mjs'
+            : sd2Version === 'v3'
+              ? useYunwu
+                ? 'call_yunwu_editmap_sd2_v3.mjs'
+                : 'call_editmap_sd2_v3.mjs'
+              : useYunwu
+                ? 'call_yunwu_editmap_sd2.mjs'
+                : 'call_editmap_sd2.mjs';
     console.log(
       `[run_sd2_pipeline] LLM 生成 edit_map_sd2.json（${sd2Version}，${useYunwu ? 'Yunwu/Opus' : 'DashScope'}）…`,
     );
@@ -481,10 +506,10 @@ async function main() {
       emArgs.push('--no-thinking');
     }
     /**
-     * Stage 0 → EditMap 产物桥接（v5 专用）：
-     * 只有在 v5 + 本次确实跑出了 Stage 0 产物时才透传；否则 EditMap 按原 v5 行为运行。
+     * Stage 0 → EditMap 产物桥接（v5/v6）：
+     * v5 透传是 opt-in，v6 默认透传（scriptChunk/KVA 依赖它）；缺失时 EditMap 自动退回 v5 行为。
      */
-    if (sd2Version === 'v5' && normalizerArtifactPath) {
+    if ((sd2Version === 'v5' || sd2Version === 'v6') && normalizerArtifactPath) {
       emArgs.push('--normalized-package', normalizerArtifactPath);
     }
     runNode(emArgs);
@@ -544,7 +569,31 @@ async function main() {
 
   if (!dryRun && !skipDirector) {
     console.log('[run_sd2_pipeline] 构建 sd2_director_payloads.json …');
-    if (sd2Version === 'v5') {
+    if (sd2Version === 'v6') {
+      const editMapForPayload = JSON.parse(fs.readFileSync(editMapOut, 'utf8'));
+      /** @type {unknown} */
+      let normalizedPackageForPayload = null;
+      if (normalizerArtifactPath && fs.existsSync(normalizerArtifactPath)) {
+        try {
+          normalizedPackageForPayload = JSON.parse(
+            fs.readFileSync(normalizerArtifactPath, 'utf8'),
+          );
+        } catch (err) {
+          console.warn(
+            `[run_sd2_pipeline] v6 payload 构造：读取 ${normalizerArtifactPath} 失败：${err instanceof Error ? err.message : err}`,
+          );
+        }
+      }
+      const data = buildAllDirectorPayloadsV6({
+        editMap: editMapForPayload,
+        normalizedScriptPackage: normalizedPackageForPayload,
+        kbDir: kbDirRel,
+        renderingStyle,
+        aspectRatio: aspectRatioArg,
+        maxExamples: 2,
+      });
+      fs.writeFileSync(directorPayloads, JSON.stringify(data, null, 2) + '\n', 'utf8');
+    } else if (sd2Version === 'v5') {
       // v5：编排层直接构造（含 v5Meta 透传），再由 block_chain_v5 按需叠加 knowledge_slices
       const editMapForPayload = JSON.parse(fs.readFileSync(editMapOut, 'utf8'));
       const data = buildAllDirectorPayloadsV5({
@@ -602,13 +651,15 @@ async function main() {
       '[run_sd2_pipeline] 各 Block 内 Director→Prompter 串联；Block 间全 fan-out 并发（v5.0-rev7 · 默认解锁 scene_run_id 串行）…',
     );
     const chainScript =
-      sd2Version === 'v5'
-        ? 'call_sd2_block_chain_v5.mjs'
-        : sd2Version === 'v4'
-          ? 'call_sd2_block_chain_v4.mjs'
-          : sd2Version === 'v3'
-            ? 'call_sd2_block_chain_v3.mjs'
-            : 'call_sd2_block_chain.mjs';
+      sd2Version === 'v6'
+        ? 'call_sd2_block_chain_v6.mjs'
+        : sd2Version === 'v5'
+          ? 'call_sd2_block_chain_v5.mjs'
+          : sd2Version === 'v4'
+            ? 'call_sd2_block_chain_v4.mjs'
+            : sd2Version === 'v3'
+              ? 'call_sd2_block_chain_v3.mjs'
+              : 'call_sd2_block_chain.mjs';
     /** @type {string[]} */
     const chainArgs = [
       path.join('scripts', 'sd2_pipeline', chainScript),
@@ -637,6 +688,23 @@ async function main() {
         '--prompter-prompt',
         path.resolve(process.cwd(), prompterPromptArg),
       );
+    }
+    if (sd2Version === 'v6') {
+      // v6 专用：把 Stage 0 产物路径透传给 block chain，用于 scriptChunk 重建 + 对白保真硬门
+      if (normalizerArtifactPath) {
+        chainArgs.push('--normalized-package', normalizerArtifactPath);
+      }
+      // 一键降级 flag（与 v6 Prompt CLI 同名）
+      for (const flag of [
+        'allow-v6-soft',
+        'skip-kva-hard',
+        'skip-segment-coverage-hard',
+        'skip-info-density-hard',
+        'skip-dialogue-fidelity-hard',
+        'skip-style-inference',
+      ]) {
+        if (args[flag] === true) chainArgs.push(`--${flag}`);
+      }
     }
     runNode(chainArgs);
   } else {
