@@ -76,6 +76,7 @@ import {
   getBlockIndexRow,
   repairAssetTagDrift,
 } from './lib/sd2_block_chain_v6_helpers.mjs';
+import { runAllPrompterSelfChecks } from './lib/sd2_prompter_selfcheck_v6.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -176,12 +177,16 @@ async function main() {
     process.exit(2);
   }
 
-  // ── 降级开关 ──
-  const allowV6Soft = args['allow-v6-soft'] === true;
-  const skipKvaHard = args['skip-kva-hard'] === true || allowV6Soft;
-  const skipSegHard = args['skip-segment-coverage-hard'] === true || allowV6Soft;
-  const skipInfoHard = args['skip-info-density-hard'] === true || allowV6Soft;
-  const skipDialogueHard = args['skip-dialogue-fidelity-hard'] === true || allowV6Soft;
+    // ── 降级开关 ──
+    const allowV6Soft = args['allow-v6-soft'] === true;
+    const skipKvaHard = args['skip-kva-hard'] === true || allowV6Soft;
+    const skipSegHard = args['skip-segment-coverage-hard'] === true || allowV6Soft;
+    const skipInfoHard = args['skip-info-density-hard'] === true || allowV6Soft;
+    const skipDialogueHard = args['skip-dialogue-fidelity-hard'] === true || allowV6Soft;
+    // v6.1 新增：Prompter 自检硬门（dialogue_fidelity_check / kva_coverage_ratio /
+    // rhythm_density_check / five_stage_check / climax_signature_check /
+    // segment_coverage_overall.pass_l2 / pass_l3）。默认开启，可一键降级。
+    const skipPrompterSelfHard = args['skip-prompter-selfcheck-hard'] === true || allowV6Soft;
 
   const rawDp = JSON.parse(fs.readFileSync(directorPayloadsPath, 'utf8'));
   /** @type {Array<{ block_id?: string, payload?: unknown }>} */
@@ -290,9 +295,9 @@ async function main() {
     `[${SCRIPT_TAG}] Director+Prompter v6；model=${getResolvedLlmModel()} base=${getResolvedLlmBaseUrl()} blocks=${list.length}；` +
       `调度=${forceSerial ? '强制串行' : enforceSceneSerial ? 'scene 串行' : '全 fan-out'} slicesRoot=${slicesRoot} aspect=${aspectRatio}`,
   );
-  console.log(
-    `[${SCRIPT_TAG}] 降级 flags: allowV6Soft=${allowV6Soft} kva=${!skipKvaHard} seg=${!skipSegHard} info=${!skipInfoHard} dialogue=${!skipDialogueHard}`,
-  );
+    console.log(
+      `[${SCRIPT_TAG}] 降级 flags: allowV6Soft=${allowV6Soft} kva=${!skipKvaHard} seg=${!skipSegHard} info=${!skipInfoHard} dialogue=${!skipDialogueHard} prompterSelf=${!skipPrompterSelfHard}`,
+    );
 
   const n = list.length;
   /** @type {Promise<void>[]} */
@@ -599,7 +604,7 @@ async function main() {
             });
           }
 
-          // ── v6 硬门 · Prompter 对白保真 ──
+          // ── v6 硬门 · Prompter 对白保真（字符级匹配 scriptChunk.text） ──
           const fidGate = checkPrompterDialogueFidelityV6(sd2Prompt, scriptChunk);
           hardgateOutcomes.push({
             code: 'prompter_dialogue_fidelity',
@@ -610,6 +615,19 @@ async function main() {
                 : fidGate.status,
             block_id: blockId,
             detail: { missing_seg_ids: fidGate.missing_seg_ids },
+          });
+        }
+
+        // ── v6.1 硬门 · Prompter 自检字段全套 ──
+        // 即便 sd2_prompt 为空（shots[] 缺失），也能暴露 LLM 输出格式退化。
+        const selfChecks = runAllPrompterSelfChecks(prParsed, scriptChunk);
+        for (const sc of selfChecks) {
+          hardgateOutcomes.push({
+            code: sc.code,
+            status: skipPrompterSelfHard && sc.status === 'fail' ? 'warn' : sc.status,
+            reason: sc.reason,
+            block_id: blockId,
+            detail: sc.detail,
           });
         }
       }

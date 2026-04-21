@@ -553,6 +553,27 @@ P0 条目必须 `pass: true`。
 | `--skip-scene-architect` | v6.0 不受影响（Scene Architect 为 v6.1 引入） |
 | `--skip-style-inference` | EditMap 不产 `meta.style_inference`；Director 回落 v5 `parsed_brief`；三轴软门跳过 |
 | `--skip-kva-hard` | KVA 硬门降级 warning；`kva_consumption_report` / `kva_visualization_check` 仍必须输出 |
+| `--skip-segment-coverage-hard` | Director `segment_coverage_report.coverage_ratio ≥ 0.90` 硬门降级 warning |
+| `--skip-info-density-hard` | Director `shot_meta.info_delta.none_ratio` 硬门降级 warning |
+| `--skip-dialogue-fidelity-hard` | Prompter sd2_prompt 对 `scriptChunk` 对白原文的字符级比对硬门降级 warning |
+| `--skip-prompter-selfcheck-hard` | Prompter v6.1 自检硬门（8 条：`dialogue_fidelity` / `kva_coverage` / `rhythm_density` / `five_stage` / `major_climax` / `closing_hook` / `segment_l2` / `segment_l3`）整组降级 warning |
+
+### 7.1 Prompter 自检硬门映射表（v6.1 新增：pipeline 实读 Prompter output）
+
+v6.0 阶段 Prompter 虽然在 JSON output 里产出上述自检字段，但 pipeline 仅在 Director 侧做同名硬门，没有读 Prompter 自己的判定。**v6.1 起 pipeline 会同时消费 Prompter self-check**，这是为了暴露一种边界情况：**Prompter 正文照做但自检不自信**（例如 closing_hook 段没有 split_screen / freeze，Prompter 自己把 `climax_signature_check.closing_hook.pass = false`，但 Director 侧只能看 shot_meta 不知道 Prompter 怎么写 sd2_prompt）。
+
+| 自检字段 | hardgate code | 通过判定 | 降级 flag |
+|---|---|---|---|
+| `dialogue_fidelity_check.fidelity_ratio` | `prompter_self_dialogue_fidelity` | `== 1.0` | `--skip-prompter-selfcheck-hard` |
+| `kva_coverage_ratio` | `prompter_self_kva_coverage` | `== 1.0`（仅当 scriptChunk 含 P0 KVA） | 同上；无 P0 自动 skip |
+| `rhythm_density_check.pass` | `prompter_self_rhythm_density` | `true` | 同上 |
+| `five_stage_check[].pass` | `prompter_self_five_stage` | 全部 `true` | 同上 |
+| `climax_signature_check.major_climax.pass` | `prompter_self_major_climax` | `applicable=false` 或 `pass=true` | 同上 |
+| `climax_signature_check.closing_hook.pass` | `prompter_self_closing_hook` | `applicable=false` 或 `pass=true` | 同上 |
+| `segment_coverage_overall.pass_l2` | `prompter_self_segment_l2` | `true` | 同上 |
+| `segment_coverage_overall.pass_l3` | `prompter_self_segment_l3` | `true`（对白段 100%） | 同上 |
+
+> 实现位置：`scripts/sd2_pipeline/lib/sd2_prompter_selfcheck_v6.mjs`。字段缺失时 `status=skip`（LLM 未输出），不拦截也不降级；真正 fail 才进入 hardgateOutcomes。
 
 ---
 
