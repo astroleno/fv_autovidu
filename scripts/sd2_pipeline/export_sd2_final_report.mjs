@@ -114,13 +114,15 @@ function collectAssetTagsFromSd2PromptText(result) {
  *
  * 返回一个归一化的视图：
  *   - `sd2Prompt`：完整拼接后的 sd2_prompt（给 Markdown 展示用）；
- *   - `time`：{ start_sec, end_sec, duration } 元组；v6 从 shots 首末 timecode 推导，失败回退 0；
+ *   - `time`：{ start_sec, end_sec, duration } 元组；v6 优先 shots 首末 timecode → edit_map 回退 → duration_sec 累加；
  *   - `shape`：'v6' 或 'legacy'，用于调试。
  *
  * @param {unknown} result
+ * @param {{ start_sec?: number, end_sec?: number, duration?: number } | null} [editMapBlockTime]
+ *   Director payload 里 `edit_map_block.time`，当 Prompter 没给 timecode 时作为兜底。
  * @returns {{ sd2Prompt: string, time: { start_sec: number, end_sec: number, duration: number } | null, shape: 'v6' | 'legacy' }}
  */
-function extractV6ResultView(result) {
+function extractV6ResultView(result, editMapBlockTime) {
   if (!result || typeof result !== 'object') {
     return { sd2Prompt: '', time: null, shape: 'legacy' };
   }
@@ -137,7 +139,7 @@ function extractV6ResultView(result) {
     );
     const body = shotPrompts.filter((x) => x && x.trim()).join('\n\n');
     const merged = [prefix, body, suffix].filter((x) => x && x.trim()).join('\n\n');
-    const time = extractTimeFromShots(shots);
+    const time = extractTimeFromShots(shots, editMapBlockTime || null);
     return { sd2Prompt: merged, time, shape: 'v6' };
   }
 
@@ -160,15 +162,24 @@ function extractV6ResultView(result) {
 }
 
 /**
- * 从 shots[] 的 timecode 字段推导 block 级时间窗口。
+ * 从 shots[] 的 timecode 字段推导 block 级时间窗口（v6.1-HOTFIX-C 回退链加强版）。
  *
  * timecode 规范格式："HH:MM–HH:MM" 或 "MM:SS–MM:SS"（常见是 "00:00–00:03"）。
- * 支持中英文破折号（– / - / —）。任一解析失败即回退到累加 duration_sec。
+ * - 支持中英文破折号（– / - / —）。
+ * - 位数放宽为 `\d{1,4}`：兼容 LLM 偶发的 "00:96–00:108" 写法（把 00:96 当 96 秒解，
+ *   语义与 01:36 等价）。原 `\d{2}` 会在秒位 ≥100 时整段拒绝，fallback 回 0。
+ *
+ * 回退链（v6.1-HOTFIX-C）：
+ *   1. shots[].timecode 全集解析成功 → 按首末拼出 block 窗口；
+ *   2. 解析失败 + editMapBlockTime 可用 → 用 EditMap 那一轮的 block.time
+ *      （这是真正的"剧本里第几秒到第几秒"，比从 0 开始更贴近事实）；
+ *   3. 最终兜底：从 0 开始累加 duration_sec（历史行为，仅当 EditMap 也没给时间窗口）。
  *
  * @param {unknown[]} shots
+ * @param {{ start_sec?: number, end_sec?: number, duration?: number } | null} editMapBlockTime
  * @returns {{ start_sec: number, end_sec: number, duration: number }}
  */
-function extractTimeFromShots(shots) {
+function extractTimeFromShots(shots, editMapBlockTime) {
   let startSec = 0;
   let endSec = 0;
   let durationSum = 0;
@@ -183,7 +194,7 @@ function extractTimeFromShots(shots) {
 
     const tc = /** @type {{ timecode?: unknown }} */ (s).timecode;
     if (typeof tc !== 'string') continue;
-    const m = tc.match(/^\s*(\d{1,2}):(\d{2})\s*[–—-]\s*(\d{1,2}):(\d{2})\s*$/);
+    const m = tc.match(/^\s*(\d{1,4}):(\d{1,4})\s*[–—-]\s*(\d{1,4}):(\d{1,4})\s*$/);
     if (!m) continue;
     const s0 = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
     const s1 = parseInt(m[3], 10) * 60 + parseInt(m[4], 10);
@@ -198,6 +209,23 @@ function extractTimeFromShots(shots) {
   if (startParsed && endParsed && endSec > startSec) {
     return { start_sec: startSec, end_sec: endSec, duration: endSec - startSec };
   }
+
+  // fallback 2：EditMap block.time 回退（优于从 0 开始）
+  if (editMapBlockTime && typeof editMapBlockTime === 'object') {
+    const es = typeof editMapBlockTime.start_sec === 'number' ? editMapBlockTime.start_sec : null;
+    const ee = typeof editMapBlockTime.end_sec === 'number' ? editMapBlockTime.end_sec : null;
+    const ed = typeof editMapBlockTime.duration === 'number' ? editMapBlockTime.duration : null;
+    if (es !== null && ee !== null && ee > es) {
+      return { start_sec: es, end_sec: ee, duration: ed !== null ? ed : ee - es };
+    }
+    // 只有 duration 可用：从 0 或 start_sec 出发
+    if (ed !== null && ed > 0) {
+      const from = es !== null ? es : 0;
+      return { start_sec: from, end_sec: from + ed, duration: ed };
+    }
+  }
+
+  // fallback 3：历史兜底——从 0 开始累加 duration_sec
   return { start_sec: 0, end_sec: durationSum, duration: durationSum };
 }
 
@@ -522,6 +550,33 @@ async function main() {
 
   const editMapInput = readJsonIfExists(editMapInputPath);
 
+  // v6.1-HOTFIX-C：读取 edit_map_sd2.json，构建 block_id → time 索引，
+  //   作为 Prompter shots[].timecode 缺失或格式异常时的最强兜底。
+  //   edit_map_sd2.json 里 block 用 `id` 字段（不是 `block_id`），time 形如
+  //   { start_sec, end_sec, duration }。Director payload 里的 edit_map_block 在
+  //   Normalizer v2 / EditMap v6 链路上经常是空 dict——此处直接查 EditMap 产物。
+  /** @type {Map<string, { start_sec?: number, end_sec?: number, duration?: number }>} */
+  const editMapBlockTimeById = new Map();
+  const editMapSd2Path = sd2Dir ? path.join(sd2Dir, 'edit_map_sd2.json') : '';
+  if (editMapSd2Path && fs.existsSync(editMapSd2Path)) {
+    const editMapSd2 = /** @type {{ blocks?: unknown[] }} */ (
+      JSON.parse(fs.readFileSync(editMapSd2Path, 'utf8'))
+    );
+    const emBlocks = Array.isArray(editMapSd2.blocks) ? editMapSd2.blocks : [];
+    for (const b of emBlocks) {
+      if (!b || typeof b !== 'object') continue;
+      const bid = /** @type {{ id?: unknown, block_id?: unknown }} */ (b).id
+        ?? /** @type {{ id?: unknown, block_id?: unknown }} */ (b).block_id;
+      const t = /** @type {{ time?: unknown }} */ (b).time;
+      if (typeof bid === 'string' && t && typeof t === 'object') {
+        editMapBlockTimeById.set(
+          bid,
+          /** @type {{ start_sec?: number, end_sec?: number, duration?: number }} */ (t),
+        );
+      }
+    }
+  }
+
   /** @type {Array<Record<string, unknown>>} */
   const blocksOut = [];
 
@@ -535,13 +590,30 @@ async function main() {
       continue;
     }
 
-    const view = extractV6ResultView(result);
+    const payloadRow = payloadByBlock.get(blockId);
+    const inner = payloadRow && payloadRow.payload;
+
+    // v6.1-HOTFIX-C：汇集 timecode 缺失/格式异常时的时间轴兜底。
+    //   优先级：Director payload.edit_map_block.time > EditMap 产物 blocks[id=blockId].time
+    /** @type {{ start_sec?: number, end_sec?: number, duration?: number } | null} */
+    let editMapBlockTime = null;
+    if (inner && typeof inner === 'object') {
+      const innerEditBlock = /** @type {{ edit_map_block?: unknown }} */ (inner).edit_map_block;
+      if (innerEditBlock && typeof innerEditBlock === 'object') {
+        const t = /** @type {{ time?: unknown }} */ (innerEditBlock).time;
+        if (t && typeof t === 'object') {
+          editMapBlockTime = /** @type {{ start_sec?: number, end_sec?: number, duration?: number }} */ (t);
+        }
+      }
+    }
+    if (!editMapBlockTime && editMapBlockTimeById.has(blockId)) {
+      editMapBlockTime = editMapBlockTimeById.get(blockId) || null;
+    }
+
+    const view = extractV6ResultView(result, editMapBlockTime);
     const sd2Prompt = view.sd2Prompt;
 
     const tagsUnique = collectUniqueAssetTagsFromSlices(result);
-
-    const payloadRow = payloadByBlock.get(blockId);
-    const inner = payloadRow && payloadRow.payload;
 
     /**
      * v4 优先使用 Prompter 输出的 block_asset_mapping（Block 内重编号的局部映射，dict 形态：
@@ -665,3 +737,6 @@ if (_e && pathToFileURL(path.resolve(_e)).href === import.meta.url) {
     process.exit(1);
   });
 }
+
+// v6.1-HOTFIX-C：导出内部纯函数供单元测试消费。主流程不经过这里，调用约定不变。
+export { extractTimeFromShots, extractV6ResultView };
