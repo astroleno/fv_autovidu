@@ -34,6 +34,239 @@ const TOTAL_SHOT_TOLERANCE_RATIO = 0.15;
 const PER_BLOCK_SHOT_TOLERANCE_ABS = 1;
 
 /**
+ * v5.0-rev4 · genre 白名单（与 1_EditMap-SD2-v5.md §0.0 保持同步）。
+ * `sweet_romance` / `revenge` / `suspense` / `fantasy` / `general`。
+ */
+const GENRE_ENUM = Object.freeze(['sweet_romance', 'revenge', 'suspense', 'fantasy', 'general']);
+
+/**
+ * v5.0-rev4 · genre 关键词→枚举 同义词映射表。
+ *
+ * 用于 LLM 把 brief / 剧本题材写成"drama / 都市情感 / 医疗情感 / 职场"等枚举外
+ * 自然语言值时，normalize 层防御性归位到 5 元枚举之一。
+ *
+ * 命中优先级：从上到下、从具体到宽泛（top-down，先命中先停）。
+ */
+const GENRE_KEYWORD_MAP = Object.freeze(
+  /** @type {Array<{ enum: string; patterns: RegExp[] }>} */ ([
+    {
+      enum: 'revenge',
+      patterns: [
+        /复仇|打脸|虐渣|反杀|追妻火葬场|夺权|逆袭|商战|宫斗|斗渣/,
+        /revenge|comeback|dominance/i,
+      ],
+    },
+    {
+      enum: 'sweet_romance',
+      patterns: [
+        /甜宠|糖分|先婚后爱|契约婚|闪婚|总裁爱上|恋爱脑|CP|强制爱|甜剧/,
+        /romance|sweet|love/i,
+      ],
+    },
+    {
+      enum: 'suspense',
+      patterns: [/悬疑|查真相|破案|反转|惊悚|神秘|身份之谜|真相/, /mystery|suspense|thriller/i],
+    },
+    {
+      enum: 'fantasy',
+      patterns: [/玄幻|仙侠|穿越|重生|系统|修真|异世|魔法|超能力/, /fantasy|isekai|supernatural/i],
+    },
+    // general 是最终兜底，不列关键词
+  ]),
+);
+
+/**
+ * v5.0-rev4 · 把 LLM / brief 里可能写错的 genre 归位到 5 元枚举之一。
+ *
+ * 归位策略（逐条尝试，首个命中即停；全失败 → `general`）：
+ *   1. 若 raw 已在白名单内，直接用；
+ *   2. 按 GENRE_KEYWORD_MAP 扫 raw 字符串 + 辅助文本（extraConstraints 拼接、title、artStyle）；
+ *   3. 兜底 `general`。
+ *
+ * @param {string | null | undefined} raw     LLM 给的原值（可能为"drama" / "都市情感" / 空）
+ * @param {string[]} auxHints                 辅助文本（title、extraConstraints 列表、artStyle 等）
+ * @returns {string}  始终返回 GENRE_ENUM 中的一个
+ */
+function coerceGenreEnum(raw, auxHints) {
+  const rawStr = typeof raw === 'string' ? raw.trim() : '';
+
+  if (rawStr && GENRE_ENUM.includes(rawStr)) {
+    return rawStr;
+  }
+
+  // 扫描 raw + 辅助文本，命中关键词返回对应枚举
+  const haystack = [rawStr, ...auxHints.filter((x) => typeof x === 'string')]
+    .filter((s) => s && s.length > 0)
+    .join(' | ');
+
+  for (const { enum: target, patterns } of GENRE_KEYWORD_MAP) {
+    for (const re of patterns) {
+      if (re.test(haystack)) {
+        return target;
+      }
+    }
+  }
+
+  return 'general';
+}
+
+/**
+ * v5.0-rev4 · 把 meta.parsed_brief.genre / meta.genre / meta.video.genre_hint 三处统一
+ * 收敛到 5 元枚举之一，并返回最终值（用于下游软门判断）。
+ *
+ * 统一策略：
+ *   - 以 `parsed_brief.genre` 为主；若它不在白名单内，按 coerceGenreEnum 归位；
+ *   - 把归位结果同时写入 `meta.genre`、`meta.video.genre_hint` 与 `parsed_brief.genre`；
+ *   - 若原来三者里有合法值就保留该值（避免 LLM 填对了但 parsed_brief 空的情况被覆盖）。
+ *
+ * @param {Record<string, unknown>} meta  appendix.meta（canonical）
+ * @returns {string}  归位后的最终 genre 枚举值
+ */
+function normalizeGenreEnum(meta) {
+  const pb =
+    meta.parsed_brief && typeof meta.parsed_brief === 'object'
+      ? /** @type {Record<string, unknown>} */ (meta.parsed_brief)
+      : null;
+  const video =
+    meta.video && typeof meta.video === 'object'
+      ? /** @type {Record<string, unknown>} */ (meta.video)
+      : null;
+
+  const candidates = [
+    pb && typeof pb.genre === 'string' ? pb.genre : null,
+    typeof meta.genre === 'string' ? meta.genre : null,
+    video && typeof video.genre_hint === 'string' ? video.genre_hint : null,
+  ];
+
+  // 找第一个已经在白名单内的值；没有则对首个非空值做归位
+  let finalGenre = candidates.find((v) => typeof v === 'string' && GENRE_ENUM.includes(v));
+  if (!finalGenre) {
+    const firstRaw = candidates.find((v) => typeof v === 'string' && v.trim().length > 0) || '';
+    const auxHints = /** @type {string[]} */ ([]);
+    if (pb) {
+      if (Array.isArray(pb.extraConstraints)) {
+        for (const ec of pb.extraConstraints) {
+          if (typeof ec === 'string') auxHints.push(ec);
+        }
+      }
+      if (typeof pb.artStyle === 'string') auxHints.push(pb.artStyle);
+      if (typeof pb.renderingStyle === 'string') auxHints.push(pb.renderingStyle);
+    }
+    if (typeof meta.title === 'string') auxHints.push(meta.title);
+    finalGenre = coerceGenreEnum(firstRaw, auxHints);
+  }
+
+  // 回写三处
+  if (pb) pb.genre = finalGenre;
+  meta.genre = finalGenre;
+  if (video) video.genre_hint = finalGenre;
+
+  return finalGenre;
+}
+
+/**
+ * v5.0-rev5 · brief 镜头数字硬锚防御（F5）。
+ *
+ * 当 `directorBrief` 里明写具体镜头数（如 "35 个镜头左右" / "60 镜" / "镜头 60 左右"）时：
+ *   1. 从 `parsed_brief.extraConstraints` 与 `parsed_brief.directorBrief` 全文抽取 N_user（首个命中）；
+ *   2. 计算允许区间 `[round(N*0.85), round(N*1.15)]`；
+ *   3. 若 LLM 推理的 `target_shot_count_range` 与允许区间**无交集**，视为严重违规 → 强制收窄覆盖；
+ *   4. 若 LLM 已自填 `meta.target_shot_count.target` 且越界，同步收窄 target 与 tolerance。
+ *
+ * 命中即追加 `routing_warnings`（code=`target_shot_count_anchor_drift`），但不阻塞 pipeline。
+ * 设计意图：保留 Scheme B 的 LLM 主权，只在 LLM 自由发挥大幅偏离 brief 数字时托底。
+ *
+ * @param {Record<string, unknown>} meta
+ * @param {Array<Record<string, unknown>>} warnings  appendix.meta.routing_warnings（会被 push）
+ */
+function coerceBriefShotCountAnchor(meta, warnings) {
+  const pb =
+    meta.parsed_brief && typeof meta.parsed_brief === 'object'
+      ? /** @type {Record<string, unknown>} */ (meta.parsed_brief)
+      : null;
+  if (!pb) return;
+
+  // ── 1. 收集 brief 相关文本片段 ──
+  /** @type {string[]} */
+  const chunks = [];
+  if (Array.isArray(pb.extraConstraints)) {
+    for (const c of pb.extraConstraints) {
+      if (typeof c === 'string') chunks.push(c);
+    }
+  }
+  if (typeof pb.directorBrief === 'string') chunks.push(pb.directorBrief);
+  const combined = chunks.join('\n');
+  if (!combined) return;
+
+  // ── 2. 正则匹配「N 个镜头 / N 镜」，排除「X 秒 / X 分」等误伤 ──
+  const m = combined.match(/(\d+)\s*(?:个)?\s*(?:镜头|镜)(?!\s*\/|\s*秒|\s*分)/);
+  if (!m) return;
+  const nUser = Number(m[1]);
+  if (!Number.isFinite(nUser) || nUser < 10 || nUser > 300) return;
+
+  const lo = Math.round(nUser * 0.85);
+  const hi = Math.round(nUser * 1.15);
+
+  // ── 3. 比较 LLM 推理的 target_shot_count_range ──
+  const rng = pb.target_shot_count_range;
+  if (!Array.isArray(rng) || rng.length !== 2) return;
+  const lo0 = Number(rng[0]);
+  const hi0 = Number(rng[1]);
+  if (!Number.isFinite(lo0) || !Number.isFinite(hi0)) return;
+
+  const hasOverlap = !(hi0 < lo || lo0 > hi);
+  if (hasOverlap) return; // LLM 推理至少部分落入允许区间，放行
+
+  // ── 4. 完全偏离 → 强制收窄覆盖 + 写 warn ──
+  warnings.push({
+    code: 'target_shot_count_anchor_drift',
+    severity: 'warn',
+    message: `LLM 推理的 target_shot_count_range=[${lo0}, ${hi0}] 与 brief 明写的 "${nUser} 个镜头" 允许区间 [${lo}, ${hi}] 无交集；编排层按 ±15% 收窄覆盖`,
+    llm_value: [lo0, hi0],
+    brief_anchor: nUser,
+    coerced_range: [lo, hi],
+  });
+  pb.target_shot_count_range = [lo, hi];
+
+  // 若 LLM 自填 meta.target_shot_count.target 也越界，同步收窄
+  const existing = meta.target_shot_count;
+  if (existing && typeof existing === 'object') {
+    const r = /** @type {Record<string, unknown>} */ (existing);
+    const t = typeof r.target === 'number' ? r.target : 0;
+    if (t > 0 && (t < lo || t > hi)) {
+      r.target = nUser;
+      r.tolerance = [lo, hi];
+      // avg_shot_duration_sec 让 deriveShotBudgets 按新 target 重算（若 meta 已存在会被 deriveShotBudgets 的 fromLlm 分支保留，所以这里不清）
+    }
+  }
+}
+
+/**
+ * v5.0-rev5 · 字段名软兼容：`block_id` vs `id`。
+ *
+ * 历史背景：v5 prompt §III 早期示例误写成 `"id": "B01"`，部分 LLM 模型会严格按示例输出。
+ * schema 冻结文档与 normalize 下游统一以 `block_id` 为准；本函数在入口处做一次迁移兼容：
+ *   - `block_id` 存在且合法（形如 `B\d+`） → 原样保留；
+ *   - `block_id` 缺失但 `id` 合法 → 提升 `id` 为 `block_id`，并移除 `id` 以避免下游歧义；
+ *   - 两者都缺失或非法 → 保持现状，交给后续 skeleton_integrity_check 捕获。
+ *
+ * @param {Record<string, unknown>} block  单条 block_index
+ */
+function coerceBlockIdField(block) {
+  const BLOCK_ID_RE = /^B\d+$/;
+  const raw = block.block_id;
+  const rawId = block.id;
+  if (typeof raw === 'string' && BLOCK_ID_RE.test(raw)) {
+    if (typeof rawId === 'string' && rawId === raw) delete block.id;
+    return;
+  }
+  if (typeof rawId === 'string' && BLOCK_ID_RE.test(rawId)) {
+    block.block_id = rawId;
+    delete block.id;
+  }
+}
+
+/**
  * 确保 block_index[i].routing 存在且六字段齐全。若缺失就填默认值；
  * 若顶层仍有 v4 的 `structural_tags` 而 routing.structural 为空，做迁移。
  *
@@ -113,84 +346,140 @@ function normalizeMetaVideo(meta) {
 }
 
 /**
- * 从 options.workflowControls / meta.parsed_brief / meta.video 逐级回退，
+ * v5.0-rev3 · Scheme B 兜底默认：
+ *   当 LLM / brief 完全没给镜头数线索时，以"2 秒/镜"作为保守默认（120s → 60 镜），
+ *   比原来的 "4 秒/镜"（120s → 30 镜，偏稀疏）更贴近真人短剧节奏。
+ */
+const FALLBACK_AVG_SHOT_DURATION_SEC = 2;
+
+/**
  * 解析出 (targetShotCount, avgShotDuration)。
  *
- * 解析优先级：
- *   1. options.workflowControls.shotCountTargetApprox  + avgShotDuration
- *   2. meta.parsed_brief.target_shot_count_range 取中点 + episode_duration_sec / 中点
- *   3. meta.video.target_duration_sec / 4    （保守回退，4s/shot）
+ * v5.0-rev3 · Scheme B 改造 · 2026-04-17：
+ *   - **删除路径「options.workflowControls」**（prepare 层已不再生成此字段）；
+ *   - **新增路径 0**：若 LLM 自填了 `meta.target_shot_count.{target, avg_shot_duration_sec}`
+ *     则直接采信，不再覆盖（让 LLM 保留权威）；
+ *   - **保留 parsed_brief 路径**：兼容 `target_shot_count_range: [lo, hi]`（v5 新格式）
+ *     与 `episodeShotCount: N`（v4 兼容格式）。
+ *
+ * 解析优先级（从高到低）：
+ *   0. meta.target_shot_count（LLM 自填；最高权威）
+ *   1. meta.parsed_brief.target_shot_count_range 取中点
+ *   2. meta.parsed_brief.episodeShotCount（v4 单值）
+ *   3. meta.video.target_duration_sec / FALLBACK_AVG_SHOT_DURATION_SEC
  *   4. 放弃派生（返回 null）
  *
  * @param {Record<string, unknown>} meta
- * @param {Record<string, unknown>} [workflowControls]
- * @returns {{ target: number, avgShotDuration: number } | null}
+ * @returns {{ target: number, avgShotDuration: number, fromLlm?: boolean } | null}
  */
-function resolveShotBudgetInputs(meta, workflowControls) {
-  // ── 路径 1：显式 workflowControls ──
-  if (workflowControls && typeof workflowControls === 'object') {
-    const wc = workflowControls;
-    const t = typeof wc.shotCountTargetApprox === 'number' ? wc.shotCountTargetApprox : 0;
-    const a = typeof wc.avgShotDuration === 'number' ? wc.avgShotDuration : 0;
+function resolveShotBudgetInputs(meta) {
+  // ── 路径 0：LLM 自填 meta.target_shot_count（最高权威） ──
+  const existing = meta.target_shot_count;
+  if (existing && typeof existing === 'object') {
+    const r = /** @type {Record<string, unknown>} */ (existing);
+    const t = typeof r.target === 'number' ? r.target : 0;
+    const a = typeof r.avg_shot_duration_sec === 'number' ? r.avg_shot_duration_sec : 0;
     if (t > 0 && a > 0) {
-      return { target: Math.round(t), avgShotDuration: a };
+      return { target: Math.round(t), avgShotDuration: a, fromLlm: true };
     }
   }
 
-  // ── 路径 2：parsed_brief.target_shot_count_range ──
+  // ── 路径 1/2：parsed_brief（LLM 从 directorBrief 自然语言解析的产物） ──
   const pb =
     meta.parsed_brief && typeof meta.parsed_brief === 'object'
       ? /** @type {Record<string, unknown>} */ (meta.parsed_brief)
       : {};
+  const dur =
+    typeof pb.episode_duration_sec === 'number' && pb.episode_duration_sec > 0
+      ? pb.episode_duration_sec
+      : typeof pb.episodeDuration === 'number' && pb.episodeDuration > 0
+        ? pb.episodeDuration
+        : 0;
+
+  // 路径 1：区间中点（v5 推荐）
   const rng = pb.target_shot_count_range;
   if (Array.isArray(rng) && rng.length === 2) {
     const lo = Number(rng[0]);
     const hi = Number(rng[1]);
     if (Number.isFinite(lo) && Number.isFinite(hi) && lo > 0 && hi >= lo) {
       const mid = Math.round((lo + hi) / 2);
-      const dur = typeof pb.episode_duration_sec === 'number' ? pb.episode_duration_sec : 0;
       if (mid > 0 && dur > 0) {
         return { target: mid, avgShotDuration: +(dur / mid).toFixed(2) };
       }
     }
   }
 
-  // ── 路径 3：target_duration_sec / 4（保守回退）──
+  // 路径 2：单值 episodeShotCount（v4 兼容）
+  const singleShot =
+    typeof pb.episodeShotCount === 'number' && pb.episodeShotCount > 0
+      ? pb.episodeShotCount
+      : typeof pb.target_shot_count === 'number' && pb.target_shot_count > 0
+        ? pb.target_shot_count
+        : 0;
+  if (singleShot > 0 && dur > 0) {
+    return { target: Math.round(singleShot), avgShotDuration: +(dur / singleShot).toFixed(2) };
+  }
+
+  // ── 路径 3：target_duration_sec / FALLBACK_AVG_SHOT_DURATION_SEC（保守回退） ──
   const video =
     meta.video && typeof meta.video === 'object'
       ? /** @type {Record<string, unknown>} */ (meta.video)
       : {};
-  const totalDur = typeof video.target_duration_sec === 'number' ? video.target_duration_sec : 0;
+  const totalDur =
+    typeof video.target_duration_sec === 'number' && video.target_duration_sec > 0
+      ? video.target_duration_sec
+      : typeof video.total_duration_sec === 'number' && video.total_duration_sec > 0
+        ? video.total_duration_sec
+        : dur;
   if (totalDur > 0) {
-    const assumedAvg = 4;
-    return { target: Math.max(1, Math.round(totalDur / assumedAvg)), avgShotDuration: assumedAvg };
+    return {
+      target: Math.max(1, Math.round(totalDur / FALLBACK_AVG_SHOT_DURATION_SEC)),
+      avgShotDuration: FALLBACK_AVG_SHOT_DURATION_SEC,
+    };
   }
 
   return null;
 }
 
 /**
- * v5.0 HOTFIX：派生 meta.target_shot_count + block_index[i].shot_budget_hint。
- * 若无法解析输入则跳过（保持兼容，不强制）。
+ * v5.0-rev3 · Scheme B：派生 meta.target_shot_count + block_index[i].shot_budget_hint。
+ *
+ * 关键变更：
+ *   - 不再接收 workflowControls 参数（prepare 层已删）；
+ *   - 输入源全部来自 LLM（自填 meta.target_shot_count）或 LLM-解析-后 brief（meta.parsed_brief）；
+ *   - 若 LLM 已自填完整 meta.target_shot_count.{target, tolerance, avg_shot_duration_sec}，
+ *     尊重其权威不覆盖；仅补齐缺失字段（如 tolerance）。
  *
  * @param {Record<string, unknown>} meta
  * @param {Array<Record<string, unknown>>} rows  appendix.block_index[]
- * @param {Record<string, unknown>} [workflowControls]
  */
-function deriveShotBudgets(meta, rows, workflowControls) {
-  const inputs = resolveShotBudgetInputs(meta, workflowControls);
+function deriveShotBudgets(meta, rows) {
+  const inputs = resolveShotBudgetInputs(meta);
   if (!inputs) {
     return;
   }
-  const { target, avgShotDuration } = inputs;
+  const { target, avgShotDuration, fromLlm } = inputs;
 
-  // 片级 target_shot_count：target ± 15% 作为容忍（至少 ±2）
-  const delta = Math.max(2, Math.ceil(target * TOTAL_SHOT_TOLERANCE_RATIO));
-  meta.target_shot_count = {
-    target,
-    tolerance: [Math.max(1, target - delta), target + delta],
-    avg_shot_duration_sec: avgShotDuration,
-  };
+  /**
+   * 片级 target_shot_count：
+   *   - 若 LLM 自填了完整对象（含 tolerance），保留；仅当 tolerance 缺失时自动补齐 ±15%。
+   *   - 否则用解析出的值构造完整对象。
+   */
+  const existing = meta.target_shot_count;
+  if (fromLlm && existing && typeof existing === 'object') {
+    const r = /** @type {Record<string, unknown>} */ (existing);
+    if (!Array.isArray(r.tolerance) || r.tolerance.length !== 2) {
+      const delta = Math.max(2, Math.ceil(target * TOTAL_SHOT_TOLERANCE_RATIO));
+      r.tolerance = [Math.max(1, target - delta), target + delta];
+    }
+  } else {
+    const delta = Math.max(2, Math.ceil(target * TOTAL_SHOT_TOLERANCE_RATIO));
+    meta.target_shot_count = {
+      target,
+      tolerance: [Math.max(1, target - delta), target + delta],
+      avg_shot_duration_sec: avgShotDuration,
+    };
+  }
 
   // 块级 shot_budget_hint：target = round(duration / avg)，tolerance = [max(1, t-1), t+1]
   for (const row of rows) {
@@ -217,13 +506,14 @@ function deriveShotBudgets(meta, rows, workflowControls) {
 /**
  * v5 归一化主入口。就地修改 parsed（EditMap v5 LLM 输出），返回同一引用。
  *
+ * v5.0-rev3 · Scheme B 改造：options 不再接收 workflowControls；镜头预算推导链路：
+ *   meta.target_shot_count（LLM 自填） > meta.parsed_brief（LLM 解析 brief） > meta.video（兜底）
+ *
  * @param {unknown} parsed
- * @param {{ workflowControls?: Record<string, unknown> }} [options]
- *   可选参数；传入 workflowControls 后 normalize 会派生镜头预算字段。
- *   未传时走 parsed_brief / target_duration_sec 回退链。
+ * @param {{}} [_options]  预留参数对象（当前无字段；保留签名供未来扩展）
  * @returns {unknown}
  */
-export function normalizeEditMapSd2V5(parsed, options = {}) {
+export function normalizeEditMapSd2V5(parsed, _options = {}) {
   // 基础形状复用 v3（拆段、合成 blocks[] 等）
   normalizeEditMapSd2V3(parsed);
 
@@ -260,6 +550,7 @@ export function normalizeEditMapSd2V5(parsed, options = {}) {
     for (const row of rawRows) {
       if (row && typeof row === 'object') {
         const r = /** @type {Record<string, unknown>} */ (row);
+        coerceBlockIdField(r);
         normalizeRoutingOnBlock(r);
         rows.push(r);
       }
@@ -276,23 +567,42 @@ export function normalizeEditMapSd2V5(parsed, options = {}) {
         : null;
 
   if (appendixMeta) {
-    deriveShotBudgets(appendixMeta, rows, options.workflowControls);
-
-    // routing_warnings：初始化为空数组，由下游（editmap-side 软门校验 + block_chain）追加
+    // v5.0-rev5：先初始化 routing_warnings，让后续所有校验（含 brief anchor 防御）可以 push
     if (!Array.isArray(appendixMeta.routing_warnings)) {
       appendixMeta.routing_warnings = [];
     }
+    const warningsRef = /** @type {Array<Record<string, unknown>>} */ (appendixMeta.routing_warnings);
+
+    // v5.0-rev4：先收敛 genre 到 5 元枚举（后续软门判断依赖 genre_hint）
+    normalizeGenreEnum(appendixMeta);
+
+    // v5.0-rev5：brief 明写镜头数字时，硬收窄 LLM 推理出界的 target_shot_count_range
+    //   详见 1_EditMap-SD2-v5.md §0.0 "target_shot_count_range 推理规则（硬口径）"
+    coerceBriefShotCountAnchor(appendixMeta, warningsRef);
+
+    deriveShotBudgets(appendixMeta, rows);
 
     // v5.0 治本 · S10/S11：EditMap 侧语义软门校验（纯数据交叉比对，无 LLM 调用）
     //   详见 07_v5-schema-冻结.md §7.10 / §7.11；06_v5-验收清单 §1.2
-    checkSatisfactionSubject(appendixMeta, /** @type {Array<Record<string, unknown>>} */ (appendixMeta.routing_warnings));
-    checkProofLadderCoverage(appendixMeta, rows, /** @type {Array<Record<string, unknown>>} */ (appendixMeta.routing_warnings));
+    checkSatisfactionSubject(appendixMeta, warningsRef);
+    checkProofLadderCoverage(appendixMeta, rows, warningsRef);
 
-    // obj.meta 与 appendix.meta 是两份引用；若都存在则同步 target_shot_count / routing_warnings
+    // obj.meta 与 appendix.meta 是两份引用；若都存在则同步 target_shot_count / routing_warnings / genre
     if (rawTopMeta && typeof rawTopMeta === 'object' && rawTopMeta !== appendixMeta) {
       const topMeta = /** @type {Record<string, unknown>} */ (rawTopMeta);
       topMeta.target_shot_count = appendixMeta.target_shot_count;
       topMeta.routing_warnings = appendixMeta.routing_warnings;
+      if (typeof appendixMeta.genre === 'string') topMeta.genre = appendixMeta.genre;
+      if (
+        appendixMeta.video &&
+        typeof appendixMeta.video === 'object' &&
+        topMeta.video &&
+        typeof topMeta.video === 'object'
+      ) {
+        const topVideo = /** @type {Record<string, unknown>} */ (topMeta.video);
+        const apxVideo = /** @type {Record<string, unknown>} */ (appendixMeta.video);
+        if (typeof apxVideo.genre_hint === 'string') topVideo.genre_hint = apxVideo.genre_hint;
+      }
     }
   }
 
@@ -370,23 +680,25 @@ function checkSatisfactionSubject(meta, warnings) {
 }
 
 /**
- * v5.0 治本 · S11：`proof_ladder_coverage_check`（07 §7.11）
+ * v5.0 治本 · S11：`proof_ladder_coverage_check`（07 §7.11 · v5.0-rev4 调整）
  *
- * 非 `non_mystery` 题材下：
- *   - 覆盖率：非 retracted 条目覆盖的 block_id 数 / 总 block 数 < 0.6 → warn；
- *   - max_level：非 retracted 条目最高 level 未触达 `testimony` 或 `self_confession` → warn；
- *   - 例外：末 block paywall_level == "final_cliff" 时允许停在 physical / testimony。
+ * 阈值调整（v5.0-rev4）：
+ *   - 覆盖率阈值从 0.6 下调到 **0.5**（实战：医疗情感剧不可能每块都摆证据）；
+ *   - "跳过条件"从 `genre_hint == non_mystery` 统一到 **5 元白名单**：
+ *     `sweet_romance` 与 `fantasy` 视作 non_mystery 跳过覆盖率校验；
+ *     `revenge` / `suspense` / `general` 仍需校验（其中 general 门槛略低）。
  *
  * @param {Record<string, unknown>} meta             appendix.meta
  * @param {Array<Record<string, unknown>>} blocks    appendix.block_index[]
  * @param {Array<Record<string, unknown>>} warnings  appendixMeta.routing_warnings
  */
 function checkProofLadderCoverage(meta, blocks, warnings) {
-  // 题材例外：non_mystery 时跳过
+  // 题材例外：sweet_romance / fantasy / 旧口径 non_mystery 跳过
   const video =
     meta.video && typeof meta.video === 'object' ? /** @type {Record<string, unknown>} */ (meta.video) : null;
   const genre = video && typeof video.genre_hint === 'string' ? video.genre_hint : null;
-  if (genre === 'non_mystery') return;
+  const NON_MYSTERY_GENRES = new Set(['non_mystery', 'sweet_romance', 'fantasy']);
+  if (genre !== null && NON_MYSTERY_GENRES.has(genre)) return;
 
   const ladder = Array.isArray(meta.proof_ladder) ? meta.proof_ladder : [];
   if (ladder.length === 0) return; // 空 ladder 由 proof_ladder_check 本身判定
@@ -409,8 +721,11 @@ function checkProofLadderCoverage(meta, blocks, warnings) {
     if (lvl) levels.add(lvl);
   }
 
-  // 覆盖率门槛：≥ ceil(N × 0.6)
-  const minCovered = Math.ceil(totalBlocks * 0.6);
+  // 覆盖率门槛（v5.0-rev4）：≥ ceil(N × 0.5)
+  //   - 旧口径 0.6 对医疗情感、家庭伦理这类"并非每块都摆证据"的剧型过于苛刻；
+  //   - 0.5 的门槛在"至少半数 block 有证据"这个直觉下仍具判别力。
+  const COVERAGE_MIN_RATIO = 0.5;
+  const minCovered = Math.ceil(totalBlocks * COVERAGE_MIN_RATIO);
   if (coveredBlocks.size < minCovered) {
     warnings.push({
       code: 'proof_ladder_coverage_insufficient',
@@ -422,7 +737,7 @@ function checkProofLadderCoverage(meta, blocks, warnings) {
       },
       expected: {
         min_covered: minCovered,
-        ratio: '>= 0.6',
+        ratio: `>= ${COVERAGE_MIN_RATIO}`,
       },
       message:
         `proof_ladder 覆盖 ${coveredBlocks.size}/${totalBlocks} 个 block（需 ≥ ${minCovered}），` +

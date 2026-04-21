@@ -96,7 +96,14 @@ export function normalizeEditMapSd2V3(parsed) {
       continue;
     }
     const b = /** @type {Record<string, unknown>} */ (row);
-    const id = typeof b.id === 'string' ? b.id : '';
+    // v5.0-rev5 · 字段名软兼容：优先 block_id，回退 id
+    //   normalize_edit_map_sd2_v5 会把 LLM 误写的 id 升级成 block_id；但若调用方跳过了 v5 层，
+    //   这里仍需对裸 v5 appendix 做一次兜底，避免 block 被全部过滤掉。
+    const id = typeof b.block_id === 'string'
+      ? b.block_id
+      : typeof b.id === 'string'
+        ? b.id
+        : '';
     if (!id) {
       continue;
     }
@@ -123,11 +130,21 @@ export function normalizeEditMapSd2V3(parsed) {
   root.blocks = blocks;
 
   // ── skeleton_integrity_check：block_index 数量 vs markdown 段落数 ──
-  // v5.0-rev1：v3 `### 段落 N`；v5 自由格式改用 `### B{NN}`。双格式各数一次、取较大值。
+  // v5.0-rev5 · 三格式兼容：
+  //   - v3 子标题：`### 段落 N`
+  //   - v5 子标题：`### B{NN}`（Scheme B 早期 prompt 的产出）
+  //   - v5 紧凑组骨架：`B01｜4s｜场景：…｜节奏型：1`（prompt §II 原话："沿用 v4"，v4 就是紧凑单行）
+  //     注意全角竖线 `｜` 与半角 `|` 都兼容；且必须排除【组骨架】块外的误伤（B01 出现在正文里时前面不会有行首竖线结构）
   const v3Paragraphs = md.match(/^###\s*段落\s*\d+/gm) || [];
   const v5Paragraphs = md.match(/^###\s*B\d+\b/gm) || [];
-  const paragraphCount = Math.max(v3Paragraphs.length, v5Paragraphs.length);
-  const paragraphFormat = v5Paragraphs.length >= v3Paragraphs.length ? 'v5(### B\\d+)' : 'v3(### 段落 N)';
+  const v5Compact = md.match(/^B\d+\s*[｜|]/gm) || [];
+  const paragraphCount = Math.max(v3Paragraphs.length, v5Paragraphs.length, v5Compact.length);
+  const paragraphFormat =
+    v5Compact.length >= Math.max(v3Paragraphs.length, v5Paragraphs.length)
+      ? 'v5Compact(B{NN}｜)'
+      : v5Paragraphs.length >= v3Paragraphs.length
+        ? 'v5(### B\\d+)'
+        : 'v3(### 段落 N)';
   const blockCount = blocks.length;
   const skeletonOk = paragraphCount > 0 && blockCount === paragraphCount;
 
@@ -137,7 +154,7 @@ export function normalizeEditMapSd2V3(parsed) {
     );
   } else if (!skeletonOk && paragraphCount === 0) {
     console.warn(
-      `[normalizeEditMapSd2V3] skeleton_integrity_check FAIL: markdown_body 未找到 v3 '### 段落 N' 也未找到 v5 '### B{NN}' 标题；block_count=${blockCount}`
+      `[normalizeEditMapSd2V3] skeleton_integrity_check FAIL: markdown_body 未找到 v3 '### 段落 N' / v5 '### B{NN}' / v5 紧凑 'B{NN}｜' 任一骨架；block_count=${blockCount}`
     );
   }
 

@@ -84,14 +84,10 @@ async function main() {
   const inputObj = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
 
   /**
-   * v5.0 HOTFIX：取 edit_map_input.json 的 workflowControls，用来驱动 normalize 派生镜头预算。
+   * v5.0-rev3 · Scheme B：normalize 不再接收 workflowControls。
+   * 镜头预算推导链路：meta.target_shot_count（LLM 自填） > meta.parsed_brief（LLM 解析 brief） > meta.video（兜底）。
    */
-  const normalizeOpts = {
-    workflowControls:
-      inputObj && typeof inputObj === 'object' && inputObj.workflowControls && typeof inputObj.workflowControls === 'object'
-        ? inputObj.workflowControls
-        : undefined,
-  };
+  const normalizeOpts = {};
 
   /**
    * Stage 0 附加输入（可选 · 00 计划 §五 Phase 1）。
@@ -128,12 +124,40 @@ async function main() {
     .filter(Boolean)
     .join('\n');
 
+  /**
+   * v5.0-rev6 观测埋点：user prompt 字节数。
+   * 目的：方案 A（挂载 trim）生效后应从 ~38K chars 降到 ~20K chars。
+   */
+  console.log(
+    `[${SCRIPT_TAG}] user prompt 大小：${userMessage.length} chars（含 Stage 0 挂载：${normalizedPackage ? '是' : '否'}）`,
+  );
+
   const defaults = getYunwuResolvedDefaults();
   const modelOverride = typeof args.model === 'string' ? args.model : undefined;
   const noThinking = args['no-thinking'] === true;
 
+  /**
+   * v5.0-rev6 · claude-opus-4-7 守卫：
+   * 2026-04 实测，云雾网关对 claude-opus-4-7 / claude-opus-4-7-thinking 的
+   * prompt caching 有缺陷：system prompt 被判为 cache 命中但 text_tokens=0，
+   * 实际送入模型的只有 ~6 个 token，导致模型看不到 v5 schema，
+   * 回退到默认训练的 SD2 v4 风格 shots[] 结构，block_index 为空。
+   * 证据：usage.prompt_tokens=6 / cached_tokens=4753 / text_tokens=0；
+   *       reasoning_content 明文 "the system schema isn't visible to me"。
+   * 在官方 anthropic-beta 通道可用之前，EditMap 层硬拒绝 4-7 系列。
+   */
+  const effectiveModel = modelOverride || defaults.model;
+  if (/^claude-opus-4-7/i.test(effectiveModel)) {
+    console.error(
+      `[call_yunwu_editmap_sd2_v5] ❌ 拒绝使用 ${effectiveModel}：云雾网关对 4-7 系列 prompt caching 有缺陷，` +
+        `EditMap 场景不可用（system prompt 会被吞，block_index 为空）。\n` +
+        `    请改用 claude-opus-4-6-thinking（默认）或 claude-opus-4-6（需配合 --no-thinking，但 §0 时长预推理稳定性下降）。`,
+    );
+    process.exit(9);
+  }
+
   console.log(
-    `[call_yunwu_editmap_sd2_v5] 云雾 LLM：model=${modelOverride || defaults.model} base=${defaults.baseUrl} thinking=${!noThinking}`,
+    `[call_yunwu_editmap_sd2_v5] 云雾 LLM：model=${effectiveModel} base=${defaults.baseUrl} thinking=${!noThinking}`,
   );
   console.log('[call_yunwu_editmap_sd2_v5] 生成 EditMap-SD2 v5 …');
 
@@ -194,6 +218,29 @@ async function main() {
 
   const blocks = /** @type {{ blocks?: unknown }} */ (parsed).blocks;
   if (!Array.isArray(blocks) || blocks.length === 0) {
+    /**
+     * blocks 为空时落盘 LLM 原文 + 结构摘要，便于区分：
+     * - markdown_body / appendix 缺失（v3 早退未合成 blocks）；
+     * - block_index 为空或缺 block_id；
+     * - 骨架段落数与 block_index 不一致导致全被过滤（少见，会先体现在 _validation）。
+     */
+    const failDump = `${outPath}.failed_llm_raw.txt`;
+    try {
+      fs.writeFileSync(failDump, raw, 'utf8');
+    } catch {
+      // ignore
+    }
+    const root = parsed && typeof parsed === 'object' ? /** @type {Record<string, unknown>} */ (parsed) : {};
+    const ap = root.appendix && typeof root.appendix === 'object'
+      ? /** @type {Record<string, unknown>} */ (root.appendix)
+      : null;
+    const bi = ap && Array.isArray(ap.block_index) ? ap.block_index : [];
+    const md = root.markdown_body;
+    console.error(
+      `[${SCRIPT_TAG}] blocks 为空 · 诊断：顶层键=[${Object.keys(root).join(', ')}]；` +
+        `markdown_body=${typeof md === 'string' ? `string(len=${md.length})` : typeof md}；` +
+        `block_index 条数=${bi.length}；已写入 ${failDump}`,
+    );
     throw new Error(
       'EditMap v5 归一化后 blocks[] 为空：请检查云雾输出是否截断，或调大 YUNWU_EDITMAP_MAX_TOKENS。',
     );
@@ -378,7 +425,12 @@ async function main() {
         const overList = Array.isArray(fv.over_limit_blocks) ? fv.over_limit_blocks.join(', ') : '未知';
         console.error(
           `[${SCRIPT_TAG}] ❌ 硬门失败：max_block_duration_check=false（${overList} 超过 15s 硬上限）。` +
-            `retry 仍未改善，拒绝写盘。请调整 episodeShotCount/targetBlockCount 或修剧本后重试。`,
+            `retry 仍未改善，拒绝写盘。\n` +
+            `    建议处置（v5.0-rev3 Scheme B）：\n` +
+            `      1) 在 --brief 里加入明确的节奏描述（例如 "节奏偏紧，Block 切细一些"）；\n` +
+            `      2) 检查是否误加了 --no-thinking（v5 §0 依赖 thinking chain 做时长预推理）；\n` +
+            `      3) 若剧本本身动作密集 / 场景多，可把 --brief 描述改为 "镜头数 80 左右"、"Block 10+ 块" 等自然语言 hint；\n` +
+            `      4) 极端长段落确实无法切分时，回到剧本层把单个动作拆成多个 beat。`,
         );
         process.exit(7);
       }

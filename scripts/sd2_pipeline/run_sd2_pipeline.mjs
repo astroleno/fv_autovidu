@@ -276,8 +276,20 @@ async function main() {
   if (durationArg) {
     prepArgs.push('--duration', durationArg);
   }
+  /**
+   * v5.0-rev3 · Scheme B · deprecate warning：
+   *   --shot-hint / --target-block-count 不再进数据字段（workflowControls 已删），
+   *   prepare 层会把它们合并到 directorBrief 文末作为"软 hint"。
+   *   这里只打一条提示，保持 CLI 向后兼容。
+   */
   if (shotHintArg) {
     prepArgs.push('--shot-hint', shotHintArg);
+    if (sd2Version === 'v5') {
+      console.warn(
+        `[run_sd2_pipeline] ⚠ --shot-hint=${shotHintArg}：v5 已改为 brief 驱动推理，此值将作为"软 hint"合入 directorBrief 文末，不再进 workflowControls 数据字段。\n` +
+          `    建议：把镜头偏好写进 --brief 自然语言里（如"节奏偏紧，镜头 60 左右"），更符合 v5 Scheme B 设计。`,
+      );
+    }
   }
   if (motionBiasArg) {
     prepArgs.push('--motion-bias', motionBiasArg);
@@ -287,6 +299,11 @@ async function main() {
   }
   if (targetBlockCountArg) {
     prepArgs.push('--target-block-count', targetBlockCountArg);
+    if (sd2Version === 'v5') {
+      console.warn(
+        `[run_sd2_pipeline] ⚠ --target-block-count=${targetBlockCountArg}：v5 已改为 brief 驱动推理，此值将作为"软 hint"合入 directorBrief 文末，Block 切分仍由 LLM 基于剧本决定。`,
+      );
+    }
   }
   if (renderingStyleCli) {
     prepArgs.push('--rendering-style', renderingStyleCli);
@@ -325,6 +342,26 @@ async function main() {
     process.env.SD2_LLM_MODEL = 'qwen-plus';
     console.log(
       '[run_sd2_pipeline] --yunwu：EditMap 使用云雾；下游已设 SD2_LLM_MODEL=qwen-plus（可加 --downstream-model 覆盖）',
+    );
+  }
+
+  /**
+   * v5.0-rev2 · 防呆警示：`--no-thinking × v5 EditMap` 是已知风险组合。
+   *
+   * 背景：v5 EditMap Prompt §0（推理前置铁律）要求 LLM **先** 逐段预估时长、**再**切 Block、
+   *       **再**自检 ≤15s。这段"多步链式推理"高度依赖 thinking chain 展开。关掉 thinking 后，
+   *       Opus 更倾向直接吐 Block 产物，容易踩 §0 的 `max_block_duration_check` 硬门
+   *       （call_yunwu_editmap_sd2_v5.mjs H1：仍 false → exit 7 拒绝写盘）。
+   *
+   * 这里只发警示、不阻断——用户显式加了 `--no-thinking`，就尊重选择（也许剧本很短很稀疏，thinking 是浪费）。
+   * 但把风险写在眼前，避免下一次再看到 exit 7 时不知道为什么。
+   */
+  if (args['no-thinking'] === true && sd2Version === 'v5') {
+    console.warn(
+      '[run_sd2_pipeline] ⚠️  --no-thinking × v5 EditMap：Prompt §0（时长预推理）依赖 thinking chain，\n' +
+        '    关掉 thinking 后 Block 时长容易踩 ≤15s 硬门（call_yunwu_editmap_sd2_v5 H1 会 exit 7 拒写）。\n' +
+        '    建议：1) 默认 **不加** --no-thinking；2) 若剧本确实稀疏短小再用。\n' +
+        '    （v5.0-rev3 起 Block 切分 / 镜头数等由 LLM 从 directorBrief + 剧本推理，不再依赖输入侧数字。）',
     );
   }
 
@@ -562,7 +599,7 @@ async function main() {
 
   if (useBlockChain) {
     console.log(
-      '[run_sd2_pipeline] 各 Block 内 Director→Prompter 串联；Block 间错峰并发（stagger-ms）…',
+      '[run_sd2_pipeline] 各 Block 内 Director→Prompter 串联；Block 间全 fan-out 并发（v5.0-rev7 · 默认解锁 scene_run_id 串行）…',
     );
     const chainScript =
       sd2Version === 'v5'

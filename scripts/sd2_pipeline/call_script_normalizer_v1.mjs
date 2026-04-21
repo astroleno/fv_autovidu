@@ -285,6 +285,50 @@ async function main() {
     metaObj.generated_at = new Date().toISOString();
   }
 
+  /**
+   * v5.0-rev6 · Stage 0 产出健康检查（不阻塞，只 warn）
+   *
+   * 实测（leji-v5k）：qwen-plus / gemini 级别的 LLM 在复杂剧本下可能出现 schema 漂移，
+   * 典型症状：`beat_ledger` 丢失 / 只给一条、内容被错塞进 `scene_timeline[*]` 导致后者
+   * 膨胀到 30K+ 字符，user prompt 被打到 50K+。此处做独立健康检查，把诊断塞到
+   * `meta.health_warnings[]`，下游 `editmap_slices_v5.trimNormalizedPackageForEditMap`
+   * 再做溢出兜底。**不做阻塞式 ajv 校验**（Phase 1 仍走弱约束，上游按兜底跳过即可）。
+   */
+  /** @type {Array<{code: string, severity: string, actual: unknown, message: string}>} */
+  const healthWarnings = [];
+  const beatLedger = Array.isArray(pkg.beat_ledger) ? pkg.beat_ledger : null;
+  if (!beatLedger || beatLedger.length === 0) {
+    healthWarnings.push({
+      code: 'beat_ledger_missing_or_empty',
+      severity: 'warn',
+      actual: { present: Array.isArray(pkg.beat_ledger), length: beatLedger ? beatLedger.length : null },
+      message: 'Stage 0 LLM 未输出 beat_ledger 或为空，下游 EditMap 的段落提示会退化到 scriptContent 原文',
+    });
+  }
+  const sceneTimeline = Array.isArray(pkg.scene_timeline) ? pkg.scene_timeline : null;
+  if (sceneTimeline && sceneTimeline.length > 0) {
+    const sceneSize = JSON.stringify(sceneTimeline).length;
+    if (sceneSize > 10000) {
+      healthWarnings.push({
+        code: 'scene_timeline_suspiciously_large',
+        severity: 'warn',
+        actual: { size_bytes: sceneSize, entry_count: sceneTimeline.length },
+        message: `scene_timeline 序列化后 ${sceneSize} 字节（> 10K），疑似 beat_ledger 内容被错塞到此处；下游 trim 会做兜底裁剪`,
+      });
+    }
+  }
+  if (healthWarnings.length > 0) {
+    if (!Array.isArray(metaObj.health_warnings)) {
+      metaObj.health_warnings = [];
+    }
+    /** @type {Array<unknown>} */
+    const hwArr = /** @type {Array<unknown>} */ (metaObj.health_warnings);
+    for (const w of healthWarnings) {
+      hwArr.push(w);
+      console.warn(`[${SCRIPT_TAG}] health warning · ${w.code}: ${w.message}`);
+    }
+  }
+
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
   console.log(`[${SCRIPT_TAG}] 已写入 ${outPath}（package_id=${pkg.package_id}）`);

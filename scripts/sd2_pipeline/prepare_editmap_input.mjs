@@ -69,12 +69,16 @@ function manifestBucket(assetType, name) {
  * @returns {number}
  */
 function sumShotDurations(episode) {
+  /**
+   * v5.0-rev3 · Scheme B：返回 0 以让调用方用 DEFAULT_EPISODE_DURATION_SEC（120）统一兜底，
+   * 不在此处返回硬编码 60。旧版本依赖 60 的外部消费者：已检查仅 prepare 内部使用。
+   */
   if (!episode || typeof episode !== 'object') {
-    return 60;
+    return 0;
   }
   const scenes = /** @type {{ scenes?: unknown[] }} */ (episode).scenes;
   if (!Array.isArray(scenes)) {
-    return 60;
+    return 0;
   }
   let total = 0;
   for (const sc of scenes) {
@@ -97,33 +101,36 @@ function sumShotDurations(episode) {
 }
 
 /**
- * 从 directorBrief 自然语言抽取「单集时长 / 目标镜头数」数值。
- * 优先级在 buildEditMapInput 内与 CLI 配合：显式 --duration/--shot-hint 始终覆盖此处结果。
- * 与 EditMap 提示词中「parsed_brief」互补：prepare 侧先把可确定数字写入 JSON，便于离线核对。
+ * 从 directorBrief 自然语言中仅解析「单集总时长」作为 episodeDuration 的最后兜底。
+ *
+ * v5.0-rev3（Scheme B · 去锚点）：**不再**从 brief 抽取镜头数 / block 数 / 时长区间等"推理空间"
+ * 数字。这些数字应由 EditMap LLM 自己根据 brief + 剧本推理（写入 meta.parsed_brief），
+ * prepare 层不再做任何"正则 → 数据锚"的降级处理。
+ *
+ * 保留时长解析是因为 episodeDuration 是**物理事实**（客户订单长度），LLM 无法从剧本自推。
  *
  * @param {string} text
- * @returns {{ episodeDuration?: number, shotCountApprox?: number }}
+ * @returns {{ episodeDuration?: number }}
  */
 function parseBriefStructuredHints(text) {
-  const out = /** @type {{ episodeDuration?: number, shotCountApprox?: number }} */ ({});
+  const out = /** @type {{ episodeDuration?: number }} */ ({});
   if (!text || typeof text !== 'string') {
     return out;
   }
-  const dur = text.match(/单集总时长\s*(\d+)\s*秒/);
-  if (dur && dur[1]) {
-    const n = parseInt(dur[1], 10);
-    if (Number.isFinite(n) && n > 0) {
-      out.episodeDuration = n;
-    }
-  }
-  const shot =
-    text.match(/目标(?:剪辑)?镜头数约\s*(\d+)/) ||
-    text.match(/目标镜头数约\s*(\d+)/) ||
-    text.match(/镜头数约\s*(\d+)/);
-  if (shot && shot[1]) {
-    const n = parseInt(shot[1], 10);
-    if (Number.isFinite(n) && n > 0) {
-      out.shotCountApprox = n;
+  const patterns = [
+    /单集总时长\s*(\d+)\s*秒/,
+    /本集(?:约|共)?\s*(\d+)\s*秒/,
+    /每集(?:约|共)?\s*(\d+)\s*秒/,
+    /总时长\s*(\d+)\s*秒/,
+  ];
+  for (const re of patterns) {
+    const m = text.match(re);
+    if (m && m[1]) {
+      const n = parseInt(m[1], 10);
+      if (Number.isFinite(n) && n > 0) {
+        out.episodeDuration = n;
+        break;
+      }
     }
   }
   return out;
@@ -201,42 +208,119 @@ function normalizeMotionBias(raw) {
   return MOTION_BIAS_MAP[trimmed] || 'balanced';
 }
 
+/** v5.0-rev3 · Scheme B：默认单集时长（当 CLI / brief / episode 都没有给时兜底） */
+const DEFAULT_EPISODE_DURATION_SEC = 120;
+
+/** v5.0-rev3 · Scheme B：默认兜底镜头数的软参考，仅用于写入 brief 的参考区间（不进数据字段） */
+const DEFAULT_AVG_SHOT_DURATION_SEC = 2;
+
 /**
- * 由单集时长与「目标镜头数」生成 workflowControls（供 EditMap-SD2 读取；Block 数仍受 Prompt 内规则约束）。
- * @param {number} durationSec
- * @param {number} shotCountApprox
- * @param {string} [motionBias] 英文标准值
- * @returns {Record<string, unknown>}
+ * v5.0-rev3 · Scheme B 核心：构造"有效 directorBrief"——一段**自然语言**，
+ * 作为 EditMap LLM 的**最高优先级约束**（高于任何数据字段默认值）。
+ *
+ * 设计原则（用户落地决策 2026-04-17）：
+ *   - 用户给什么就用什么（brief / shot-hint / block-count 等 CLI hint）；
+ *   - 没给的，**不进 workflowControls 数字表**，而是合并成一段自然语言后缀给 LLM，
+ *     让 LLM 自己权衡"要不要参考这个默认值"；
+ *   - 剧本与 brief 永远优先；默认值只在"完全没输入"时兜底。
+ *
+ * 三段结构：
+ *   A. 用户自己的 brief（若有）；
+ *   B. 系统补齐段（若用户 brief 未提时长 / 镜头数，由这里补——自然语言软提示，非硬约束）；
+ *   C. 自主推理授权（明确告诉 LLM"默认值仅供参考，剧本优先"）。
+ *
+ * @param {{ userBrief: string, episodeDuration: number, shotHintFromCli?: number, targetBlockCountFromCli?: number }} input
+ * @returns {string}
  */
-function buildDefaultWorkflowControls(durationSec, shotCountApprox, motionBias) {
-  const targetBlockDurationSec = 15;
-  const rawCount = Math.round(durationSec / targetBlockDurationSec);
-  const targetBlockCount = Math.max(4, Math.min(12, rawCount || 8));
-  const avgShotDuration = shotCountApprox > 0
-    ? Math.round((durationSec / shotCountApprox) * 10) / 10
-    : null;
-  const biasLabel = motionBias || 'balanced';
-  const speedBias = MOTION_TO_SPEED[biasLabel] || 'neutral';
-  return {
-    targetBlockDurationSec,
-    targetBlockCount,
-    blockDurationRange: { min_sec: 13, max_sec: 17 },
-    shotCountTargetApprox: shotCountApprox,
-    avgShotDuration,
-    motionBias: biasLabel,
-    speedBias,
-    editorialDensityNote:
-      `单集总时长 ${durationSec} 秒；目标镜头数约 ${shotCountApprox}（avg_shot_duration ≈ ${avgShotDuration}s）；运镜偏好 ${biasLabel}（speed_bias=${speedBias}）。`,
-  };
+function composeEffectiveBrief(input) {
+  const { userBrief, episodeDuration, shotHintFromCli, targetBlockCountFromCli } = input;
+  const parts = /** @type {string[]} */ ([]);
+
+  const trimmedUser = (userBrief || '').trim();
+  if (trimmedUser) {
+    parts.push(trimmedUser);
+  }
+
+  /**
+   * 系统补齐段：只有在用户 brief 里没写对应信息时才追加。
+   * 用关键词粗查（同 parseBriefStructuredHints 的启发式），漏报不致命（LLM 可兼容）。
+   */
+  const userMentionsDuration = /\d+\s*秒|总时长|每集|本集|单集/.test(trimmedUser);
+  const userMentionsShotCount = /镜头|分镜|shot|镜数/i.test(trimmedUser);
+  const userMentionsBlockCount = /\d+\s*(?:块|段|组|block)/i.test(trimmedUser);
+
+  const suppl = /** @type {string[]} */ ([]);
+  if (!userMentionsDuration) {
+    suppl.push(`本集约 ${episodeDuration} 秒。`);
+  }
+  if (!userMentionsShotCount) {
+    const ref = Math.round(episodeDuration / DEFAULT_AVG_SHOT_DURATION_SEC);
+    const lo = Math.round(ref * 0.75);
+    const hi = Math.round(ref * 1.25);
+    suppl.push(
+      `镜头总数请基于剧本密度、钩子分布、情绪曲线自主决定（参考区间 ${lo}–${hi}，以剧本节奏为准）。`,
+    );
+  }
+  if (!userMentionsBlockCount) {
+    suppl.push(
+      `Block 切分数量与每块时长由你根据剧本自主决定（铁律：每块 4–15 秒、总时长守恒）。`,
+    );
+  }
+
+  /** CLI 仍传了 hint 的向后兼容：把它们合入 brief 文末（软提示），而不是硬塞数据字段 */
+  if (typeof shotHintFromCli === 'number' && shotHintFromCli > 0) {
+    suppl.push(`（CLI 参考 hint：镜头数约 ${shotHintFromCli}，剧本节奏仍然优先。）`);
+  }
+  if (typeof targetBlockCountFromCli === 'number' && targetBlockCountFromCli > 0) {
+    suppl.push(
+      `（CLI 参考 hint：Block 约 ${targetBlockCountFromCli} 块，剧本节奏仍然优先。）`,
+    );
+  }
+
+  if (suppl.length > 0) {
+    parts.push(suppl.join(' '));
+  }
+
+  if (parts.length === 0) {
+    /** 完全兜底：没有任何用户输入，也没有 CLI 补齐 */
+    parts.push(
+      `本集约 ${episodeDuration} 秒。Block 切分、每块时长、总镜头数均由你根据剧本自主决定；铁律：每块 4–15 秒、总时长守恒。`,
+    );
+  }
+
+  return parts.join('\n\n');
 }
 
 /**
+ * v5.0-rev3 · Scheme B：构造 EditMap 输入 JSON。
+ *
+ * **字段分层**（用户落地决策 2026-04-17）：
+ *
+ *  [A] 物理事实 / 必给（LLM 不能自推）
+ *      - scriptContent     剧本
+ *      - episodeDuration   总时长（缺省 120s）
+ *      - assetManifest / referenceAssets   可用资产清单
+ *
+ *  [B] 自然语言约束 · 最高优先级（优先级 > 任何默认值）
+ *      - directorBrief     用户自然语言 brief（由 composeEffectiveBrief 与默认兜底合并）
+ *
+ *  [C] 审美诉求（用户显式给了就用）
+ *      - motionBias / genre / renderingStyle / artStyle
+ *
+ *  [D] 已删除字段（v5.0-rev3 去锚点重构）
+ *      - ❌ workflowControls             → 所有数字让 LLM 自行从 brief 推理
+ *      - ❌ episodeShotCount（顶层）     → 合入 brief 文案
+ *      - ❌ globalSynopsis 头部前缀      → 不再污染剧本入口
+ *
+ * CLI 仍允许传 --shot-hint / --target-block-count 作为"软 hint"，但**不再**进数据字段，
+ * 而是通过 composeEffectiveBrief 合入 directorBrief 文末。
+ *
  * @param {unknown} episode episode.json 解析结果
- * @param {{ globalSynopsis?: string, scriptContent?: string, episodeDuration?: number, shotCountApprox?: number, motionBias?: string, genre?: string, renderingStyle?: string, artStyle?: string, workflowControls?: object, targetBlockCount?: number, directorBrief?: string }} options
- * @returns {{ globalSynopsis: string, scriptContent: string, assetManifest: object, episodeDuration: number, referenceAssets: Array<{ assetName: string, assetType: string }>, workflowControls?: object, directorBrief?: string }}
+ * @param {{ globalSynopsis?: string, scriptContent?: string, episodeDuration?: number, shotCountApprox?: number, motionBias?: string, genre?: string, renderingStyle?: string, artStyle?: string, targetBlockCount?: number, directorBrief?: string }} options
+ * @returns {{ globalSynopsis: string, scriptContent: string, assetManifest: object, episodeDuration: number, referenceAssets: Array<{ assetName: string, assetType: string }>, directorBrief: string, motionBias: string }}
  */
 function buildEditMapInput(episode, options) {
-  let globalSynopsis = options.globalSynopsis || '';
+  const globalSynopsis = (options.globalSynopsis || '').trim();
   let scriptContent = options.scriptContent || '';
   if (!scriptContent) {
     scriptContent = buildScriptFromShots(episode);
@@ -245,35 +329,42 @@ function buildEditMapInput(episode, options) {
   const briefRaw = typeof options.directorBrief === 'string' ? options.directorBrief.trim() : '';
   const fromBrief = briefRaw ? parseBriefStructuredHints(briefRaw) : {};
 
-  /** 显式 CLI > directorBrief 解析 > episode 分镜累加 */
+  /**
+   * episodeDuration 解析优先级（Scheme B · 仅保留物理事实）：
+   *   1. CLI --duration
+   *   2. brief 文本里的"本集 N 秒"（仅时长，不再抽镜头数）
+   *   3. episode.json 分镜累加
+   *   4. 默认兜底 DEFAULT_EPISODE_DURATION_SEC（120s）
+   */
   const explicitDuration =
     typeof options.episodeDuration === 'number' && options.episodeDuration > 0
       ? options.episodeDuration
       : undefined;
-  /** @type {number | undefined} */
-  const explicitShot =
-    typeof options.shotCountApprox === 'number' && options.shotCountApprox > 0
-      ? options.shotCountApprox
-      : undefined;
-
   const episodeDuration =
     explicitDuration !== undefined
       ? explicitDuration
       : typeof fromBrief.episodeDuration === 'number' && fromBrief.episodeDuration > 0
         ? fromBrief.episodeDuration
-        : sumShotDurations(episode);
+        : sumShotDurations(episode) || DEFAULT_EPISODE_DURATION_SEC;
 
-  /** @type {number | undefined} */
-  const shotHint =
-    explicitShot !== undefined
-      ? explicitShot
-      : typeof fromBrief.shotCountApprox === 'number' && fromBrief.shotCountApprox > 0
-        ? fromBrief.shotCountApprox
-        : undefined;
-  if (shotHint !== undefined) {
-    const prefix = `【编排附加条件】单集总时长 ${episodeDuration} 秒；目标剪辑镜头数约 ${shotHint}（传统分镜/剪辑密度参考，Block 划分仍须满足 EditMap-SD2 时长守恒与 Schema）。\n\n`;
-    globalSynopsis = prefix + globalSynopsis;
-  }
+  /** CLI 里的镜头数 / block 数 hint：不再进数据字段，而是合入 brief 文末 */
+  const shotHintFromCli =
+    typeof options.shotCountApprox === 'number' && options.shotCountApprox > 0
+      ? options.shotCountApprox
+      : undefined;
+  const targetBlockCountFromCli =
+    typeof options.targetBlockCount === 'number' &&
+    Number.isFinite(options.targetBlockCount) &&
+    options.targetBlockCount > 0
+      ? Math.round(options.targetBlockCount)
+      : undefined;
+
+  const effectiveBrief = composeEffectiveBrief({
+    userBrief: briefRaw,
+    episodeDuration,
+    shotHintFromCli,
+    targetBlockCountFromCli,
+  });
 
   const assets = /** @type {{ assets?: unknown[] }} */ (episode).assets;
   const manifest = {
@@ -311,22 +402,16 @@ function buildEditMapInput(episode, options) {
 
   const motionBias = normalizeMotionBias(options.motionBias);
 
+  /** @type {Record<string, unknown>} */
   const out = {
     globalSynopsis,
     scriptContent,
     assetManifest: manifest,
     episodeDuration,
     referenceAssets,
+    directorBrief: effectiveBrief,
+    motionBias,
   };
-
-  if (shotHint !== undefined) {
-    out.episodeShotCount = shotHint;
-  }
-  out.motionBias = motionBias;
-
-  if (briefRaw) {
-    out.directorBrief = briefRaw;
-  }
 
   const GENRE_ENUM = /** @type {const} */ (['sweet_romance', 'revenge', 'suspense', 'fantasy', 'general']);
   if (options.genre && GENRE_ENUM.includes(/** @type {typeof GENRE_ENUM[number]} */ (options.genre))) {
@@ -342,27 +427,7 @@ function buildEditMapInput(episode, options) {
     out.artStyle = ars;
   }
 
-  if (options.workflowControls && typeof options.workflowControls === 'object') {
-    out.workflowControls = options.workflowControls;
-  } else if (shotHint !== undefined) {
-    out.workflowControls = buildDefaultWorkflowControls(episodeDuration, shotHint, motionBias);
-  }
-
-  const tbc = options.targetBlockCount;
-  if (tbc !== undefined && Number.isFinite(tbc)) {
-    const n = Math.max(4, Math.min(12, Math.round(Number(tbc))));
-    const base =
-      typeof out.workflowControls === 'object' && out.workflowControls !== null
-        ? /** @type {Record<string, unknown>} */ (out.workflowControls)
-        : buildDefaultWorkflowControls(
-            episodeDuration,
-            shotHint !== undefined ? shotHint : Math.max(8, Math.round(episodeDuration / 2)),
-            motionBias,
-          );
-    out.workflowControls = { ...base, targetBlockCount: n };
-  }
-
-  return out;
+  return /** @type {any} */ (out);
 }
 
 /**
@@ -383,6 +448,9 @@ export {
   MOTION_BIAS_MAP,
   MOTION_TO_SPEED,
   parseBriefStructuredHints,
+  composeEffectiveBrief,
+  DEFAULT_EPISODE_DURATION_SEC,
+  DEFAULT_AVG_SHOT_DURATION_SEC,
 };
 
 function main() {
@@ -390,7 +458,14 @@ function main() {
   const episodePath = /** @type {string | undefined} */ (args.episode);
   if (!episodePath) {
     console.error(
-      '用法: --episode <episode.json> [--script-file e1.md] [--global-synopsis "..."] [--global-synopsis-file path.md] [--duration 120] [--shot-hint 60] [--motion-bias 平衡] [--genre sweet_romance] [--rendering-style "真人电影"] [--art-style "冷调偏青"] [--target-block-count 6] [--brief "单集总时长120秒；目标镜头数约60。现代都市医疗情感短剧，真人电影风格。"] [--brief-file brief.txt] [--output out.json]',
+      '用法: --episode <episode.json> [--script-file e1.md] [--global-synopsis "..."] [--global-synopsis-file path.md]\n' +
+        '  [--duration 120]   单集时长（默认 120；物理事实，LLM 不能自推）\n' +
+        '  [--motion-bias 平衡] [--genre sweet_romance] [--rendering-style "真人电影"] [--art-style "冷调偏青"]\n' +
+        '  [--brief "本集约120秒，节奏偏紧，参考 60 镜"] / [--brief-file brief.txt]\n' +
+        '                     自然语言约束，优先级最高（高于所有默认值）\n' +
+        '  [--shot-hint 60]   ⚠ deprecated：合入 brief 文末，不再进数据字段\n' +
+        '  [--target-block-count 8]   ⚠ deprecated：合入 brief 文末，不再进数据字段\n' +
+        '  [--output out.json]',
     );
     process.exit(2);
   }

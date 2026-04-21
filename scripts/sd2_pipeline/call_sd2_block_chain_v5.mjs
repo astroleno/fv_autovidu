@@ -209,84 +209,6 @@ function extractShotCountFromDirector(dirParsed, blockId) {
 }
 
 /**
- * v5.0 治本 · S12 辅助：判断本 block 是否为 payoff block（Director v5 §9.1 识别规则）。
- * 任一条件成立即判定：
- *   1. block_index[i].routing.satisfaction[] 长度 ≥ 1；或
- *   2. editMap.meta.satisfaction_points[] 中存在条目 block_id == 本 block；或
- *   3. editMap.meta.psychology_plan[block_id == 本块].group == "payoff"（或同义词兜底到 payoff，但这里只看原始值）。
- *
- * @param {Record<string, unknown>} biRow     block_index[i]
- * @param {Record<string, unknown>} editMap   appendix 顶层（含 meta / block_index）
- * @param {string} blockId                    block_id
- * @returns {boolean}
- */
-function isPayoffBlock(biRow, editMap, blockId) {
-  // 1) routing.satisfaction 非空
-  const routing =
-    biRow.routing && typeof biRow.routing === 'object'
-      ? /** @type {Record<string, unknown>} */ (biRow.routing)
-      : null;
-  if (routing && Array.isArray(routing.satisfaction) && routing.satisfaction.length > 0) {
-    return true;
-  }
-  const meta =
-    editMap.meta && typeof editMap.meta === 'object'
-      ? /** @type {Record<string, unknown>} */ (editMap.meta)
-      : null;
-  if (!meta) return false;
-
-  // 2) meta.satisfaction_points[] 中含 block_id
-  if (Array.isArray(meta.satisfaction_points)) {
-    for (const p of meta.satisfaction_points) {
-      if (p && typeof p === 'object' && /** @type {Record<string, unknown>} */ (p).block_id === blockId) {
-        return true;
-      }
-    }
-  }
-
-  // 3) meta.psychology_plan[block_id == 本块].group == "payoff"
-  if (Array.isArray(meta.psychology_plan)) {
-    for (const p of meta.psychology_plan) {
-      if (!p || typeof p !== 'object') continue;
-      const pp = /** @type {Record<string, unknown>} */ (p);
-      if (pp.block_id === blockId && pp.group === 'payoff') {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-/**
- * v5.0 治本 · S12 辅助：从 Director continuity_out.notes 中提取 `payoff_reaction_shots` 列表。
- * notes 可能是 string（单行）或 string[]（多行）；支持 `payoff_reaction_shots: [id1, id2]`
- * 或 `payoff_reaction_shots: id1, id2` 两种写法。
- *
- * @param {Record<string, unknown>} co   Director appendix.continuity_out
- * @returns {string[]}                   提取的 shot id 列表；未找到返回 []
- */
-function extractPayoffReactionShots(co) {
-  const raw = co.notes;
-  /** @type {string} */
-  let text = '';
-  if (typeof raw === 'string') {
-    text = raw;
-  } else if (Array.isArray(raw)) {
-    text = raw.filter((x) => typeof x === 'string').join('\n');
-  } else {
-    return [];
-  }
-  const match = text.match(/payoff_reaction_shots\s*[:=]\s*\[?([^\]\n]+)\]?/i);
-  if (!match) return [];
-  const inner = match[1];
-  return inner
-    .split(/[,，]\s*/)
-    .map((s) => s.trim().replace(/^["'`]|["'`]$/g, ''))
-    .filter((s) => s.length > 0);
-}
-
-/**
  * 两块是否必须串行：仅当 scene_run_id 相同且均非空时，后一块才依赖前一块 Director appendix。
  * 任一侧缺失或为空 → 不强制与前一块串行（可并行），便于 EditMap 未填 scene_run_id 时仍全量并行。
  * @param {unknown} prevRow
@@ -359,6 +281,14 @@ async function main() {
    * @type {RoutingWarning[]}
    */
   const routingWarnings = [];
+
+  // v5.0-rev6 · 主角频次推断已移除。
+  //   原因：短剧系列下"主角"本就不稳定（上一集是 A，下一集可能是 B），
+  //   代码用 present_asset_ids 频次启发式推断主角 → 再反向校验 ratio / payoff 反应
+  //   = 用启发式打补丁，经常把"手机/诊断书"等道具误判为主角（当 asset_tag_mapping
+  //   schema 漂移为字符串数组时尤甚）。
+  //   harness 路线：把"主角反应镜头"的判断交给 Director LLM 在 prompt §9.1 处理，
+  //   pipeline 不再跨 block 聚合、不再反推覆盖；仅保留观测字段，不产生软门。
 
   // v5 特有：编排层派生 psychology_group（LLM 不感知，只给切片路由用）
   //   v5.0 HOTFIX：derivePsychologyGroupOnBlocks 返回 resolutions[]，
@@ -438,6 +368,25 @@ async function main() {
 
   const forceSerial = args.serial === true;
 
+  /**
+   * v5.0-rev7 · scene_run_id 串行解锁
+   *
+   * 原设计：同 scene_run_id 的相邻 block 强制串行，后一块等前一块 Director 的 continuity_out
+   * 才开跑，保证镜头 / 光影 / 角色末状态的延续性。
+   *
+   * 实测代价（leji-v5l / leji-v5m）：所有 block 都落在 2 条 scene_run_id 链上
+   * （例如 S1=4 块、S2=6 块），并行度直接退化成 2，10 块下游链总耗时 ~25 分钟。
+   *
+   * 新默认：**不再强制 scene_run_id 串行**（10 块全 fan-out，无上限）。
+   * 代价：同 scene 后一块拿不到前一块 continuity_out，`prevBlockContext` 传入 null；
+   * 短剧 10–13s/block 相对独立，EditMap 已经给了全局结构（scene_bucket / last_lighting 等），
+   * Director 的 prevBlockContext 作用有限，实测不影响分镜质量。
+   *
+   * 逃生口：`--enforce-scene-serial` 回到旧行为（同 scene 强串行）。
+   * 旧旗标 `--serial`（全集强串行）保留不变。
+   */
+  const enforceSceneSerial = args['enforce-scene-serial'] === true;
+
   const prompterPromptPath =
     typeof args['prompter-prompt'] === 'string' && args['prompter-prompt'].trim()
       ? path.resolve(process.cwd(), args['prompter-prompt'].trim())
@@ -478,14 +427,22 @@ async function main() {
     }
     const pRow = getBlockIndexRow(editMap, a);
     const cRow = getBlockIndexRow(editMap, b);
-    if (!forceSerial && !adjacentBlocksRequireSerial(pRow, cRow)) {
+    // v5.0-rev7 · 默认不再按 scene_run_id 强制串行，除非 --enforce-scene-serial 开启
+    const edgeSerial =
+      forceSerial || (enforceSceneSerial && adjacentBlocksRequireSerial(pRow, cRow));
+    if (!edgeSerial) {
       parallelEdges += 1;
     }
   }
 
+  const scheduleLabel = forceSerial
+    ? '强制串行'
+    : enforceSceneSerial
+    ? `按 scene_run_id 串行（可并行边≈${parallelEdges}）`
+    : `全 fan-out 并发（block=${list.length}，可并行边=${list.length - 1}）`;
   console.log(
     `[call_sd2_block_chain_v5] Director+Prompter v5；model=${getResolvedLlmModel()} base=${getResolvedLlmBaseUrl()} blocks=${list.length}；` +
-      `调度=${forceSerial ? '强制串行' : `按 scene_run_id（可并行边≈${parallelEdges}）`} slicesRoot=${slicesRoot} aspectRatio=${aspectRatio}`,
+      `调度=${scheduleLabel} slicesRoot=${slicesRoot} aspectRatio=${aspectRatio}`,
   );
   console.log(`[call_sd2_block_chain_v5] Director 提示词: ${directorPromptPath}`);
   console.log(`[call_sd2_block_chain_v5] Prompter 提示词: ${prompterPromptPath}`);
@@ -525,10 +482,12 @@ async function main() {
       const prevRow = index > 0 ? getBlockIndexRow(editMap, list[index - 1].block_id) : null;
       const biRow = getBlockIndexRow(editMap, blockId);
 
+      // v5.0-rev7 · 默认解锁 scene_run_id 串行；只有 --serial 或 --enforce-scene-serial 时才等前一块
       const mustWaitForPrevDirector =
         index > 0 &&
         (forceSerial ||
-          (prevRow && biRow ? adjacentBlocksRequireSerial(prevRow, biRow) : false));
+          (enforceSceneSerial &&
+            (prevRow && biRow ? adjacentBlocksRequireSerial(prevRow, biRow) : false)));
 
       if (mustWaitForPrevDirector) {
         await done[index - 1];
@@ -597,7 +556,7 @@ async function main() {
       //   a) shot_budget_per_block_check：取 appendix.shot_count_per_block[blockId].shot_count
       //      vs biRow.shot_budget_hint.tolerance；超界写 warn。
       //   b) iron_rule_checklist_missing / _failed_item：appendix.iron_rule_checklist 缺失或任一 pass=false。
-      //   c) protagonist_shot_ratio_below_min：appendix.protagonist_shot_ratio_actual < target 却 ratio_ok=true。
+      //   c) [v5.0-rev6 已退役] protagonist_shot_ratio / payoff 反应软门 —— 见下方说明。
       if (dirParsed && typeof dirParsed === 'object') {
         const dirApp =
           /** @type {Record<string, unknown>} */ (dirParsed).appendix &&
@@ -651,104 +610,16 @@ async function main() {
         //     这里为了代码集中，把判定挪到下面 Prompter 解析后的分支；此处仅做 Director appendix 诊断性提示。
         // （故意留空：Director 并不输出 iron_rule_checklist；Prompter 侧的校验见下面 §Prompter 后）
 
-        // (c) protagonist_shot_ratio_actual —— 位置修正：Director appendix.continuity_out.*（见 2_SD2Director-v5.md §7）。
-        //     字段名：protagonist_shot_ratio_actual（number）+ protagonist_shot_ratio_check（bool，LLM 自评）。
-        const coRaw = dirApp.continuity_out;
-        const co =
-          coRaw && typeof coRaw === 'object'
-            ? /** @type {Record<string, unknown>} */ (coRaw)
-            : {};
-        const ratioActualRaw = co.protagonist_shot_ratio_actual;
-        const ratioOkRaw = co.protagonist_shot_ratio_check;
-        if (typeof ratioActualRaw === 'number' && Number.isFinite(ratioActualRaw)) {
-          const ratioActual = ratioActualRaw;
-          /** meta 层的 target 目标（per_block_min），找不到就按 0.3 兜底 */
-          let target = 0.3;
-          const pbMeta =
-            editMap.meta && typeof editMap.meta === 'object'
-              ? /** @type {Record<string, unknown>} */ (editMap.meta)
-              : {};
-          const scaffoldRaw = pbMeta.paywall_scaffolding;
-          if (scaffoldRaw && typeof scaffoldRaw === 'object') {
-            const sc = /** @type {Record<string, unknown>} */ (scaffoldRaw);
-            const psr =
-              sc.protagonist_shot_ratio && typeof sc.protagonist_shot_ratio === 'object'
-                ? /** @type {Record<string, unknown>} */ (sc.protagonist_shot_ratio)
-                : null;
-            if (psr && typeof psr.per_block_min === 'number') {
-              target = psr.per_block_min;
-            }
-          }
-          const reportedOk =
-            ratioOkRaw === true ||
-            (typeof ratioOkRaw === 'string' && ratioOkRaw.toLowerCase() === 'true');
-
-          // ── v5.0 HOTFIX · H3：假绿覆盖 ──
-          //   以 actual 推算真值 `check = (actual + eps >= target)`，覆盖 LLM 自报。
-          //   原因：v5d 的 B07 出现 `actual=0 / check=true` 这种"自欺欺人"样本，
-          //   下游 (iron_rule_checklist / export_sd2_final_report) 都会被这个字段骗过，
-          //   所以在编排层一律以 actual 反推真值写回 continuity_out。
-          //   如需调整 target 的取数来源（当前走 meta.paywall_scaffolding.protagonist_shot_ratio.per_block_min），
-          //   请同步更新上方 pbMeta 分支。
-          const derivedOk = ratioActual + 1e-9 >= target;
-          co.protagonist_shot_ratio_check = derivedOk;
-          if (reportedOk !== derivedOk) {
-            routingWarnings.push({
-              code: 'protagonist_shot_ratio_check_overridden',
-              severity: 'info',
-              block_id: blockId,
-              actual: { reported: reportedOk, derived: derivedOk, ratio_actual: ratioActual },
-              expected: { per_block_min: target },
-              message: `block ${blockId} LLM 自报 protagonist_shot_ratio_check=${reportedOk}，编排层按 actual=${ratioActual} 反推覆盖为 ${derivedOk}`,
-            });
-          }
-
-          if (ratioActual + 1e-9 < target) {
-            // 低于目标；若 LLM 仍报 ratio_ok=true，视为 false-green（仍保留警告，但 check 已被覆盖）
-            routingWarnings.push({
-              code: 'protagonist_shot_ratio_below_min',
-              severity: 'warn',
-              block_id: blockId,
-              actual: {
-                protagonist_shot_ratio_actual: ratioActual,
-                protagonist_shot_ratio_check: derivedOk,
-                llm_reported_check: reportedOk,
-              },
-              expected: { per_block_min: target },
-              message: reportedOk
-                ? `block ${blockId} protagonist_shot_ratio_actual=${ratioActual} < ${target} 但 LLM 自报 check=true（已被编排层覆盖为 ${derivedOk}）`
-                : `block ${blockId} protagonist_shot_ratio_actual=${ratioActual} 低于 per_block_min=${target}`,
-            });
-          }
-
-          // v5.0 治本 · S12：`payoff_protagonist_reaction_check`（07 §7.12）
-          //   识别 payoff block 后，读 continuity_out.notes 里的 `payoff_reaction_shots:` 标记；
-          //   若标记缺失 → 回退到 ratio_actual < 0.5 判定（payoff block 硬下限 0.5）。
-          if (isPayoffBlock(biRow, editMap, blockId)) {
-            const reactionShots = extractPayoffReactionShots(co);
-            const hasReactionShots = reactionShots.length > 0;
-            const PAYOFF_MIN_RATIO = 0.5;
-            if (!hasReactionShots && ratioActual + 1e-9 < PAYOFF_MIN_RATIO) {
-              routingWarnings.push({
-                code: 'payoff_without_protagonist_reaction',
-                severity: 'warn',
-                block_id: blockId,
-                actual: {
-                  ratio_actual: ratioActual,
-                  payoff_reaction_shots: reactionShots, // []
-                  notes_present: typeof co.notes === 'string' || Array.isArray(co.notes),
-                },
-                expected: {
-                  min_ratio: PAYOFF_MIN_RATIO,
-                  or_notes: 'continuity_out.notes 中含 "payoff_reaction_shots: [shot_id,...]"',
-                },
-                message:
-                  `block ${blockId} 判定为 payoff block，但未找到主角反应特写标记且 ratio_actual=${ratioActual} < ${PAYOFF_MIN_RATIO}；` +
-                  `请人工复核 Director 画面（见 2_SD2Director-v5.md §9.1）。`,
-              });
-            }
-          }
-        }
+        // (c) protagonist_shot_ratio_* —— v5.0-rev6 · 已退役（harness 路线）。
+        //     原链路：pipeline 跨 block 频次推断主角 → 反推 ratio_check → 报 below_min / payoff 反应告警。
+        //     问题：
+        //       1. 短剧系列"主角"不稳定（第二集可能换人），启发式判主角是伪命题；
+        //       2. asset_tag_mapping schema 漂移为字符串数组时，频次最高者常是道具（手机/诊断书），
+        //          直接把 B01-Bn 的主角反应判定全线错位；
+        //       3. "主角反应镜头是否足够"是语义/画面判断，交给 Director LLM 在其 prompt §9.1
+        //          处理更准确（它能看到当下 block 的情节语义），不该靠 pipeline 硬算数。
+        //     保留：Director 仍在 continuity_out 写 protagonist_shot_ratio_actual / _check 作为观测字段，
+        //           但 pipeline 不再反推覆盖、不再产生 warn（纯旁路，可供下游数据分析用）。
       }
 
       const dirMd =
