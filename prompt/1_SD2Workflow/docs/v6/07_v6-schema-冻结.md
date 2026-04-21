@@ -664,3 +664,40 @@ CI 与本地都可直接 `node` 运行。
 
 两条修复彼此独立：A 是"让真相源不丢"，B 是"就算丢了也不装样子"。
 任何一条单独打开都有防护价值，叠加即得深度防御。
+
+### 10.4 HOTFIX C · 汇总导出器时间轴 bug 修复
+
+**问题根因**：leji-v6e_pass2 复查发现 `sd2_final_report.json` 中 B05/B09 的 time
+被错误地写成 `{start_sec: 0, end_sec: 12}`，但同一 block 的 `sd2_prompt` 内
+timecode 明明写的是 `00:48–00:60` / `00:96–00:108`。两层 bug：
+
+1. **正则太严格**：`extractTimeFromShots` 原正则
+   `^\s*(\d{1,2}):(\d{2})\s*[–—-]\s*(\d{1,2}):(\d{2})\s*$`
+   强制分/秒各 2 位。LLM 偶尔写出 `00:96–00:108`（把 96 秒写成 "00:96" 而不是
+   "01:36"），秒位 `108` 是 3 位数直接拒识，整段 fallback。
+2. **Fallback 从 0 开始**：timecode 解析失败时，原代码直接从 0 累加 `duration_sec`，
+   完全没有参考 EditMap 里该 block 的真实起止时间，于是 B05 被写成 0–12s 而不是
+   48–60s。
+
+**修复**：
+- **C-1 正则放宽**：`(\d{1,4}):(\d{1,4})`，仍用 `分*60+秒` 语义解释。
+  `00:96` → 96 秒（与 `01:36` 等价），`00:108` → 108 秒。
+- **C-2 三段 fallback 链**：`extractV6ResultView(result, editMapBlockTime)` 新增参数，
+  `extractTimeFromShots(shots, editMapBlockTime)` 对应：
+  1. shots[].timecode 首末解析成功 → 用之；
+  2. 解析失败 + EditMap block.time 可用 → 用 EditMap；
+  3. 最终兜底：从 0 累加 duration_sec（历史行为，仅当前两路都空）。
+- **EditMap 产物索引**：exporter 读 `edit_map_sd2.json` 构建
+  `block_id → time` 映射。Director payload 的 `edit_map_block` 在 v6 链路上
+  经常是空 dict，所以直接查 EditMap 产物最稳。
+
+**日志指纹**：无新增日志；修复前症状是 final_report 里 `time: {start_sec: 0, ...}`
+与 prompt 内 timecode 脱节；修复后 time 总是与 prompt 内 timecode 或 EditMap 对齐。
+
+**回归测试**：`scripts/sd2_pipeline/tests/test_export_timecode_v6_hotfix_c.mjs`
+覆盖 8 个用例：标准格式 / 3 位秒放宽 / 等价写法 / EditMap 兜底（leji-v6e_pass2 B05
+场景）/ 历史兜底 / 优先级正确 / 中英破折号 / 空 shots。
+
+**与 A/B 的关系**：C 只管"导出器把时间写对"，不参与硬门判定，和 A/B 正交。
+但如果没有 A 把 normalized_script_package 透传下来，即便时间轴正确，内容也还是
+脱锚——所以交付验收的顺序是 A → B → C，缺一不可。
