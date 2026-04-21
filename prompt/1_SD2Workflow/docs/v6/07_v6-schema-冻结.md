@@ -593,4 +593,74 @@ v6.0 阶段 Prompter 虽然在 JSON output 里产出上述自检字段，但 pip
 |---|---|---|---|
 | v5 | 2026-04-16 | 🟢 Frozen | `docs/v5/07_v5-schema-冻结.md` 全部字段 |
 | v6.0 | 2026-04-21 | 🟢 Frozen | 本文件（五个消费者的增量） |
+| v6.1-HOTFIX-A/B | 2026-04-21 | 🟢 Frozen | Stage 0 产物自动挂载 + Prompter 自检假阳性清洁化 |
 | v6.1 | 计划 2026-05-04 | ⏳ | Scene Architect payload / 反清洁化 / 微表情去重 / 构图硬锚 |
+
+---
+
+## 十、v6.1 HOTFIX · 真相源透传与自检假阳性（2026-04-21）
+
+> 触发背景：`leji-v6d` 全链路跑后，用户审稿发现"Stage 2/3 根本没吃到 `normalized_script_package`"——
+>   导出 `sd2_final_report.json` 里 `has_normalized_script_package: false`；所有
+>   `director_kva_coverage` 都降级为 `skip — no_kva_in_chunk`；B10 `dialogue_fidelity_check`
+>   竟然以 `raw_text="" prompt_text="<silent>"` 的形态自报 `pass=true`（LLM 在无参照物
+>   情况下给出的假阳性）。两条症状合起来让当轮所有 "pass" 都只是降级模式下的表面通过。
+
+### 10.1 HOTFIX A · `run_sd2_pipeline.mjs` 自动挂载既有 Stage 0 产物
+
+**问题根因**：`normalizerArtifactPath` 只在 Stage 0 **实跑成功**时被赋值。若用户传
+`--skip-editmap` / `--no-normalizer` / `--dry-run`，变量保持空串，`--normalized-package`
+不会传给 `call_editmap_sd2_v6.mjs` / `call_sd2_block_chain_v6.mjs`，
+即使 output-dir 下 `normalized_script_package.json` 明明已经存在。
+
+**修复**：Stage 0 block 结束后增加一段探测——若 `normalizerArtifactPath` 为空但
+`normalizerOut` 文件存在（上一轮遗留或外部写入），自动挂载。
+
+```js
+if (sd2Version === 'v6' && !normalizerArtifactPath && fs.existsSync(normalizerOut)) {
+  normalizerArtifactPath = normalizerOut;
+  console.log(`[run_sd2_pipeline] Stage 0 未实跑，自动挂载既有产物：${normalizerOut}...`);
+}
+```
+
+**日志指纹**：触发时会打印 `Stage 0 未实跑，自动挂载既有产物`；Stage 0 实跑成功时仍
+走原路径 `Stage 0 产物就绪，将透传给 EditMap`，两条日志互斥。
+
+**边界**：Stage 0 实跑失败会先 `process.exit(8/9)`，不会走到这条探测；`--no-normalizer`
+场景若 output-dir 没有 normalized_script_package.json，探测也不误挂——保持诚实降级。
+
+### 10.2 HOTFIX B · Prompter `dialogue_fidelity_check` 假阳性清洁化
+
+**问题根因**：`checkPrompterSelfDialogueFidelity` 原本只看 `fidelity_ratio === 1` 就判 pass。
+但 Prompter LLM 在 scriptChunk 缺失时会写出：
+
+```json
+{ "checked_segments": [{ "raw_text": "", "prompt_text": "<silent>", "pass": true }],
+  "fidelity_ratio": 1, "pass": true }
+```
+
+——"我没检查到任何对白，所以我通过了"。pipeline 如果照单全收，相当于替 LLM 盖章假阳性。
+
+**修复**：`checkPrompterSelfDialogueFidelity` 新增一层扫描——
+`checked_segments` 中任一条 `raw_text === ""` **且** `prompt_text !== ""`，
+整体降级为 `fail`（reason: `phantom_pass_detected`），不再信任 LLM 自报的 `fidelity_ratio`。
+
+**边界**：
+- 真实无对白场景 LLM 应输出 `checked_segments: []`（total=0），该路径 pass 不受影响；
+- raw_text 与 prompt_text 均非空走原 `fidelity_ratio` 判定，完全兼容。
+
+**回归测试**：`scripts/sd2_pipeline/tests/test_prompter_selfcheck_v6_hotfix_b.mjs`
+覆盖 6 个用例（假阳性命中 / 真实无对白 / 真 pass / 真 fail / 字段缺失 / 多条假阳性），
+CI 与本地都可直接 `node` 运行。
+
+### 10.3 两条 HOTFIX 的协作关系
+
+| 场景 | HOTFIX A 命中 | HOTFIX B 命中 | 最终判定 |
+|---|---|---|---|
+| Stage 0 实跑 + scriptChunk 正常 | N | N | LLM 自检按原规则判 |
+| `--skip-editmap` 二跑 + 既有 Stage 0 产物 | **Y（自动挂载）** | N（有参照物，不会假阳性） | 下游所有硬门按真实状态判定 |
+| `--no-normalizer` + 无 Stage 0 产物 | N | **Y（兜底降级假阳性）** | 假阳性被挡住，真实"无对白"仍 pass |
+| Stage 0 实跑失败 | 不会走到（`process.exit`） | —— | 非零退出 |
+
+两条修复彼此独立：A 是"让真相源不丢"，B 是"就算丢了也不装样子"。
+任何一条单独打开都有防护价值，叠加即得深度防御。
