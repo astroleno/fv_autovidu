@@ -460,6 +460,24 @@ async function main() {
     );
   }
 
+  // ── v6.1 HOTFIX · Stage 0 产物自动挂载（真相源复用） ──
+  //   背景：当 --skip-editmap / --no-normalizer / --dry-run 导致 enableNormalizer=false
+  //        时，即使 output-dir 下已有 normalized_script_package.json（上一轮遗留），
+  //        pipeline 也不会把它透传给 EditMap / Director payload / block_chain，
+  //        下游 scriptChunk 全空 → director_kva_coverage=skip → Prompter 自检
+  //        在无参照物情况下写出 raw_text="" 的假阳性 pass。
+  //   修复：Stage 0 block 结束后，若 normalizerArtifactPath 仍空但 normalizerOut
+  //        文件实际存在，自动挂载。这样 --skip-editmap 二跑或外部预生成 Stage 0
+  //        的场景都能保留 v6 真相源，所有下游硬门按真实状态判定。
+  //   边界：Stage 0 实跑失败会在上方 process.exit(8/9) 直接退出；真正走到这里的
+  //        三种路径（未跑 / 成功 / 产物找不到）都已被明确处理，不会误挂其他版本产物。
+  if (sd2Version === 'v6' && !normalizerArtifactPath && fs.existsSync(normalizerOut)) {
+    normalizerArtifactPath = normalizerOut;
+    console.log(
+      `[run_sd2_pipeline] Stage 0 未实跑，自动挂载既有产物：${normalizerOut}（如需刷新请删除后重跑）`,
+    );
+  }
+
   if (!skipEditmap) {
     /**
      * EditMap 脚本路由：v6/v5/v4/v3/v2 各有一份；每份再细分云雾（Yunwu/Opus）和 DashScope。
