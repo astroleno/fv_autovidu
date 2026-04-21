@@ -242,7 +242,7 @@
 - `iron_rule_checklist_presence` · v5.0 HOTFIX（Prompter 返回空 `iron_rule_checklist` 时告警）
 - `psychology_group_synonym_fallback` · v5.0 HOTFIX（LLM 自创词被同义词层兜底时打 info）
 - `satisfaction_subject_check` · v5.0 治本（`satisfaction_points[i]` 主体不是主角/我方时告警；交叉检查 §4.2 payoff 位置硬约束）
-- `proof_ladder_coverage_check` · v5.0 治本（非 non_mystery 题材下 `proof_ladder` 覆盖率 < 60% 或最高 level 未触达 `testimony` 时告警）
+- `proof_ladder_coverage_check` · v5.0 治本 · rev4（`revenge` / `suspense` / `general` 题材下 `proof_ladder` 覆盖率 < 50% 或最高 level 未触达 `testimony` 时告警；`sweet_romance` / `fantasy` 跳过）
 - `payoff_protagonist_reaction_check` · v5.0 治本（Director 产出 payoff block 中无显式主角反应特写镜头时告警；该块 `ratio_actual` 下限强拉 0.5）
 
 ---
@@ -472,15 +472,16 @@ if (block.structural_tags && !block.routing?.structural) {
 - 命中任一即写 `code = "satisfaction_subject_misaligned"`、`severity = "warn"`、`block_id = B`、`expected = {"protagonist.position": "mid|up", "delta_from_prev": "up|up_steep"}`、`actual = <当前 status_curve 值>`。
 - **实现位置**：`normalize_edit_map_sd2_v5.mjs`（纯数据比对，无 LLM 调用）。
 
-### 7.11 `proof_ladder_coverage_check`（v5.0 治本 · 软门）
+### 7.11 `proof_ladder_coverage_check`（v5.0 治本 · 软门 · v5.0-rev4 调整）
 
 - **不触发条件**（任一满足即跳过）：
-  - `meta.video.genre_hint ∈ {"non_mystery"}`；或
-  - `proof_ladder` 为空。
-- **覆盖率**：设 `N = block_index[].length`，`C = 去重 block_id 在 proof_ladder 非 retracted 条目中的数量`；若 `C < ceil(N × 0.6)` → 写 `code = "proof_ladder_coverage_insufficient"`、`severity = "warn"`、`message = "coverage C/N (<60%)"`。
+  - `meta.video.genre_hint ∈ {"non_mystery", "sweet_romance", "fantasy"}`（v5.0-rev4 扩展：这三个题材天然不依赖证据链）；或
+  - `proof_ladder` 为空（由 `proof_ladder_check` 本身判定）。
+- **覆盖率阈值**（v5.0-rev4：`0.6 → 0.5`，更贴近医疗情感 / 家庭伦理类剧本的实际密度）：
+  设 `N = block_index[].length`，`C = 去重 block_id 在 proof_ladder 非 retracted 条目中的数量`；若 `C < ceil(N × 0.5)` → 写 `code = "proof_ladder_coverage_insufficient"`、`severity = "warn"`、`message = "coverage C/N (<50%)"`。
 - **最高 level**：非 retracted 条目最高 level 未触达 `testimony` 或 `self_confession` → 同 code 追写一条，`expected.max_level ≥ "testimony"`、`actual.max_level = <实际>`。
 - **例外**：末 block `paywall_level == "final_cliff"` 时 `max_level` 允许停在 `physical` / `testimony`。
-- **实现位置**：`normalize_edit_map_sd2_v5.mjs`。
+- **实现位置**：`normalize_edit_map_sd2_v5.mjs · checkProofLadderCoverage()`。
 
 ### 7.12 `payoff_protagonist_reaction_check`（v5.0 治本 · 软门 · Director 侧）
 
