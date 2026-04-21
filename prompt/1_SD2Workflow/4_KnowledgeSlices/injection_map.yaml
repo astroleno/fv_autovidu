@@ -1,14 +1,28 @@
-# injection_map.yaml — 知识切片路由映射表 v2.0
+# injection_map.yaml — 知识切片路由映射表 v2.1
 # 编排层按此表机械执行：路由标签 -> 命中切片 -> 拼接注入
-# 版本：v2.0
-# 日期：2026-04-17
-# 契约源：prompt/1_SD2Workflow/docs/v5/07_v5-schema-冻结.md
+# 版本：v2.1
+# 日期：2026-04-21
+# 契约源：
+#   - prompt/1_SD2Workflow/docs/v5/07_v5-schema-冻结.md
+#   - prompt/1_SD2Workflow/docs/v6/07_v6-schema-冻结.md
+#
+# v2.1 变更（v6.0）：
+#   1. director 新增 2 个无条件切片：
+#      - v6_segment_consumption_priority（原文消费优先级参考表）
+#      - v6_kva_examples（KVA 正反例库，按 has_kva 条件注入）
+#   2. editmap/v6_rhythm_templates.md 加入编剧方法论静态目录，
+#      EditMap 调用器按 editmap/ 目录 fs.readdirSync 顺序拼接（不登记为 consumer）。
+#   3. director.max_total_tokens 上调：3000 -> 3600（新增切片 ~600 tokens）。
+#   4. prompter 不新增 consumer 切片；Prompter v6 五铁律写在系统提示词本体，不走路由。
 #
 # 说明：
 #   - `director.*` 匹配字段来自 EditMap appendix 中的 `block_index[i].routing`。
 #   - `prompter.*` 的 `aspect_ratio` 匹配字段来自 `meta.video.aspect_ratio`。
 #   - `psychology_group` 为编排层派生字段（由 `meta.psychology_plan[].group` 按 block 复制到 `routing.psychology_group`），
 #     不属于 07 schema 的正式字段，LLM 侧无感知。
+#   - `has_kva`（v6）为编排层派生字段：pipeline 在构造 Director payload 时，
+#     若 `scriptChunk.key_visual_actions.length > 0` 则置 true，
+#     否则 false；不属于 EditMap schema。
 #   - 单份切片正文长度必须 ≤ `max_tokens × 0.9`（超限 → CI 不通过）。
 #
 # ========================================================================
@@ -31,9 +45,13 @@
 #
 # 详细机制、拼接顺序、token 预算规则见：
 #   prompt/1_SD2Workflow/docs/v5/08_v5-编剧方法论切片.md
+#
+# v6 追加：
+#   - 新增 editmap/v6_rhythm_templates.md（节奏模板库），同样走静态目录拼接；
+#   - editmap/ 目录整体 token 硬限由 4000 提升到 4800（新增 ~700 tokens）。
 # ========================================================================
 
-version: "2.0"
+version: "2.1"
 
 # ===== 按消费者分组 =====
 
@@ -50,8 +68,22 @@ director:
       max_tokens: 500
       priority: 15
 
+    # --- v6 · 原文消费优先级参考表（T01/T02）---
+    - slice_id: v6_segment_consumption_priority
+      path: director/v6_segment_consumption_priority.md
+      max_tokens: 400
+      priority: 12
+
   # 条件注入（路由标签命中时注入）
   conditional:
+    # --- v6 · KVA 正反例库（T03） ---
+    - slice_id: v6_kva_examples
+      path: director/v6_kva_examples.md
+      max_tokens: 700
+      priority: 25
+      match:
+        has_kva:
+          equals: true
     # --- v4 保留：结构范式示例 ---
     - slice_id: structure_fewshot
       path: director/structure_fewshot.md
@@ -237,7 +269,7 @@ prompter:
 rules:
   # 每个消费者的切片拼接上限（超过则按优先级截断）
   max_total_tokens_per_consumer:
-    director: 3000
+    director: 3600
     prompter: 2000
 
   # 优先级：always 先于 conditional；conditional 内 priority 越小越优先
