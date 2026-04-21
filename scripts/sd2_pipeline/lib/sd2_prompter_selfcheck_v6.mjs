@@ -44,7 +44,9 @@ export function checkPrompterSelfDialogueFidelity(prompterResult) {
     return { code: 'prompter_self_dialogue_fidelity', status: 'skip', reason: 'no_result', detail: {} };
   }
   const r = /** @type {Record<string, unknown>} */ (prompterResult);
-  const chk = /** @type {{ fidelity_ratio?: unknown }} */ (r.dialogue_fidelity_check);
+  const chk = /** @type {{ fidelity_ratio?: unknown, checked_segments?: unknown }} */ (
+    r.dialogue_fidelity_check
+  );
   if (!chk || typeof chk.fidelity_ratio !== 'number') {
     return {
       code: 'prompter_self_dialogue_fidelity',
@@ -54,6 +56,38 @@ export function checkPrompterSelfDialogueFidelity(prompterResult) {
     };
   }
   const ratio = chk.fidelity_ratio;
+
+  // ── v6.1 HOTFIX B · 假阳性清洁化 ──
+  //   LLM 在无 scriptChunk 参照物时可能写出以下形态并自报 pass：
+  //     { seg_id, raw_text: "", prompt_text: "<silent>", pass: true }
+  //   这是"LLM 自己骗自己"——没有原文可比对，却输出 match_mode=exact 的通过。
+  //   清洁化规则：若 checked_segments 中任意一条 raw_text 为空串而 prompt_text
+  //   非空（"<silent>" / 任何占位符都视作非空），即判定 LLM 自检失效，降级为 fail。
+  //   真实"本 block 无对白"场景 LLM 应该输出 checked_segments=[]（total=0），
+  //   那条路径仍判 skip，不受影响。
+  const checkedSegments = Array.isArray(chk.checked_segments)
+    ? /** @type {unknown[]} */ (chk.checked_segments)
+    : [];
+  const phantoms = checkedSegments.filter((seg) => {
+    if (!seg || typeof seg !== 'object') return false;
+    const s = /** @type {{ raw_text?: unknown, prompt_text?: unknown }} */ (seg);
+    const rawEmpty = typeof s.raw_text === 'string' && s.raw_text === '';
+    const promptNonEmpty = typeof s.prompt_text === 'string' && s.prompt_text !== '';
+    return rawEmpty && promptNonEmpty;
+  });
+  if (phantoms.length > 0) {
+    return {
+      code: 'prompter_self_dialogue_fidelity',
+      status: 'fail',
+      reason: `phantom_pass_detected: ${phantoms.length} segment(s) with empty raw_text but non-empty prompt_text`,
+      detail: {
+        fidelity_ratio: ratio,
+        phantom_count: phantoms.length,
+        total: checkedSegments.length,
+      },
+    };
+  }
+
   return {
     code: 'prompter_self_dialogue_fidelity',
     status: ratio === 1 ? 'pass' : 'fail',
