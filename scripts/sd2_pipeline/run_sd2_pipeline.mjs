@@ -217,6 +217,14 @@ async function main() {
   const skipEditmap = Boolean(args['skip-editmap']) || dryRun;
   const skipDirector = Boolean(args['skip-director']);
   const skipPrompter = Boolean(args['skip-prompter']);
+  /**
+   * Stage 1.5 · Scene Architect v1（PoC）默认关闭（用户决策 D4）。
+   *   - `--enable-scene-architect` 显式开启；
+   *   - `--skip-scene-architect` 保留作显式关闭（覆盖 --enable-scene-architect）。
+   * 只在 sd2Version === 'v6' 时生效；v5/v4/v3/v2 全部强制跳过，避免误跑影响下游 payload。
+   */
+  const enableSceneArchitect =
+    Boolean(args['enable-scene-architect']) && !Boolean(args['skip-scene-architect']) && !dryRun;
   const kbDirRel = path.join('prompt', '1_SD2Workflow', '3_FewShotKnowledgeBase');
   const staggerMsArg =
     typeof args['stagger-ms'] === 'string' && args['stagger-ms'] !== ''
@@ -632,6 +640,45 @@ async function main() {
     await runNode(emArgs);
   } else if (!fs.existsSync(editMapOut)) {
     throw new Error(`skip-editmap 需要已有文件: ${editMapOut}`);
+  }
+
+  /**
+   * Stage 1.5 · Scene Architect v1（rhythm_timeline 微调 + KVA 编排 PoC）。
+   *   - 仅在 v6 + `--enable-scene-architect` 时调用；
+   *   - 需要 EditMap 产物与 normalized_script_package（否则降级 skip 并 warn）；
+   *   - runner 内部会并列落盘 scene_architect_output.json 并原地回灌 editMap。
+   *     下方 editMapParsed 的读取会自动拿到回灌后的版本。
+   */
+  if (enableSceneArchitect && sd2Version === 'v6') {
+    if (!fs.existsSync(editMapOut)) {
+      console.warn(
+        `[run_sd2_pipeline] 跳过 Stage 1.5：EditMap 产物不存在 ${editMapOut}`,
+      );
+    } else if (!normalizerArtifactPath) {
+      console.warn(
+        '[run_sd2_pipeline] 跳过 Stage 1.5：缺 normalized_script_package（--no-normalizer 或 Stage 0 未产出）',
+      );
+    } else {
+      /** @type {string[]} */
+      const saArgs = [
+        path.join('scripts', 'sd2_pipeline', 'call_scene_architect_v1.mjs'),
+        '--edit-map', editMapOut,
+        '--normalized-package', normalizerArtifactPath,
+        '--output-dir', outRoot,
+      ];
+      if (typeof args['episode-json'] === 'string') {
+        saArgs.push('--episode-json', args['episode-json']);
+      }
+      if (typeof args['scene-architect-model'] === 'string') {
+        saArgs.push('--model', args['scene-architect-model']);
+      }
+      console.log('[run_sd2_pipeline] Stage 1.5 · Scene Architect v1 启动（APIMart Opus thinking）');
+      await runNode(saArgs);
+    }
+  } else if (sd2Version !== 'v6' && Boolean(args['enable-scene-architect'])) {
+    console.warn(
+      `[run_sd2_pipeline] --enable-scene-architect 只在 --sd2-version v6 下生效；当前 ${sd2Version}，已忽略。`,
+    );
   }
 
   /** @type {unknown} */
