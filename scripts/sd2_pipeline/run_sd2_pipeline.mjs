@@ -530,15 +530,17 @@ async function main() {
     if ((sd2Version === 'v5' || sd2Version === 'v6') && normalizerArtifactPath) {
       emArgs.push('--normalized-package', normalizerArtifactPath);
     }
-    // HOTFIX D · v6 EditMap 层硬门降级 flag 透传（与下游 block chain 同名）：
+    // HOTFIX D/G · v6 EditMap 层硬门降级 flag 透传（与下游 block chain 同名）：
     //   --allow-v6-soft：一键降级
     //   --skip-editmap-coverage-hard：仅 segment_coverage_l1 降级
     //   --skip-last-seg-hard：仅 last_seg_covered_check 降级
+    //   --skip-source-integrity-hard：仅 source_integrity_check 降级（HOTFIX G）
     if (sd2Version === 'v6') {
       for (const flag of [
         'allow-v6-soft',
         'skip-editmap-coverage-hard',
         'skip-last-seg-hard',
+        'skip-source-integrity-hard',
       ]) {
         if (args[flag] === true) emArgs.push(`--${flag}`);
       }
@@ -681,16 +683,33 @@ async function main() {
     console.log(
       '[run_sd2_pipeline] 各 Block 内 Director→Prompter 串联；Block 间全 fan-out 并发（v5.0-rev7 · 默认解锁 scene_run_id 串行）…',
     );
+    // HOTFIX J · v6 后端切换：
+    //   --block-chain-backend=doubao 会把 Stage 2/3 的 LLM 后端切到火山豆包 Ark
+    //   （独立入口 call_sd2_block_chain_v6_doubao.mjs，复用 v6 主脚本的 main()）。
+    //   默认值 'default' 保持 DashScope/云雾路径不变。
+    const blockChainBackend =
+      typeof args['block-chain-backend'] === 'string' && args['block-chain-backend'].trim()
+        ? args['block-chain-backend'].trim()
+        : 'default';
+    const useDoubaoBackend = sd2Version === 'v6' && blockChainBackend === 'doubao';
     const chainScript =
-      sd2Version === 'v6'
-        ? 'call_sd2_block_chain_v6.mjs'
-        : sd2Version === 'v5'
-          ? 'call_sd2_block_chain_v5.mjs'
-          : sd2Version === 'v4'
-            ? 'call_sd2_block_chain_v4.mjs'
-            : sd2Version === 'v3'
-              ? 'call_sd2_block_chain_v3.mjs'
-              : 'call_sd2_block_chain.mjs';
+      useDoubaoBackend
+        ? 'call_sd2_block_chain_v6_doubao.mjs'
+        : sd2Version === 'v6'
+          ? 'call_sd2_block_chain_v6.mjs'
+          : sd2Version === 'v5'
+            ? 'call_sd2_block_chain_v5.mjs'
+            : sd2Version === 'v4'
+              ? 'call_sd2_block_chain_v4.mjs'
+              : sd2Version === 'v3'
+                ? 'call_sd2_block_chain_v3.mjs'
+                : 'call_sd2_block_chain.mjs';
+    if (useDoubaoBackend) {
+      console.log(
+        '[run_sd2_pipeline] HOTFIX J · Stage 2/3 后端切换至豆包（call_sd2_block_chain_v6_doubao.mjs）。' +
+          '需要 ARK_API_KEY（或显式设置 SD2_LLM_*，优先级更高）。',
+      );
+    }
     /** @type {string[]} */
     const chainArgs = [
       path.join('scripts', 'sd2_pipeline', chainScript),
