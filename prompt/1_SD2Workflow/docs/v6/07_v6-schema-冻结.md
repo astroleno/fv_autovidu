@@ -701,3 +701,149 @@ timecode 明明写的是 `00:48–00:60` / `00:96–00:108`。两层 bug：
 **与 A/B 的关系**：C 只管"导出器把时间写对"，不参与硬门判定，和 A/B 正交。
 但如果没有 A 把 normalized_script_package 透传下来，即便时间轴正确，内容也还是
 脱锚——所以交付验收的顺序是 A → B → C，缺一不可。
+
+### 10.5 HOTFIX D · EditMap 段覆盖硬门化 + tail_seg 几何约束 + diagnosis 权威回填
+
+**问题根因**：leji-v6e_pass2 回归观察到 —— 即便 A/B/C 三发 HOTFIX 都已落地，EditMap
+仍然只把 62 个 seg 中的前 26 个送进下游（ratio=0.419）。更严重的是：LLM 在
+`appendix.diagnosis.segment_coverage_ratio_estimated` 字段里**自填 0.97**，和 pipeline
+实算值 0.419 差了一个数量级。由于 L1 是**软门**（只 warn 不拦），加上 LLM 自报一个"真阳性"
+数字，所以最终 `segment_coverage_check: true` 一路放行，后半场（撞破对峙、怀孕反转、
+绿茶插话、门外幻想、closing hook 素材）整段没进 block，导致"工程成立，叙事不成立"。
+
+**三条根因**：
+1. **L1 覆盖是软门**：`ratio < 0.95` 只 warn，不阻塞。遇到 LLM 懒惰策略（"能切多少切多少、
+   装作覆盖率够了"）时，没有兜底拦截。
+2. **LLM 可自填结论字段**：`diagnosis.segment_coverage_ratio_estimated` 是一个"LLM 自评"
+   字段，pipeline 原先不覆盖。LLM 可以"自报 pass"，让下游误以为已验证。
+3. **缺 tail_seg 几何约束**：即便整体 ratio 达标，LLM 也可以"放弃最后 3 段"换总覆盖率 96%，
+   但最后 3 段往往是 cliffhanger / closing_hook 的物料，放弃等于叙事破产。
+
+**修复三件套**：
+
+- **D-1 · L1 段覆盖升级硬门**：`call_editmap_sd2_v6.mjs` 的 `runSegmentCoverageL1Check`
+  返回 `status === 'fail'` 时，默认 `process.exit(7)`。仅当 CLI 传 `--allow-v6-soft` 或
+  `--skip-editmap-coverage-hard` 时降级为 warn（保留审计轨迹）。
+- **D-2 · 新增 last_seg_covered_check 硬门**：`runLastSegCoveredCheck(parsed, normalizedPackage)`。
+  从 `beat_ledger[*].segments[]` 取出时间轴上**最后一个** `seg_id`（ordered universe 末元素），
+  扫 `⋃ block_index[i].covered_segment_ids[]` 是否命中。未命中 → `process.exit(7)`。可 `--skip-last-seg-hard`
+  单独降级。
+- **D-3 · diagnosis 权威回填**：`backfillDiagnosisAuthoritativeMetrics(parsed, segCheck, tailCheck)`
+  在 pipeline 层直接覆盖：
+  - `diagnosis.segment_coverage_check` = `segCheck.status === 'pass'`
+  - `diagnosis.segment_coverage_ratio_estimated` = pipeline 实算（保留 3 位小数）
+  - `diagnosis.last_seg_covered_check` = `tailCheck.status === 'pass'`
+  - `diagnosis.pipeline_authoritative = true` + `pipeline_authoritative_note`
+  - LLM 原值留底到 `*_llm_self_reported` 字段（仅审计，不进下游决策）
+
+**日志指纹**（成功）：
+```
+[call_editmap_sd2_v6] v6 硬门 · segment_coverage L1: pass (62/62, ratio=1.000)
+[call_editmap_sd2_v6] v6 硬门 · last_seg_covered_check: pass tail=SEG_062
+```
+
+**日志指纹**（严格模式失败 · 非降级）：
+```
+[call_editmap_sd2_v6] v6 硬门 · segment_coverage L1: fail (26/62, ratio=0.419) missing(前12)=SEG_027,SEG_028,...
+[call_editmap_sd2_v6] v6 硬门 · last_seg_covered_check: fail tail=SEG_062 (tail_seg SEG_062 not found in any block.covered_segment_ids)
+[call_editmap_sd2_v6] ❌ v6 EditMap 硬门失败 2 项：
+  - segment_coverage_l1 ratio=0.419 < 0.95 (26/62)
+  - last_seg_covered_check: tail_seg SEG_062 not found in any block.covered_segment_ids
+[call_editmap_sd2_v6] 如需一次性降级请加 --allow-v6-soft（或对应 --skip-editmap-coverage-hard / --skip-last-seg-hard）。拒绝写盘。
+(exit 7)
+```
+
+**降级开关矩阵**：
+
+| flag | 效果 |
+|---|---|
+| 无 flag（严格模式） | L1 + tail_seg 任一 fail → exit 7 |
+| `--skip-editmap-coverage-hard` | L1 降级 warn，tail_seg 仍硬门 |
+| `--skip-last-seg-hard` | tail_seg 降级 warn，L1 仍硬门 |
+| `--allow-v6-soft` | 一次性全部降级（包含 D/E/F + Prompter 侧 B 系列） |
+
+**回归测试**：`scripts/sd2_pipeline/tests/test_editmap_hardgate_v6_hotfix_d.mjs`
+覆盖 21 个用例：universe 抽取 / L1 pass/fail/skip / 阈值边界（59/62, 58/62）/ tail_seg 三态
+/ diagnosis 回填（含 LLM 留底）/ 动态硬下限公式 / appendHardFloor 正确性。
+
+### 10.6 HOTFIX E · 1_EditMap-SD2-v6.md prompt 文档收口
+
+**动机**：D 在代码层把 L1/tail 硬门化之后，LLM 侧的 system prompt 还在说"L1 是软门"、
+还在让 LLM 自填 `segment_coverage_check` 和 `segment_coverage_ratio_estimated`。prompt 与
+pipeline 行为脱节会让 LLM 端产生自相矛盾的指令，影响下一轮生成质量。
+
+**修复**：
+- §A.2 门级由"软门"→"**硬门**（v6.1-HOTFIX-D 升级）"。
+- §A.5 三层覆盖率表格 L1 软 → **硬**，新增 L1.5（tail_seg_covered_check）行。
+- §A.5 正文追加 HOTFIX-D 动机段、exit 7 语义、降级开关说明。
+- §A.6 `diagnosis` 追加"pipeline 回填"条款：
+  - `segment_coverage_check` / `segment_coverage_ratio_estimated` / `last_seg_covered_check` 由 pipeline 权威回填；
+  - LLM 自填会被覆盖，原值留底到 `*_llm_self_reported`；
+  - 明确"LLM 禁止自评上述字段"。
+- §B.4 自检条目追加 #9（tail_seg 必须进 block）与 #10（服从"动态硬下限"段）。
+- §C 降级开关表追加 `--skip-editmap-coverage-hard` / `--skip-last-seg-hard`。
+- §D 版本演进追加 v6.1-HOTFIX-A/B/C/D/E/F 条目。
+
+### 10.7 HOTFIX F · directorBrief 动态硬下限注入
+
+**背景**：用户验收目标是"**120 秒 × 高密度快节奏 × 至少 50 个镜头**"。但
+`prepare_editmap_input.mjs` 生成的默认 brief 用的是软措辞「镜头总数请基于剧本密度 …
+自主决定（参考区间 45–75，以剧本节奏为准）」。这类"参考区间"LLM 经常解读为
+"可以不到下限"，导致只出 26 个 block/shot 覆盖前半段。
+
+**设计决策（用户 2026-04-21）**：
+- 走方案 B：代码硬门 + prompt 文档 + brief 文案三路并举；
+- 数字用**动态**而非固定：`max(50, segs_count)` / `max(15, ceil(segs_count/4))`，对不同体量
+  剧本通用。
+
+**修复**：在 `call_editmap_sd2_v6.mjs` 组装 `userPayload` 之前（但在 Stage 0 产物挂载之后），
+调用 `composeDynamicHardFloorBrief(segsCount, tailSegId, episodeDuration)` 生成一段"HOTFIX F
+标记的最高优先级硬约束"文字，通过 `appendHardFloorToDirectorBrief` 追加到
+`userPayload.directorBrief` 末尾。LLM 看到的内容：
+
+```
+──（HOTFIX F · pipeline 注入 · 最高优先级硬约束，覆盖上方"参考区间"软措辞）──
+本集目标：120 秒 × 高密度快节奏；剧本共 62 个 segment。
+【硬下限 · 镜头】shots.length ≥ 62（max(50, segs_count)）。达不到就继续拆，不要省略后半场。
+【硬下限 · Block】blocks.length ≥ 16（max(15, ceil(segs_count/4))），且每块 4–15s、总时长守恒。
+【硬下限 · Segment 覆盖】⋃ covered_segment_ids ⊇ 全集 segs × 0.95，L1 覆盖率 < 0.95 → 硬门失败。
+最后一个 seg（SEG_062）必须进入最后一个 block.covered_segment_ids，否则流水线会用 last_seg_covered_check 硬门拦截。
+如果剧本体量 > 目标时长，请通过"每 block 镜头数↑ + 每镜头时长↓"的方式压缩，而不是丢弃后半段 segment。
+禁止 LLM 自填 appendix.diagnosis.segment_coverage_check / segment_coverage_ratio_estimated，此两字段由 pipeline 回填（HOTFIX D）。
+```
+
+**时序考虑**：`prepare_editmap_input.mjs` 跑在 Stage 0 之前，拿不到 segs_count。因此
+把动态计算放在 `call_editmap_sd2_v6.mjs` 的 userPayload 组装阶段（此时 Stage 0 产物已挂载），
+是改动最小、时序最稳的方案。
+
+**日志指纹**：
+```
+[call_editmap_sd2_v6] HOTFIX F · 动态硬下限已注入 directorBrief：shot≥62 / block≥16 / tail=SEG_062
+```
+
+**与 D/E 的协作**：
+- **F → LLM**：prompt 层面告知 LLM 数字下限，把"软参考区间"压为"硬下限"；
+- **D → pipeline**：代码层面兜底，LLM 不听话也会被 exit 7 拦住；
+- **E → prompt doc**：system prompt 本体也同步改写，避免 LLM 看到内部矛盾的两套说法。
+三者叠加实现"prompt 打招呼 + 代码兜底 + 文档一致"的深度防御。
+
+### 10.8 交付验收顺序
+
+A → B → C → D → E → F **顺序必须**：
+- A 不先落：Stage 0 产物不传到下游，D/F 都无从拿 `segs_count` / `tail_seg_id`；
+- B 不先落：Prompter 层仍会"自欺 pass"，掩盖上游 EditMap 的真实失败；
+- C 不先落：时间轴写错会误导"Block 覆盖正确但时长错位"的判断；
+- D 不先落：L1 软门会让 LLM 幻觉 ratio=0.97 直接通过；
+- E 不先落：prompt 仍让 LLM 自填结论字段，和 D 冲突；
+- F 不先落：没有"至少 N shot / 至少 M block"的显式硬约束，LLM 会按"参考区间"下限偷懒。
+
+验收命令（严格模式）：
+```bash
+node scripts/sd2_pipeline/run_sd2_pipeline.mjs \
+  --sd2-version v6 \
+  --project-id leji-v6f \
+  --episode-id 第1集 \
+  --script-file sample/第1集/剧本.md \
+  --duration 120 \
+  # 注意：**不要** 加 --allow-v6-soft，跑严格模式
+```

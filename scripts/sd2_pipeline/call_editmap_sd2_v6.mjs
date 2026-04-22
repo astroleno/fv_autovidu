@@ -81,27 +81,26 @@ function parseArgs(argv) {
 }
 
 /**
- * v6 EditMap 层软门：segment_coverage_check · L1 阈值 ≥ 0.95。
+ * HOTFIX D · 从 Stage 0 产物里抽取 segment universe（有序 seg_id 列表）。
  *
- * 计算口径（与 04_v6-并发链路.md §5.1.1 完全一致）：
- *   - 分母：normalizedScriptPackage.beat_ledger[*].segments[].seg_id 的全集 count
- *   - 分子：⋃ block_index[i].covered_segment_ids[] 的去重 count
- *   - 阈值：≥ 0.95 视为通过；低于阈值 → 软门失败（打 warn，不阻塞）
- *   - Stage 0 未提供 → 跳过本检查
- *   - EditMap 未升级（所有 block 都缺 covered_segment_ids）→ 写入 ratio=0 + 警告
+ * 口径（与 04_v6-并发链路.md §5.1.1 完全一致）：
+ *   - 遍历 beat_ledger[].segments[].seg_id，按出场顺序去重；
+ *   - tail_seg_id 取遍历到的最后一个 seg_id（时间轴上最后一场戏）；
+ *   - 若 Stage 0 缺失 / 无 seg，返回空集合（下游按 'skip' 处理）。
  *
- * @param {Record<string, unknown>} parsed      LLM 已解析的 EditMap 产物
- * @param {unknown | null} normalizedPackage    Stage 0 产物
- * @returns {{ ratio: number, covered: number, total: number, status: 'pass'|'fail'|'skip' }}
+ * @param {unknown | null} normalizedPackage Stage 0 产物
+ * @returns {{ ordered: string[], universe: Set<string>, tailSegId: string | null }}
  */
-function runSegmentCoverageL1Check(parsed, normalizedPackage) {
+function computeSegmentUniverseFromPackage(normalizedPackage) {
   if (!normalizedPackage || typeof normalizedPackage !== 'object') {
-    return { ratio: 1, covered: 0, total: 0, status: 'skip' };
+    return { ordered: [], universe: new Set(), tailSegId: null };
   }
   const pkg = /** @type {Record<string, unknown>} */ (normalizedPackage);
   const ledger = Array.isArray(pkg.beat_ledger) ? pkg.beat_ledger : [];
   /** @type {Set<string>} */
   const universe = new Set();
+  /** @type {string[]} */
+  const ordered = [];
   for (const beat of ledger) {
     if (!beat || typeof beat !== 'object') continue;
     const b = /** @type {Record<string, unknown>} */ (beat);
@@ -109,21 +108,31 @@ function runSegmentCoverageL1Check(parsed, normalizedPackage) {
     for (const seg of segs) {
       if (!seg || typeof seg !== 'object') continue;
       const sid = /** @type {Record<string, unknown>} */ (seg).seg_id;
-      if (typeof sid === 'string' && sid) universe.add(sid);
+      if (typeof sid === 'string' && sid && !universe.has(sid)) {
+        universe.add(sid);
+        ordered.push(sid);
+      }
     }
   }
-  const totalCount = universe.size;
-  if (totalCount === 0) {
-    return { ratio: 1, covered: 0, total: 0, status: 'skip' };
-  }
+  const tailSegId = ordered.length > 0 ? ordered[ordered.length - 1] : null;
+  return { ordered, universe, tailSegId };
+}
 
+/**
+ * HOTFIX D · 从 EditMap 产物里抽取 covered_segment_ids 去重并集（过滤仅保留 universe 内）。
+ *
+ * @param {Record<string, unknown>} parsed
+ * @param {Set<string>} universe
+ * @returns {Set<string>}
+ */
+function collectCoveredSegmentIds(parsed, universe) {
+  /** @type {Set<string>} */
+  const covered = new Set();
   const appendix =
     parsed.appendix && typeof parsed.appendix === 'object'
       ? /** @type {Record<string, unknown>} */ (parsed.appendix)
       : {};
   const rows = Array.isArray(appendix.block_index) ? appendix.block_index : [];
-  /** @type {Set<string>} */
-  const covered = new Set();
   for (const row of rows) {
     if (!row || typeof row !== 'object') continue;
     const r = /** @type {Record<string, unknown>} */ (row);
@@ -134,13 +143,167 @@ function runSegmentCoverageL1Check(parsed, normalizedPackage) {
       }
     }
   }
+  return covered;
+}
+
+/**
+ * v6 EditMap 层 segment_coverage_check · L1 阈值 ≥ 0.95。
+ *
+ * HOTFIX D（2026-04）：本检查默认**升级为硬门**（由调用层按 `--allow-v6-soft`
+ * 降级为 warn）。Stage 0 未提供时保持 'skip'。
+ *
+ * @param {Record<string, unknown>} parsed      LLM 已解析的 EditMap 产物
+ * @param {unknown | null} normalizedPackage    Stage 0 产物
+ * @returns {{ ratio: number, covered: number, total: number, status: 'pass'|'fail'|'skip', missingIds: string[] }}
+ */
+function runSegmentCoverageL1Check(parsed, normalizedPackage) {
+  const { ordered, universe } = computeSegmentUniverseFromPackage(normalizedPackage);
+  const totalCount = universe.size;
+  if (totalCount === 0) {
+    return { ratio: 1, covered: 0, total: 0, status: 'skip', missingIds: [] };
+  }
+
+  const covered = collectCoveredSegmentIds(parsed, universe);
   const ratio = covered.size / totalCount;
+
+  // 未命中 seg 列表，用于报告和 directorBrief 回注（截取前 12 条避免刷屏）
+  const missing = ordered.filter((sid) => !covered.has(sid));
+
   return {
     ratio,
     covered: covered.size,
     total: totalCount,
     status: ratio >= 0.95 ? 'pass' : 'fail',
+    missingIds: missing,
   };
+}
+
+/**
+ * HOTFIX D · last_seg_covered_check：时间轴上最后一个 seg_id 必须被任一 block 覆盖。
+ *
+ * 动机（v6e_pass2 review 观察）：EditMap 经常只"送前半段"，后半场关键戏（撞破、
+ * 怀孕反转、结尾钩子）被整段丢弃。单看 ratio ≥ 0.95 可能仍然漏掉关键尾段，
+ * 因此追加一个"末段必进"的几何约束——在 closing_hook 落地前强制把 tail_seg
+ * 塞进最后一个 block 的 covered_segment_ids。
+ *
+ * 返回 status：
+ *   - 'skip'：Stage 0 缺失或无 seg（不适用）
+ *   - 'pass'：tail_seg_id 被至少一个 block 覆盖
+ *   - 'fail'：tail_seg_id 存在但未进任何 block.covered_segment_ids
+ *
+ * @param {Record<string, unknown>} parsed
+ * @param {unknown | null} normalizedPackage
+ * @returns {{ status: 'pass'|'fail'|'skip', tailSegId: string | null, reason: string }}
+ */
+function runLastSegCoveredCheck(parsed, normalizedPackage) {
+  const { universe, tailSegId } = computeSegmentUniverseFromPackage(normalizedPackage);
+  if (!tailSegId) {
+    return { status: 'skip', tailSegId: null, reason: 'no_tail_seg_in_package' };
+  }
+  const covered = collectCoveredSegmentIds(parsed, universe);
+  if (covered.has(tailSegId)) {
+    return { status: 'pass', tailSegId, reason: 'covered_by_some_block' };
+  }
+  return {
+    status: 'fail',
+    tailSegId,
+    reason: `tail_seg ${tailSegId} not found in any block.covered_segment_ids`,
+  };
+}
+
+/**
+ * HOTFIX D · 用 pipeline 真实算出的 ratio 覆盖 LLM 自报的
+ * `diagnosis.segment_coverage_check` / `segment_coverage_ratio_estimated`
+ * 字段（常见幻觉：LLM 自填 0.97，但 pipeline 实算 0.42）。
+ *
+ * 保留 LLM 原值到 `diagnosis.segment_coverage_ratio_llm_self_reported`
+ * 字段下，便于回归审计。
+ *
+ * @param {Record<string, unknown>} parsed
+ * @param {{ ratio: number, covered: number, total: number, status: string, missingIds: string[] }} segCheck
+ * @param {{ status: string, tailSegId: string | null, reason: string }} tailCheck
+ * @returns {void}
+ */
+function backfillDiagnosisAuthoritativeMetrics(parsed, segCheck, tailCheck) {
+  if (!parsed || typeof parsed !== 'object') return;
+  const appendix =
+    parsed.appendix && typeof parsed.appendix === 'object'
+      ? /** @type {Record<string, unknown>} */ (parsed.appendix)
+      : null;
+  if (!appendix) return;
+  const diag =
+    appendix.diagnosis && typeof appendix.diagnosis === 'object'
+      ? /** @type {Record<string, unknown>} */ (appendix.diagnosis)
+      : (appendix.diagnosis = {});
+  const d = /** @type {Record<string, unknown>} */ (diag);
+
+  // 留底 LLM 原值（仅首次回填时记录）
+  if (d.segment_coverage_ratio_estimated !== undefined) {
+    d.segment_coverage_ratio_llm_self_reported = d.segment_coverage_ratio_estimated;
+  }
+  if (d.segment_coverage_check !== undefined) {
+    d.segment_coverage_check_llm_self_reported = d.segment_coverage_check;
+  }
+
+  // 覆盖：以 pipeline 算值为准
+  d.segment_coverage_ratio_estimated = Number(segCheck.ratio.toFixed(3));
+  d.segment_coverage_check = segCheck.status === 'pass';
+  d.last_seg_covered_check = tailCheck.status === 'pass';
+  d.pipeline_authoritative = true;
+  d.pipeline_authoritative_note =
+    'HOTFIX D · segment_coverage_* 与 last_seg_covered_check 由 pipeline 实算覆盖，LLM 自报字段另存 *_llm_self_reported。';
+}
+
+/**
+ * HOTFIX F · 动态硬下限生成器：根据 segs_count 构造"镜头 / block / tail_seg"硬下限文案，
+ * 追加到 userPayload.directorBrief 文末，覆盖 prepare_editmap_input 默认的"参考区间"软措辞。
+ *
+ * 公式（用户落地决策 2026-04-21）：
+ *   - 镜头硬下限 = max(50, segs_count)         // 保 120s 快节奏的 ≥ 50 shots，或 1 shot/seg
+ *   - Block 硬下限 = max(15, ceil(segs_count/4)) // 保 ≥ 15 blocks，或每 4 seg 1 block
+ *   - tail_seg 硬约束：最后一个 seg_id 必须进最后一个 block.covered_segment_ids
+ *
+ * @param {number} segsCount
+ * @param {string | null} tailSegId
+ * @param {number} episodeDuration
+ * @returns {string}  追加到 directorBrief 尾部的硬下限段落
+ */
+function composeDynamicHardFloorBrief(segsCount, tailSegId, episodeDuration) {
+  const shotFloor = Math.max(50, segsCount);
+  const blockFloor = Math.max(15, Math.ceil(segsCount / 4));
+  const tailClause = tailSegId
+    ? `最后一个 seg（${tailSegId}）必须进入最后一个 block.covered_segment_ids，否则流水线会用 last_seg_covered_check 硬门拦截。`
+    : '';
+
+  return [
+    '──（HOTFIX F · pipeline 注入 · 最高优先级硬约束，覆盖上方"参考区间"软措辞）──',
+    `本集目标：${episodeDuration} 秒 × 高密度快节奏；剧本共 ${segsCount} 个 segment。`,
+    `【硬下限 · 镜头】shots.length ≥ ${shotFloor}（max(50, segs_count)）。达不到就继续拆，不要省略后半场。`,
+    `【硬下限 · Block】blocks.length ≥ ${blockFloor}（max(15, ceil(segs_count/4))），且每块 4–15s、总时长守恒。`,
+    `【硬下限 · Segment 覆盖】⋃ covered_segment_ids ⊇ 全集 segs × 0.95，L1 覆盖率 < 0.95 → 硬门失败。`,
+    tailClause,
+    '如果剧本体量 > 目标时长，请通过"每 block 镜头数↑ + 每镜头时长↓"的方式压缩，而不是丢弃后半段 segment。',
+    '禁止 LLM 自填 appendix.diagnosis.segment_coverage_check / segment_coverage_ratio_estimated，此两字段由 pipeline 回填（HOTFIX D）。',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+/**
+ * HOTFIX F · 把动态硬下限文案 append 到 userPayload.directorBrief 文末。
+ *
+ * @param {unknown} userPayload
+ * @param {string} appendText
+ * @returns {unknown}
+ */
+function appendHardFloorToDirectorBrief(userPayload, appendText) {
+  if (!userPayload || typeof userPayload !== 'object' || Array.isArray(userPayload)) {
+    return userPayload;
+  }
+  const payload = /** @type {Record<string, unknown>} */ (userPayload);
+  const existing = typeof payload.directorBrief === 'string' ? payload.directorBrief : '';
+  const patched = existing ? `${existing}\n\n${appendText}` : appendText;
+  return { ...payload, directorBrief: patched };
 }
 
 /**
@@ -222,6 +385,14 @@ async function main() {
     process.exit(2);
   }
 
+  // ── HOTFIX D · v6 EditMap 硬门降级开关 ──
+  //   - --allow-v6-soft：一键降级（所有 v6 硬门 → warn，保留审计轨迹）
+  //   - --skip-editmap-coverage-hard：仅 segment_coverage L1 降级
+  //   - --skip-last-seg-hard：仅 last_seg_covered_check 降级
+  const allowV6Soft = args['allow-v6-soft'] === true;
+  const skipCoverageHard = args['skip-editmap-coverage-hard'] === true || allowV6Soft;
+  const skipLastSegHard = args['skip-last-seg-hard'] === true || allowV6Soft;
+
   const outPath =
     typeof args.output === 'string'
       ? path.resolve(process.cwd(), args.output)
@@ -266,7 +437,27 @@ async function main() {
     );
   }
 
-  const userPayload = mergeNormalizedPackageIntoPayload(inputObj, normalizedPackage);
+  let userPayload = mergeNormalizedPackageIntoPayload(inputObj, normalizedPackage);
+
+  // ── HOTFIX F · 动态硬下限注入 ──
+  //   若已挂载 Stage 0 产物：按 segs_count 重写 directorBrief 硬下限尾段，
+  //   覆盖 prepare_editmap_input 默认的"参考区间"软措辞，让 LLM 看到"至少 N shot / 至少 M block / tail_seg 必进"。
+  if (normalizedPackage) {
+    const { universe, tailSegId } = computeSegmentUniverseFromPackage(normalizedPackage);
+    const segsCount = universe.size;
+    if (segsCount > 0) {
+      const episodeDuration =
+        (inputObj && typeof inputObj === 'object' && !Array.isArray(inputObj) &&
+          typeof /** @type {Record<string, unknown>} */ (inputObj).episodeDuration === 'number')
+          ? /** @type {number} */ (/** @type {Record<string, unknown>} */ (inputObj).episodeDuration)
+          : 120;
+      const hardFloorText = composeDynamicHardFloorBrief(segsCount, tailSegId, episodeDuration);
+      userPayload = appendHardFloorToDirectorBrief(userPayload, hardFloorText);
+      console.log(
+        `[${SCRIPT_TAG}] HOTFIX F · 动态硬下限已注入 directorBrief：shot≥${Math.max(50, segsCount)} / block≥${Math.max(15, Math.ceil(segsCount / 4))} / tail=${tailSegId || 'N/A'}`,
+      );
+    }
+  }
 
   const userMessage = [
     '以下为 globalSynopsis、scriptContent、assetManifest、episodeDuration、referenceAssets 等输入。',
@@ -335,13 +526,17 @@ async function main() {
     }
   }
 
-  // ── v6 软门三件套（只 warn，不阻塞；失败记录到 appendix.diagnosis.v6_softgate_report） ──
+  // ── v6 软门/硬门集群（HOTFIX D：L1 与 last_seg 默认硬门，其他保持软门） ──
   const segCheck = runSegmentCoverageL1Check(parsed, normalizedPackage);
+  const tailCheck = runLastSegCoveredCheck(parsed, normalizedPackage);
   const rhythmCheck = runRhythmTimelineShapeCheck(parsed);
   const styleCheck = runStyleInferenceShapeCheck(parsed);
 
   console.log(
-    `[${SCRIPT_TAG}] v6 软门 · segment_coverage L1: ${segCheck.status} (${segCheck.covered}/${segCheck.total}, ratio=${segCheck.ratio.toFixed(3)})`,
+    `[${SCRIPT_TAG}] v6 硬门 · segment_coverage L1: ${segCheck.status} (${segCheck.covered}/${segCheck.total}, ratio=${segCheck.ratio.toFixed(3)})${segCheck.status === 'fail' && segCheck.missingIds.length ? ' missing(前12)=' + segCheck.missingIds.slice(0, 12).join(',') : ''}`,
+  );
+  console.log(
+    `[${SCRIPT_TAG}] v6 硬门 · last_seg_covered_check: ${tailCheck.status}${tailCheck.tailSegId ? ` tail=${tailCheck.tailSegId}` : ''}${tailCheck.status === 'fail' ? ` (${tailCheck.reason})` : ''}`,
   );
   console.log(
     `[${SCRIPT_TAG}] v6 软门 · rhythm_timeline shape: ${rhythmCheck.status}${rhythmCheck.missing.length ? ' missing=' + rhythmCheck.missing.join(',') : ''}`,
@@ -350,10 +545,52 @@ async function main() {
     `[${SCRIPT_TAG}] v6 软门 · style_inference shape: ${styleCheck.status}${styleCheck.missing.length ? ' missing=' + styleCheck.missing.join(',') : ''}`,
   );
 
+  // 回填 diagnosis：用 pipeline 真实值覆盖 LLM 自报（防止 0.97 幻觉）
+  backfillDiagnosisAuthoritativeMetrics(parsed, segCheck, tailCheck);
+
+  // 把门结果写到 appendix.diagnosis.v6_softgate_report（保留审计轨迹）
+  const appendixAny =
+    parsed.appendix && typeof parsed.appendix === 'object'
+      ? /** @type {Record<string, unknown>} */ (parsed.appendix)
+      : null;
+  if (appendixAny) {
+    const diag =
+      appendixAny.diagnosis && typeof appendixAny.diagnosis === 'object'
+        ? /** @type {Record<string, unknown>} */ (appendixAny.diagnosis)
+        : (appendixAny.diagnosis = {});
+    /** @type {Record<string, unknown>} */ (diag).v6_softgate_report = {
+      segment_coverage_l1: segCheck,
+      last_seg_covered: tailCheck,
+      rhythm_timeline_shape: rhythmCheck,
+      style_inference_shape: styleCheck,
+      downgrade_flags: {
+        allow_v6_soft: allowV6Soft,
+        skip_editmap_coverage_hard: skipCoverageHard,
+        skip_last_seg_hard: skipLastSegHard,
+      },
+    };
+  }
+
+  // ── HOTFIX D · 硬门拦截（L1 + last_seg），允许通过 flag 降级 ──
+  /** @type {string[]} */
+  const hardFails = [];
   if (segCheck.status === 'fail') {
-    console.warn(
-      `[${SCRIPT_TAG}] ⚠️ segment_coverage L1 < 0.95（${segCheck.ratio.toFixed(3)}）· 下游 Prompter L2 硬门可能拦截`,
-    );
+    if (skipCoverageHard) {
+      console.warn(
+        `[${SCRIPT_TAG}] ⚠️ segment_coverage L1 < 0.95（${segCheck.ratio.toFixed(3)}）· 已降级为 warn（--allow-v6-soft / --skip-editmap-coverage-hard）`,
+      );
+    } else {
+      hardFails.push(`segment_coverage_l1 ratio=${segCheck.ratio.toFixed(3)} < 0.95 (${segCheck.covered}/${segCheck.total})`);
+    }
+  }
+  if (tailCheck.status === 'fail') {
+    if (skipLastSegHard) {
+      console.warn(
+        `[${SCRIPT_TAG}] ⚠️ last_seg_covered_check fail（${tailCheck.reason}）· 已降级为 warn（--allow-v6-soft / --skip-last-seg-hard）`,
+      );
+    } else {
+      hardFails.push(`last_seg_covered_check: ${tailCheck.reason}`);
+    }
   }
   if (rhythmCheck.status === 'fail') {
     console.warn(
@@ -366,21 +603,17 @@ async function main() {
     );
   }
 
-  // 把软门结果写到 appendix.diagnosis.v6_softgate_report（保留审计轨迹）
-  const appendixAny =
-    parsed.appendix && typeof parsed.appendix === 'object'
-      ? /** @type {Record<string, unknown>} */ (parsed.appendix)
-      : null;
-  if (appendixAny) {
-    const diag =
-      appendixAny.diagnosis && typeof appendixAny.diagnosis === 'object'
-        ? /** @type {Record<string, unknown>} */ (appendixAny.diagnosis)
-        : (appendixAny.diagnosis = {});
-    /** @type {Record<string, unknown>} */ (diag).v6_softgate_report = {
-      segment_coverage_l1: segCheck,
-      rhythm_timeline_shape: rhythmCheck,
-      style_inference_shape: styleCheck,
-    };
+  if (hardFails.length > 0) {
+    console.error(
+      `[${SCRIPT_TAG}] ❌ v6 EditMap 硬门失败 ${hardFails.length} 项：`,
+    );
+    for (const msg of hardFails) {
+      console.error(`  - ${msg}`);
+    }
+    console.error(
+      `[${SCRIPT_TAG}] 如需一次性降级请加 --allow-v6-soft（或对应 --skip-editmap-coverage-hard / --skip-last-seg-hard）。拒绝写盘。`,
+    );
+    process.exit(7);
   }
 
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
@@ -395,3 +628,14 @@ if (_e && pathToFileURL(path.resolve(_e)).href === import.meta.url) {
     process.exit(1);
   });
 }
+
+// HOTFIX D/F · 导出 pure 函数供单元测试使用（参见 tests/test_editmap_hardgate_v6_hotfix_d.mjs）
+export {
+  computeSegmentUniverseFromPackage,
+  collectCoveredSegmentIds,
+  runSegmentCoverageL1Check,
+  runLastSegCoveredCheck,
+  backfillDiagnosisAuthoritativeMetrics,
+  composeDynamicHardFloorBrief,
+  appendHardFloorToDirectorBrief,
+};
