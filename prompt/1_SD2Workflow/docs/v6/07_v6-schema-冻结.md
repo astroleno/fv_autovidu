@@ -847,3 +847,109 @@ node scripts/sd2_pipeline/run_sd2_pipeline.mjs \
   --duration 120 \
   # 注意：**不要** 加 --allow-v6-soft，跑严格模式
 ```
+
+---
+
+## 11. HOTFIX G/I/J（2026-04-22）· 源真相铁律 + Prompter 防崩 + 豆包后端
+
+### 11.1 触发原因（leji-v6f 豆包实验）
+
+leji-v6f 在豆包 Ark 后端下跑出**三类新的严重缺陷**：
+
+1. **EditMap 伪造 seg_id**：真实 Normalizer universe 到 `SEG_062` 为止，但 LLM 在 `appendix.block_index[15/16].covered_segment_ids` 里自造了 `SEG_063`–`SEG_072` 共 10 个伪段，并在 `markdown_body` 额外长出一个"剧本外尾钩字幕"。HOTFIX-D 的 L1 `collectCoveredSegmentIds` **用 universe 过滤伪段**，所以伪段不进覆盖率、也不报警，导致"假 pass 传染下游"。
+2. **B03 Prompter repetition collapse**：`prompts/B03.json` 的 `global_prefix` 被 LLM 循环填充"偶像剧、家庭剧、伦理剧、婆媳剧、宅斗剧…"重复到 23530 字符，耗光 max_tokens，其余自检字段（`dialogue_fidelity_check` / `segment_coverage_overall` / `pass_l2` / `pass_l3`）全部被截断丢失，pipeline 只能全部 skip，整 block 静默失败。
+3. **Stage 2/3 换后端的需求**：用户手搓了 `call_sd2_block_chain_v6_doubao.mjs` 做 Ark 适配，需要 `run_sd2_pipeline.mjs` 提供正式的 backend 开关。
+
+### 11.2 HOTFIX G · source_integrity_check 硬门
+
+**代码**：`scripts/sd2_pipeline/call_editmap_sd2_v6.mjs`
+
+- 新增纯函数 `collectAllReferencedSegIds(parsed)`：**不过滤 universe**，扫出 `appendix.block_index[*].{covered_segment_ids, must_cover_segment_ids, script_chunk_hint.{lead_seg_id, tail_seg_id, must_cover_segment_ids}}` 中所有被引用的 seg_id；
+- 新增纯函数 `runSourceIntegrityCheck(parsed, normalizedPackage)`：
+  - `'pass'`：所有引用 ⊆ universe；
+  - `'fail'`：存在引用 ∉ universe，附带 `outOfUniverseIds`；
+  - `'skip'`：Stage 0 未挂载或 universe 为空；
+- `main()` 里作为硬门接入：`sourceCheck.status === 'fail'` 时 `hardFails.push(...)` → `process.exit(7)`；
+- 支持降级：`--skip-source-integrity-hard` 或 `--allow-v6-soft`；
+- `appendix.diagnosis.v6_softgate_report.source_integrity` 回写审计轨迹。
+
+**Prompt 文档同步**：`1_EditMap-SD2-v6.md` §A.5 新增 L1.6 行、§B.4 新增自检条目 #11（源真相铁律）。
+
+**回归测试**：`tests/test_editmap_hardgate_v6_hotfix_g.mjs`（15 用例，全过），覆盖：
+- `collectAllReferencedSegIds` 的去重/嵌套 hint 扫描；
+- pass / fail（复现 v6f 豆包伪段）/ skip 三路径；
+- `hint.must_cover` 里的伪 seg 也能被抓到。
+
+### 11.3 HOTFIX I · Prompter 产物完整性 + repetition collapse 自动重试
+
+**代码**：
+- 新模块 `scripts/sd2_pipeline/lib/sd2_prompter_anomaly_v6.mjs`
+  - `detectPrefixRepetitionCollapse(globalPrefix)`：若 `globalPrefix.length > 4000` 且存在某个 3–6 字**纯中文**短语（非同一字重复）出现 ≥ 20 次 → 判定 collapse；
+  - `detectTailFieldsMissing(prParsed)`：`dialogue_fidelity_check` / `segment_coverage_overall` / `forbidden_words_self_check` 必须至少 1 个存在；
+  - `shouldRetryPrompter(prParsed)`：综合判定。
+- 调用链 `scripts/sd2_pipeline/call_sd2_block_chain_v6.mjs`
+  - 把 Prompter `callLLM` 包进两次尝试的循环：第 1 次温度 `0.35`、第 2 次温度 `0.55`；
+  - 若第 1 次判定异常，日志 `⚠️ Prompter 产物异常，以 temperature=0.55 自动重试…`；
+  - 若两次都异常，保留最后一次解析结果、写 `_v6_anomaly_retry.reasons`，让下游硬门（`runAllPrompterSelfChecks`）按 fail 处置。
+- 产物元数据：`prompts/Bxx.json._v6_anomaly_retry = { attempts, reasons, hotfix: 'I' }`。
+
+**回归测试**：`tests/test_prompter_anomaly_v6_hotfix_i.mjs`（22 用例，全过），覆盖：
+- v6f B03 真实样式循环复现 + phrase 命中；
+- 正常 prefix 不误伤（英文重复 / 单字重复 / 非循环中文都不触发）；
+- `shouldRetryPrompter` 四象限（双阳 / 单阳 / 双阴）的 reasons 排列。
+
+### 11.4 HOTFIX J · `run_sd2_pipeline --block-chain-backend=doubao`
+
+**代码**：`scripts/sd2_pipeline/run_sd2_pipeline.mjs`
+
+- 新增 CLI 参数 `--block-chain-backend`，值 `default`（默认，保持 DashScope/云雾）或 `doubao`（切火山 Ark）。
+- 仅对 `--sd2-version v6` 生效；其他版本忽略。
+- `doubao` 模式下 chainScript 改为 `call_sd2_block_chain_v6_doubao.mjs`（用户提供的入口已经把 `ARK_*` 映射到 `SD2_LLM_*` 并复用 v6 主脚本的 `main()`）。
+- 同时透传新的降级 flag `--skip-source-integrity-hard` 到 EditMap 层。
+
+**与块间并发/块内串行的关系**：HOTFIX J **只替换 LLM HTTP 后端**，不改动 fan-out（`Promise.all + runOne`）与 block 内 Director → Prompter 串行的执行语义。
+
+### 11.5 交付顺序
+
+A→B→C→D→E→F→**G→I→J** 必须有序：
+
+- **G** 依赖 D 的 universe 计算（`computeSegmentUniverseFromPackage` 复用）；不先落，后半场（或剧本外）伪段会继续污染 Director/Prompter；
+- **I** 独立，但部署顺序放在 G 之后：先保证 EditMap 不伪造，再保证 Prompter 偶发崩溃能自愈；
+- **J** 放最后：只有 G/I 落地后，豆包后端的验收才有意义——否则伪段/重复崩溃的问题会被误记到"豆包模型差"账上。
+
+### 11.6 验收命令（leji-v6g · 豆包并发）
+
+```bash
+node scripts/sd2_pipeline/run_sd2_pipeline.mjs \
+  --sd2-version v6 \
+  --project-id leji-v6g \
+  --episode-id 第1集 \
+  --script-file sample/第1集/剧本.md \
+  --duration 120 \
+  --block-chain-backend doubao
+  # 严格模式：不加任何 --skip-* / --allow-v6-soft
+```
+
+Stage 0/1（Normalizer / EditMap）仍走 DashScope；Stage 2/3（Director / Prompter 块链）切豆包并发。期望 `v6_softgate_report.source_integrity.status === 'pass'` 且不再出现 `SEG_063+` 伪段。
+
+### 11.7 leji-v6g 验收结果（2026-04-22 豆包并发跑）
+
+**三类严重缺陷全部消失：**
+
+| 缺陷类别 | leji-v6f | leji-v6g |
+|---|---|---|
+| EditMap 伪造 SEG_063–072 | ❌ 10 个伪段 | ✅ source_integrity=pass，totalReferenced=61，全部 ⊆ universe |
+| B03 `global_prefix` 膨胀 23KB、尾部字段丢失 | ❌ `field_missing / pass_l2_missing` | ✅ `global_prefix=33` 字符，`dialogue_fidelity_check / segment_coverage_overall / forbidden_words_self_check` 全部齐备 |
+| 16 个 block 尾部自检字段 | B03 缺失 | ✅ 16/16 `tail_ok` |
+
+**额外发现 + HOTFIX K：**
+
+豆包 `doubao-seed-2-0-pro-260215` 系列文本模型**不支持** `response_format: json_object`（返回 `InvalidParameter`）。新增 `SD2_LLM_DISABLE_JSON_RESPONSE_FORMAT=1` 环境变量，`applyArkEnvForSd2Pipeline()` 默认开启；JSON 归一由 system prompt 硬约束 + `parseJsonFromModelText` 的 `jsonrepair` 兜底。
+
+**仍残留的 LLM 质量问题（13 项硬门失败，归属 HOTFIX H 待处理）：**
+
+- `director_kva_coverage` × 7（B04/B05/B06/B07/B09/B10/B13）— Doubao 漏掉部分 P0 KVA；
+- `director_segment_coverage @ B16` = 0.21 — B16 覆盖率 LLM 策略性偏低；
+- `prompter_dialogue_fidelity` × 5（B09/B11/B13/B15/B16）— 缺 SEG_028 / SEG_034 / SEG_040 / SEG_045 / SEG_048/53/54 对白。
+
+**结论**：HOTFIX G/I/J/K 修复了"基础设施性"问题（伪造段、JSON 崩溃、模型后端兼容），Doubao 后端的 fan-out 并发已完全跑通；剩余的"对白保住 / 动作没保住"属于 LLM payload 增强范畴（HOTFIX H 规划中），不在本轮修复范围。

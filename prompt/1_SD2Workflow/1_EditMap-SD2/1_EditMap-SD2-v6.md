@@ -277,10 +277,13 @@ bonding_budget_sec            = clamp(round(duration_sec × template.bonding_bud
 |---|---|---|:-:|---|---|
 | L1 · EditMap | `segment_coverage_check` | `diagnosis` | ≥ 0.95 | **硬门**（v6.1-HOTFIX-D） | 是否把 `seg_id` 分配到 block |
 | L1.5 · EditMap | `last_seg_covered_check` | `diagnosis` | tail 必进 | **硬门**（v6.1-HOTFIX-D 新增） | 时间轴末段必须被覆盖 |
+| L1.6 · EditMap | `source_integrity_check` | `diagnosis.v6_softgate_report.source_integrity` | 引用 seg_id ⊆ universe | **硬门**（v6.2-HOTFIX-G 新增） | 禁止伪造 seg_id |
 | L2 · Prompter 整集 | `segment_coverage_ratio` | `sd2_final_report` | ≥ 0.90 | **硬门** | 实际消费占比 |
 | L3 · Prompter 子类 | `dialogue_subtype_coverage` | `episode_coverage` | = 1.00 | **硬门**（上位） | 对白类必须 100% 消费 |
 
-L1 / L1.5 / L2 / L3 全部为硬门，任一失败 pipeline 立即 exit 7 / 8。仅在 `--allow-v6-soft` / `--skip-editmap-coverage-hard` / `--skip-last-seg-hard` 显式降级时转为 warning。
+L1 / L1.5 / L1.6 / L2 / L3 全部为硬门，任一失败 pipeline 立即 exit 7 / 8。仅在 `--allow-v6-soft` / `--skip-editmap-coverage-hard` / `--skip-last-seg-hard` / `--skip-source-integrity-hard` 显式降级时转为 warning。
+
+**L1.6 · source_integrity_check（v6.2-HOTFIX-G）动机**：leji-v6f 豆包实验暴露出 LLM 会在 `appendix.block_index[].covered_segment_ids` 中**伪造 universe 之外的 seg_id**（真实 Normalizer 池到 `SEG_062` 为止，LLM 却自造 `SEG_063`…`SEG_072`，并长出一个剧本外尾钩字幕）。HOTFIX-D 的 L1 用 universe 过滤伪段，所以伪段既不计入覆盖率也不报警，会被当作 pass 写盘并向下游传染。L1.6 直接禁止"越界造段"：扫 `covered_segment_ids` + `must_cover_segment_ids` + `script_chunk_hint.{lead_seg_id, tail_seg_id, must_cover_segment_ids}` 中所有 seg_id，任意一个 ∉ universe → 硬门 fail。
 
 ### A.6 `diagnosis` 字段追加
 
@@ -379,6 +382,12 @@ v5 要求 `markdown_body.## 【组骨架】` 行数 == `appendix.block_index.len
     - `shots.length ≥ max(50, segs_count)`；
     - `blocks.length ≥ max(15, ceil(segs_count/4))`；
     - 剧本体量 > 目标时长时以"每 block 镜头数↑ + 每镜头时长↓"方式压缩，**禁止丢弃后半段 segment**。
+11. **（v6.2-HOTFIX-G 新增 · 源真相一致性铁律）所有 `seg_id` 必须来自 Normalizer 的真实 universe**：
+    - `appendix.block_index[*].covered_segment_ids[]`、`must_cover_segment_ids[]`、`script_chunk_hint.{lead_seg_id, tail_seg_id, must_cover_segment_ids[]}` 中**任何**一个 `seg_id` 都必须能在 `__NORMALIZED_SCRIPT_PACKAGE__.beat_ledger[*].segments[*].seg_id` 或 `script_segments[*].seg_id` 里找到；
+    - **严禁**自造超出 universe 的 seg_id（如 Normalizer 只到 `SEG_062`，不得自行生成 `SEG_063`…）；
+    - **严禁**额外生成剧本外的"尾钩字幕 / 彩蛋段"塞进 `markdown_body` 并引用伪 seg_id；
+    - 若剧本体量不足以铺满 120s，请**拆 shot / 放慢节奏**，而不是造段；
+    - pipeline 会用 `source_integrity_check` 硬门拦截任何伪 seg_id，失败直接 exit 7。
 
 ---
 
@@ -389,6 +398,7 @@ v5 要求 `markdown_body.## 【组骨架】` 行数 == `appendix.block_index.len
 | `--allow-v6-soft` | 所有 v6 硬门降级为 warning（含 L1 段覆盖 / tail_seg） |
 | `--skip-editmap-coverage-hard` | **仅** L1 段覆盖（≥ 0.95）硬门降级（v6.1-HOTFIX-D） |
 | `--skip-last-seg-hard` | **仅** last_seg_covered_check 硬门降级（v6.1-HOTFIX-D） |
+| `--skip-source-integrity-hard` | **仅** source_integrity_check 硬门降级（v6.2-HOTFIX-G） |
 | `--skip-rhythm-timeline` | 不产 `meta.rhythm_timeline`，但仍产 style_inference + covered_segment_ids |
 | `--skip-style-inference` | 不产 `meta.style_inference`，Director 回落 v5 `parsed_brief` |
 | `--rhythm-soft-only` | rhythm_timeline 产出正常，但 pipeline 下游的节奏硬门降级 warning |
@@ -406,7 +416,10 @@ v5 要求 `markdown_body.## 【组骨架】` 行数 == `appendix.block_index.len
 | v6.1-HOTFIX-C | 2026-04-21 | 🟢 | 汇总导出器 timecode 正则放宽 + EditMap block.time 兜底链 |
 | v6.1-HOTFIX-D | 2026-04-21 | 🟢 | **L1 段覆盖升级硬门 + tail_seg 硬门 + diagnosis 权威回填**（本次） |
 | v6.1-HOTFIX-E | 2026-04-21 | 🟢 | prompt 文档侧收口：L1/tail 硬门化 + 禁写 LLM 自估字段（本次） |
-| v6.1-HOTFIX-F | 2026-04-21 | 🟢 | directorBrief 动态硬下限注入：shot ≥ max(50, segs) / block ≥ max(15, segs/4) / tail_seg 必进（本次） |
+| v6.1-HOTFIX-F | 2026-04-21 | 🟢 | directorBrief 动态硬下限注入：shot ≥ max(50, segs) / block ≥ max(15, segs/4) / tail_seg 必进 |
+| v6.2-HOTFIX-G | 2026-04-22 | 🟢 | **source_integrity_check 硬门**：禁止 EditMap 伪造 universe 之外的 seg_id（v6f 豆包实验发现）（本次） |
+| v6.2-HOTFIX-I | 2026-04-22 | 🟢 | Prompter 产物完整性检测 + repetition collapse 自动重试 1 次（本次） |
+| v6.2-HOTFIX-J | 2026-04-22 | 🟢 | run_sd2_pipeline 新增 `--block-chain-backend=doubao`：Stage 2/3 可切火山 Ark（本次） |
 | v6.1 | 计划 2026-05-04 | ⏳ | 引入 Stage 1.5 Scene Architect（微调 rhythm_timeline；本 v6 对其输出兼容） |
 
 ---

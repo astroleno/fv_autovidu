@@ -78,8 +78,24 @@ export async function callLLM({
     messages,
     temperature,
   };
-  if (jsonObject) {
+  /**
+   * v6.2-HOTFIX-K · 网关/模型不支持 `response_format: json_object` 时（例如
+   * 火山 Ark 的 doubao-seed-2-0-* 系列会 400 `InvalidParameter`），允许用
+   * `SD2_LLM_DISABLE_JSON_RESPONSE_FORMAT=1` 显式关掉该参数；JSON 归一完全由
+   * system prompt + `parseJsonFromModelText` 的 jsonrepair 兜底。
+   */
+  const disableJsonFormat =
+    String(process.env.SD2_LLM_DISABLE_JSON_RESPONSE_FORMAT || '').trim() === '1';
+  if (jsonObject && !disableJsonFormat) {
     body.response_format = { type: 'json_object' };
+  }
+  /** 长 JSON（Director / Prompter）可设 SD2_LLM_MAX_OUTPUT_TOKENS，兼容火山 Ark / 其它网关。 */
+  const maxOutRaw = process.env.SD2_LLM_MAX_OUTPUT_TOKENS || '';
+  if (maxOutRaw.trim()) {
+    const mt = parseInt(maxOutRaw, 10);
+    if (Number.isFinite(mt) && mt > 0) {
+      body.max_tokens = mt;
+    }
   }
 
   /** EditMap 等大输入可能超过默认 TCP/空闲超时，默认 15 分钟，可用 SD2_LLM_TIMEOUT_MS 覆盖（毫秒）。 */

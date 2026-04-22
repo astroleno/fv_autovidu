@@ -147,6 +147,101 @@ function collectCoveredSegmentIds(parsed, universe) {
 }
 
 /**
+ * HOTFIX G · 收集 EditMap 中**所有被引用的 seg_id**（不过滤 universe）。
+ *
+ * 动机：v6f 暴露出 LLM 会在 `appendix.block_index[].covered_segment_ids` 里伪造
+ * 超出真实 Normalizer 范围的 seg_id（例：真实池只到 SEG_062，LLM 却自造
+ * SEG_063–SEG_072）。`collectCoveredSegmentIds` 用 universe 过滤伪段，
+ * 所以伪段不会影响 L1 计数——但**也不会触发任何警报**。
+ *
+ * 本函数**不做过滤**，把 `covered_segment_ids` + `must_cover_segment_ids` +
+ * `script_chunk_hint.{lead_seg_id, tail_seg_id, must_cover_segment_ids}` 中所有
+ * 字符串形态的 seg_id 都扫出来，供下游做"是否全部 ∈ universe"判定。
+ *
+ * @param {Record<string, unknown>} parsed
+ * @returns {Set<string>}  所有被 EditMap 引用过的 seg_id
+ */
+function collectAllReferencedSegIds(parsed) {
+  /** @type {Set<string>} */
+  const referenced = new Set();
+  const appendix =
+    parsed.appendix && typeof parsed.appendix === 'object'
+      ? /** @type {Record<string, unknown>} */ (parsed.appendix)
+      : {};
+  const rows = Array.isArray(appendix.block_index) ? appendix.block_index : [];
+  for (const row of rows) {
+    if (!row || typeof row !== 'object') continue;
+    const r = /** @type {Record<string, unknown>} */ (row);
+    const arrays = [
+      Array.isArray(r.covered_segment_ids) ? r.covered_segment_ids : [],
+      Array.isArray(r.must_cover_segment_ids) ? r.must_cover_segment_ids : [],
+    ];
+    const hint =
+      r.script_chunk_hint && typeof r.script_chunk_hint === 'object'
+        ? /** @type {Record<string, unknown>} */ (r.script_chunk_hint)
+        : null;
+    if (hint) {
+      if (typeof hint.lead_seg_id === 'string' && hint.lead_seg_id) {
+        referenced.add(hint.lead_seg_id);
+      }
+      if (typeof hint.tail_seg_id === 'string' && hint.tail_seg_id) {
+        referenced.add(hint.tail_seg_id);
+      }
+      if (Array.isArray(hint.must_cover_segment_ids)) {
+        arrays.push(hint.must_cover_segment_ids);
+      }
+    }
+    for (const arr of arrays) {
+      for (const sid of arr) {
+        if (typeof sid === 'string' && sid) referenced.add(sid);
+      }
+    }
+  }
+  return referenced;
+}
+
+/**
+ * HOTFIX G · source_integrity_check：EditMap 引用的所有 seg_id 必须 ∈ Normalizer universe。
+ *
+ * 返回 status：
+ *   - 'skip'：Stage 0 未挂载或 universe 为空
+ *   - 'pass'：所有被引用的 seg_id 都在真实 universe 里
+ *   - 'fail'：存在 seg_id ∉ universe（LLM 伪造），附带 `outOfUniverseIds`
+ *
+ * @param {Record<string, unknown>} parsed
+ * @param {unknown | null} normalizedPackage
+ * @returns {{ status: 'pass'|'fail'|'skip', outOfUniverseIds: string[], totalReferenced: number, reason: string }}
+ */
+function runSourceIntegrityCheck(parsed, normalizedPackage) {
+  const { universe } = computeSegmentUniverseFromPackage(normalizedPackage);
+  if (universe.size === 0) {
+    return {
+      status: 'skip',
+      outOfUniverseIds: [],
+      totalReferenced: 0,
+      reason: 'no_universe_from_package',
+    };
+  }
+  const referenced = collectAllReferencedSegIds(parsed);
+  const outOfUniverse = [...referenced].filter((sid) => !universe.has(sid));
+  outOfUniverse.sort();
+  if (outOfUniverse.length === 0) {
+    return {
+      status: 'pass',
+      outOfUniverseIds: [],
+      totalReferenced: referenced.size,
+      reason: 'all_ids_in_universe',
+    };
+  }
+  return {
+    status: 'fail',
+    outOfUniverseIds: outOfUniverse,
+    totalReferenced: referenced.size,
+    reason: `fabricated seg_ids detected: ${outOfUniverse.slice(0, 8).join(',')}${outOfUniverse.length > 8 ? ',…' : ''}`,
+  };
+}
+
+/**
  * v6 EditMap 层 segment_coverage_check · L1 阈值 ≥ 0.95。
  *
  * HOTFIX D（2026-04）：本检查默认**升级为硬门**（由调用层按 `--allow-v6-soft`
@@ -385,13 +480,15 @@ async function main() {
     process.exit(2);
   }
 
-  // ── HOTFIX D · v6 EditMap 硬门降级开关 ──
+  // ── HOTFIX D/G · v6 EditMap 硬门降级开关 ──
   //   - --allow-v6-soft：一键降级（所有 v6 硬门 → warn，保留审计轨迹）
   //   - --skip-editmap-coverage-hard：仅 segment_coverage L1 降级
   //   - --skip-last-seg-hard：仅 last_seg_covered_check 降级
+  //   - --skip-source-integrity-hard：仅 source_integrity_check 降级（HOTFIX G）
   const allowV6Soft = args['allow-v6-soft'] === true;
   const skipCoverageHard = args['skip-editmap-coverage-hard'] === true || allowV6Soft;
   const skipLastSegHard = args['skip-last-seg-hard'] === true || allowV6Soft;
+  const skipSourceIntegrityHard = args['skip-source-integrity-hard'] === true || allowV6Soft;
 
   const outPath =
     typeof args.output === 'string'
@@ -526,9 +623,10 @@ async function main() {
     }
   }
 
-  // ── v6 软门/硬门集群（HOTFIX D：L1 与 last_seg 默认硬门，其他保持软门） ──
+  // ── v6 软门/硬门集群（HOTFIX D：L1 与 last_seg 默认硬门；HOTFIX G：source_integrity 硬门） ──
   const segCheck = runSegmentCoverageL1Check(parsed, normalizedPackage);
   const tailCheck = runLastSegCoveredCheck(parsed, normalizedPackage);
+  const sourceCheck = runSourceIntegrityCheck(parsed, normalizedPackage);
   const rhythmCheck = runRhythmTimelineShapeCheck(parsed);
   const styleCheck = runStyleInferenceShapeCheck(parsed);
 
@@ -537,6 +635,9 @@ async function main() {
   );
   console.log(
     `[${SCRIPT_TAG}] v6 硬门 · last_seg_covered_check: ${tailCheck.status}${tailCheck.tailSegId ? ` tail=${tailCheck.tailSegId}` : ''}${tailCheck.status === 'fail' ? ` (${tailCheck.reason})` : ''}`,
+  );
+  console.log(
+    `[${SCRIPT_TAG}] v6 硬门 · source_integrity_check: ${sourceCheck.status} (refs=${sourceCheck.totalReferenced})${sourceCheck.status === 'fail' ? ` out_of_universe(前8)=${sourceCheck.outOfUniverseIds.slice(0, 8).join(',')}` : ''}`,
   );
   console.log(
     `[${SCRIPT_TAG}] v6 软门 · rhythm_timeline shape: ${rhythmCheck.status}${rhythmCheck.missing.length ? ' missing=' + rhythmCheck.missing.join(',') : ''}`,
@@ -561,17 +662,19 @@ async function main() {
     /** @type {Record<string, unknown>} */ (diag).v6_softgate_report = {
       segment_coverage_l1: segCheck,
       last_seg_covered: tailCheck,
+      source_integrity: sourceCheck,
       rhythm_timeline_shape: rhythmCheck,
       style_inference_shape: styleCheck,
       downgrade_flags: {
         allow_v6_soft: allowV6Soft,
         skip_editmap_coverage_hard: skipCoverageHard,
         skip_last_seg_hard: skipLastSegHard,
+        skip_source_integrity_hard: skipSourceIntegrityHard,
       },
     };
   }
 
-  // ── HOTFIX D · 硬门拦截（L1 + last_seg），允许通过 flag 降级 ──
+  // ── HOTFIX D/G · 硬门拦截（L1 + last_seg + source_integrity），允许通过 flag 降级 ──
   /** @type {string[]} */
   const hardFails = [];
   if (segCheck.status === 'fail') {
@@ -590,6 +693,17 @@ async function main() {
       );
     } else {
       hardFails.push(`last_seg_covered_check: ${tailCheck.reason}`);
+    }
+  }
+  if (sourceCheck.status === 'fail') {
+    if (skipSourceIntegrityHard) {
+      console.warn(
+        `[${SCRIPT_TAG}] ⚠️ source_integrity_check fail（${sourceCheck.outOfUniverseIds.length} 个伪 seg_id，前 8: ${sourceCheck.outOfUniverseIds.slice(0, 8).join(',')}）· 已降级为 warn（--allow-v6-soft / --skip-source-integrity-hard）`,
+      );
+    } else {
+      hardFails.push(
+        `source_integrity_check: ${sourceCheck.outOfUniverseIds.length} fabricated seg_ids (${sourceCheck.outOfUniverseIds.slice(0, 8).join(',')}${sourceCheck.outOfUniverseIds.length > 8 ? ',…' : ''})`,
+      );
     }
   }
   if (rhythmCheck.status === 'fail') {
@@ -629,12 +743,16 @@ if (_e && pathToFileURL(path.resolve(_e)).href === import.meta.url) {
   });
 }
 
-// HOTFIX D/F · 导出 pure 函数供单元测试使用（参见 tests/test_editmap_hardgate_v6_hotfix_d.mjs）
+// HOTFIX D/F/G · 导出 pure 函数供单元测试使用
+//   - D/F: tests/test_editmap_hardgate_v6_hotfix_d.mjs
+//   - G:   tests/test_editmap_hardgate_v6_hotfix_g.mjs
 export {
   computeSegmentUniverseFromPackage,
   collectCoveredSegmentIds,
+  collectAllReferencedSegIds,
   runSegmentCoverageL1Check,
   runLastSegCoveredCheck,
+  runSourceIntegrityCheck,
   backfillDiagnosisAuthoritativeMetrics,
   composeDynamicHardFloorBrief,
   appendHardFloorToDirectorBrief,

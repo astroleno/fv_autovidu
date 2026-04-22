@@ -77,6 +77,7 @@ import {
   repairAssetTagDrift,
 } from './lib/sd2_block_chain_v6_helpers.mjs';
 import { runAllPrompterSelfChecks } from './lib/sd2_prompter_selfcheck_v6.mjs';
+import { shouldRetryPrompter } from './lib/sd2_prompter_anomaly_v6.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -149,7 +150,8 @@ function hardgateToWarning(o) {
   };
 }
 
-async function main() {
+/** 导出供 `call_sd2_block_chain_v6_doubao.mjs` 等入口在设置好 `SD2_LLM_*` 后动态 import 调用。 */
+export async function main() {
   const args = parseArgs(process.argv.slice(2));
   const editMapPath =
     typeof args['edit-map'] === 'string' ? path.resolve(process.cwd(), args['edit-map']) : '';
@@ -504,13 +506,53 @@ async function main() {
       console.log(
         `[${SCRIPT_TAG}] ${blockId}：Prompter … slices=${proLoad.applied.length} tokens=${proLoad.total_tokens}/${proLoad.budget}`,
       );
-      const prRaw = await callLLM({
-        systemPrompt: prompterSys,
-        userMessage: prUser,
-        temperature: 0.35,
-        jsonObject: true,
-      });
-      const prParsed = parseJsonFromModelText(prRaw);
+
+      // ── HOTFIX I · Prompter 产物异常自动重试 ──
+      //   偶发的 repetition collapse（如 global_prefix 被"偶像剧、家庭剧…"循环撑爆）
+      //   或 tail-field-missing（LLM 只写到 shots + global_prefix 就停）会让整个 block
+      //   的自检字段全丢、下游硬门只能 skip。这里检测到异常就用更高的温度重试 1 次，
+      //   既避免陷入同一采样分支，也不放任坏样本污染产物。
+      /** @type {{ temperature: number, tag: string }[]} */
+      const prAttemptPlan = [
+        { temperature: 0.35, tag: 'initial' },
+        { temperature: 0.55, tag: 'retry_anomaly' },
+      ];
+      /** @type {unknown} */
+      let prParsed = null;
+      /** @type {string[]} */
+      const prRetryReasons = [];
+      for (let attemptIdx = 0; attemptIdx < prAttemptPlan.length; attemptIdx += 1) {
+        const plan = prAttemptPlan[attemptIdx];
+        const rawText = await callLLM({
+          systemPrompt: prompterSys,
+          userMessage: prUser,
+          temperature: plan.temperature,
+          jsonObject: true,
+        });
+        const parsed = parseJsonFromModelText(rawText);
+        const verdict = shouldRetryPrompter(parsed);
+        if (!verdict.shouldRetry) {
+          prParsed = parsed;
+          if (attemptIdx > 0) {
+            console.log(
+              `[${SCRIPT_TAG}] ${blockId}：Prompter 重试 ${attemptIdx} 次后产物通过完整性检查（原因：${prRetryReasons.join('；')}）。`,
+            );
+          }
+          break;
+        }
+        prRetryReasons.push(...verdict.reasons);
+        if (attemptIdx < prAttemptPlan.length - 1) {
+          console.warn(
+            `[${SCRIPT_TAG}] ${blockId}：Prompter 产物异常（${verdict.reasons.join('；')}），以 temperature=${prAttemptPlan[attemptIdx + 1].temperature} 自动重试…`,
+          );
+        } else {
+          // 最后一次仍失败：保留最后一次解析结果，让下游硬门来处理
+          console.error(
+            `[${SCRIPT_TAG}] ${blockId}：Prompter 已尝试 ${prAttemptPlan.length} 次仍异常（${verdict.reasons.join('；')}），交由下游硬门处置。`,
+          );
+          prParsed = parsed;
+        }
+      }
 
       // ── v5 复用：@图N drift / AV-split / BGM 裸名 ──
       //
@@ -630,6 +672,15 @@ async function main() {
             detail: sc.detail,
           });
         }
+      }
+
+      // HOTFIX I · 将异常重试轨迹写进产物（便于审计，不影响下游 schema）
+      if (prParsed && typeof prParsed === 'object' && !Array.isArray(prParsed) && prRetryReasons.length > 0) {
+        /** @type {Record<string, unknown>} */ (prParsed)._v6_anomaly_retry = {
+          attempts: prRetryReasons.length + 1,
+          reasons: prRetryReasons,
+          hotfix: 'I',
+        };
       }
 
       fs.writeFileSync(path.join(promptsDir, `${blockId}.json`), JSON.stringify(prParsed, null, 2) + '\n', 'utf8');
