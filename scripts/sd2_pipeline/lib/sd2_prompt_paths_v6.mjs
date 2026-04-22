@@ -117,6 +117,27 @@ export function getDirectorSd2V6PromptPath() {
 }
 
 /**
+ * Stage 1.5 · Scene Architect v1 系统提示词绝对路径。
+ *
+ * 对应 `prompt/1_SD2Workflow/1_5_SceneArchitect/1_5_SceneArchitect-v1.md`；
+ * Scene Architect 是 EditMap 与 Director 之间的调度层（v1 PoC 只做
+ * rhythm_timeline 微调 + KVA 编排建议；不产出 scene_blocking_sheets / audio_intent_ledger）。
+ *
+ * 契约源：
+ *   - `prompt/1_SD2Workflow/docs/v6/05_v6-场级调度与音频意图.md`
+ *   - `prompt/1_SD2Workflow/docs/v6/06_v6-节奏推导与爆点密度.md`
+ *
+ * @returns {string}
+ */
+export function getSceneArchitectV1PromptPath() {
+  return path.join(
+    getPromptRootV6(),
+    '1_5_SceneArchitect',
+    '1_5_SceneArchitect-v1.md',
+  );
+}
+
+/**
  * Prompter v6 系统提示词绝对路径。
  *
  * 对应 `prompt/1_SD2Workflow/2_SD2Prompter/2_SD2Prompter-v6.md`（delta 文档）；
