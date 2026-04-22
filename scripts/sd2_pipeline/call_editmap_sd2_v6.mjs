@@ -43,6 +43,14 @@ import {
   parseJsonFromModelText,
 } from './lib/llm_client.mjs';
 import {
+  callApimartChatCompletions,
+  getApimartResolvedDefaults,
+} from './lib/apimart_chat.mjs';
+import {
+  callApimartMessages,
+  getApimartMessagesDefaults,
+} from './lib/apimart_messages_chat.mjs';
+import {
   annotateNormalizerRef,
   estimateTokens,
   loadEditMapSlicesV6,
@@ -575,24 +583,136 @@ async function main() {
     .filter(Boolean)
     .join('\n');
 
-  console.log(
-    `[${SCRIPT_TAG}] 调用 LLM：model=${getResolvedLlmModel()} base=${getResolvedLlmBaseUrl()}`,
-  );
-  console.log(`[${SCRIPT_TAG}] 生成 EditMap-SD2 v6 …`);
-  const raw = await callLLM({
-    systemPrompt,
-    userMessage,
-    temperature: 0.25,
-    jsonObject: true,
-  });
+  // ── 网关选择 ──
+  //   默认：SD2_LLM_*（豆包/qwen/通义，OpenAI 兼容）
+  //   --apimart：APIMart /v1/messages（Anthropic 原生端点）
+  //     - 默认模型 claude-opus-4-6-thinking（APIMart 上 4-7 不存在，只有 4-6）
+  //     - 可用 --model 覆盖 / --apimart-openai-compat 退到老的 /chat/completions 分支
+  const useApimart = args.apimart === true;
+  const useApimartOpenAiCompat = args['apimart-openai-compat'] === true;
+
+  /** @type {string} */
+  let raw;
+  if (useApimart) {
+    const editMapMaxTokens = Math.max(
+      32768,
+      parseInt(process.env.APIMART_EDITMAP_MAX_TOKENS || '200000', 10),
+    );
+    const modelOverride = typeof args.model === 'string' ? args.model : undefined;
+
+    if (useApimartOpenAiCompat) {
+      // 旧路径：/v1/chat/completions（Anthropic 新模型已不支持，留作回退）
+      const defaults = getApimartResolvedDefaults();
+      const effectiveModel = modelOverride || defaults.model;
+      console.log(
+        `[${SCRIPT_TAG}] 调用 APIMart (OpenAI-compat)：model=${effectiveModel} base=${defaults.baseUrl} max_tokens=${editMapMaxTokens}`,
+      );
+      console.log(`[${SCRIPT_TAG}] 生成 EditMap-SD2 v6（APIMart /chat/completions）…`);
+      const chatOpts = {
+        messages: [
+          { role: /** @type {'system'} */ ('system'), content: systemPrompt },
+          { role: /** @type {'user'} */ ('user'), content: userMessage },
+        ],
+        model: modelOverride,
+        temperature: 0.25,
+        jsonObject: true,
+        enableThinking: args['no-thinking'] !== true,
+        maxTokens: editMapMaxTokens,
+      };
+      try {
+        raw = await callApimartChatCompletions(chatOpts);
+      } catch (firstErr) {
+        const fr = /** @type {Error & { finishReason?: string }} */ (firstErr);
+        if (fr.finishReason === 'length') {
+          const cap = Math.max(
+            editMapMaxTokens,
+            parseInt(process.env.APIMART_EDITMAP_MAX_RETRY_CAP || '262144', 10),
+          );
+          const bumped = Math.min(Math.floor(editMapMaxTokens * 1.5), cap);
+          if (bumped > editMapMaxTokens) {
+            console.warn(
+              `[${SCRIPT_TAG}] finish_reason=length，max_tokens ${editMapMaxTokens}→${bumped} 重试…`,
+            );
+            raw = await callApimartChatCompletions({ ...chatOpts, maxTokens: bumped });
+          } else {
+            throw firstErr;
+          }
+        } else {
+          throw firstErr;
+        }
+      }
+    } else {
+      // 默认路径：/v1/messages（Anthropic 原生，支持 claude-opus-4-6-thinking）
+      const msgDefaults = getApimartMessagesDefaults();
+      const effectiveModel = modelOverride || msgDefaults.model;
+      console.log(
+        `[${SCRIPT_TAG}] 调用 APIMart (Anthropic /messages)：model=${effectiveModel} ` +
+          `base=${msgDefaults.baseUrl} anthropic-version=${msgDefaults.anthropicVersion} ` +
+          `max_tokens=${editMapMaxTokens}`,
+      );
+      console.log(`[${SCRIPT_TAG}] 生成 EditMap-SD2 v6（APIMart /messages）…`);
+      const msgOpts = {
+        messages: [
+          { role: /** @type {'system'} */ ('system'), content: systemPrompt },
+          { role: /** @type {'user'} */ ('user'), content: userMessage },
+        ],
+        model: effectiveModel,
+        temperature: 0.25,
+        maxTokens: editMapMaxTokens,
+      };
+      try {
+        raw = await callApimartMessages(msgOpts);
+      } catch (firstErr) {
+        const fr = /** @type {Error & { finishReason?: string }} */ (firstErr);
+        if (fr.finishReason === 'length') {
+          const cap = Math.max(
+            editMapMaxTokens,
+            parseInt(process.env.APIMART_EDITMAP_MAX_RETRY_CAP || '262144', 10),
+          );
+          const bumped = Math.min(Math.floor(editMapMaxTokens * 1.5), cap);
+          if (bumped > editMapMaxTokens) {
+            console.warn(
+              `[${SCRIPT_TAG}] stop_reason=max_tokens，max_tokens ${editMapMaxTokens}→${bumped} 重试…`,
+            );
+            raw = await callApimartMessages({ ...msgOpts, maxTokens: bumped });
+          } else {
+            throw firstErr;
+          }
+        } else {
+          throw firstErr;
+        }
+      }
+    }
+  } else {
+    console.log(
+      `[${SCRIPT_TAG}] 调用 LLM：model=${getResolvedLlmModel()} base=${getResolvedLlmBaseUrl()}`,
+    );
+    console.log(`[${SCRIPT_TAG}] 生成 EditMap-SD2 v6 …`);
+    raw = await callLLM({
+      systemPrompt,
+      userMessage,
+      temperature: 0.25,
+      jsonObject: true,
+    });
+  }
 
   /** @type {Record<string, unknown>} */
   let parsed;
   try {
     parsed = /** @type {Record<string, unknown>} */ (parseJsonFromModelText(raw));
   } catch (e) {
-    console.error(`[${SCRIPT_TAG}] JSON 解析失败，原始前 500 字：`);
-    console.error(raw.slice(0, 500));
+    // HOTFIX R · 解析失败时把完整 raw 落盘以便诊断（流式 thinking 模型易出现
+    // "推理文本 + JSON + 可能截断"的混合输出）。
+    const rawDumpPath = outPath.replace(/\.json$/i, '.raw.txt');
+    try {
+      fs.writeFileSync(rawDumpPath, raw, 'utf8');
+      console.error(
+        `[${SCRIPT_TAG}] JSON 解析失败，已保存完整 raw 到 ${rawDumpPath}（${raw.length} chars）。前 800 字：`,
+      );
+    } catch {
+      console.error(`[${SCRIPT_TAG}] JSON 解析失败，原始前 800 字：`);
+    }
+    console.error(raw.slice(0, 800));
     throw e;
   }
 
