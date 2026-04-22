@@ -633,6 +633,14 @@ async function main() {
         'skip-editmap-coverage-hard',
         'skip-last-seg-hard',
         'skip-source-integrity-hard',
+        // v6 EditMap 后端选择（HOTFIX U）：
+        //   --apimart                 走 APIMart /v1/messages（Anthropic 原生 schema，Opus thinking 原生支持）
+        //   --apimart-openai-compat   退回 /chat/completions（仅在 Messages 端点异常时使用）
+        //   --no-thinking             关闭 thinking 模式（仅 APIMart OpenAI-compat 有效）
+        // 之前这些参数只对手动直跑 call_editmap_sd2_v6.mjs 生效，走 run_sd2_pipeline 时会被吞掉，
+        // 导致完整一键跑法下默认回到 DashScope/qwen-plus，与 leji-v6-apimart-* 样本不一致。
+        'apimart',
+        'apimart-openai-compat',
       ]) {
         if (args[flag] === true) emArgs.push(`--${flag}`);
       }
