@@ -39,6 +39,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 
 import {
   callLLM,
+  getLlmTraceSnapshot,
   getResolvedLlmBaseUrl,
   getResolvedLlmModel,
   parseJsonFromModelText,
@@ -78,6 +79,14 @@ import {
 } from './lib/sd2_block_chain_v6_helpers.mjs';
 import { runAllPrompterSelfChecks } from './lib/sd2_prompter_selfcheck_v6.mjs';
 import { shouldRetryPrompter } from './lib/sd2_prompter_anomaly_v6.mjs';
+import {
+  buildCharacterWhitelist,
+  checkCharacterWhitelistForBlock,
+} from './lib/sd2_character_whitelist_v6.mjs';
+import {
+  checkMaxDialoguePerShot,
+  checkMinShotsPerBlock,
+} from './lib/sd2_shot_structure_v6.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -189,6 +198,26 @@ export async function main() {
     // rhythm_density_check / five_stage_check / climax_signature_check /
     // segment_coverage_overall.pass_l2 / pass_l3）。默认开启，可一键降级。
     const skipPrompterSelfHard = args['skip-prompter-selfcheck-hard'] === true || allowV6Soft;
+    // HOTFIX L · max_dialogue_per_shot 硬门（每 shot 独立对白行 ≤ 2）
+    const skipDialoguePerShotHard = args['skip-dialogue-per-shot-hard'] === true || allowV6Soft;
+    // HOTFIX M · 块局部 min_shots_per_block 硬下限（shots ≥ max(2, ceil(seg/4))）
+    const skipMinShotsHard = args['skip-min-shots-hard'] === true || allowV6Soft;
+    // HOTFIX N · character_token_integrity_check 白名单硬门
+    const skipCharacterWhitelistHard =
+      args['skip-character-whitelist-hard'] === true || allowV6Soft;
+    // HOTFIX L/M 默认参数（可通过 CLI 微调；不建议业务使用）
+    const maxDialoguePerShot = Math.max(
+      1,
+      parseInt(String(args['max-dialogue-per-shot'] !== undefined ? args['max-dialogue-per-shot'] : '2'), 10) || 2,
+    );
+    const minShotsFloor = Math.max(
+      1,
+      parseInt(String(args['min-shots-floor'] !== undefined ? args['min-shots-floor'] : '2'), 10) || 2,
+    );
+    const segsPerShotCeil = Math.max(
+      1,
+      parseInt(String(args['segs-per-shot-ceil'] !== undefined ? args['segs-per-shot-ceil'] : '4'), 10) || 4,
+    );
 
   const rawDp = JSON.parse(fs.readFileSync(directorPayloadsPath, 'utf8'));
   /** @type {Array<{ block_id?: string, payload?: unknown }>} */
@@ -204,6 +233,35 @@ export async function main() {
 
   const editMap = JSON.parse(fs.readFileSync(editMapPath, 'utf8'));
   const normalizedPackage = loadNormalizedPackageSafely(normalizedPackagePath);
+
+  // HOTFIX N · 尝试读取同目录 edit_map_input.json（承载 assetManifest.characters），
+  //   用于角色白名单硬门；读不到则 gate 自动降级为 skip。
+  const editMapInputPath = path.join(outRoot, 'edit_map_input.json');
+  /** @type {unknown | null} */
+  let editMapInputForWhitelist = null;
+  if (fs.existsSync(editMapInputPath)) {
+    try {
+      const raw = fs.readFileSync(editMapInputPath, 'utf8');
+      const obj = JSON.parse(raw);
+      if (obj && typeof obj === 'object') editMapInputForWhitelist = obj;
+    } catch (err) {
+      console.warn(
+        `[${SCRIPT_TAG}] 读取 edit_map_input.json 失败（将跳过 character_token_integrity_check）：${err instanceof Error ? err.message : err}`,
+      );
+    }
+  } else {
+    console.warn(
+      `[${SCRIPT_TAG}] 未找到 ${editMapInputPath}，character_token_integrity_check 将自动 skip`,
+    );
+  }
+
+  // HOTFIX P · 只在 main() 入口采一次 LLM trace 快照，后续所有产物都引用它；
+  //   产物文件 **不含** API Key，只含 provider / base_url / model / 几个调用开关。
+  const llmTraceSnapshot = getLlmTraceSnapshot();
+  console.log(
+    `[${SCRIPT_TAG}] HOTFIX P · llm_trace provider=${llmTraceSnapshot.provider} model=${llmTraceSnapshot.model}` +
+      ` json_fmt_disabled=${llmTraceSnapshot.json_response_format_disabled} max_out=${llmTraceSnapshot.max_output_tokens}`,
+  );
   if (normalizedPackage) {
     console.log(`[${SCRIPT_TAG}] 已挂载 Stage 0 产物: ${normalizedPackagePath}`);
   } else {
@@ -683,6 +741,87 @@ export async function main() {
         };
       }
 
+      // ── HOTFIX L · max_dialogue_per_shot 硬门 ──
+      const dlgPerShotGate = checkMaxDialoguePerShot(prParsed, maxDialoguePerShot);
+      hardgateOutcomes.push({
+        code: 'max_dialogue_per_shot',
+        status:
+          skipDialoguePerShotHard && dlgPerShotGate.status === 'fail' ? 'warn' : dlgPerShotGate.status,
+        reason: dlgPerShotGate.reason,
+        block_id: blockId,
+        detail: { offenders: dlgPerShotGate.offenders, max_per_shot: dlgPerShotGate.max_per_shot },
+      });
+
+      // ── HOTFIX M · 块局部 min_shots_per_block 硬下限 ──
+      const scriptChunkForM = /** @type {Record<string, unknown> | null} */ (
+        /** @type {Record<string, unknown>} */ (dpPayload).scriptChunk
+      );
+      const segCountForM =
+        scriptChunkForM && Array.isArray(/** @type {{ segments?: unknown[] }} */ (scriptChunkForM).segments)
+          ? /** @type {unknown[]} */ (/** @type {{ segments: unknown[] }} */ (scriptChunkForM).segments).length
+          : 0;
+      const minShotsGate = checkMinShotsPerBlock(prParsed, segCountForM, {
+        minShotsFloor,
+        segsPerShotCeil,
+      });
+      hardgateOutcomes.push({
+        code: 'min_shots_per_block',
+        status: skipMinShotsHard && minShotsGate.status === 'fail' ? 'warn' : minShotsGate.status,
+        reason: minShotsGate.reason,
+        block_id: blockId,
+        detail: {
+          required: minShotsGate.required,
+          actual: minShotsGate.actual,
+          seg_count: minShotsGate.seg_count,
+        },
+      });
+
+      // ── HOTFIX N · character_token_integrity_check 白名单硬门 ──
+      const whitelist = buildCharacterWhitelist({
+        editMapInput: /** @type {import('./lib/sd2_character_whitelist_v6.mjs').EditMapInputLike | null} */ (
+          editMapInputForWhitelist
+        ),
+        scriptChunk: /** @type {import('./lib/sd2_character_whitelist_v6.mjs').ScriptChunkLike | null} */ (
+          scriptChunkForM
+        ),
+      });
+      const charGate = checkCharacterWhitelistForBlock(prParsed, whitelist);
+      hardgateOutcomes.push({
+        code: 'character_token_integrity',
+        status: skipCharacterWhitelistHard && charGate.status === 'fail' ? 'warn' : charGate.status,
+        reason: charGate.reason,
+        block_id: blockId,
+        detail: {
+          unknown_tokens: charGate.unknown_tokens,
+          per_shot: charGate.per_shot,
+          whitelist_size: charGate.whitelist_size,
+        },
+      });
+
+      // ── HOTFIX P · 把 LLM trace 注入到每个 Bxx.json 顶层，便于审计哪一轮是豆包/qwen ──
+      if (prParsed && typeof prParsed === 'object' && !Array.isArray(prParsed)) {
+        /** @type {Record<string, unknown>} */ (prParsed)._llm_trace = {
+          ...llmTraceSnapshot,
+          stage: 'prompter',
+          block_id: blockId,
+          hotfix: 'P',
+        };
+      }
+      if (dirParsed && typeof dirParsed === 'object' && !Array.isArray(dirParsed)) {
+        /** @type {Record<string, unknown>} */ (dirParsed)._llm_trace = {
+          ...llmTraceSnapshot,
+          stage: 'director',
+          block_id: blockId,
+          hotfix: 'P',
+        };
+        // director_prompts/${blockId}.json 已在前面写入；此处补写一遍以带上 trace
+        fs.writeFileSync(
+          path.join(directorDir, `${blockId}.json`),
+          JSON.stringify(dirParsed, null, 2) + '\n',
+          'utf8',
+        );
+      }
+
       fs.writeFileSync(path.join(promptsDir, `${blockId}.json`), JSON.stringify(prParsed, null, 2) + '\n', 'utf8');
       rows[index] = { block_id: blockId, director_result: dirParsed, prompter_result: prParsed };
 
@@ -741,6 +880,8 @@ export async function main() {
     stagger_ms: staggerMs,
     slices_root: path.resolve(slicesRoot),
     has_normalized_script_package: Boolean(normalizedPackage),
+    /** HOTFIX P · 整轮 LLM 调用快照，用于审计链（每个 Bxx.json 顶层亦有同样的 _llm_trace） */
+    llm_trace: llmTraceSnapshot,
   };
 
   writeJson(path.join(outRoot, 'sd2_director_all.json'), {

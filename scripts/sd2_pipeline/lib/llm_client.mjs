@@ -30,6 +30,50 @@ export function getResolvedLlmBaseUrl() {
 }
 
 /**
+ * HOTFIX P · 从 base_url 反推供应商（仅用于产物 trace / 审计）。
+ * @param {string} baseUrl
+ * @returns {string}
+ */
+export function inferLlmProviderFromBaseUrl(baseUrl) {
+  const u = String(baseUrl || '').toLowerCase();
+  if (u.includes('volcengineapi.com') || u.includes('ark.cn-') || u.includes('/ark/')) return 'doubao_ark';
+  if (u.includes('dashscope.aliyuncs.com') || u.includes('bailian.aliyuncs.com')) return 'dashscope_qwen';
+  if (u.includes('yunwu.ai') || u.includes('yun-wu.com')) return 'yunwu';
+  if (u.includes('openai.com')) return 'openai';
+  if (u.includes('anthropic.com')) return 'anthropic';
+  if (u.includes('deepseek.com')) return 'deepseek';
+  return 'custom_openai_compatible';
+}
+
+/**
+ * HOTFIX P · 当前 LLM 调用参数快照（用于写入产物元数据以便审计）。
+ *
+ * 注意：绝不包含 API Key；只包含 base_url / model / 与调用行为相关的几个开关。
+ * @returns {{
+ *   provider: string,
+ *   base_url: string,
+ *   model: string,
+ *   json_response_format_disabled: boolean,
+ *   max_output_tokens: number | null,
+ *   timeout_ms: number,
+ * }}
+ */
+export function getLlmTraceSnapshot() {
+  const baseUrl = getResolvedLlmBaseUrl();
+  const maxOutRaw = process.env.SD2_LLM_MAX_OUTPUT_TOKENS || '';
+  const mt = maxOutRaw.trim() ? parseInt(maxOutRaw, 10) : NaN;
+  return {
+    provider: inferLlmProviderFromBaseUrl(baseUrl),
+    base_url: baseUrl,
+    model: getResolvedLlmModel(),
+    json_response_format_disabled:
+      String(process.env.SD2_LLM_DISABLE_JSON_RESPONSE_FORMAT || '').trim() === '1',
+    max_output_tokens: Number.isFinite(mt) && mt > 0 ? mt : null,
+    timeout_ms: Math.max(60000, parseInt(process.env.SD2_LLM_TIMEOUT_MS || '900000', 10)),
+  };
+}
+
+/**
  * @param {object} opts
  * @param {string} opts.systemPrompt
  * @param {string} opts.userMessage

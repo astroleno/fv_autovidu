@@ -47,7 +47,7 @@
  * --normalizer（仅 v5）：Stage 0 ScriptNormalizer 默认走 DashScope（同上 SD2_LLM_MODEL，如 qwen-plus），与 EditMap 云雾 Opus 解耦。
  *           若需 Stage 0 也走云雾，设环境变量 SD2_NORMALIZER_USE_YUNWU=1（且本进程带 --yunwu）。
  */
-import { spawnSync } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -85,18 +85,42 @@ function parseArgs(argv) {
 }
 
 /**
+ * HOTFIX O · 子进程 stdout/stderr 流式转发到父进程（父进程已 patch 了
+ * process.stdout/stderr.write，所以子进程输出也会被自动 tee 到 pipeline_run.log）。
+ *
+ * 说明：
+ *   - 用 spawn（异步）代替 spawnSync('inherit')，保证子进程每一行都经过
+ *     父进程 process.stdout.write → 触发 tee hook。
+ *   - 以 Promise 形式暴露，调用点需要 `await runNode(...)`。
+ *   - 失败时仍按原行为抛异常（throw）；如调用方需要捕获 non-zero，自行 try/catch。
+ *
  * @param {string[]} nodeArgs
  * @param {string} [cwd]
+ * @returns {Promise<void>}
  */
 function runNode(nodeArgs, cwd = REPO_ROOT) {
-  const r = spawnSync(process.execPath, nodeArgs, {
-    cwd,
-    stdio: 'inherit',
-    env: process.env,
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, nodeArgs, {
+      cwd,
+      env: process.env,
+      stdio: ['inherit', 'pipe', 'pipe'],
+    });
+    if (child.stdout) {
+      child.stdout.on('data', (chunk) => {
+        process.stdout.write(chunk);
+      });
+    }
+    if (child.stderr) {
+      child.stderr.on('data', (chunk) => {
+        process.stderr.write(chunk);
+      });
+    }
+    child.on('error', (err) => reject(err));
+    child.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`命令失败 (exit ${code}): node ${nodeArgs.join(' ')}`));
+    });
   });
-  if (r.status !== 0) {
-    throw new Error(`命令失败 (exit ${r.status}): node ${nodeArgs.join(' ')}`);
-  }
 }
 
 /**
@@ -225,6 +249,66 @@ async function main() {
 
   fs.mkdirSync(outRoot, { recursive: true });
 
+  // HOTFIX O · 把父进程 stdout/stderr 同步 tee 到 `${outRoot}/pipeline_run.log`。
+  //   - 之前的 runNode 已切换为 spawn + pipe，子进程输出会流经父 process.stdout，
+  //     因此这里只需 patch 父 process.stdout/stderr.write 即可覆盖全部三阶段日志。
+  //   - 本 hook 只在脚本被直接执行（import.meta.url === argv1）时安装，避免被其他
+  //     入口（如豆包 wrapper）重复安装。
+  //   - 失败仍尽力写入；写入异常不阻断脚本。
+  const pipelineLogPath = path.join(outRoot, 'pipeline_run.log');
+  try {
+    const pipelineLogStream = fs.createWriteStream(pipelineLogPath, { flags: 'a' });
+    pipelineLogStream.write(
+      `\n[pipeline_run] START ${new Date().toISOString()} · outRoot=${outRoot} · pid=${process.pid}\n`,
+    );
+    const origStdoutWrite = process.stdout.write.bind(process.stdout);
+    const origStderrWrite = process.stderr.write.bind(process.stderr);
+    /**
+     * @param {string | Uint8Array} chunk
+     * @param {any} encOrCb
+     * @param {any} [cb]
+     * @returns {boolean}
+     */
+    const teeStdout = (chunk, encOrCb, cb) => {
+      try {
+        pipelineLogStream.write(chunk);
+      } catch {
+        /* swallow: tee 失败不影响主流程 */
+      }
+      return origStdoutWrite(chunk, encOrCb, cb);
+    };
+    /**
+     * @param {string | Uint8Array} chunk
+     * @param {any} encOrCb
+     * @param {any} [cb]
+     * @returns {boolean}
+     */
+    const teeStderr = (chunk, encOrCb, cb) => {
+      try {
+        pipelineLogStream.write(chunk);
+      } catch {
+        /* swallow */
+      }
+      return origStderrWrite(chunk, encOrCb, cb);
+    };
+    process.stdout.write = teeStdout;
+    process.stderr.write = teeStderr;
+    process.on('exit', (code) => {
+      try {
+        pipelineLogStream.end(
+          `[pipeline_run] EXIT code=${code} ${new Date().toISOString()}\n`,
+        );
+      } catch {
+        /* swallow */
+      }
+    });
+    console.log(`[run_sd2_pipeline] HOTFIX O · pipeline_run.log tee 已启用: ${pipelineLogPath}`);
+  } catch (err) {
+    console.warn(
+      `[run_sd2_pipeline] HOTFIX O · tee 初始化失败（不影响主流程）: ${err instanceof Error ? err.message : err}`,
+    );
+  }
+
   if (editMapInputOverride) {
     if (!fs.existsSync(editMapInputOverride)) {
       throw new Error(`--edit-map-input 文件不存在: ${editMapInputOverride}`);
@@ -322,7 +406,7 @@ async function main() {
 
   if (!editMapInputOverride) {
     console.log('[run_sd2_pipeline] 准备 edit_map_input.json …');
-    runNode(prepArgs);
+    await runNode(prepArgs);
   }
 
   if (dryRun && !fs.existsSync(editMapOut)) {
@@ -424,7 +508,7 @@ async function main() {
     //   如果确实希望容忍 Stage 0 失败（例如 CI 灰度阶段），请取消 --normalizer
     //   或者显式把 SD2_NORMALIZER_FALLBACK=1 设上（仅作为临时逃生口）。
     try {
-      runNode(stage0Args);
+      await runNode(stage0Args);
       if (fs.existsSync(normalizerOut)) {
         normalizerArtifactPath = normalizerOut;
         console.log(
@@ -545,7 +629,7 @@ async function main() {
         if (args[flag] === true) emArgs.push(`--${flag}`);
       }
     }
-    runNode(emArgs);
+    await runNode(emArgs);
   } else if (!fs.existsSync(editMapOut)) {
     throw new Error(`skip-editmap 需要已有文件: ${editMapOut}`);
   }
@@ -658,7 +742,7 @@ async function main() {
       });
       fs.writeFileSync(directorPayloads, JSON.stringify(data, null, 2) + '\n', 'utf8');
     } else {
-      runNode([
+      await runNode([
         path.join('scripts', 'build_sd2_prompter_payload.js'),
         editMapOut,
         '--director-payloads-only',
@@ -753,11 +837,32 @@ async function main() {
         'skip-dialogue-fidelity-hard',
         'skip-prompter-selfcheck-hard',
         'skip-style-inference',
+        // HOTFIX L/M/N 降级 flag
+        'skip-dialogue-per-shot-hard',
+        'skip-min-shots-hard',
+        'skip-character-whitelist-hard',
       ]) {
         if (args[flag] === true) chainArgs.push(`--${flag}`);
       }
     }
-    runNode(chainArgs);
+    // HOTFIX Q · 即使 block chain 以非零码退出（v6 硬门失败会 exit 8），也仍然
+    // 在后面产生 sd2_final_report（partial），保证审计链完整。
+    // 原错误会挂到 blockChainFailure 里，跑完 final report 再决定是否抛出。
+    /** @type {Error | null} */
+    let blockChainFailure = null;
+    try {
+      await runNode(chainArgs);
+    } catch (err) {
+      blockChainFailure = err instanceof Error ? err : new Error(String(err));
+      console.error(
+        `[run_sd2_pipeline] HOTFIX Q · block chain 失败（${blockChainFailure.message}），` +
+          `继续生成 partial sd2_final_report 以便审计。`,
+      );
+    }
+    // 把失败状态挂到上层（main 顶部捕获），final report 先跑再 throw
+    if (blockChainFailure) {
+      process.env.SD2_PIPELINE_BLOCK_CHAIN_FAILURE = blockChainFailure.message;
+    }
   } else {
     if (!dryRun && !skipDirector && skipPrompter) {
       console.log('[run_sd2_pipeline] LLM SD2Director（仅导演，随后写 payload，不跑 Prompter）…');
@@ -769,7 +874,7 @@ async function main() {
             : sd2Version === 'v3'
               ? 'call_sd2_director_v3.mjs'
               : 'call_sd2_director.mjs';
-      runNode([
+      await runNode([
         path.join('scripts', 'sd2_pipeline', directorScript),
         '--payloads',
         directorPayloads,
@@ -795,7 +900,7 @@ async function main() {
       if (!dryRun && !skipDirector && fs.existsSync(directorAll)) {
         payArgs.push('--director-json', directorAll);
       }
-      runNode(payArgs);
+      await runNode(payArgs);
     } else if (isMdPipeline) {
       console.log(
         `[run_sd2_pipeline] ${sd2Version}：已跳过 build_sd2_prompter_payload（与 v2 合并字段不兼容，请用默认 Block 链或仅 EditMap）`,
@@ -848,15 +953,37 @@ async function main() {
         path.resolve(process.cwd(), prompterPromptArg),
       );
     }
-    runNode(proArgs);
+    await runNode(proArgs);
   }
 
   console.log('[run_sd2_pipeline] 汇总每 Block 最终 prompt 与资产 …');
-  runNode([
+  // HOTFIX Q · 若 block chain 已失败，以 --allow-partial 模式跑 final report，
+  //   允许 missing / corrupted 字段，仍输出 sd2_final_report.json（status=partial）。
+  const blockChainFailMsg = process.env.SD2_PIPELINE_BLOCK_CHAIN_FAILURE || '';
+  /** @type {string[]} */
+  const reportArgs = [
     path.join('scripts', 'sd2_pipeline', 'export_sd2_final_report.mjs'),
     '--sd2-dir',
     outRoot,
-  ]);
+  ];
+  if (blockChainFailMsg) {
+    reportArgs.push('--allow-partial', '--partial-reason', blockChainFailMsg.slice(0, 400));
+  }
+  try {
+    await runNode(reportArgs);
+  } catch (reportErr) {
+    console.error(
+      `[run_sd2_pipeline] HOTFIX Q · export_sd2_final_report 失败：${reportErr instanceof Error ? reportErr.message : reportErr}`,
+    );
+  }
+
+  if (blockChainFailMsg) {
+    console.error(
+      `[run_sd2_pipeline] ❌ 本轮 block chain 未通过硬门（${blockChainFailMsg}）。` +
+        `已落盘 sd2_final_report（partial）与 pipeline_run.log 供审计。`,
+    );
+    throw new Error(`block_chain_failure: ${blockChainFailMsg}`);
+  }
 
   console.log(`[run_sd2_pipeline] 全部完成: ${outRoot}`);
 }
