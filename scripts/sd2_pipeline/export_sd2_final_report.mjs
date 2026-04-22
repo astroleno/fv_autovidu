@@ -497,6 +497,12 @@ function buildMarkdownReport(report) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const noMarkdown = Boolean(args['no-markdown']);
+  // HOTFIX Q · 允许 block chain 失败时仍然产出 partial report（审计链完整）
+  const allowPartial = Boolean(args['allow-partial']);
+  const partialReason =
+    typeof args['partial-reason'] === 'string' && args['partial-reason'].trim()
+      ? args['partial-reason'].trim()
+      : '';
 
   let promptsAllPath = '';
   let payloadsPath = '';
@@ -531,18 +537,43 @@ async function main() {
     process.exit(2);
   }
 
-  if (!fs.existsSync(promptsAllPath)) {
-    console.error(`找不到文件: ${promptsAllPath}`);
-    process.exit(2);
-  }
-
   if (!outputPath) {
     outputPath = path.join(path.dirname(promptsAllPath), 'sd2_final_report.json');
   }
 
-  const promptsAll = /** @type {{ meta?: object, blocks?: unknown[] }} */ (
-    JSON.parse(fs.readFileSync(promptsAllPath, 'utf8'))
-  );
+  // HOTFIX Q · sd2_prompts_all.json 不存在 / 读取失败 / blocks 为空 时的降级策略：
+  //   - 非 --allow-partial：保持旧行为（exit 2 / 抛异常）。
+  //   - --allow-partial：写一份 status=partial 的最小 report（+ markdown）并 exit 0。
+  /** @type {{ meta?: object, blocks?: unknown[] } | null} */
+  let promptsAll = null;
+  /** @type {string} */
+  let promptsAllReadError = '';
+
+  if (!fs.existsSync(promptsAllPath)) {
+    promptsAllReadError = `file_not_found:${promptsAllPath}`;
+    if (!allowPartial) {
+      console.error(`找不到文件: ${promptsAllPath}`);
+      process.exit(2);
+    }
+  } else {
+    try {
+      promptsAll = /** @type {{ meta?: object, blocks?: unknown[] }} */ (
+        JSON.parse(fs.readFileSync(promptsAllPath, 'utf8'))
+      );
+    } catch (err) {
+      promptsAllReadError = `parse_error:${err instanceof Error ? err.message : err}`;
+      if (!allowPartial) throw err;
+    }
+  }
+
+  if (!promptsAll) {
+    // partial 模式下 promptsAll 可能为 null；给一个占位对象，后续按 blocks=[] 处理。
+    promptsAll = { meta: {}, blocks: [] };
+    console.warn(
+      `[export_sd2_final_report] HOTFIX Q · partial 模式：promptsAll 读取失败（${promptsAllReadError || 'unknown'}），继续生成最小 report。`,
+    );
+  }
+
   const blocksRaw = Array.isArray(promptsAll.blocks) ? promptsAll.blocks : [];
 
   const payloadsRaw = readJsonIfExists(payloadsPath);
@@ -707,6 +738,18 @@ async function main() {
     };
   }
 
+  // HOTFIX Q · partial 标记：
+  //   - status='ok' 表示 sd2_prompts_all.json 正常读取；
+  //   - status='partial' 表示本轮 block chain 失败 / 产物缺失，但 report 仍写一份占位。
+  const partialInfo = allowPartial
+    ? {
+        status: blocksOut.length === 0 || promptsAllReadError ? 'partial' : 'ok',
+        block_chain_failure: partialReason || null,
+        prompts_all_read_error: promptsAllReadError || null,
+        hotfix: 'Q',
+      }
+    : { status: 'ok' };
+
   const report = {
     meta: {
       report_generated_at: new Date().toISOString(),
@@ -714,6 +757,7 @@ async function main() {
       sd2_payloads: payloadsRaw ? path.resolve(payloadsPath) : null,
       edit_map_input: editMapInput ? path.resolve(editMapInputPath) : null,
       prompter_meta: promptsAll.meta ?? null,
+      partial: partialInfo,
     },
     reference,
     blocks: blocksOut,
