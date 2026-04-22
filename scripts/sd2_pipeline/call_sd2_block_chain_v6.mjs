@@ -312,8 +312,30 @@ export async function main() {
       ? /** @type {Record<string, unknown>} */ (editMap.meta.video)
       : {};
   const metaAspect = typeof metaVideo.aspect_ratio === 'string' ? metaVideo.aspect_ratio : '';
-  const aspectRatio =
-    typeof args['aspect-ratio'] === 'string' ? args['aspect-ratio'] : metaAspect || '9:16';
+  const cliAspect = typeof args['aspect-ratio'] === 'string' ? args['aspect-ratio'].trim() : '';
+  const aspectRatio = cliAspect || metaAspect || '9:16';
+
+  // HOTFIX S · Fix A · 画幅单一真相源：
+  //   EditMap v6 的 `meta.video.aspect_ratio` 是 LLM 在 Stage 1 自由填写的，
+  //   实战中经常与 Stage 2/3 实际执行的画幅不一致（leji-v6-apimart 实锤：
+  //   meta 写 "9:16"，CLI 跑 "16:9"，Qwen 把 "9:16" 带进 global_prefix 污染了所有 prompt）。
+  //   统一口径：CLI 传了 --aspect-ratio 就以 CLI 为权威，强制写回 editMap.meta.video.aspect_ratio，
+  //   保证下游 Prompter 从 editMap 里读到的画幅与 CLI 一致；同时 emit 一条 warn
+  //   供审计追溯 LLM 原填的值与覆盖后的值。
+  if (cliAspect && cliAspect !== metaAspect) {
+    if (!editMap.meta || typeof editMap.meta !== 'object') editMap.meta = {};
+    const meta = /** @type {Record<string, unknown>} */ (editMap.meta);
+    if (!meta.video || typeof meta.video !== 'object') meta.video = {};
+    /** @type {Record<string, unknown>} */ (meta.video).aspect_ratio = cliAspect;
+    routingWarnings.push({
+      code: 'aspect_ratio_source_mismatch',
+      severity: 'warn',
+      block_id: null,
+      actual: { edit_map_meta: metaAspect || null, cli: cliAspect },
+      expected: { single_source: 'cli --aspect-ratio' },
+      message: `edit_map.meta.video.aspect_ratio=${metaAspect || '(empty)'} 与 CLI --aspect-ratio=${cliAspect} 不一致；已以 CLI 为准覆盖。`,
+    });
+  }
 
   const kbDir =
     typeof args['kb-dir'] === 'string' ? path.resolve(process.cwd(), args['kb-dir']) : DEFAULT_KB;
