@@ -599,7 +599,13 @@ async function main() {
                 ? 'call_yunwu_editmap_sd2.mjs'
                 : 'call_editmap_sd2.mjs';
     console.log(
-      `[run_sd2_pipeline] LLM 生成 edit_map_sd2.json（${sd2Version}，${useYunwu ? 'Yunwu/Opus' : 'DashScope'}）…`,
+      `[run_sd2_pipeline] LLM 生成 edit_map_sd2.json（${sd2Version}，${
+        useYunwu
+          ? 'Yunwu/Opus'
+          : args.apimart === true
+            ? 'APIMart/Opus'
+            : 'DashScope'
+      }）…`,
     );
     /** @type {string[]} */
     const emArgs = [
