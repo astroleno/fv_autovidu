@@ -208,14 +208,23 @@ export function checkDirectorSegmentCoverageV6(dirAppendix, scriptChunk) {
   if (ratio === null) {
     return { status: 'fail', reason: 'coverage_ratio_missing', coverage_ratio: null };
   }
-  if (ratio < 0.9) {
-    return { status: 'fail', reason: `coverage_ratio ${ratio.toFixed(2)} < 0.90`, coverage_ratio: ratio };
-  }
+
+  // HOTFIX S · Bug C1 · 合法 deferred 必须先从分母剔除再比阈值。
+  //   原实现先判 ratio<0.9 直接 fail，把"合法跨 block 延迟"误伤为假阳性（B14 实锤：
+  //   SEG_057 defer 到 B15，ratio=0.75 导致 fail）。
+  //   修复策略：
+  //     1. missing_must_cover 中每条必须带 deferred_to_block（非空串）→ 合法 defer；
+  //        有任一条无 deferred → 直接 fail（不进重算）。
+  //     2. 若全部 missing 均合法 defer → effective_ratio = consumed / (total - deferred)
+  //        再按 0.9 阈值比对。
+  //     3. 对外仍透出 LLM 原填的 coverage_ratio（便于审计审阅原值），
+  //        但 pass/fail 判定用 effective_ratio。
   const missing = Array.isArray(r.missing_must_cover) ? r.missing_must_cover : [];
+  const deferredLegal = [];
   for (const m of missing) {
     if (!m || typeof m !== 'object') continue;
     const mm = /** @type {Record<string, unknown>} */ (m);
-    const deferred = typeof mm.deferred_to_block === 'string' ? mm.deferred_to_block : '';
+    const deferred = typeof mm.deferred_to_block === 'string' ? mm.deferred_to_block.trim() : '';
     if (!deferred) {
       return {
         status: 'fail',
@@ -223,6 +232,28 @@ export function checkDirectorSegmentCoverageV6(dirAppendix, scriptChunk) {
         coverage_ratio: ratio,
       };
     }
+    deferredLegal.push(mm);
+  }
+
+  const total = typeof r.total_segments_in_covered_beats === 'number' ? r.total_segments_in_covered_beats : null;
+  const consumed = typeof r.consumed_count === 'number' ? r.consumed_count : null;
+
+  if (total !== null && consumed !== null) {
+    const denom = Math.max(1, total - deferredLegal.length);
+    const effective = consumed / denom;
+    if (effective < 0.9) {
+      return {
+        status: 'fail',
+        reason: `effective_ratio ${effective.toFixed(2)} < 0.90 (consumed=${consumed}, denom=${denom}, raw_ratio=${ratio.toFixed(2)})`,
+        coverage_ratio: ratio,
+      };
+    }
+    return { status: 'pass', reason: 'ok', coverage_ratio: ratio };
+  }
+
+  // total / consumed 字段缺失时退回原阈值判断（此时 missing 已全部合法 deferred）
+  if (ratio < 0.9) {
+    return { status: 'fail', reason: `coverage_ratio ${ratio.toFixed(2)} < 0.90`, coverage_ratio: ratio };
   }
   return { status: 'pass', reason: 'ok', coverage_ratio: ratio };
 }
@@ -252,10 +283,14 @@ export function checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, skipKvaHard
   if (kvas.length === 0) {
     return { status: 'skip', reason: 'no_kva_in_chunk', kva_ratio: null };
   }
-  const hasP0 = kvas.some((k) => {
-    if (!k || typeof k !== 'object') return false;
-    return /** @type {Record<string, unknown>} */ (k).priority === 'P0';
-  });
+  // chunk 侧的 P0 KVA 集合（用于下面重算 effective_ratio 时识别分子/分母归属）。
+  const p0KvaIds = new Set(
+    kvas
+      .filter((k) => k && typeof k === 'object' && /** @type {Record<string, unknown>} */ (k).priority === 'P0')
+      .map((k) => /** @type {Record<string, unknown>} */ (k).kva_id)
+      .filter((v) => typeof v === 'string'),
+  );
+  const hasP0 = p0KvaIds.size > 0;
 
   if (!dirAppendix || typeof dirAppendix !== 'object') {
     return skipKvaHard
@@ -263,20 +298,59 @@ export function checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, skipKvaHard
       : { status: 'fail', reason: 'appendix_missing', kva_ratio: null };
   }
   const app = /** @type {Record<string, unknown>} */ (dirAppendix);
-  const ratio = typeof app.kva_coverage_ratio === 'number' ? app.kva_coverage_ratio : null;
+  const rawRatio = typeof app.kva_coverage_ratio === 'number' ? app.kva_coverage_ratio : null;
   const report = Array.isArray(app.kva_consumption_report) ? app.kva_consumption_report : null;
 
-  if (ratio === null && !report) {
+  if (rawRatio === null && !report) {
     return skipKvaHard
       ? { status: 'warn', reason: 'kva_report_missing (soft · skipKvaHard)', kva_ratio: null }
       : { status: 'fail', reason: 'kva_consumption_report + kva_coverage_ratio both missing', kva_ratio: null };
   }
-  if (hasP0 && typeof ratio === 'number' && ratio < 1.0) {
-    return skipKvaHard
-      ? { status: 'warn', reason: `kva_coverage_ratio ${ratio.toFixed(2)} < 1.00 (soft · skipKvaHard)`, kva_ratio: ratio }
-      : { status: 'fail', reason: `kva_coverage_ratio ${ratio.toFixed(2)} < 1.00 with P0 KVA present`, kva_ratio: ratio };
+
+  // HOTFIX S · Bug C2 · LLM 手填 kva_coverage_ratio 经常与 kva_consumption_report 不一致：
+  //   - B08 实锤：LLM 写 0，但 report 里实际全部 consumed_at_shot 非 null → 应该 1.0；
+  //   - 反例：LLM 可能虚报 1 但 report 里实际只消费一半 → 不能放水。
+  //   真相源在哪：结构化数组 > 单一数值。report 内部条目的 consumed_at_shot / deferred_to_block
+  //   是 Director 自己登记的"镜头归属账本"，更难一致性撒谎；而顶层 ratio 只是一个数字，
+  //   LLM 经常算错或漏算 defer。
+  //   修复策略：
+  //     1. 根据 report 重算 effective_ratio = consumed_p0 / max(1, total_p0 - deferred_p0)
+  //        （P0 是硬门口径；P1/P2 只作 soft）；
+  //     2. 若与 rawRatio 偏差 < 0.1（包括 report 为空或 P0 集合为空），沿用 rawRatio；
+  //     3. 若偏差 ≥ 0.1，以重算值为权威，detail 标记 recomputed=true。
+  let effective = rawRatio;
+  let recomputed = false;
+  if (report && hasP0) {
+    let consumedP0 = 0;
+    let deferredP0 = 0;
+    for (const item of report) {
+      if (!item || typeof item !== 'object') continue;
+      const it = /** @type {Record<string, unknown>} */ (item);
+      const kvaId = typeof it.kva_id === 'string' ? it.kva_id : '';
+      if (!kvaId || !p0KvaIds.has(kvaId)) continue;
+      const consumedShot = it.consumed_at_shot;
+      const deferredTo = typeof it.deferred_to_block === 'string' ? it.deferred_to_block.trim() : '';
+      if (typeof consumedShot === 'number' && Number.isFinite(consumedShot)) {
+        consumedP0 += 1;
+      } else if (deferredTo) {
+        deferredP0 += 1;
+      }
+    }
+    const denom = Math.max(1, p0KvaIds.size - deferredP0);
+    const recalc = consumedP0 / denom;
+    if (rawRatio === null || Math.abs(recalc - rawRatio) >= 0.1) {
+      effective = recalc;
+      recomputed = true;
+    }
   }
-  return { status: 'pass', reason: 'ok', kva_ratio: ratio };
+
+  if (hasP0 && typeof effective === 'number' && effective < 1.0) {
+    const note = recomputed ? ` (recomputed from report; llm_filled=${rawRatio})` : '';
+    return skipKvaHard
+      ? { status: 'warn', reason: `kva_coverage_ratio ${effective.toFixed(2)} < 1.00 (soft · skipKvaHard)${note}`, kva_ratio: effective }
+      : { status: 'fail', reason: `kva_coverage_ratio ${effective.toFixed(2)} < 1.00 with P0 KVA present${note}`, kva_ratio: effective };
+  }
+  return { status: 'pass', reason: 'ok', kva_ratio: effective };
 }
 
 /**
@@ -374,16 +448,50 @@ export function checkPrompterDialogueFidelityV6(sd2Prompt, scriptChunk) {
     if (!text) continue;
     const sid = typeof seg.seg_id === 'string' ? seg.seg_id : '(unknown)';
 
+    // Level 1 · exact：scriptChunk.text 在 sd2_prompt 中原样出现。
     if (sd2Prompt.indexOf(text) >= 0) continue;
 
-    // author_hint.shortened_text 兜底：允许原样替代
+    // Level 2 · shortened_by_author_hint：作者显式允许压缩时，接受 shortened_text 替代。
     const hint = seg.author_hint && typeof seg.author_hint === 'object'
       ? /** @type {Record<string, unknown>} */ (seg.author_hint)
       : null;
     const shortened = hint && typeof hint.shortened_text === 'string' ? hint.shortened_text.trim() : '';
     if (shortened && sd2Prompt.indexOf(shortened) >= 0) continue;
 
+    // HOTFIX S · Bug B · Level 3 · annotation_stripped fallback。
+    //   剧本常在对白里嵌入 "（动作指示）" 注释（B14 SEG_054 实锤），这些注释是给演员看的
+    //   舞台指示、不进配音 TTS；Prompter 合法剥除后写入 [DIALOG]。原总审计器只做字符级
+    //   严格比对，对这种场景会假阳性 fail。这里剥除成对的 `（...）` 和 `(...)` 再比对，
+    //   保持与 Prompter 自检 match_mode=annotation_stripped 的口径一致。
+    const stripped = stripInlineAnnotations(text);
+    if (stripped && stripped !== text && sd2Prompt.indexOf(stripped) >= 0) continue;
+
     missing.push(sid);
   }
   return { status: missing.length === 0 ? 'pass' : 'fail', missing_seg_ids: missing };
+}
+
+/**
+ * 剥除对白中成对的舞台指示注释：`（...）`（全角）和 `(...)`（半角）。
+ *
+ * 口径说明：
+ *   - 只剥**成对**出现的括号及其内容，避免把台词中合法的反问括号误剥；
+ *   - 剥完后做一次 trim，避免首尾留空白；
+ *   - 不递归处理嵌套括号（目前剧本未见用例，保持简单实现）；
+ *   - 不剥方括号 `[...]`，保留给 AV-split 段标签使用。
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+export function stripInlineAnnotations(text) {
+  if (typeof text !== 'string' || !text) return '';
+  // 非贪婪匹配成对括号；全角 / 半角各跑一遍；循环直至稳定（处理多个括号段）。
+  let out = text;
+  /* eslint-disable no-constant-condition */
+  while (true) {
+    const next = out.replace(/（[^（）]*）/g, '').replace(/\([^()]*\)/g, '');
+    if (next === out) break;
+    out = next;
+  }
+  return out.trim();
 }
