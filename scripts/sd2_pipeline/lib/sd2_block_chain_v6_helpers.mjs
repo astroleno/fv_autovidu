@@ -310,34 +310,19 @@ export function checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, skipKvaHard
   // HOTFIX S · Bug C2 · LLM 手填 kva_coverage_ratio 经常与 kva_consumption_report 不一致：
   //   - B08 实锤：LLM 写 0，但 report 里实际全部 consumed_at_shot 非 null → 应该 1.0；
   //   - 反例：LLM 可能虚报 1 但 report 里实际只消费一半 → 不能放水。
-  //   真相源在哪：结构化数组 > 单一数值。report 内部条目的 consumed_at_shot / deferred_to_block
-  //   是 Director 自己登记的"镜头归属账本"，更难一致性撒谎；而顶层 ratio 只是一个数字，
-  //   LLM 经常算错或漏算 defer。
+  //   真相源：结构化数组 > 单一数值。report 内部的 consumed_at_shot / deferred_to_block
+  //   比顶层 ratio 数值更难一致性撒谎。
   //   修复策略：
-  //     1. 根据 report 重算 effective_ratio = consumed_p0 / max(1, total_p0 - deferred_p0)
-  //        （P0 是硬门口径；P1/P2 只作 soft）；
+  //     1. 根据 report 重算 effective_ratio = consumed_p0 / max(1, total_p0 - deferred_p0)；
   //     2. 若与 rawRatio 偏差 < 0.1（包括 report 为空或 P0 集合为空），沿用 rawRatio；
   //     3. 若偏差 ≥ 0.1，以重算值为权威，detail 标记 recomputed=true。
+  //   Director 侧的裁决可能偏严（LLM 漏登记就 fail）；真正的最终裁决需要等
+  //   Prompter 产物到齐后调用 reconcileKvaWithPrompterV6 做二次合并。
   let effective = rawRatio;
   let recomputed = false;
   if (report && hasP0) {
-    let consumedP0 = 0;
-    let deferredP0 = 0;
-    for (const item of report) {
-      if (!item || typeof item !== 'object') continue;
-      const it = /** @type {Record<string, unknown>} */ (item);
-      const kvaId = typeof it.kva_id === 'string' ? it.kva_id : '';
-      if (!kvaId || !p0KvaIds.has(kvaId)) continue;
-      const consumedShot = it.consumed_at_shot;
-      const deferredTo = typeof it.deferred_to_block === 'string' ? it.deferred_to_block.trim() : '';
-      if (typeof consumedShot === 'number' && Number.isFinite(consumedShot)) {
-        consumedP0 += 1;
-      } else if (deferredTo) {
-        deferredP0 += 1;
-      }
-    }
-    const denom = Math.max(1, p0KvaIds.size - deferredP0);
-    const recalc = consumedP0 / denom;
+    const summary = summarizeKvaEvidenceV6(p0KvaIds, report, null);
+    const recalc = summary.ratio;
     if (rawRatio === null || Math.abs(recalc - rawRatio) >= 0.1) {
       effective = recalc;
       recomputed = true;
@@ -351,6 +336,195 @@ export function checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, skipKvaHard
       : { status: 'fail', reason: `kva_coverage_ratio ${effective.toFixed(2)} < 1.00 with P0 KVA present${note}`, kva_ratio: effective };
   }
   return { status: 'pass', reason: 'ok', kva_ratio: effective };
+}
+
+/**
+ * HOTFIX S.1 · consumed_at_shot 值形态兼容判定。
+ *
+ * 背景：LLM 回填 `kva_consumption_report[*].consumed_at_shot` 的数据形态不稳定，
+ * 至少见到三种：
+ *   - `number`        —— 单 shot 消费（如 `3`），最常见；
+ *   - `number[]`      —— 多 shot 连续消费（B03 实锤：`[1, 2]` 表示同一 KVA 横跨 shot1-2）；
+ *   - `null / undef`  —— 本 block 未消费。
+ *
+ * 原 Fix C2 只认 `typeof === 'number'`，会把数组形态误判成未消费 → 新假阳性。
+ * 口径：**只要存在至少一个有限数字**，就算已消费。
+ *
+ * @param {unknown} v
+ * @returns {boolean}
+ */
+export function isKvaConsumedShotValue(v) {
+  if (typeof v === 'number' && Number.isFinite(v)) return true;
+  if (Array.isArray(v)) {
+    for (const x of v) {
+      if (typeof x === 'number' && Number.isFinite(x)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * HOTFIX S.1 · 合并 Director 账本与 Prompter 可视化自检，重算 P0 KVA 消费证据。
+ *
+ * 合并口径（两侧证据取并，"有任一 positive 证据即算 consumed"）：
+ *   - Director.kva_consumption_report[].consumed_at_shot 存在 → consumed
+ *   - Prompter.kva_visualization_check[].pass === true       → consumed
+ *   - Director.kva_consumption_report[].deferred_to_block 非空 **且** Prompter 侧
+ *     对同 KVA 无 pass 证据 → 合法 deferred（从分母剔除）
+ *   - 否则 → 未消费（计入分母分子差）
+ *
+ * 注意：
+ *   - 只计 scriptChunk 里 priority=P0 的 KVA；P1/P2 不参与硬门；
+ *   - Prompter 的 pass=true 会**覆盖** Director 的 deferred 意图
+ *     （Prompter 是实际生成者，它画了就是画了，Director 想 defer 也晚了）；
+ *   - 分母下限 1，避免 0-除；全部合法 deferred 时分母=1、分子=0 → ratio=0
+ *     由上层决定是否 fail（通常 skip，因为并无 P0 负担）。
+ *
+ * @param {Set<string>} p0KvaIds
+ * @param {unknown[] | null} directorReport  `kva_consumption_report`
+ * @param {unknown[] | null} prompterCheck   `kva_visualization_check`
+ * @returns {{
+ *   total: number,
+ *   consumed: number,
+ *   deferred: number,
+ *   ratio: number,
+ *   evidence: Record<string, { consumed: boolean, deferred: boolean, source: string[] }>
+ * }}
+ */
+export function summarizeKvaEvidenceV6(p0KvaIds, directorReport, prompterCheck) {
+  /** @type {Record<string, { consumed: boolean, deferred: boolean, source: string[] }>} */
+  const evidence = {};
+  for (const id of p0KvaIds) {
+    evidence[id] = { consumed: false, deferred: false, source: [] };
+  }
+
+  if (Array.isArray(directorReport)) {
+    for (const item of directorReport) {
+      if (!item || typeof item !== 'object') continue;
+      const it = /** @type {Record<string, unknown>} */ (item);
+      const kvaId = typeof it.kva_id === 'string' ? it.kva_id : '';
+      if (!kvaId || !(kvaId in evidence)) continue;
+      if (isKvaConsumedShotValue(it.consumed_at_shot)) {
+        evidence[kvaId].consumed = true;
+        evidence[kvaId].source.push('director.consumed_at_shot');
+      } else if (typeof it.deferred_to_block === 'string' && it.deferred_to_block.trim()) {
+        evidence[kvaId].deferred = true;
+        evidence[kvaId].source.push(`director.deferred_to_block=${it.deferred_to_block.trim()}`);
+      }
+    }
+  }
+
+  if (Array.isArray(prompterCheck)) {
+    for (const item of prompterCheck) {
+      if (!item || typeof item !== 'object') continue;
+      const it = /** @type {Record<string, unknown>} */ (item);
+      const kvaId = typeof it.kva_id === 'string' ? it.kva_id : '';
+      if (!kvaId || !(kvaId in evidence)) continue;
+      if (it.pass === true) {
+        evidence[kvaId].consumed = true;
+        evidence[kvaId].deferred = false;
+        evidence[kvaId].source.push('prompter.kva_visualization_check.pass');
+      }
+    }
+  }
+
+  let consumed = 0;
+  let deferred = 0;
+  for (const id of Object.keys(evidence)) {
+    if (evidence[id].consumed) consumed += 1;
+    else if (evidence[id].deferred) deferred += 1;
+  }
+  const total = p0KvaIds.size;
+  const denom = Math.max(1, total - deferred);
+  return { total, consumed, deferred, ratio: consumed / denom, evidence };
+}
+
+/**
+ * HOTFIX S.1 · 用 Prompter 的 kva_visualization_check 对 Director 的 kvaOutcome 做二次裁决。
+ *
+ * 背景：Director 产物落地时我们就已经跑过一次 checkDirectorKvaCoverageV6 硬门，
+ * 但 Director 自己常漏登记 kva_consumption_report（见 leji-v6-apimart-doubao-s 回测）。
+ * 实际合同的最终履行者是 Prompter——它在生成 shots[] 时把 KVA 真的画到镜头里，
+ * 并在自检字段 kva_visualization_check[] 里记录每条 KVA 的 shot_idx 与 pass。
+ *
+ * 因此：Prompter 到齐后，我们再合并两侧证据重算。如果合并后 ≥ 1.0，就把
+ * 之前 Director 单独评出的 fail 就地改为 pass（detail 保留"Director 独判值 + Prompter 补证"供审计）。
+ *
+ * 本函数**只修改传入的 kvaOutcome**（原地改写），不返回新对象，保持与
+ * call_sd2_block_chain_v6.mjs 里 hardgateOutcomes.push 后的引用一致。
+ *
+ * @param {{
+ *   code: string,
+ *   status: 'pass'|'fail'|'warn'|'skip',
+ *   reason: string,
+ *   block_id: string,
+ *   detail: Record<string, unknown>
+ * }} kvaOutcome           Director 侧已写入 hardgateOutcomes 的 outcome（将被原地改写）
+ * @param {unknown} dirAppendix   Director 输出的 appendix（用于读 kva_consumption_report）
+ * @param {unknown} prParsed      Prompter 完整产物（用于读 kva_visualization_check）
+ * @param {Record<string, unknown> | null} scriptChunk  用于取 P0 KVA 集合
+ * @param {boolean} skipKvaHard
+ * @returns {void}
+ */
+export function reconcileKvaWithPrompterV6(kvaOutcome, dirAppendix, prParsed, scriptChunk, skipKvaHard) {
+  // 只对 Director 侧已判 fail/warn 的 outcome 做 reconcile。pass 不用动；skip 代表无 P0 也不用动。
+  if (kvaOutcome.status !== 'fail' && kvaOutcome.status !== 'warn') return;
+  if (!scriptChunk) return;
+  const kvas = Array.isArray(scriptChunk.key_visual_actions) ? scriptChunk.key_visual_actions : [];
+  const p0KvaIds = new Set(
+    kvas
+      .filter((k) => k && typeof k === 'object' && /** @type {Record<string, unknown>} */ (k).priority === 'P0')
+      .map((k) => /** @type {Record<string, unknown>} */ (k).kva_id)
+      .filter((v) => typeof v === 'string'),
+  );
+  if (p0KvaIds.size === 0) return;
+
+  const dirApp = dirAppendix && typeof dirAppendix === 'object'
+    ? /** @type {Record<string, unknown>} */ (dirAppendix)
+    : null;
+  const dirReport = dirApp && Array.isArray(dirApp.kva_consumption_report)
+    ? dirApp.kva_consumption_report
+    : null;
+
+  const pr = prParsed && typeof prParsed === 'object'
+    ? /** @type {Record<string, unknown>} */ (prParsed)
+    : null;
+  const prCheck = pr && Array.isArray(pr.kva_visualization_check) ? pr.kva_visualization_check : null;
+
+  // Prompter 没提供任何证据时，保持 Director 侧裁决不变。
+  if (!prCheck || prCheck.length === 0) return;
+
+  const summary = summarizeKvaEvidenceV6(p0KvaIds, dirReport, prCheck);
+  const reconciledRatio = summary.ratio;
+  const prevRatio = typeof kvaOutcome.detail?.kva_ratio === 'number' ? kvaOutcome.detail.kva_ratio : null;
+
+  // 合并后仍 < 1.0 → 仍然 fail，但刷新 ratio 让审计看到 Prompter 补证后的值（通常比 Director 单独算的更高）。
+  if (reconciledRatio < 1.0) {
+    kvaOutcome.detail = {
+      ...kvaOutcome.detail,
+      kva_ratio: reconciledRatio,
+      kva_ratio_director_only: prevRatio,
+      reconciled_with_prompter: true,
+      reconciled_consumed: summary.consumed,
+      reconciled_deferred: summary.deferred,
+      reconciled_total: summary.total,
+    };
+    kvaOutcome.reason = `kva_coverage_ratio ${reconciledRatio.toFixed(2)} < 1.00 (reconciled director+prompter; director_only=${prevRatio === null ? 'n/a' : prevRatio.toFixed(2)})`;
+    return;
+  }
+
+  // 合并后 ≥ 1.0 → Director 漏登记但 Prompter 画到了；整体合同履行，降级为 pass。
+  kvaOutcome.status = skipKvaHard ? 'pass' : 'pass';
+  kvaOutcome.reason = `pass (reconciled director+prompter; director_only=${prevRatio === null ? 'n/a' : prevRatio.toFixed(2)}, prompter_recovered=${summary.consumed}/${summary.total})`;
+  kvaOutcome.detail = {
+    ...kvaOutcome.detail,
+    kva_ratio: reconciledRatio,
+    kva_ratio_director_only: prevRatio,
+    reconciled_with_prompter: true,
+    reconciled_consumed: summary.consumed,
+    reconciled_deferred: summary.deferred,
+    reconciled_total: summary.total,
+  };
 }
 
 /**

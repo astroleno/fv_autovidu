@@ -75,6 +75,7 @@ import {
   detectBgmNameLeak,
   extractShotCountFromDirector,
   getBlockIndexRow,
+  reconcileKvaWithPrompterV6,
   repairAssetTagDrift,
 } from './lib/sd2_block_chain_v6_helpers.mjs';
 import { runAllPrompterSelfChecks } from './lib/sd2_prompter_selfcheck_v6.mjs';
@@ -633,6 +634,14 @@ export async function main() {
           prParsed = parsed;
         }
       }
+
+      // ── HOTFIX S.1 · director_kva_coverage 二次裁决 ──
+      //   Director 独判时常因漏登记 kva_consumption_report 而假阳性 fail
+      //   （doubao-s 回测实锤：B04/B06/B14 Director 填 None 但 Prompter 实际画了）。
+      //   Prompter 自检的 kva_visualization_check 是真实履约证据，在此合并两侧，
+      //   对已 push 的 kvaOutcome 做原地改写；合并后 ≥1.0 就从 fail 降为 pass。
+      //   不新增硬门，只让已有硬门更准。
+      reconcileKvaWithPrompterV6(kvaOutcome, dirAppendix, prParsed, scriptChunk, skipKvaHard);
 
       // ── v5 复用：@图N drift / AV-split / BGM 裸名 ──
       //

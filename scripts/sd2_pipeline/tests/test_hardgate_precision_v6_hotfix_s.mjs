@@ -30,6 +30,9 @@ import {
   checkDirectorSegmentCoverageV6,
   checkDirectorKvaCoverageV6,
   checkPrompterDialogueFidelityV6,
+  isKvaConsumedShotValue,
+  reconcileKvaWithPrompterV6,
+  summarizeKvaEvidenceV6,
 } from '../lib/sd2_block_chain_v6_helpers.mjs';
 
 let passed = 0;
@@ -287,6 +290,197 @@ console.log('\n── HOTFIX S · Bug C2 · skipKvaHard 降级行为不变 ─�
   };
   const r = checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, true);
   assert('skipKvaHard=true → warn 而非 fail', r.status === 'warn', r);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HOTFIX S.1 · Fix C2 扩展：数组 consumed_at_shot + Prompter 证据兜底
+// ══════════════════════════════════════════════════════════════════
+//
+// 背景：leji-v6-apimart-doubao-s 回测（HOTFIX S 后）发现两类新问题：
+//   1. Director 把 consumed_at_shot 填成数组（如 [1, 2] 表示多 shot 消费），
+//      但 Fix C2 只认 `typeof === 'number'` → 新假阳性（B03 实锤）。
+//   2. Director 经常漏登记 kva_consumption_report（填 None 或空数组），
+//      但 Prompter 的 kva_visualization_check 明确记录了"我画了 KVA_x 到 shot_y"。
+//      最终产品其实合规，但 Director 侧单独裁决会假阳性 fail（B04/B06/B14 实锤）。
+//
+// Fix S.1：
+//   - 新 helper `isKvaConsumedShotValue` 兼容 number | number[]；
+//   - 新 helper `summarizeKvaEvidenceV6` 合并 Director + Prompter 证据；
+//   - 新 helper `reconcileKvaWithPrompterV6` 在 Prompter 到齐后二次裁决，
+//     对已写入 hardgateOutcomes 的 kvaOutcome 原地改写。
+
+console.log('\n── HOTFIX S.1 · isKvaConsumedShotValue 形态兼容 ──');
+{
+  assert('number (3) → true', isKvaConsumedShotValue(3) === true);
+  assert('number (0) → true（0 也是合法 shot_idx）', isKvaConsumedShotValue(0) === true);
+  assert('null → false', isKvaConsumedShotValue(null) === false);
+  assert('undefined → false', isKvaConsumedShotValue(undefined) === false);
+  assert('number[] [1, 2] → true（B03 实锤）', isKvaConsumedShotValue([1, 2]) === true);
+  assert('number[] [0] → true', isKvaConsumedShotValue([0]) === true);
+  assert('空数组 [] → false', isKvaConsumedShotValue([]) === false);
+  assert('混杂 [null, 1] → true（有至少一个数字即可）', isKvaConsumedShotValue([null, 1]) === true);
+  assert('字符串 "1" → false（不做隐式转换）', isKvaConsumedShotValue('1') === false);
+}
+
+console.log('\n── HOTFIX S.1 · checkDirectorKvaCoverageV6 支持数组（B03 实锤）──');
+{
+  const scriptChunk = {
+    key_visual_actions: [{ kva_id: 'KVA_001', priority: 'P0' }],
+  };
+  const dirAppendix = {
+    kva_coverage_ratio: 1,
+    // B03 真实数据：Director 诚实写了 consumed_at_shot=[1, 2]
+    kva_consumption_report: [{ kva_id: 'KVA_001', consumed_at_shot: [1, 2] }],
+  };
+  const r = checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, false);
+  assert('数组 consumed_at_shot → pass', r.status === 'pass', r);
+  assert('kva_ratio === 1（rawRatio 与重算一致，未触发 recomputed）', r.kva_ratio === 1, r);
+}
+
+console.log('\n── HOTFIX S.1 · summarizeKvaEvidenceV6 合并两侧证据 ──');
+{
+  const p0 = new Set(['KVA_A', 'KVA_B', 'KVA_C']);
+
+  // 单纯 Director
+  let s = summarizeKvaEvidenceV6(p0, [
+    { kva_id: 'KVA_A', consumed_at_shot: 1 },
+    { kva_id: 'KVA_B', consumed_at_shot: null, deferred_to_block: 'B99' },
+    { kva_id: 'KVA_C', consumed_at_shot: null },
+  ], null);
+  assert('Director only · consumed=1, deferred=1, ratio=1/2=0.5', s.consumed === 1 && s.deferred === 1 && Math.abs(s.ratio - 0.5) < 1e-9, s);
+
+  // Prompter 补证 KVA_C
+  s = summarizeKvaEvidenceV6(p0, [
+    { kva_id: 'KVA_A', consumed_at_shot: 1 },
+    { kva_id: 'KVA_B', consumed_at_shot: null, deferred_to_block: 'B99' },
+    { kva_id: 'KVA_C', consumed_at_shot: null },
+  ], [
+    { kva_id: 'KVA_C', shot_idx: 2, pass: true },
+  ]);
+  assert('Prompter 补证 KVA_C · consumed=2, deferred=1, ratio=2/2=1.0', s.consumed === 2 && s.deferred === 1 && Math.abs(s.ratio - 1) < 1e-9, s);
+
+  // Prompter 抢跑 Director 的 deferred
+  s = summarizeKvaEvidenceV6(p0, [
+    { kva_id: 'KVA_A', consumed_at_shot: null, deferred_to_block: 'B99' },
+    { kva_id: 'KVA_B', consumed_at_shot: null, deferred_to_block: 'B99' },
+    { kva_id: 'KVA_C', consumed_at_shot: null, deferred_to_block: 'B99' },
+  ], [
+    { kva_id: 'KVA_A', shot_idx: 1, pass: true },
+    { kva_id: 'KVA_B', shot_idx: 2, pass: true },
+    { kva_id: 'KVA_C', shot_idx: 3, pass: true },
+  ]);
+  assert('Prompter 抢跑 Director defer · consumed=3, deferred=0, ratio=3/3=1.0（Prompter 说了算）', s.consumed === 3 && s.deferred === 0 && Math.abs(s.ratio - 1) < 1e-9, s);
+
+  // 两边都空 → 真 fail
+  s = summarizeKvaEvidenceV6(p0, [], []);
+  assert('两边都空 · consumed=0, ratio=0', s.consumed === 0 && s.ratio === 0, s);
+}
+
+console.log('\n── HOTFIX S.1 · reconcileKvaWithPrompterV6 · Prompter 补证 → fail 降 pass（B04 案例）──');
+{
+  const scriptChunk = {
+    key_visual_actions: [{ kva_id: 'KVA_001', priority: 'P0' }],
+  };
+  const dirAppendix = {
+    kva_coverage_ratio: 1,
+    kva_consumption_report: [{ kva_id: 'KVA_001', consumed_at_shot: null }],
+  };
+  const prParsed = {
+    kva_visualization_check: [{ kva_id: 'KVA_001', shot_idx: 0, pass: true }],
+  };
+  // Director 独判会 fail（consumed=0, ratio=0）
+  const kvaGate = checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, false);
+  assert('Director only · pre-reconcile = fail', kvaGate.status === 'fail', kvaGate);
+
+  // 模拟 call_sd2_block_chain_v6.mjs 里 push 进 hardgateOutcomes 的 outcome 对象
+  const kvaOutcome = {
+    code: 'director_kva_coverage',
+    status: kvaGate.status,
+    reason: kvaGate.reason,
+    block_id: 'B04',
+    detail: { kva_ratio: kvaGate.kva_ratio },
+  };
+  reconcileKvaWithPrompterV6(kvaOutcome, dirAppendix, prParsed, scriptChunk, false);
+  assert('reconciled · status 降级为 pass', kvaOutcome.status === 'pass', kvaOutcome);
+  assert('detail.reconciled_with_prompter=true', kvaOutcome.detail.reconciled_with_prompter === true, kvaOutcome.detail);
+  assert('detail.kva_ratio_director_only 保留历史值', kvaOutcome.detail.kva_ratio_director_only === 0, kvaOutcome.detail);
+}
+
+console.log('\n── HOTFIX S.1 · reconcileKvaWithPrompterV6 · 两边都空仍 fail（B07 案例）──');
+{
+  const scriptChunk = {
+    key_visual_actions: [
+      { kva_id: 'KVA_002', priority: 'P0' },
+      { kva_id: 'KVA_003', priority: 'P0' },
+      { kva_id: 'KVA_004', priority: 'P0' },
+    ],
+  };
+  const dirAppendix = {
+    kva_coverage_ratio: 1,
+    kva_consumption_report: [],
+  };
+  const prParsed = {
+    kva_visualization_check: [],
+  };
+  const kvaGate = checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, false);
+  const kvaOutcome = {
+    code: 'director_kva_coverage',
+    status: kvaGate.status,
+    reason: kvaGate.reason,
+    block_id: 'B07',
+    detail: { kva_ratio: kvaGate.kva_ratio },
+  };
+  reconcileKvaWithPrompterV6(kvaOutcome, dirAppendix, prParsed, scriptChunk, false);
+  // Prompter 侧 check 为空数组 → reconcile 不启动 → 保留 Director 原判 fail
+  assert('两边都空 · 仍 fail（不放水）', kvaOutcome.status === 'fail', kvaOutcome);
+}
+
+console.log('\n── HOTFIX S.1 · reconcileKvaWithPrompterV6 · Prompter 部分补证 → ratio 仍 <1 仍 fail（B12 案例）──');
+{
+  const scriptChunk = {
+    key_visual_actions: [
+      { kva_id: 'KVA_002', priority: 'P0' },
+      { kva_id: 'KVA_003', priority: 'P0' },
+      { kva_id: 'KVA_004', priority: 'P0' },
+    ],
+  };
+  const dirAppendix = {
+    kva_coverage_ratio: 1,
+    kva_consumption_report: [],
+  };
+  const prParsed = {
+    kva_visualization_check: [
+      { kva_id: 'KVA_002', shot_idx: 4, pass: true },
+    ],
+  };
+  const kvaGate = checkDirectorKvaCoverageV6(dirAppendix, scriptChunk, false);
+  const kvaOutcome = {
+    code: 'director_kva_coverage',
+    status: kvaGate.status,
+    reason: kvaGate.reason,
+    block_id: 'B12',
+    detail: { kva_ratio: kvaGate.kva_ratio },
+  };
+  reconcileKvaWithPrompterV6(kvaOutcome, dirAppendix, prParsed, scriptChunk, false);
+  assert('Prompter 只补 1/3 · 仍 fail', kvaOutcome.status === 'fail', kvaOutcome);
+  assert('detail.reconciled_with_prompter=true（显示已尝试合并）', kvaOutcome.detail.reconciled_with_prompter === true, kvaOutcome.detail);
+  assert('detail.kva_ratio ≈ 1/3', Math.abs(kvaOutcome.detail.kva_ratio - 1 / 3) < 1e-9, kvaOutcome.detail);
+}
+
+console.log('\n── HOTFIX S.1 · reconcileKvaWithPrompterV6 · Director 已 pass 时不动 ──');
+{
+  const kvaOutcome = {
+    code: 'director_kva_coverage',
+    status: 'pass',
+    reason: 'ok',
+    block_id: 'B05',
+    detail: { kva_ratio: 1 },
+  };
+  const scriptChunk = { key_visual_actions: [{ kva_id: 'KVA_A', priority: 'P0' }] };
+  const prParsed = { kva_visualization_check: [{ kva_id: 'KVA_A', shot_idx: 0, pass: false }] };
+  reconcileKvaWithPrompterV6(kvaOutcome, {}, prParsed, scriptChunk, false);
+  assert('pass 不被动（不引入新降级）', kvaOutcome.status === 'pass', kvaOutcome);
+  assert('detail 未被污染', kvaOutcome.detail.reconciled_with_prompter === undefined, kvaOutcome.detail);
 }
 
 // ──────────────────────────────────────────────────────────────────
