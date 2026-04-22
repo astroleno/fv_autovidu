@@ -270,6 +270,19 @@ function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex) {
   const hintsAll = [];
   /** @type {Set<string>} */
   const hintIdSeen = new Set();
+  // HOTFIX T · block 级 KVA 过滤
+  //   Normalizer 的 beat_ledger[i].key_visual_actions[] 是"整 beat 的 KVA 视图"，
+  //   一个 beat 常横跨 5–12 个 block（例如 BT_002 覆盖 SEG_020…SEG_062）。
+  //   老实现按 beatIdsHit 聚合后没有二次过滤，导致每个 block 的 scriptChunk
+  //   都塞入整个 beat 的 KVA 全集 → Director 看到跨 block 的 P0 KVA 不得不填
+  //   kva_consumption_report，全写 deferred_to_block；审计侧把这些"本 block
+  //   根本没职责消费"的 KVA 算进分母 → 大面积假 fail（B07/B09/B12 实锤）。
+  //
+  //   正确口径：一条 KVA 属于 block X ⇔ 它的 source_seg_id ∈ X.covered_segment_ids。
+  //   缺 source_seg_id 的老版 KVA（罕见）保守保留，避免真 KVA 被吞。
+  const coveredSet = new Set(
+    covered.filter((s) => typeof s === 'string' && s.length > 0),
+  );
   for (const bid of beatIdsHit) {
     const aux = beatAuxIndex.get(bid);
     if (!aux) continue;
@@ -278,6 +291,8 @@ function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex) {
       const k = /** @type {Record<string, unknown>} */ (kva);
       const kid = typeof k.kva_id === 'string' ? k.kva_id : '';
       if (kid && kvaIdSeen.has(kid)) continue;
+      const srcSeg = typeof k.source_seg_id === 'string' ? k.source_seg_id : '';
+      if (srcSeg && !coveredSet.has(srcSeg)) continue;
       if (kid) kvaIdSeen.add(kid);
       kvasAll.push(k);
     }
