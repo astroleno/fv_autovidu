@@ -594,9 +594,15 @@ async function main() {
   /** @type {string} */
   let raw;
   if (useApimart) {
+    // HOTFIX V · APIMart Opus（Bedrock 后端）max_tokens 上限是 128000，
+    //   之前默认 200000 会直接 400：exceeds the model limit of 128000。
+    //   改默认 128000；如果 APIMart 后端换成别的供应商允许更高，显式改 env 覆盖。
     const editMapMaxTokens = Math.max(
       32768,
-      parseInt(process.env.APIMART_EDITMAP_MAX_TOKENS || '200000', 10),
+      Math.min(
+        128000,
+        parseInt(process.env.APIMART_EDITMAP_MAX_TOKENS || '128000', 10),
+      ),
     );
     const modelOverride = typeof args.model === 'string' ? args.model : undefined;
 
@@ -626,7 +632,10 @@ async function main() {
         if (fr.finishReason === 'length') {
           const cap = Math.max(
             editMapMaxTokens,
-            parseInt(process.env.APIMART_EDITMAP_MAX_RETRY_CAP || '262144', 10),
+            Math.min(
+              128000,
+              parseInt(process.env.APIMART_EDITMAP_MAX_RETRY_CAP || '128000', 10),
+            ),
           );
           const bumped = Math.min(Math.floor(editMapMaxTokens * 1.5), cap);
           if (bumped > editMapMaxTokens) {
@@ -667,7 +676,10 @@ async function main() {
         if (fr.finishReason === 'length') {
           const cap = Math.max(
             editMapMaxTokens,
-            parseInt(process.env.APIMART_EDITMAP_MAX_RETRY_CAP || '262144', 10),
+            Math.min(
+              128000,
+              parseInt(process.env.APIMART_EDITMAP_MAX_RETRY_CAP || '128000', 10),
+            ),
           );
           const bumped = Math.min(Math.floor(editMapMaxTokens * 1.5), cap);
           if (bumped > editMapMaxTokens) {
