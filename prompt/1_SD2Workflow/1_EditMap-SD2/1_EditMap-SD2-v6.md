@@ -12,11 +12,11 @@
 | # | 变更点 | 章节 | 门级 |
 |---|--------|------|------|
 | 1 | Step 0.7 · **风格三轴 `style_inference`** 兜底推理 | §A.1 | 软门（warning） |
-| 2 | Step 0.8 · **每 block `covered_segment_ids[]` 与 `script_chunk_hint`** | §A.2 | 软门 |
+| 2 | Step 0.8 · **每 block `covered_segment_ids[]` 与 `script_chunk_hint`** | §A.2 | **硬门**（v6.1-HOTFIX-D 升级） |
 | 3 | Step 0.9 · **`meta.rhythm_timeline` 推导**（模板路由 + 几何公式） | §A.3 | **硬门** |
 | 4 | **`major_climax.strategy` 三选一 + null 合法化** | §A.4 | **硬门**（null 时跳过签名校验） |
-| 5 | **三层 `segment_coverage` 独立门级** | §A.5 | L1 软 / L2 L3 下游硬门 |
-| 6 | `diagnosis` 字段追加 | §A.6 | — |
+| 5 | **三层 `segment_coverage` 独立门级 + tail_seg 几何约束** | §A.5 | L1 **硬门** / tail_seg **硬门** / L2 L3 下游硬门（v6.1-HOTFIX-D） |
+| 6 | `diagnosis` 字段追加（pipeline 回填权威值） | §A.6 | — |
 
 ---
 
@@ -134,7 +134,14 @@
 }
 ```
 
-**软门**：`diagnosis.segment_coverage_check` = ⋃ `block_index[i].covered_segment_ids[]` ⊇ ⋃ `beat_ledger[*].segments[].seg_id` 的 **0.95**。低于阈值仅 warning，不阻塞（下游 Prompter 的 L2/L3 硬门会兜底拦截）。
+**硬门（v6.1-HOTFIX-D 升级）**：`diagnosis.segment_coverage_check` = ⋃ `block_index[i].covered_segment_ids[]` ⊇ ⋃ `beat_ledger[*].segments[].seg_id` 的 **0.95**。低于阈值 → pipeline **exit 7**，拒绝写盘；仅在 `--allow-v6-soft` / `--skip-editmap-coverage-hard` 显式降级时转为 warning。
+
+**动机（2026-04-21）**：leji-v6e_pass2 验收观察到 EditMap 只处理前 26/62 段（ratio=0.419），但 LLM 自填 `segment_coverage_ratio_estimated: 0.97`（与事实相反），软门放行让后半场关键戏（撞破对峙、怀孕反转、绿茶插话、门外幻想、closing hook）整段丢失。本硬门直接阻断"工程成立但叙事不成立"的伪 pass。
+
+**额外几何约束 · tail_seg_covered_check（v6.1-HOTFIX-D 新增硬门）**：
+- 时间轴上最后一个 `seg_id`（遍历 `beat_ledger[*].segments[]` 取最后一条）**必须进入最少一个 `block.covered_segment_ids[]`**；
+- 未覆盖 → pipeline **exit 7**；可 `--skip-last-seg-hard` 单独降级；
+- 原因：L1 ratio 即使 ≥ 0.95，仍可能漏掉最后 1–3 段（尾钩、反转、cliffhanger 正是最后一段），本约束保证 closing_hook 有实际可消费的素材。
 
 ### A.3 Step 0.9 · `meta.rhythm_timeline` 推导（T13 · 硬门）
 
@@ -262,17 +269,18 @@ bonding_budget_sec            = clamp(round(duration_sec × template.bonding_bud
 
 **硬门仲裁**：`strategy == null` 时，下游"major_climax 签名校验"硬门**跳过**；pipeline 不得自行补造证据戏（违反 §〇 上位合同）。
 
-### A.5 三层 `segment_coverage` 独立门级
+### A.5 三层 `segment_coverage` 独立门级（v6.1-HOTFIX-D：L1 升级为硬门）
 
 与 00 号文档 §4.1 对齐：
 
 | 层 | 指标 | 产出 | 阈值 | 门级 | 语义 |
 |---|---|---|:-:|---|---|
-| L1 · EditMap | `segment_coverage_check` | `diagnosis` | ≥ 0.95 | **软门** | 是否把 `seg_id` 分配到 block |
+| L1 · EditMap | `segment_coverage_check` | `diagnosis` | ≥ 0.95 | **硬门**（v6.1-HOTFIX-D） | 是否把 `seg_id` 分配到 block |
+| L1.5 · EditMap | `last_seg_covered_check` | `diagnosis` | tail 必进 | **硬门**（v6.1-HOTFIX-D 新增） | 时间轴末段必须被覆盖 |
 | L2 · Prompter 整集 | `segment_coverage_ratio` | `sd2_final_report` | ≥ 0.90 | **硬门** | 实际消费占比 |
 | L3 · Prompter 子类 | `dialogue_subtype_coverage` | `episode_coverage` | = 1.00 | **硬门**（上位） | 对白类必须 100% 消费 |
 
-L1 失败仅 warning，允许下游修正；L2/L3 失败 pipeline 立即硬拦。
+L1 / L1.5 / L2 / L3 全部为硬门，任一失败 pipeline 立即 exit 7 / 8。仅在 `--allow-v6-soft` / `--skip-editmap-coverage-hard` / `--skip-last-seg-hard` 显式降级时转为 warning。
 
 ### A.6 `diagnosis` 字段追加
 
@@ -281,8 +289,20 @@ v5 原有 `diagnosis.*` 保持不变，v6 追加：
 ```jsonc
 "diagnosis": {
   /* v5 原字段保持 */
-  "segment_coverage_check": true,           // L1 软门结果
-  "segment_coverage_ratio_estimated": 0.97, // number
+
+  // v6.1-HOTFIX-D：以下两字段由 pipeline **回填**为实算值，LLM 即使写了也会被覆盖，
+  // LLM 原值另存到 *_llm_self_reported 字段（审计用）。LLM 端只需专注于正确切块与
+  // 填 covered_segment_ids[]；本两字段不是 LLM 的责任面。
+  "segment_coverage_check": true,           // L1 硬门结果（pipeline 权威）
+  "segment_coverage_ratio_estimated": 0.97, // number（pipeline 权威）
+  "last_seg_covered_check": true,           // v6.1-HOTFIX-D 新增硬门结果（pipeline 权威）
+
+  // v6.1-HOTFIX-D：pipeline 自动标记，LLM 无需输出
+  "pipeline_authoritative": true,
+  "pipeline_authoritative_note": "…",
+  "segment_coverage_ratio_llm_self_reported": 0.97,  // LLM 原值（审计）
+  "segment_coverage_check_llm_self_reported": true,  // LLM 原值（审计）
+
   "style_inference_completeness": "full",   // full / partial_low_confidence / missing
   "rhythm_timeline_derived": true,          // 是否成功推导
   "major_climax_strategy_resolved": true,   // false 时 strategy=null 合法
@@ -291,10 +311,14 @@ v5 原有 `diagnosis.*` 保持不变，v6 追加：
     // "major_climax_strategy_unresolved"
   ],
   "warning_msg": [
-    // 可恢复的异常：如"L1 segment_coverage 0.91 < 0.95"
+    // 可恢复的异常：如"L1 segment_coverage 0.91 < 0.95（降级模式下）"
   ]
 }
 ```
+
+**禁止条款（v6.1-HOTFIX-D）**：
+- LLM **禁止**自填 `segment_coverage_check` / `segment_coverage_ratio_estimated` / `last_seg_covered_check` 作为"结论"；
+- 即使填了，pipeline 也会按实算值覆盖；LLM 自报值仅保留为 `*_llm_self_reported` 回归审计用，**不再参与任何下游决策**。
 
 ---
 
@@ -349,7 +373,12 @@ v5 要求 `markdown_body.## 【组骨架】` 行数 == `appendix.block_index.len
 5. `major_climax.block_id` 在 `block_index` 里实际存在；
 6. `mini_climaxes[].at_sec_derived` 单调递增，相邻差值 ≤ 25s；
 7. `info_density_contract.episode_dialogue_floor_hard ≤ effective_expected ≤ episode_dialogue_ceiling_hard`；
-8. L1 `segment_coverage_check` 若为 false，`warning_msg` 必含诊断原因。
+8. L1 `segment_coverage_check` 若为 false，`warning_msg` 必含诊断原因（v6.1-HOTFIX-D：本字段由 pipeline 回填，LLM 无需自评）；
+9. **（v6.1-HOTFIX-D 新增）时间轴上最后一个 `seg_id` 必须出现在至少一个 `block.covered_segment_ids[]`**，保证 closing_hook 有可消费素材；
+10. **（v6.1-HOTFIX-F 新增）遇到 pipeline 注入的"动态硬下限"段（directorBrief 尾部 `──（HOTFIX F · pipeline 注入 · 最高优先级硬约束 …）──` 标记），必须优先服从**：
+    - `shots.length ≥ max(50, segs_count)`；
+    - `blocks.length ≥ max(15, ceil(segs_count/4))`；
+    - 剧本体量 > 目标时长时以"每 block 镜头数↑ + 每镜头时长↓"方式压缩，**禁止丢弃后半段 segment**。
 
 ---
 
@@ -357,7 +386,9 @@ v5 要求 `markdown_body.## 【组骨架】` 行数 == `appendix.block_index.len
 
 | 开关 | 对 EditMap 的含义 |
 |---|---|
-| `--allow-v6-soft` | 所有 v6 硬门降级为 warning |
+| `--allow-v6-soft` | 所有 v6 硬门降级为 warning（含 L1 段覆盖 / tail_seg） |
+| `--skip-editmap-coverage-hard` | **仅** L1 段覆盖（≥ 0.95）硬门降级（v6.1-HOTFIX-D） |
+| `--skip-last-seg-hard` | **仅** last_seg_covered_check 硬门降级（v6.1-HOTFIX-D） |
 | `--skip-rhythm-timeline` | 不产 `meta.rhythm_timeline`，但仍产 style_inference + covered_segment_ids |
 | `--skip-style-inference` | 不产 `meta.style_inference`，Director 回落 v5 `parsed_brief` |
 | `--rhythm-soft-only` | rhythm_timeline 产出正常，但 pipeline 下游的节奏硬门降级 warning |
@@ -370,6 +401,12 @@ v5 要求 `markdown_body.## 【组骨架】` 行数 == `appendix.block_index.len
 |------|------|------|------|
 | v5.0-rev9 | 2026-04-17 | 🟢 稳定 | v5 工程基线（Slot-fill、付费、routing） |
 | v6.0 | 2026-04-21 | 🟢 正式 | 三轴 style_inference + covered_segment_ids + rhythm_timeline + 三层覆盖率 |
+| v6.1-HOTFIX-A | 2026-04-21 | 🟢 | 修复 Stage 0 产物在 `--skip-editmap` 重跑时未挂载；run_sd2_pipeline 自动 mount |
+| v6.1-HOTFIX-B | 2026-04-21 | 🟢 | Prompter 自检 `dialogue_fidelity_check` 假阳性降级（raw_text 空 + prompt 非空 → phantom_pass_detected） |
+| v6.1-HOTFIX-C | 2026-04-21 | 🟢 | 汇总导出器 timecode 正则放宽 + EditMap block.time 兜底链 |
+| v6.1-HOTFIX-D | 2026-04-21 | 🟢 | **L1 段覆盖升级硬门 + tail_seg 硬门 + diagnosis 权威回填**（本次） |
+| v6.1-HOTFIX-E | 2026-04-21 | 🟢 | prompt 文档侧收口：L1/tail 硬门化 + 禁写 LLM 自估字段（本次） |
+| v6.1-HOTFIX-F | 2026-04-21 | 🟢 | directorBrief 动态硬下限注入：shot ≥ max(50, segs) / block ≥ max(15, segs/4) / tail_seg 必进（本次） |
 | v6.1 | 计划 2026-05-04 | ⏳ | 引入 Stage 1.5 Scene Architect（微调 rhythm_timeline；本 v6 对其输出兼容） |
 
 ---

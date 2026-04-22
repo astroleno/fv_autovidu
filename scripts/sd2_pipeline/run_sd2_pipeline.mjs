@@ -530,6 +530,19 @@ async function main() {
     if ((sd2Version === 'v5' || sd2Version === 'v6') && normalizerArtifactPath) {
       emArgs.push('--normalized-package', normalizerArtifactPath);
     }
+    // HOTFIX D · v6 EditMap 层硬门降级 flag 透传（与下游 block chain 同名）：
+    //   --allow-v6-soft：一键降级
+    //   --skip-editmap-coverage-hard：仅 segment_coverage_l1 降级
+    //   --skip-last-seg-hard：仅 last_seg_covered_check 降级
+    if (sd2Version === 'v6') {
+      for (const flag of [
+        'allow-v6-soft',
+        'skip-editmap-coverage-hard',
+        'skip-last-seg-hard',
+      ]) {
+        if (args[flag] === true) emArgs.push(`--${flag}`);
+      }
+    }
     runNode(emArgs);
   } else if (!fs.existsSync(editMapOut)) {
     throw new Error(`skip-editmap 需要已有文件: ${editMapOut}`);
