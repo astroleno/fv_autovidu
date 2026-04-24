@@ -2,7 +2,7 @@
  * API Mart - Anthropic Messages API 客户端。
  *
  * 用途：
- *   - 原生 Anthropic 端点 POST /v1/messages，认证用 `x-api-key` + `anthropic-version`
+ *   - 原生 Anthropic 端点 POST /v1/messages，认证用 `x-api-key` + `anthropic-version`（**协议版本，不是模型名**）
  *   - 支持 thinking 模型（如 claude-opus-4-6-thinking），响应 content[] 会混有
  *     {type:"thinking"} 与 {type:"text"} 两种 block，本模块只拼接 text block 作为正文
  *   - 支持流式（SSE）以避免上游网关在长推理任务中 idle 超时
@@ -18,8 +18,18 @@ import { loadEnvFromDotenv } from './load_env.mjs';
 
 loadEnvFromDotenv();
 
-/** 本端点固定的 Anthropic API 版本。APIMart 文档示例用 2025-10-01。 */
-const ANTHROPIC_VERSION = process.env.APIMART_ANTHROPIC_VERSION || '2025-10-01';
+/**
+ * `anthropic-version`：**Anthropic HTTP Messages API 的协议日期头**（官方必填），
+ * 与**选用哪一代 Claude 模型**无关 —— 模型由请求 JSON 里 `model: "claude-opus-4-6-thinking"` 等字段决定。
+ * 把「2023-06-01」理解成「模型很旧」是误读；它只是 **API 规范版本号**（类似 `2023-06-01` 版 Messages 接口 shape），
+ * Opus 4.6 / 4.5 等新模型仍走同一类 header + 自己的 `model` 字符串。
+ *
+ * 优先读 `process.env.APIMART_ANTHROPIC_VERSION`（随 APIMart/网关白名单调整而无需改代码）。
+ *
+ * 默认 `2023-06-01`：在现网 `api.apimart.ai` 上短探测时，`2025-10-01` 等常返回 400「not a valid version」；**该默认值表示「当前网关接受的协议头」而非「回退到旧模型」**。
+ * 若你环境仍接受 `2025-10-01`，在 `.env` 设置即可覆盖。
+ */
+const ANTHROPIC_VERSION = process.env.APIMART_ANTHROPIC_VERSION || '2023-06-01';
 
 /**
  * 输入消息（user / assistant）。system 不走这里，单独作为顶层字段。
