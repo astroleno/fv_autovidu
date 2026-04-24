@@ -29,6 +29,7 @@
 import {
   checkDirectorSegmentCoverageV6,
   checkDirectorKvaCoverageV6,
+  checkDirectorInfoDensityV6,
   checkPrompterDialogueFidelityV6,
   isKvaConsumedShotValue,
   reconcileKvaWithPrompterV6,
@@ -109,6 +110,45 @@ console.log('\n── HOTFIX S · Bug B · 半角圆括号注释也能剥 ──
   const sd2Prompt = '[DIALOG] 对不起我不该这样';
   const r = checkPrompterDialogueFidelityV6(sd2Prompt, scriptChunk);
   assert('半角括号注释剥除后命中', r.status === 'pass', r);
+}
+
+console.log('\n── HOTFIX T · Bug B 扩展 · 长对白拆到多镜头仍算 pass ──');
+{
+  const scriptChunk = {
+    segments: [
+      {
+        seg_id: 'SEG_SPLIT_1',
+        segment_type: 'dialogue',
+        text: '张医生，你心脏的情况你应该清楚，除非通过手术治愈，否则生育的风险太大了。但是这种手术的风险同样极大！从专业的角度，我不建议你做……',
+      },
+    ],
+  };
+  const sd2Prompt = [
+    '[DIALOG] 李院长：「张医生，你心脏的情况你应该清楚，除非通过手术治愈，否则生育的风险太大了。」',
+    '[DIALOG] 李院长：「但是这种手术的风险同样极大！」',
+    '[DIALOG] 李院长：「从专业的角度，我不建议你做……」',
+  ].join('\n');
+  const r = checkPrompterDialogueFidelityV6(sd2Prompt, scriptChunk);
+  assert('跨 3 条 [DIALOG] 拼接后仍 pass', r.status === 'pass', r);
+}
+
+console.log('\n── HOTFIX T · Bug B 扩展 · 拆句丢连接标点仍算 punctuation_only pass ──');
+{
+  const scriptChunk = {
+    segments: [
+      {
+        seg_id: 'SEG_SPLIT_2',
+        segment_type: 'dialogue',
+        text: '她是咱们医院妇产科的秦主任，她老公是医院的赵副院长，就是可惜秦主任好像是因为身体原因，两个人好像结婚好多年都没有生孩子……',
+      },
+    ],
+  };
+  const sd2Prompt = [
+    '[DIALOG] 医生：她是咱们医院妇产科的秦主任，她老公是医院的赵副院长',
+    '[DIALOG] 医生：就是可惜秦主任好像是因为身体原因，两个人好像结婚好多年都没有生孩子……',
+  ].join('\n');
+  const r = checkPrompterDialogueFidelityV6(sd2Prompt, scriptChunk);
+  assert('跨 shot 拼接时连接处少一个逗号仍 pass', r.status === 'pass', r);
 }
 
 console.log('\n── HOTFIX S · Bug B · shortened_by_author_hint 不被破坏 ──');
@@ -204,6 +244,48 @@ console.log('\n── HOTFIX S · Bug C1 · 原本就 ≥ 0.9 的 pass 路径不
   };
   const r = checkDirectorSegmentCoverageV6(dirAppendix, { segments: [] });
   assert('coverage=1.0 仍 pass', r.status === 'pass', r);
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Bug D · director_info_density
+// ──────────────────────────────────────────────────────────────────
+console.log('\n── HOTFIX T · Bug D · closing freeze hold 末 shot 不应计入 none_ratio ──');
+{
+  const dirAppendix = {
+    shot_meta: [
+      { shot_idx: 1, info_delta: 'motion' },
+      { shot_idx: 2, info_delta: 'dialogue' },
+      { shot_idx: 3, info_delta: 'relation' },
+      { shot_idx: 4, info_delta: 'none' },
+    ],
+    structure_hint_consumption: [
+      { hint_id: 'SH_001', type: 'split_screen', consumed_at_shot: 4 },
+      { hint_id: 'SH_002', type: 'freeze_frame', consumed_at_shot: 4 },
+    ],
+  };
+  const r = checkDirectorInfoDensityV6(dirAppendix, {
+    max_none_ratio: 0.2,
+    consecutive_none_limit: 1,
+  });
+  assert('closing freeze hold 的末 shot 允许继承前一拍信息而不算 none', r.status === 'pass', r);
+}
+
+console.log('\n── HOTFIX T · Bug D · 普通末 shot 的 none 仍按旧规则 fail ──');
+{
+  const dirAppendix = {
+    shot_meta: [
+      { shot_idx: 1, info_delta: 'motion' },
+      { shot_idx: 2, info_delta: 'dialogue' },
+      { shot_idx: 3, info_delta: 'relation' },
+      { shot_idx: 4, info_delta: 'none' },
+    ],
+    structure_hint_consumption: [],
+  };
+  const r = checkDirectorInfoDensityV6(dirAppendix, {
+    max_none_ratio: 0.2,
+    consecutive_none_limit: 1,
+  });
+  assert('没有 closing structural hold 时仍 fail', r.status === 'fail', r);
 }
 
 // ──────────────────────────────────────────────────────────────────

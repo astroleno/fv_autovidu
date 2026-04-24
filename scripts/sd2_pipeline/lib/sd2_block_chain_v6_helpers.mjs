@@ -553,12 +553,35 @@ export function checkDirectorInfoDensityV6(dirAppendix, infoDensityContract) {
     return { status: 'warn', reason: 'shot_meta_missing_or_empty', none_ratio: null, consecutive_max: 0 };
   }
 
+  const structureHits = Array.isArray(app.structure_hint_consumption) ? app.structure_hint_consumption : [];
+  const lastShotIdx = meta.reduce((mx, m, i) => {
+    if (!m || typeof m !== 'object') return Math.max(mx, i + 1);
+    const idx = Number(/** @type {Record<string, unknown>} */ (m).shot_idx);
+    return Number.isFinite(idx) && idx > 0 ? Math.max(mx, idx) : Math.max(mx, i + 1);
+  }, 0);
+  const terminalClosingHold = structureHits.some((hit) => {
+    if (!hit || typeof hit !== 'object') return false;
+    const h = /** @type {Record<string, unknown>} */ (hit);
+    const type = typeof h.type === 'string' ? h.type : '';
+    const shotIdx = Number(h.consumed_at_shot);
+    if (!Number.isFinite(shotIdx) || shotIdx !== lastShotIdx) return false;
+    return type === 'freeze_frame' || type === 'split_screen';
+  });
+
   let noneCount = 0;
   let consecutive = 0;
   let consecutiveMax = 0;
-  for (const m of meta) {
+  for (let i = 0; i < meta.length; i += 1) {
+    const m = meta[i];
     if (!m || typeof m !== 'object') continue;
-    const d = /** @type {Record<string, unknown>} */ (m).info_delta;
+    const mm = /** @type {Record<string, unknown>} */ (m);
+    const d = mm.info_delta;
+    const shotIdx = Number(mm.shot_idx);
+    const effectiveShotIdx = Number.isFinite(shotIdx) && shotIdx > 0 ? shotIdx : i + 1;
+    if (d === 'none' && terminalClosingHold && effectiveShotIdx === lastShotIdx) {
+      consecutive = 0;
+      continue;
+    }
     if (d === 'none') {
       noneCount += 1;
       consecutive += 1;
@@ -611,6 +634,7 @@ export function checkPrompterDialogueFidelityV6(sd2Prompt, scriptChunk) {
     return { status: 'skip', missing_seg_ids: [] };
   }
   const segs = Array.isArray(scriptChunk.segments) ? scriptChunk.segments : [];
+  const dialogCorpus = normalizePromptDialogueCorpus(sd2Prompt);
   /** @type {string[]} */
   const missing = [];
   for (const s of segs) {
@@ -640,6 +664,19 @@ export function checkPrompterDialogueFidelityV6(sd2Prompt, scriptChunk) {
     const stripped = stripInlineAnnotations(text);
     if (stripped && stripped !== text && sd2Prompt.indexOf(stripped) >= 0) continue;
 
+    // HOTFIX T · 长对白跨多 shot 合法拆分时，允许在整个 [DIALOG] 语料拼接后命中。
+    //   典型场景：同一条原文 seg 被 Director 拆到 2–4 个镜头，每个镜头各说一截。
+    //   旧实现只在原始 sd2Prompt 上做整串 indexOf，会被重复 speaker 前缀 / 引号 / 换行打断。
+    const textLoose = normalizeLooseText(text);
+    if (dialogCorpus && textLoose && dialogCorpus.includes(textLoose)) continue;
+    const strippedLoose = normalizeLooseText(stripped);
+    if (dialogCorpus && strippedLoose && strippedLoose !== textLoose && dialogCorpus.includes(strippedLoose)) {
+      continue;
+    }
+
+    const hintLoose = normalizeLooseText(shortened);
+    if (dialogCorpus && hintLoose && dialogCorpus.includes(hintLoose)) continue;
+
     missing.push(sid);
   }
   return { status: missing.length === 0 ? 'pass' : 'fail', missing_seg_ids: missing };
@@ -668,4 +705,67 @@ export function stripInlineAnnotations(text) {
     out = next;
   }
   return out.trim();
+}
+
+/**
+ * @param {string} sd2Prompt
+ * @param {'DIALOG' | 'SFX'} label
+ * @returns {string[]}
+ */
+function extractTaggedBodies(sd2Prompt, label) {
+  const safe = String(sd2Prompt || '');
+  const re = new RegExp(`\\[${label}\\]([\\s\\S]*?)(?=(?:\\n\\[(?:FRAME|DIALOG|SFX|BGM)\\])|$)`, 'g');
+  /** @type {string[]} */
+  const out = [];
+  let m;
+  while ((m = re.exec(safe)) !== null) {
+    const body = (m[1] || '').trim();
+    if (body) out.push(body);
+  }
+  return out;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function stripDialogueLead(text) {
+  let out = String(text || '').trim();
+  while (true) {
+    const next = out
+      .replace(/^(?:独白|画外音|旁白|内心|心声|VO|OS)\s*[A-Za-z]*\s*[：:]\s*/i, '')
+      .replace(/^[\u4e00-\u9fffA-Za-z0-9_]{1,10}(?:[（(][^）)]*[）)])?\s*[：:]\s*/, '')
+      .trim();
+    if (next === out) break;
+    out = next;
+  }
+  return out.replace(/^[「『“"'‘’]+|[」』”"'‘’]+$/g, '').trim();
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function normalizeLooseText(text) {
+  return String(text || '')
+    .replace(/\s+/g, '')
+    .replace(/[「」『』“”"'‘’]/g, '')
+    .replace(/[，。！？、；：,.!?;:…—-]/g, '')
+    .trim();
+}
+
+/**
+ * 把多镜头 [DIALOG] 段落拼成一个连续可比对语料，去掉 speaker 前缀、引号与 <silent>。
+ *
+ * @param {string} sd2Prompt
+ * @returns {string}
+ */
+function normalizePromptDialogueCorpus(sd2Prompt) {
+  return extractTaggedBodies(sd2Prompt, 'DIALOG')
+    .map((body) => body.trim())
+    .filter((body) => body && body !== '<silent>')
+    .map(stripDialogueLead)
+    .map(normalizeLooseText)
+    .filter(Boolean)
+    .join('');
 }
