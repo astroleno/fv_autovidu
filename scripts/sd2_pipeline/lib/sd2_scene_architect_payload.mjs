@@ -76,12 +76,13 @@ function extractKvaFlat(nsp) {
 }
 
 /**
- * 压缩 segments，只带前 40 字 text（让 LLM 能定位情绪触发点而不爆 token）。
+ * 压缩 segments：普通段只带前 40 字；关键调度依据带 text_full。
  *
  * @param {Record<string, unknown> | null | undefined} nsp
+ * @param {Set<string>} criticalSegIds
  * @returns {Array<Record<string, unknown>>}
  */
-function extractSegmentsCompact(nsp) {
+function extractSegmentsCompact(nsp, criticalSegIds = new Set()) {
   if (!nsp || typeof nsp !== 'object') return [];
   const beats = /** @type {unknown} */ (
     /** @type {Record<string, unknown>} */ (nsp).beat_ledger
@@ -98,15 +99,57 @@ function extractSegmentsCompact(nsp) {
       if (!s || typeof s !== 'object') continue;
       const seg = /** @type {Record<string, unknown>} */ (s);
       const text = typeof seg.text === 'string' ? seg.text : '';
-      out.push({
+      const item = {
         seg_id: typeof seg.seg_id === 'string' ? seg.seg_id : '',
         segment_type: typeof seg.segment_type === 'string' ? seg.segment_type : 'descriptive',
         speaker: typeof seg.speaker === 'string' ? seg.speaker : null,
         text_first_40: text.length > 40 ? text.slice(0, 40) : text,
-      });
+      };
+      if (criticalSegIds.has(item.seg_id)) {
+        item.text_full = text;
+      }
+      out.push(item);
     }
   }
   return out;
+}
+
+/**
+ * @param {Record<string, unknown> | null} rhythmTimeline
+ * @param {Array<Record<string, unknown>>} kvas
+ * @returns {Set<string>}
+ */
+function collectCriticalSegmentIds(rhythmTimeline, kvas) {
+  const ids = new Set();
+  const rt = rhythmTimeline && typeof rhythmTimeline === 'object' ? rhythmTimeline : {};
+  for (const mc of Array.isArray(rt.mini_climaxes) ? rt.mini_climaxes : []) {
+    if (!mc || typeof mc !== 'object') continue;
+    const m = /** @type {Record<string, unknown>} */ (mc);
+    const sid =
+      typeof m.trigger_source_seg_id === 'string'
+        ? m.trigger_source_seg_id
+        : typeof m.trigger === 'string'
+          ? m.trigger
+          : '';
+    if (sid) ids.add(sid);
+  }
+  for (const key of ['major_climax', 'closing_hook']) {
+    const item = rt[key] && typeof rt[key] === 'object'
+      ? /** @type {Record<string, unknown>} */ (rt[key])
+      : null;
+    const sid =
+      item && typeof item.trigger_source_seg_id === 'string'
+        ? item.trigger_source_seg_id
+        : item && typeof item.trigger === 'string'
+          ? item.trigger
+          : '';
+    if (sid) ids.add(sid);
+  }
+  for (const kva of kvas) {
+    const sid = typeof kva.source_seg_id === 'string' ? kva.source_seg_id : '';
+    if (sid) ids.add(sid);
+  }
+  return ids;
 }
 
 /**
@@ -157,13 +200,20 @@ export function buildSceneArchitectPayload(editMap, nsp, episode) {
   const meta = /** @type {Record<string, unknown>} */ (editMap.meta || {});
   const styleInference = meta.style_inference || {};
   const rhythmDraft = meta.rhythm_timeline || null;
+  const kvas = extractKvaFlat(nsp);
+  const criticalSegIds = collectCriticalSegmentIds(
+    rhythmDraft && typeof rhythmDraft === 'object'
+      ? /** @type {Record<string, unknown>} */ (rhythmDraft)
+      : null,
+    kvas,
+  );
   return {
     episode,
     style_inference: styleInference,
     rhythm_timeline_draft: rhythmDraft,
     block_index_compact: extractBlockIndexCompact(editMap),
-    key_visual_actions: extractKvaFlat(nsp),
-    segments_compact: extractSegmentsCompact(nsp),
+    key_visual_actions: kvas,
+    segments_compact: extractSegmentsCompact(nsp, criticalSegIds),
   };
 }
 
@@ -518,6 +568,31 @@ export function applySceneArchitectToEditMap(editMap, sanitized) {
     ? sanitized.rhythm_adjustments
     : [];
   meta.rhythm_adjustments = prevAdj.concat(newAdj);
+
+  const kvaArrForMeta = Array.isArray(sanitized.kva_arrangements)
+    ? sanitized.kva_arrangements
+    : [];
+  meta.kva_consumption_plan = kvaArrForMeta
+    .filter((a) => a && typeof a === 'object')
+    .map((a) => {
+      const obj = /** @type {Record<string, unknown>} */ (a);
+      return {
+        kva_id: typeof obj.kva_id === 'string' ? obj.kva_id : '',
+        source_seg_id: typeof obj.source_seg_id === 'string' ? obj.source_seg_id : '',
+        assigned_block_id:
+          typeof obj.suggested_block_id === 'string' ? obj.suggested_block_id : null,
+        suggested_shot_role:
+          typeof obj.suggested_shot_role === 'string' ? obj.suggested_shot_role : null,
+        routing_reason:
+          typeof obj.routing_reason === 'string'
+            ? obj.routing_reason
+            : typeof obj.rationale === 'string'
+              ? obj.rationale
+              : '',
+        authority: 'scene_architect_v1',
+        status: 'assigned',
+      };
+    });
 
   if (!editMap.appendix || typeof editMap.appendix !== 'object') editMap.appendix = {};
   const appendix = /** @type {Record<string, unknown>} */ (editMap.appendix);

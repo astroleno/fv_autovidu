@@ -45,6 +45,11 @@ import {
   SEEDANCE_MIN_SHOT_SEC,
   DEFAULT_AVG_SHOT_SEC,
 } from './shot_slot_planner.mjs';
+import {
+  buildKvaConsumptionPlan,
+  buildSegmentOwnershipPlan,
+  resolveRhythmAnchorsForPayloads,
+} from './edit_map_v7_contract.mjs';
 
 const require = createRequire(import.meta.url);
 const {
@@ -66,12 +71,20 @@ export function extractDirectorMarkdownSectionForBlock(markdownBody, blockId) {
   if (!markdownBody || typeof markdownBody !== 'string' || !blockId) {
     return '';
   }
-  const chunks = markdownBody.split(/(?=^## B\d+)/m);
-  for (const chunk of chunks) {
-    const m = chunk.match(/^## (B\d+)\b/m);
-    if (m && m[1] === blockId) {
-      return chunk.trim();
+  const headingRe = /^(?:>\s*)?(?:#{1,6}\s*)?(?:【\s*)?(B\d+)(?=\b|[\s|】])/gm;
+  /** @type {Array<{ block_id: string, index: number }>} */
+  const headings = [];
+  for (const match of markdownBody.matchAll(headingRe)) {
+    if (typeof match[1] === 'string') {
+      headings.push({ block_id: match[1], index: match.index ?? 0 });
     }
+  }
+  for (let i = 0; i < headings.length; i += 1) {
+    const h = headings[i];
+    if (h.block_id !== blockId) continue;
+    const next = headings[i + 1];
+    const end = next ? next.index : markdownBody.length;
+    return markdownBody.slice(h.index, end).trim();
   }
   return '';
 }
@@ -210,7 +223,7 @@ function buildBeatAuxIndex(normalizedPackage) {
  * @param {Map<string, { kvas: unknown[], structure_hints: unknown[] }>} beatAuxIndex
  * @returns {Record<string, unknown>|null}
  */
-function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex) {
+function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex, options = {}) {
   if (!blockIndexRow || typeof blockIndexRow !== 'object') {
     return null;
   }
@@ -225,6 +238,41 @@ function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex) {
     ? /** @type {Record<string, unknown>} */ (bi.script_chunk_hint)
     : {};
   const mustCover = Array.isArray(bi.must_cover_segment_ids) ? bi.must_cover_segment_ids : [];
+  const segmentOwnershipPlan = Array.isArray(options.segmentOwnershipPlan)
+    ? /** @type {Array<Record<string, unknown>>} */ (options.segmentOwnershipPlan)
+    : [];
+  const kvaConsumptionPlan = Array.isArray(options.kvaConsumptionPlan)
+    ? /** @type {Array<Record<string, unknown>>} */ (options.kvaConsumptionPlan)
+    : [];
+  /** @type {Map<string, Record<string, unknown>>} */
+  const ownershipBySegId = new Map();
+  for (const item of segmentOwnershipPlan) {
+    if (!item || typeof item !== 'object') continue;
+    const it = /** @type {Record<string, unknown>} */ (item);
+    if (it.block_id === blockId && typeof it.seg_id === 'string') {
+      ownershipBySegId.set(it.seg_id, it);
+    }
+  }
+
+  /**
+   * @param {string} sid
+   * @param {string} segmentType
+   */
+  const fallbackOwnership = (sid, segmentType) => {
+    const lead = typeof hint.lead_seg_id === 'string' ? hint.lead_seg_id : '';
+    const tail = typeof hint.tail_seg_id === 'string' ? hint.tail_seg_id : '';
+    let coverageRole = 'covered';
+    if (mustCover.includes(sid)) coverageRole = 'must';
+    else if (sid === lead) coverageRole = 'lead';
+    else if (sid === tail) coverageRole = 'tail';
+    return {
+      coverage_role: coverageRole,
+      consumption_role: 'owned',
+      owner_block_id: blockId,
+      context_for_block_id: null,
+      allow_dialogue_output: ['dialogue', 'monologue', 'vo'].includes(segmentType),
+    };
+  };
 
   /** @type {unknown[]} */
   const segmentsOut = [];
@@ -235,24 +283,37 @@ function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex) {
     const hit = segmentIndex.get(sid);
     if (!hit) {
       // 缺失原文 → 占位（不 throw；Director 硬门会在 segment_coverage_report 里暴露）
+      const ownership = ownershipBySegId.get(sid) || fallbackOwnership(sid, 'unknown');
       segmentsOut.push({
         seg_id: sid,
         beat_id: null,
         segment_type: 'unknown',
         speaker: null,
         text: '',
+        coverage_role: ownership.coverage_role,
+        consumption_role: ownership.consumption_role,
+        owner_block_id: ownership.owner_block_id,
+        context_for_block_id: ownership.context_for_block_id,
+        allow_dialogue_output: ownership.allow_dialogue_output === true,
         __missing_from_normalizer__: true,
       });
       continue;
     }
     if (hit.beat_id) beatIdsHit.add(hit.beat_id);
     const s = hit.segment;
+    const segmentType = typeof s.segment_type === 'string' ? s.segment_type : 'descriptive';
+    const ownership = ownershipBySegId.get(sid) || fallbackOwnership(sid, segmentType);
     segmentsOut.push({
       seg_id: sid,
       beat_id: hit.beat_id || null,
-      segment_type: typeof s.segment_type === 'string' ? s.segment_type : 'descriptive',
+      segment_type: segmentType,
       speaker: typeof s.speaker === 'string' ? s.speaker : null,
       text: typeof s.text === 'string' ? s.text : '',
+      coverage_role: ownership.coverage_role,
+      consumption_role: ownership.consumption_role,
+      owner_block_id: ownership.owner_block_id,
+      context_for_block_id: ownership.context_for_block_id,
+      allow_dialogue_output: ownership.allow_dialogue_output === true,
       // 透传 dialogue_char_count（v2 新增），便于 Prompter 做对白字数自检
       dialogue_char_count:
         typeof s.dialogue_char_count === 'number' ? s.dialogue_char_count : null,
@@ -267,9 +328,61 @@ function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex) {
   /** @type {Set<string>} */
   const kvaIdSeen = new Set();
   /** @type {unknown[]} */
+  const kvaTraceNotes = [];
+  /** @type {unknown[]} */
   const hintsAll = [];
   /** @type {Set<string>} */
   const hintIdSeen = new Set();
+  const hasConsumptionPlan = kvaConsumptionPlan.some(
+    (x) => x && typeof x === 'object' && typeof /** @type {Record<string, unknown>} */ (x).kva_id === 'string',
+  );
+  if (hasConsumptionPlan) {
+    for (const item of kvaConsumptionPlan) {
+      if (!item || typeof item !== 'object') continue;
+      const plan = /** @type {Record<string, unknown>} */ (item);
+      const kid = typeof plan.kva_id === 'string' ? plan.kva_id : '';
+      const assignedBlock =
+        typeof plan.assigned_block_id === 'string' ? plan.assigned_block_id : '';
+      const sourceBlock = typeof plan.source_block_id === 'string' ? plan.source_block_id : '';
+      if (sourceBlock === blockId && assignedBlock && assignedBlock !== blockId) {
+        kvaTraceNotes.push({
+          kva_id: kid,
+          source_block_id: sourceBlock,
+          assigned_block_id: assignedBlock,
+          status: 'routed_elsewhere',
+          routing_reason:
+            typeof plan.routing_reason === 'string' ? plan.routing_reason : '',
+        });
+      }
+      if (assignedBlock !== blockId) continue;
+      if (kid && kvaIdSeen.has(kid)) continue;
+      const sourceKva =
+        plan.source_kva && typeof plan.source_kva === 'object'
+          ? /** @type {Record<string, unknown>} */ (plan.source_kva)
+          : plan;
+      const outKva = {
+        ...sourceKva,
+        kva_id: kid || sourceKva.kva_id,
+        source_block_id: sourceBlock || sourceKva.source_block_id || null,
+      };
+      if (
+        plan.authority === 'scene_architect_v1' ||
+        (sourceBlock && assignedBlock && sourceBlock !== assignedBlock)
+      ) {
+        outKva.scene_architect = {
+          assigned_block_id: assignedBlock,
+          suggested_shot_role:
+            typeof plan.suggested_shot_role === 'string' ? plan.suggested_shot_role : null,
+          routing_reason:
+            typeof plan.routing_reason === 'string' ? plan.routing_reason : '',
+          authority:
+            typeof plan.authority === 'string' ? plan.authority : 'scene_architect_v1',
+        };
+      }
+      if (kid) kvaIdSeen.add(kid);
+      kvasAll.push(outKva);
+    }
+  }
   // HOTFIX T · block 级 KVA 过滤
   //   Normalizer 的 beat_ledger[i].key_visual_actions[] 是"整 beat 的 KVA 视图"，
   //   一个 beat 常横跨 5–12 个 block（例如 BT_002 覆盖 SEG_020…SEG_062）。
@@ -292,6 +405,7 @@ function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex) {
       const kid = typeof k.kva_id === 'string' ? k.kva_id : '';
       if (kid && kvaIdSeen.has(kid)) continue;
       const srcSeg = typeof k.source_seg_id === 'string' ? k.source_seg_id : '';
+      if (hasConsumptionPlan && srcSeg) continue;
       if (srcSeg && !coveredSet.has(srcSeg)) continue;
       if (kid) kvaIdSeen.add(kid);
       kvasAll.push(k);
@@ -314,6 +428,7 @@ function buildScriptChunkForBlock(blockIndexRow, segmentIndex, beatAuxIndex) {
     overflow_policy: typeof hint.overflow_policy === 'string' ? hint.overflow_policy : null,
     segments: segmentsOut,
     key_visual_actions: kvasAll,
+    kva_trace_notes: kvaTraceNotes,
     structure_hints: hintsAll,
   };
 }
@@ -344,6 +459,17 @@ function resolveRhythmRoleForBlock(rhythmTimeline, blockId) {
     : null;
   if (g && Array.isArray(g.covered_blocks) && g.covered_blocks.includes(blockId)) {
     return {
+      anchor_id: typeof g.anchor_id === 'string' ? g.anchor_id : null,
+      role: 'golden_open',
+      required_signatures_any_of: Array.isArray(g.required_signatures_any_of)
+        ? g.required_signatures_any_of
+        : [],
+      duration_sec_max: typeof g.duration_sec_max === 'number' ? g.duration_sec_max : 3,
+    };
+  }
+  if (g && typeof g.block_id === 'string' && g.block_id === blockId) {
+    return {
+      anchor_id: typeof g.anchor_id === 'string' ? g.anchor_id : null,
       role: 'golden_open',
       required_signatures_any_of: Array.isArray(g.required_signatures_any_of)
         ? g.required_signatures_any_of
@@ -358,6 +484,12 @@ function resolveRhythmRoleForBlock(rhythmTimeline, blockId) {
     if (!mc || typeof mc !== 'object') continue;
     const m = /** @type {Record<string, unknown>} */ (mc);
     const seq = typeof m.seq === 'number' ? m.seq : null;
+    const anchorBlockId =
+      typeof m.anchor_block_id === 'string'
+        ? m.anchor_block_id
+        : typeof m.block_id === 'string'
+          ? m.block_id
+          : '';
     const slots = m.slots && typeof m.slots === 'object'
       ? /** @type {Record<string, unknown>} */ (m.slots)
       : {};
@@ -367,6 +499,7 @@ function resolveRhythmRoleForBlock(rhythmTimeline, blockId) {
         const slot = /** @type {Record<string, unknown>} */ (sl);
         if (typeof slot.block_id === 'string' && slot.block_id === blockId) {
           return {
+            anchor_id: typeof m.anchor_id === 'string' ? m.anchor_id : null,
             role: 'mini_climax',
             mini_climax_seq: seq,
             stage,
@@ -376,6 +509,16 @@ function resolveRhythmRoleForBlock(rhythmTimeline, blockId) {
         }
       }
     }
+    if (anchorBlockId && anchorBlockId === blockId) {
+      return {
+        anchor_id: typeof m.anchor_id === 'string' ? m.anchor_id : null,
+        role: 'mini_climax',
+        mini_climax_seq: seq,
+        stage: 'trigger',
+        signature_required: m.required !== false,
+        strategy: typeof m.strategy === 'string' ? m.strategy : null,
+      };
+    }
   }
 
   // major_climax
@@ -384,6 +527,7 @@ function resolveRhythmRoleForBlock(rhythmTimeline, blockId) {
     : null;
   if (mj && typeof mj.block_id === 'string' && mj.block_id === blockId) {
     return {
+      anchor_id: typeof mj.anchor_id === 'string' ? mj.anchor_id : null,
       role: 'major_climax',
       strategy: typeof mj.strategy === 'string' ? mj.strategy : null,
       required_elements_all_of: Array.isArray(mj.required_elements_all_of)
@@ -398,6 +542,7 @@ function resolveRhythmRoleForBlock(rhythmTimeline, blockId) {
     : null;
   if (ch && typeof ch.block_id === 'string' && ch.block_id === blockId) {
     return {
+      anchor_id: typeof ch.anchor_id === 'string' ? ch.anchor_id : null,
       role: 'closing_hook',
       cliff_sentence_required: ch.cliff_sentence_required === true,
       required_elements_any_of: Array.isArray(ch.required_elements_any_of)
@@ -640,10 +785,16 @@ export function buildDirectorPayloadV6({
   // ── v6 · scriptChunk / KVA / structure_hints 构造（降级兜底见本文件头部 javadoc） ──
   const segmentIndex = buildSegmentIndex(normalizedScriptPackage);
   const beatAuxIndex = buildBeatAuxIndex(normalizedScriptPackage);
+  const segmentOwnershipResult = buildSegmentOwnershipPlan(editMap, normalizedScriptPackage);
+  const kvaConsumptionResult = buildKvaConsumptionPlan(editMap, normalizedScriptPackage);
   const scriptChunk = buildScriptChunkForBlock(
     /** @type {Record<string, unknown>|null} */ (bi),
     segmentIndex,
     beatAuxIndex,
+    {
+      segmentOwnershipPlan: segmentOwnershipResult.plan,
+      kvaConsumptionPlan: kvaConsumptionResult.plan,
+    },
   );
 
   // ── v6 · rhythm / style / density 派生 ──
@@ -652,6 +803,15 @@ export function buildDirectorPayloadV6({
       ? /** @type {Record<string, unknown>} */ (meta.rhythm_timeline)
       : null;
   const rhythmRole = resolveRhythmRoleForBlock(rhythmTimeline, blockId);
+  const rhythmAnchorResolutions = resolveRhythmAnchorsForPayloads(
+    editMap,
+    rows,
+    normalizedScriptPackage,
+  ).filter((r) => r.resolved_payload_block_id === blockId);
+  const rhythmAnchorResolution =
+    rhythmAnchorResolutions.find((r) => rhythmRole && r.role === rhythmRole.role) ||
+    rhythmAnchorResolutions[0] ||
+    null;
   const infoDensityContract = resolveInfoDensityContract(rhythmTimeline);
   const styleInference =
     meta.style_inference && typeof meta.style_inference === 'object'
@@ -691,6 +851,8 @@ export function buildDirectorPayloadV6({
     // ── v6 新增 · 节奏 / 风格 / 密度 ──
     styleInference,
     rhythmTimelineForBlock: rhythmRole,
+    rhythmAnchorResolution,
+    rhythmAnchorResolutions,
     infoDensityContract,
 
     // ── v5 透传（原样）──
@@ -788,16 +950,31 @@ export function buildPrompterPayloadV6({
   // v6 · 剧本真相源 + 节奏 / 风格 / 密度
   const segmentIndex = buildSegmentIndex(normalizedScriptPackage);
   const beatAuxIndex = buildBeatAuxIndex(normalizedScriptPackage);
+  const segmentOwnershipResult = buildSegmentOwnershipPlan(editMap, normalizedScriptPackage);
+  const kvaConsumptionResult = buildKvaConsumptionPlan(editMap, normalizedScriptPackage);
   const scriptChunk = buildScriptChunkForBlock(
     /** @type {Record<string, unknown>|null} */ (bi),
     segmentIndex,
     beatAuxIndex,
+    {
+      segmentOwnershipPlan: segmentOwnershipResult.plan,
+      kvaConsumptionPlan: kvaConsumptionResult.plan,
+    },
   );
   const rhythmTimeline =
     meta.rhythm_timeline && typeof meta.rhythm_timeline === 'object'
       ? /** @type {Record<string, unknown>} */ (meta.rhythm_timeline)
       : null;
   const rhythmRole = resolveRhythmRoleForBlock(rhythmTimeline, blockId);
+  const rhythmAnchorResolutions = resolveRhythmAnchorsForPayloads(
+    editMap,
+    rows,
+    normalizedScriptPackage,
+  ).filter((r) => r.resolved_payload_block_id === blockId);
+  const rhythmAnchorResolution =
+    rhythmAnchorResolutions.find((r) => rhythmRole && r.role === rhythmRole.role) ||
+    rhythmAnchorResolutions[0] ||
+    null;
   const infoDensityContract = resolveInfoDensityContract(rhythmTimeline);
   const styleInference =
     meta.style_inference && typeof meta.style_inference === 'object'
@@ -819,6 +996,32 @@ export function buildPrompterPayloadV6({
     (typeof meta.rendering_style === 'string' ? meta.rendering_style : '') ||
     '3D写实动画';
 
+  const isLastBlock =
+    Array.isArray(rows) && rows.length > 0
+      ? (() => {
+          const lastRow = /** @type {Record<string, unknown>} */ (rows[rows.length - 1] || {});
+          const lastId =
+            typeof lastRow.block_id === 'string'
+              ? lastRow.block_id
+              : typeof lastRow.id === 'string'
+                ? lastRow.id
+                : '';
+          return lastId === blockId;
+        })()
+      : false;
+  const tsc =
+    meta.target_shot_count && typeof meta.target_shot_count === 'object'
+      ? /** @type {Record<string, unknown>} */ (meta.target_shot_count)
+      : null;
+  const avgShotSec =
+    tsc && typeof tsc.avg_shot_duration_sec === 'number' && Number.isFinite(tsc.avg_shot_duration_sec)
+      ? /** @type {number} */ (tsc.avg_shot_duration_sec)
+      : DEFAULT_AVG_SHOT_SEC;
+  const shotSlotsResult = planShotSlotsFromBlockIndex(bi, isLastBlock, {
+    minShotSec: SEEDANCE_MIN_SHOT_SEC,
+    avgShotSec,
+  });
+
   return {
     directorMarkdownSection,
     blockIndex: bi,
@@ -836,10 +1039,21 @@ export function buildPrompterPayloadV6({
     scriptChunk,
     styleInference,
     rhythmTimelineForBlock: rhythmRole,
+    rhythmAnchorResolution,
+    rhythmAnchorResolutions,
     infoDensityContract,
 
     // v5 透传
-    v5Meta: { video },
+    v5Meta: {
+      video,
+      shotBudgetHint: extractShotBudgetHint(bi),
+      targetShotCount:
+        meta.target_shot_count && typeof meta.target_shot_count === 'object'
+          ? /** @type {Record<string, unknown>} */ (meta.target_shot_count)
+          : null,
+      shotSlots: shotSlotsResult ? shotSlotsResult.slots : null,
+      shotSlotsMeta: shotSlotsResult ? shotSlotsResult.meta : null,
+    },
   };
 }
 

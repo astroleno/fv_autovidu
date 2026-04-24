@@ -35,11 +35,20 @@ const ROLE_WORDS_STOPLIST = new Set([
   '孕妇', '病人', '家人', '朋友', '同事', '客户', '患者', '同学', '路人', '观众',
   '空镜', '画面', '镜头', '背景', '前景', '特写', '近景', '中景', '远景', '分屏',
   '字幕', '人名', '片头', '片尾', '回忆', '闪回', '梦境',
+  '医院', '大楼', '走廊', '病房', '办公室', '手术室', '门外', '门内', '拐角', '桌面',
+  '诊断书', '特效', '蓝光', '冷光',
+  '路过',
   'VO', 'Vo', 'vo', 'OS', 'Os', 'os', 'voiceover', 'VoiceOver',
   '旁白', '独白', '内心', '心声', '心里',
 ]);
 
 const CONNECTORS = new Set(['与', '和', '、']);
+const COMMON_CHINESE_SURNAMES = new Set(
+  '赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦许何吕张孔曹严华金魏陶姜戚谢邹喻柏窦章云苏潘葛范彭郎鲁韦昌马苗凤花方俞任袁柳鲍史唐费薛雷贺倪汤殷罗毕郝邬安常乐于时傅卞齐康伍余元卜顾孟平黄穆萧尹姚邵汪祁毛禹狄米明臧成戴谈宋茅庞熊纪舒屈项祝董梁杜阮蓝闵席季麻强贾路娄江童颜郭梅盛林刁钟徐邱骆高夏蔡田樊胡凌霍虞万柯莫房裘缪干解应宗丁宣邓郁单杭洪包左石崔吉龚程邢裴陆荣翁荀惠甄曲家封芮靳焦巴谷车侯班秋仲伊宫宁仇栾甘厉戎祖武符刘景龙叶司黎薄白蒲赖卓屠乔温喻'.split(''),
+);
+const NON_NAME_SUFFIXES = new Set(
+  ['桌', '柜', '单', '笔', '门', '灯', '光', '柔', '声', '影', '件', '书', '报告', '面', '头', '肩', '臂', '手', '腰', '背', '腿', '腹', '角', '口'],
+);
 
 /**
  * @param {string} ch
@@ -219,6 +228,19 @@ function isKnown(c, whitelist) {
 }
 
 /**
+ * 仅用于 connector 场景的保守姓名启发式，避免把"病历单、笔掉落"之类物体列表误判成人名。
+ *
+ * @param {string} c
+ * @returns {boolean}
+ */
+function looksPersonLikeName(c) {
+  if (!c || c.length < 2 || c.length > 3) return false;
+  if (ROLE_WORDS_STOPLIST.has(c)) return false;
+  if (!COMMON_CHINESE_SURNAMES.has(c[0])) return false;
+  return !NON_NAME_SUFFIXES.has(c[c.length - 1]);
+}
+
+/**
  * 单个 shot 的白名单核对。
  *
  * @param {string} sd2Prompt
@@ -232,6 +254,15 @@ export function checkCharacterWhitelistForShot(sd2Prompt, whitelist) {
   /** @type {Set<string>} */
   const unknownSet = new Set();
   for (const pt of points) {
+    const shouldJudge =
+      pt.kind === 'dialog_speaker'
+        ? true
+        : pt.kind === 'bracket' ||
+            pt.kind === 'connector_left' ||
+            pt.kind === 'connector_right'
+          ? pt.choices.some((c) => isKnown(c, whitelist) || looksPersonLikeName(c))
+          : true;
+    if (!shouldJudge) continue;
     for (const c of pt.choices) allCands.add(c);
     const ok = pt.choices.some((c) => isKnown(c, whitelist));
     if (!ok) {

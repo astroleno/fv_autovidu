@@ -405,27 +405,12 @@ export function planShotSlotsFromBlockIndex(biRow, isLastBlock, densityCtx) {
     r.shot_budget_hint && typeof r.shot_budget_hint === 'object'
       ? /** @type {Record<string, unknown>} */ (r.shot_budget_hint)
       : null;
-  if (!hint || typeof hint.target !== 'number') return null;
 
   const routing =
     r.routing && typeof r.routing === 'object'
       ? /** @type {Record<string, unknown>} */ (r.routing)
       : {};
-  const toleranceRaw = Array.isArray(hint.tolerance) ? hint.tolerance : null;
-  /** @type {[number, number] | null} */
-  const tolerance =
-    toleranceRaw && toleranceRaw.length === 2
-      ? [Number(toleranceRaw[0]) | 0, Number(toleranceRaw[1]) | 0]
-      : null;
-
   const duration = typeof r.duration === 'number' ? r.duration : 0;
-  const rhythmTier = typeof r.rhythm_tier === 'number' ? r.rhythm_tier : 3;
-  const shotHint = Array.isArray(routing.shot_hint) ? /** @type {string[]} */ (routing.shot_hint) : [];
-  const psychologyGroup =
-    typeof routing.psychology_group === 'string' ? routing.psychology_group : 'general';
-  const sceneArchetype = typeof r.scene_archetype === 'string' ? r.scene_archetype : '';
-  const paywallLevel = typeof routing.paywall_level === 'string' ? routing.paywall_level : 'none';
-
   const minShotSec =
     densityCtx && Number.isFinite(densityCtx.minShotSec)
       ? /** @type {number} */ (densityCtx.minShotSec)
@@ -434,9 +419,29 @@ export function planShotSlotsFromBlockIndex(biRow, isLastBlock, densityCtx) {
     densityCtx && Number.isFinite(densityCtx.avgShotSec)
       ? /** @type {number} */ (densityCtx.avgShotSec)
       : DEFAULT_AVG_SHOT_SEC;
+  const derivedTarget = Math.max(
+    1,
+    Math.round(Math.max(1, duration) / Math.max(minShotSec, avgShotSec)),
+  );
+  const targetCount = hint && typeof hint.target === 'number' ? Number(hint.target) | 0 : derivedTarget;
+  const toleranceRaw = hint && Array.isArray(hint.tolerance) ? hint.tolerance : null;
+  /** @type {[number, number] | null} */
+  const tolerance =
+    toleranceRaw && toleranceRaw.length === 2
+      ? [Number(toleranceRaw[0]) | 0, Number(toleranceRaw[1]) | 0]
+      : !hint
+        ? [Math.max(1, targetCount - 1), targetCount + 1]
+      : null;
+
+  const rhythmTier = typeof r.rhythm_tier === 'number' ? r.rhythm_tier : 3;
+  const shotHint = Array.isArray(routing.shot_hint) ? /** @type {string[]} */ (routing.shot_hint) : [];
+  const psychologyGroup =
+    typeof routing.psychology_group === 'string' ? routing.psychology_group : 'general';
+  const sceneArchetype = typeof r.scene_archetype === 'string' ? r.scene_archetype : '';
+  const paywallLevel = typeof routing.paywall_level === 'string' ? routing.paywall_level : 'none';
 
   return planShotSlots({
-    targetCount: Number(hint.target) | 0,
+    targetCount,
     tolerance,
     duration,
     rhythmTier,

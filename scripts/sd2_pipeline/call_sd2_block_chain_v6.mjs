@@ -12,7 +12,7 @@
  *        · Director kva_coverage_ratio ≥ 1.00（有 P0 KVA 时）
  *        · Director shot_meta.info_delta none_ratio ≤ contract
  *        · Prompter dialogue_fidelity（scriptChunk.text 原样出现在 [DIALOG]）
- *      任一硬门失败 → exit 8（除非 --skip-kva-hard 等降级 flag）。
+ *      默认降级为 warning 并完整落盘；显式 --strict-quality-hard 才恢复 exit 8。
  *
  * 保留 v5 行为（直接复用 v5 helpers）：
  *   - @图N 全局 drift 修复；
@@ -88,6 +88,13 @@ import {
   checkMaxDialoguePerShot,
   checkMinShotsPerBlock,
 } from './lib/sd2_shot_structure_v6.mjs';
+import { resolveV6HardgateOptions } from './lib/sd2_hardgate_options_v6.mjs';
+import {
+  normalizeShotTimecodes,
+  polishShortDramaRhythmLanguage,
+  repairAssetTagReferences,
+  sanitizeTextOverlayNegations,
+} from './lib/sd2_prompt_repair_v6.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -190,22 +197,18 @@ export async function main() {
   }
 
     // ── 降级开关 ──
-    const allowV6Soft = args['allow-v6-soft'] === true;
-    const skipKvaHard = args['skip-kva-hard'] === true || allowV6Soft;
-    const skipSegHard = args['skip-segment-coverage-hard'] === true || allowV6Soft;
-    const skipInfoHard = args['skip-info-density-hard'] === true || allowV6Soft;
-    const skipDialogueHard = args['skip-dialogue-fidelity-hard'] === true || allowV6Soft;
-    // v6.1 新增：Prompter 自检硬门（dialogue_fidelity_check / kva_coverage_ratio /
-    // rhythm_density_check / five_stage_check / climax_signature_check /
-    // segment_coverage_overall.pass_l2 / pass_l3）。默认开启，可一键降级。
-    const skipPrompterSelfHard = args['skip-prompter-selfcheck-hard'] === true || allowV6Soft;
-    // HOTFIX L · max_dialogue_per_shot 硬门（每 shot 独立对白行 ≤ 2）
-    const skipDialoguePerShotHard = args['skip-dialogue-per-shot-hard'] === true || allowV6Soft;
-    // HOTFIX M · 块局部 min_shots_per_block 硬下限（shots ≥ max(2, ceil(seg/4))）
-    const skipMinShotsHard = args['skip-min-shots-hard'] === true || allowV6Soft;
-    // HOTFIX N · character_token_integrity_check 白名单硬门
-    const skipCharacterWhitelistHard =
-      args['skip-character-whitelist-hard'] === true || allowV6Soft;
+    const {
+      allowV6Soft,
+      strictQualityHard,
+      skipKvaHard,
+      skipSegHard,
+      skipInfoHard,
+      skipDialogueHard,
+      skipPrompterSelfHard,
+      skipDialoguePerShotHard,
+      skipMinShotsHard,
+      skipCharacterWhitelistHard,
+    } = resolveV6HardgateOptions(args);
     // HOTFIX L/M 默认参数（可通过 CLI 微调；不建议业务使用）
     const maxDialoguePerShot = Math.max(
       1,
@@ -379,7 +382,7 @@ export async function main() {
       `调度=${forceSerial ? '强制串行' : enforceSceneSerial ? 'scene 串行' : '全 fan-out'} slicesRoot=${slicesRoot} aspect=${aspectRatio}`,
   );
     console.log(
-      `[${SCRIPT_TAG}] 降级 flags: allowV6Soft=${allowV6Soft} kva=${!skipKvaHard} seg=${!skipSegHard} info=${!skipInfoHard} dialogue=${!skipDialogueHard} prompterSelf=${!skipPrompterSelfHard}`,
+      `[${SCRIPT_TAG}] 降级 flags: allowV6Soft=${allowV6Soft} kva=${!skipKvaHard} seg=${!skipSegHard} info=${!skipInfoHard} dialogue=${!skipDialogueHard} qualityHard=${strictQualityHard}`,
     );
 
   const n = list.length;
@@ -460,6 +463,8 @@ export async function main() {
       const dirUser = [
         '以下为单 Block 的 SD2Director v6 输入 JSON。',
         'v6 新字段：scriptChunk（本 block 剧本切片 + KVA + structure_hints）/ styleInference（三轴）/ rhythmTimelineForBlock（节奏角色）/ infoDensityContract（none 密度契约）。',
+        '题材裁决：若剧本含医院、夫妻、出轨、怀孕、手术、权力竞聘等信号，按“都市医疗婚恋背叛短剧”设计镜头，不按医疗科普/纪实剧设计。',
+        '节奏裁决：每个 shot 必须承载新的情绪或信息增量；优先偷听视角、门缝窥视、手机/诊断书/腹部/衣领特写、反应反打、分屏反差；避免连续平视固定中景。',
         '请严格按系统提示输出唯一一个 JSON 对象（含 markdown_body 与 appendix），不要 Markdown 围栏。',
         '',
         JSON.stringify(dirUserObj, null, 2),
@@ -570,6 +575,15 @@ export async function main() {
       });
       mergedPayloads.push({ block_id: blockId, payload: prompterPayload });
 
+      const expectedPrompterShotCount =
+        prompterPayload &&
+        typeof prompterPayload === 'object' &&
+        prompterPayload.v5Meta &&
+        typeof prompterPayload.v5Meta === 'object' &&
+        Array.isArray(/** @type {{ shotSlots?: unknown }} */ (prompterPayload.v5Meta).shotSlots)
+          ? /** @type {unknown[]} */ (/** @type {{ shotSlots: unknown[] }} */ (prompterPayload.v5Meta).shotSlots).length
+          : null;
+
       const prompterSys = appendKnowledgeSlicesToSystemPromptV6(prompterSysBase, proLoad.slices);
       const prUserObj = omitKnowledgeSlicesFromPayloadV6(
         /** @type {Record<string, unknown>} */ (JSON.parse(JSON.stringify(prompterPayload))),
@@ -577,12 +591,19 @@ export async function main() {
       const prUser = [
         '以下为单 Block 的 SD2Prompter v6 输入 JSON。',
         'v6 新字段同 Director：scriptChunk / styleInference / rhythmTimelineForBlock / infoDensityContract。',
+        expectedPrompterShotCount
+          ? `镜头合同：v5Meta.shotSlots 已锁定本 block 必须输出 ${expectedPrompterShotCount} 个 shots[]；每个 slot 对应一个且只能一个 final shot，禁止合并、删除、改时长。`
+          : '',
+        '题材裁决：若剧本含医院、夫妻、出轨、怀孕、手术、院长竞聘、绿茶/小三等信号，本 block 必须按“都市医疗婚恋背叛短剧”拍，不按冷静医疗纪录片拍。',
+        '节奏裁决：每 2-3 秒必须出现一个新的情绪/信息钩子（偷听、门缝、手机、诊断书、腹部、衣领、反应特写、分屏反差）；禁止连续复用“中景，平视，固定镜头”。',
+        '镜头裁决：优先门缝窥视、压迫近景、快速反打、手部/腹部/手机/诊断书特写、缓慢推近、短暂停顿；保留现实质感，但情绪强度要服务短剧爽点和讽刺反差。',
         '对白保真铁律：scriptChunk.segments[] 中 dialogue/monologue/vo 类的 text 必须原样出现在 sd2_prompt 的 [DIALOG] 段；',
         '仅当 segment.author_hint.shortened_text 存在时才允许使用压缩后的文本。',
+        '时间码必须使用合法 MM:SS–MM:SS；秒位不得超过 59。',
         '请严格按系统提示输出唯一一个 JSON 对象，不要 Markdown 围栏。',
         '',
         JSON.stringify(prUserObj, null, 2),
-      ].join('\n');
+      ].filter(Boolean).join('\n');
 
       console.log(
         `[${SCRIPT_TAG}] ${blockId}：Prompter … slices=${proLoad.applied.length} tokens=${proLoad.total_tokens}/${proLoad.budget}`,
@@ -611,7 +632,7 @@ export async function main() {
           jsonObject: true,
         });
         const parsed = parseJsonFromModelText(rawText);
-        const verdict = shouldRetryPrompter(parsed);
+        const verdict = shouldRetryPrompter(parsed, expectedPrompterShotCount);
         if (!verdict.shouldRetry) {
           prParsed = parsed;
           if (attemptIdx > 0) {
@@ -658,6 +679,15 @@ export async function main() {
           typeof /** @type {{ sd2_prompt?: string }} */ (prParsed).sd2_prompt === 'string'
             ? /** @type {{ sd2_prompt: string }} */ (prParsed).sd2_prompt
             : '';
+        const blockTime =
+          biRow && typeof biRow === 'object'
+            ? {
+                start_sec: Number(/** @type {Record<string, unknown>} */ (biRow).start_sec),
+                end_sec: Number(/** @type {Record<string, unknown>} */ (biRow).end_sec),
+                duration: Number(/** @type {Record<string, unknown>} */ (biRow).duration),
+              }
+            : null;
+        const timecodeRepair = topLevel ? { changed: 0 } : normalizeShotTimecodes(shotsRaw, blockTime);
         const shotPrompts = shotsRaw.map((s) =>
           s && typeof s === 'object' && typeof /** @type {{ sd2_prompt?: string }} */ (s).sd2_prompt === 'string'
             ? /** @type {{ sd2_prompt: string }} */ (s).sd2_prompt
@@ -669,8 +699,8 @@ export async function main() {
             biRow && Array.isArray(biRow.present_asset_ids)
               ? /** @type {unknown[]} */ (biRow.present_asset_ids).length
               : 8;
-          const { sd2Prompt, drifts } = repairAssetTagDrift(sd2PromptOrig, presentCount);
-          if (drifts.length > 0) {
+          let sd2Prompt = sd2PromptOrig;
+          const writeBackPrompt = () => {
             if (topLevel) {
               /** @type {{ sd2_prompt: string }} */ (prParsed).sd2_prompt = sd2Prompt;
             } else {
@@ -681,13 +711,101 @@ export async function main() {
                 if (shot && typeof shot === 'object') shot.sd2_prompt = fixedParts[i];
               }
             }
+          };
+
+          const driftRepair = repairAssetTagDrift(sd2Prompt, presentCount);
+          sd2Prompt = driftRepair.sd2Prompt;
+          const assetRepair = repairAssetTagReferences(sd2Prompt, prompterPayload.assetTagMapping, {
+            injectDeclaration: false,
+          });
+          sd2Prompt = assetRepair.sd2Prompt;
+          const rhythmPolish = polishShortDramaRhythmLanguage(sd2Prompt);
+          sd2Prompt = rhythmPolish.sd2Prompt;
+          if (assetRepair.declaration) {
+            const curPrefix =
+              typeof /** @type {{ global_prefix?: unknown }} */ (prParsed).global_prefix === 'string'
+                ? /** @type {{ global_prefix: string }} */ (prParsed).global_prefix
+                : '';
+            if (!curPrefix.includes(assetRepair.declaration)) {
+              /** @type {{ global_prefix: string }} */ (prParsed).global_prefix = curPrefix.trim()
+                ? `${curPrefix}\n${assetRepair.declaration}`
+                : assetRepair.declaration;
+            }
+          }
+          const textRepair = sanitizeTextOverlayNegations(sd2Prompt);
+          sd2Prompt = textRepair.sd2Prompt;
+          let globalSuffixRemovedLines = 0;
+          let globalPrefixRemovedLines = 0;
+          if (typeof /** @type {{ global_prefix?: unknown }} */ (prParsed).global_prefix === 'string') {
+            const prefixRepair = sanitizeTextOverlayNegations(
+              /** @type {{ global_prefix: string }} */ (prParsed).global_prefix,
+            );
+            if (prefixRepair.sd2Prompt !== /** @type {{ global_prefix: string }} */ (prParsed).global_prefix) {
+              /** @type {{ global_prefix: string }} */ (prParsed).global_prefix = prefixRepair.sd2Prompt;
+            }
+            globalPrefixRemovedLines = prefixRepair.removed_lines;
+          }
+          if (typeof /** @type {{ global_suffix?: unknown }} */ (prParsed).global_suffix === 'string') {
+            const suffixRepair = sanitizeTextOverlayNegations(
+              /** @type {{ global_suffix: string }} */ (prParsed).global_suffix,
+            );
+            if (suffixRepair.sd2Prompt !== /** @type {{ global_suffix: string }} */ (prParsed).global_suffix) {
+              /** @type {{ global_suffix: string }} */ (prParsed).global_suffix = suffixRepair.sd2Prompt;
+            }
+            globalSuffixRemovedLines = suffixRepair.removed_lines;
+          }
+          if (sd2Prompt !== sd2PromptOrig) {
+            writeBackPrompt();
+          }
+
+          if (driftRepair.drifts.length > 0) {
             routingWarnings.push({
               code: 'asset_tag_drift',
               severity: 'warn',
               block_id: blockId,
-              actual: { drifted_tags: drifts },
+              actual: { drifted_tags: driftRepair.drifts },
               expected: { local_tag_range: `@图1..@图${presentCount}` },
               message: `block ${blockId} @图N 越界已替换为 @图DROP*`,
+            });
+          }
+          if (assetRepair.inserted_tags.length > 0) {
+            routingWarnings.push({
+              code: 'asset_tag_reference_repaired',
+              severity: 'info',
+              block_id: blockId,
+              actual: { inserted_tags: assetRepair.inserted_tags },
+              expected: { prompt_uses_asset_tags: true },
+              message: `block ${blockId} 裸资产名已补写为 @图N（资产名）`,
+            });
+          }
+          if (timecodeRepair.changed > 0) {
+            routingWarnings.push({
+              code: 'timecode_normalized',
+              severity: 'info',
+              block_id: blockId,
+              actual: { changed: timecodeRepair.changed },
+              expected: { format: 'MM:SS–MM:SS', seconds_lt_60: true },
+              message: `block ${blockId} 时间码已按 block 时间轴归一化`,
+            });
+          }
+          if (rhythmPolish.replacements > 0) {
+            routingWarnings.push({
+              code: 'short_drama_rhythm_polished',
+              severity: 'info',
+              block_id: blockId,
+              actual: { replacements: rhythmPolish.replacements },
+              expected: { avoid_repeated_fixed_mid_shots: true },
+              message: `block ${blockId} 已替换平视固定模板为短剧冲突镜头语法`,
+            });
+          }
+          if (textRepair.removed_lines + globalPrefixRemovedLines + globalSuffixRemovedLines > 0) {
+            routingWarnings.push({
+              code: 'positive_prompt_text_token_sanitized',
+              severity: 'info',
+              block_id: blockId,
+              actual: { removed_lines: textRepair.removed_lines + globalPrefixRemovedLines + globalSuffixRemovedLines },
+              expected: { no_text_overlay_tokens_in_global_suffix: true },
+              message: `block ${blockId} 已移除全局后缀中的文字/字幕负向描述`,
             });
           }
           // AV-split：shots[] 形式下逐镜头校验；topLevel 形式按整段一次性扫
