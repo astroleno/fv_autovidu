@@ -183,10 +183,11 @@ export function normalizeEditMapSd2V3(parsed) {
     metaIn.total_duration_sec = actualSum;
   }
 
-  // ── max_block_duration_check：单组不得超过 16s（Hook/Cliff 不得超过 10s） ──
+  // ── max_block_duration_check：单组不得超过 SD2_MAX_BLOCK_DURATION_SEC（默认 16s；与 v3 注释及业务一致，曾误写 15 导致合法 16s 被拒）──
   /** @type {string[]} */
   const overLimitBlocks = [];
-  const MAX_BLOCK_DUR = 15;
+  const envMax = Number.parseInt(process.env.SD2_MAX_BLOCK_DURATION_SEC ?? '', 10);
+  const MAX_BLOCK_DUR = Number.isFinite(envMax) && envMax >= 4 && envMax <= 30 ? envMax : 16;
   for (const blk of blocks) {
     const t = /** @type {{ time?: { duration?: number }, id?: string }} */ (blk).time;
     const blkId = /** @type {{ id?: string }} */ (blk).id || '?';
@@ -197,7 +198,7 @@ export function normalizeEditMapSd2V3(parsed) {
   const maxBlockDurationOk = overLimitBlocks.length === 0;
   if (!maxBlockDurationOk) {
     console.warn(
-      `[normalizeEditMapSd2V3] max_block_duration_check FAIL: ${overLimitBlocks.join(', ')} 超过 ${MAX_BLOCK_DUR}s 上限`
+      `[normalizeEditMapSd2V3] max_block_duration_check WARN: ${overLimitBlocks.join(', ')} 超过建议上限 ${MAX_BLOCK_DUR}s（EditMap 调度器对超长块仅软门告警，不拒写；可用 SD2_MAX_BLOCK_DURATION_SEC 覆盖 4–30）`,
     );
   }
 

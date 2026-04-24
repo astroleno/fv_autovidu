@@ -203,6 +203,12 @@ console.log('-- buildSceneArchitectPayload');
   assert('block_index_compact 有 3 块', Array.isArray(p.block_index_compact) && p.block_index_compact.length === 3);
   assert('KVA 条目全部铺平（3 条）', Array.isArray(p.key_visual_actions) && p.key_visual_actions.length === 3);
   assert('segments_compact 覆盖全部 4 条', Array.isArray(p.segments_compact) && p.segments_compact.length === 4);
+  const seg001 = p.segments_compact.find((s) => s.seg_id === 'SEG_001');
+  const seg005 = p.segments_compact.find((s) => s.seg_id === 'SEG_005');
+  const seg010 = p.segments_compact.find((s) => s.seg_id === 'SEG_010');
+  assert('KVA source segment 带 text_full', typeof seg001?.text_full === 'string' && seg001.text_full === '开场', seg001);
+  assert('mini trigger segment 带 text_full', typeof seg005?.text_full === 'string' && seg005.text_full === '秘密会议', seg005);
+  assert('major trigger segment 带 text_full', typeof seg010?.text_full === 'string' && seg010.text_full === '揭露', seg010);
   assert(
     'KVA 带 beat_id（审计字段）',
     Array.isArray(p.key_visual_actions) && /** @type {Record<string, unknown>} */ (p.key_visual_actions[0]).beat_id === 'BT_001',

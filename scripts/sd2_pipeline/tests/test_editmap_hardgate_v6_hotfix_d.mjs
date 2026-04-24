@@ -26,6 +26,7 @@ import {
   computeSegmentUniverseFromPackage,
   runSegmentCoverageL1Check,
   runLastSegCoveredCheck,
+  runStyleInferenceShapeCheck,
   backfillDiagnosisAuthoritativeMetrics,
   composeDynamicHardFloorBrief,
   appendHardFloorToDirectorBrief,
@@ -189,6 +190,24 @@ check('tail_seg：Stage 0 缺失 → skip', () => {
   const parsed = makeParsedWithCoverage([]);
   const r = runLastSegCoveredCheck(parsed, null);
   return r.status === 'skip' && r.tailSegId === null;
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// 3.5. runStyleInferenceShapeCheck · v7 genre_bias.primary canonical
+// ─────────────────────────────────────────────────────────────────────────
+
+check('style_inference：v7 canonical genre_bias.primary 缺 value 也通过', () => {
+  const parsed = {
+    meta: {
+      style_inference: {
+        rendering_style: { value: '3D写实动画' },
+        tone_bias: { value: 'high_contrast' },
+        genre_bias: { primary: 'short_drama_contrast_hook' },
+      },
+    },
+  };
+  const r = runStyleInferenceShapeCheck(parsed);
+  return r.status === 'pass' && r.missing.length === 0;
 });
 
 // ─────────────────────────────────────────────────────────────────────────
