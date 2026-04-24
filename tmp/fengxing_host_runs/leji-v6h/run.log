@@ -1,0 +1,32 @@
+[run_sd2_pipeline] HOTFIX O · pipeline_run.log tee 已启用: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6h/pipeline_run.log
+[run_sd2_pipeline] 已复制 --edit-map-input → /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6h/edit_map_input.json，跳过 prepare_editmap_input
+[run_sd2_pipeline] Stage 0 · ScriptNormalizer（v2 默认开启）…
+[call_script_normalizer_v2] 调用 LLM：model=qwen-plus base=https://dashscope.aliyuncs.com/compatible-mode/v1
+[call_script_normalizer_v2] 已写入 /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6h/normalized_script_package.json（package_id=normpkg-v2-7055a931-mo9i901y, schema_version=v2）
+[run_sd2_pipeline] Stage 0 产物就绪，将透传给 EditMap：/Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6h/normalized_script_package.json
+[run_sd2_pipeline] LLM 生成 edit_map_sd2.json（v6，DashScope）…
+[call_editmap_sd2_v6] editmap/ v6 静态挂载 · 7 切片 · 合计 11767 tokens（硬限 14000）
+  · dramatic_action.md  1006 chars  ≈ 629 tokens
+  · character_want_need.md  1610 chars  ≈ 1007 tokens
+  · subtext_and_signals.md  2096 chars  ≈ 1310 tokens
+  · hook_strategies.md  1851 chars  ≈ 1157 tokens
+  · two_track_pacing.md  2051 chars  ≈ 1282 tokens
+  · proof_and_info_gap.md  2404 chars  ≈ 1503 tokens
+  · v6_rhythm_templates.md  7806 chars  ≈ 4879 tokens
+[call_editmap_sd2_v6] system prompt 合计 ≈ 23100 tokens（基础 11333 + editmap/ 11767）
+[call_editmap_sd2_v6] 已挂载 Stage 0 产物: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6h/normalized_script_package.json（冲突以原文为准）
+[call_editmap_sd2_v6] HOTFIX F · 动态硬下限已注入 directorBrief：shot≥62 / block≥16 / tail=SEG_062
+[call_editmap_sd2_v6] 调用 LLM：model=qwen-plus base=https://dashscope.aliyuncs.com/compatible-mode/v1
+[call_editmap_sd2_v6] 生成 EditMap-SD2 v6 …
+[normalizeEditMapSd2V3] skeleton_integrity_check FAIL: markdown_body 未找到 v3 '### 段落 N' / v5 '### B{NN}' / v5 紧凑 'B{NN}｜' 任一骨架；block_count=16
+[normalizeEditMapSd2V3] duration_sum_check FAIL: sum(blocks)=120 ≠ target=0
+[call_editmap_sd2_v6] v6 硬门 · segment_coverage L1: pass (62/62, ratio=1.000)
+[call_editmap_sd2_v6] v6 硬门 · last_seg_covered_check: pass tail=SEG_062
+[call_editmap_sd2_v6] v6 硬门 · source_integrity_check: fail (refs=72) out_of_universe(前8)=SEG_063,SEG_064,SEG_065,SEG_066,SEG_067,SEG_068,SEG_069,SEG_070
+[call_editmap_sd2_v6] v6 软门 · rhythm_timeline shape: pass
+[call_editmap_sd2_v6] v6 软门 · style_inference shape: fail missing=meta.style_inference.genre_bias.value
+[call_editmap_sd2_v6] ⚠️ style_inference 三轴不全，下游 renderingStyle 会回退到 meta.rendering_style 或默认值
+[call_editmap_sd2_v6] ❌ v6 EditMap 硬门失败 1 项：
+  - source_integrity_check: 10 fabricated seg_ids (SEG_063,SEG_064,SEG_065,SEG_066,SEG_067,SEG_068,SEG_069,SEG_070,…)
+[call_editmap_sd2_v6] 如需一次性降级请加 --allow-v6-soft（或对应 --skip-editmap-coverage-hard / --skip-last-seg-hard）。拒绝写盘。
+[run_sd2_pipeline] 命令失败 (exit 7): node scripts/sd2_pipeline/call_editmap_sd2_v6.mjs --input /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6h/edit_map_input.json --output /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6h/edit_map_sd2.json --normalized-package /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6h/normalized_script_package.json
