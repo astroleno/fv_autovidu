@@ -1,0 +1,238 @@
+[run_sd2_pipeline] 已复制 --edit-map-input → /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/edit_map_input.json，跳过 prepare_editmap_input
+[run_sd2_pipeline] Stage 0 未实跑，自动挂载既有产物：/Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/normalized_script_package.json（如需刷新请删除后重跑）
+[run_sd2_pipeline] 画面风格: renderingStyle=真人电影；artStyle=写实主义
+[run_sd2_pipeline] 构建 sd2_director_payloads.json …
+[run_sd2_pipeline] 各 Block 内 Director→Prompter 串联；Block 间全 fan-out 并发（v5.0-rev7 · 默认解锁 scene_run_id 串行）…
+[run_sd2_pipeline] HOTFIX J · Stage 2/3 后端切换至豆包（call_sd2_block_chain_v6_doubao.mjs）。需要 ARK_API_KEY（或显式设置 SD2_LLM_*，优先级更高）。
+[call_sd2_block_chain_v6_doubao] 已注入 Ark → SD2_LLM：base=https://ark.cn-beijing.volces.com/api/v3 model=doubao-seed-2-0-pro-260215（默认 ARK 模型名=doubao-seed-2-0-pro-260215）
+[call_sd2_block_chain_v6] 已挂载 Stage 0 产物: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/normalized_script_package.json
+[call_sd2_block_chain_v6] Director+Prompter v6；model=doubao-seed-2-0-pro-260215 base=https://ark.cn-beijing.volces.com/api/v3 blocks=16；调度=全 fan-out slicesRoot=/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/4_KnowledgeSlices aspect=16:9
+[call_sd2_block_chain_v6] 降级 flags: allowV6Soft=false kva=true seg=true info=true dialogue=true prompterSelf=true
+[call_sd2_block_chain_v6] B01：Director … slices=6 hasKva=true tokens=2700/3600
+[call_sd2_block_chain_v6] B02：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B03：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B04：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B05：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B06：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B07：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B08：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B09：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B10：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B11：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B12：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B13：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B14：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B15：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B16：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B16：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B13：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B06：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B03：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B10：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B14：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B01：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B05：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B08：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B04：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B02：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B09：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B15：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B12：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B11：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] B07：Prompter … slices=2 tokens=1100/2000
+[call_sd2_block_chain_v6] v6 硬门汇总：
+  · director_segment_coverage @ B16: fail — coverage_ratio 0.21 < 0.90
+  · director_kva_coverage @ B16: pass — ok
+  · director_info_density @ B16: pass — ok
+  · director_segment_coverage @ B13: pass — ok
+  · director_kva_coverage @ B13: fail — kva_coverage_ratio 0.50 < 1.00 with P0 KVA present
+  · director_info_density @ B13: pass — ok
+  · director_segment_coverage @ B06: pass — ok
+  · director_kva_coverage @ B06: fail — kva_coverage_ratio 0.50 < 1.00 with P0 KVA present
+  · director_info_density @ B06: pass — ok
+  · director_segment_coverage @ B03: pass — ok
+  · director_kva_coverage @ B03: pass — ok
+  · director_info_density @ B03: pass — ok
+  · director_segment_coverage @ B10: pass — ok
+  · director_kva_coverage @ B10: fail — kva_coverage_ratio 0.25 < 1.00 with P0 KVA present
+  · director_info_density @ B10: pass — ok
+  · director_segment_coverage @ B14: pass — ok
+  · director_kva_coverage @ B14: pass — ok
+  · director_info_density @ B14: pass — ok
+  · director_segment_coverage @ B01: pass — ok
+  · director_kva_coverage @ B01: pass — ok
+  · director_info_density @ B01: pass — ok
+  · director_segment_coverage @ B05: pass — ok
+  · director_kva_coverage @ B05: fail — kva_coverage_ratio 0.25 < 1.00 with P0 KVA present
+  · director_info_density @ B05: pass — ok
+  · director_segment_coverage @ B08: pass — ok
+  · director_kva_coverage @ B08: pass — ok
+  · director_info_density @ B08: pass — ok
+  · director_segment_coverage @ B04: pass — ok
+  · director_kva_coverage @ B04: fail — kva_coverage_ratio 0.50 < 1.00 with P0 KVA present
+  · director_info_density @ B04: pass — ok
+  · director_segment_coverage @ B02: pass — ok
+  · director_kva_coverage @ B02: pass — ok
+  · director_info_density @ B02: pass — ok
+  · director_segment_coverage @ B09: pass — ok
+  · director_kva_coverage @ B09: fail — kva_coverage_ratio 0.25 < 1.00 with P0 KVA present
+  · director_info_density @ B09: pass — ok
+  · director_segment_coverage @ B15: pass — ok
+  · director_kva_coverage @ B15: pass — ok
+  · director_info_density @ B15: pass — ok
+  · director_segment_coverage @ B12: pass — ok
+  · director_kva_coverage @ B12: pass — ok
+  · director_info_density @ B12: pass — ok
+  · director_segment_coverage @ B11: pass — ok
+  · director_kva_coverage @ B11: pass — ok
+  · director_info_density @ B11: pass — ok
+  · prompter_dialogue_fidelity @ B13: fail — missing seg_ids=SEG_040
+  · prompter_self_dialogue_fidelity @ B13: pass — ok
+  · prompter_self_kva_coverage @ B13: pass — ok
+  · prompter_self_rhythm_density @ B13: pass — ok
+  · prompter_self_five_stage @ B13: pass — ok
+  · prompter_self_major_climax @ B13: skip — not_applicable
+  · prompter_self_closing_hook @ B13: skip — not_applicable
+  · prompter_self_segment_l2 @ B13: pass — ok
+  · prompter_self_segment_l3 @ B13: pass — ok
+  · prompter_dialogue_fidelity @ B10: pass — pass
+  · prompter_self_dialogue_fidelity @ B10: pass — ok
+  · prompter_self_kva_coverage @ B10: pass — ok
+  · prompter_self_rhythm_density @ B10: pass — ok
+  · prompter_self_five_stage @ B10: pass — ok
+  · prompter_self_major_climax @ B10: skip — not_applicable
+  · prompter_self_closing_hook @ B10: skip — not_applicable
+  · prompter_self_segment_l2 @ B10: pass — ok
+  · prompter_self_segment_l3 @ B10: pass — ok
+  · director_segment_coverage @ B07: pass — ok
+  · director_kva_coverage @ B07: fail — kva_coverage_ratio 0.25 < 1.00 with P0 KVA present
+  · director_info_density @ B07: pass — ok
+  · prompter_dialogue_fidelity @ B06: pass — pass
+  · prompter_self_dialogue_fidelity @ B06: pass — ok
+  · prompter_self_kva_coverage @ B06: pass — ok
+  · prompter_self_rhythm_density @ B06: pass — ok
+  · prompter_self_five_stage @ B06: pass — ok
+  · prompter_self_major_climax @ B06: skip — not_applicable
+  · prompter_self_closing_hook @ B06: skip — not_applicable
+  · prompter_self_segment_l2 @ B06: pass — ok
+  · prompter_self_segment_l3 @ B06: pass — ok
+  · prompter_dialogue_fidelity @ B01: pass — pass
+  · prompter_self_dialogue_fidelity @ B01: pass — ok
+  · prompter_self_kva_coverage @ B01: pass — ok
+  · prompter_self_rhythm_density @ B01: pass — ok
+  · prompter_self_five_stage @ B01: pass — ok
+  · prompter_self_major_climax @ B01: skip — not_applicable
+  · prompter_self_closing_hook @ B01: skip — not_applicable
+  · prompter_self_segment_l2 @ B01: pass — ok
+  · prompter_self_segment_l3 @ B01: pass — ok
+  · prompter_dialogue_fidelity @ B16: fail — missing seg_ids=SEG_048,SEG_053,SEG_054
+  · prompter_self_dialogue_fidelity @ B16: pass — ok
+  · prompter_self_kva_coverage @ B16: pass — ok
+  · prompter_self_rhythm_density @ B16: pass — ok
+  · prompter_self_five_stage @ B16: pass — ok
+  · prompter_self_major_climax @ B16: skip — not_applicable
+  · prompter_self_closing_hook @ B16: pass — ok
+  · prompter_self_segment_l2 @ B16: pass — ok
+  · prompter_self_segment_l3 @ B16: pass — ok
+  · prompter_dialogue_fidelity @ B12: pass — pass
+  · prompter_self_dialogue_fidelity @ B12: pass — ok
+  · prompter_self_kva_coverage @ B12: pass — ok
+  · prompter_self_rhythm_density @ B12: pass — ok
+  · prompter_self_five_stage @ B12: pass — ok
+  · prompter_self_major_climax @ B12: skip — not_applicable
+  · prompter_self_closing_hook @ B12: skip — not_applicable
+  · prompter_self_segment_l2 @ B12: pass — ok
+  · prompter_self_segment_l3 @ B12: pass — ok
+  · prompter_dialogue_fidelity @ B02: pass — pass
+  · prompter_self_dialogue_fidelity @ B02: pass — ok
+  · prompter_self_kva_coverage @ B02: pass — ok
+  · prompter_self_rhythm_density @ B02: pass — ok
+  · prompter_self_five_stage @ B02: pass — ok
+  · prompter_self_major_climax @ B02: skip — not_applicable
+  · prompter_self_closing_hook @ B02: skip — not_applicable
+  · prompter_self_segment_l2 @ B02: pass — ok
+  · prompter_self_segment_l3 @ B02: pass — ok
+  · prompter_dialogue_fidelity @ B08: pass — pass
+  · prompter_self_dialogue_fidelity @ B08: pass — ok
+  · prompter_self_kva_coverage @ B08: pass — ok
+  · prompter_self_rhythm_density @ B08: pass — ok
+  · prompter_self_five_stage @ B08: pass — ok
+  · prompter_self_major_climax @ B08: skip — not_applicable
+  · prompter_self_closing_hook @ B08: skip — not_applicable
+  · prompter_self_segment_l2 @ B08: pass — ok
+  · prompter_self_segment_l3 @ B08: pass — ok
+  · prompter_dialogue_fidelity @ B05: pass — pass
+  · prompter_self_dialogue_fidelity @ B05: pass — ok
+  · prompter_self_kva_coverage @ B05: pass — ok
+  · prompter_self_rhythm_density @ B05: pass — ok
+  · prompter_self_five_stage @ B05: pass — ok
+  · prompter_self_major_climax @ B05: skip — not_applicable
+  · prompter_self_closing_hook @ B05: skip — not_applicable
+  · prompter_self_segment_l2 @ B05: pass — ok
+  · prompter_self_segment_l3 @ B05: pass — ok
+  · prompter_dialogue_fidelity @ B14: pass — pass
+  · prompter_self_dialogue_fidelity @ B14: pass — ok
+  · prompter_self_kva_coverage @ B14: pass — ok
+  · prompter_self_rhythm_density @ B14: pass — ok
+  · prompter_self_five_stage @ B14: pass — ok
+  · prompter_self_major_climax @ B14: pass — ok
+  · prompter_self_closing_hook @ B14: skip — not_applicable
+  · prompter_self_segment_l2 @ B14: pass — ok
+  · prompter_self_segment_l3 @ B14: pass — ok
+  · prompter_dialogue_fidelity @ B04: pass — pass
+  · prompter_self_dialogue_fidelity @ B04: pass — ok
+  · prompter_self_kva_coverage @ B04: pass — ok
+  · prompter_self_rhythm_density @ B04: pass — ok
+  · prompter_self_five_stage @ B04: pass — ok
+  · prompter_self_major_climax @ B04: skip — not_applicable
+  · prompter_self_closing_hook @ B04: skip — not_applicable
+  · prompter_self_segment_l2 @ B04: pass — ok
+  · prompter_self_segment_l3 @ B04: pass — ok
+  · prompter_dialogue_fidelity @ B03: pass — pass
+  · prompter_self_dialogue_fidelity @ B03: pass — ok
+  · prompter_self_kva_coverage @ B03: pass — ok
+  · prompter_self_rhythm_density @ B03: pass — ok
+  · prompter_self_five_stage @ B03: pass — ok
+  · prompter_self_major_climax @ B03: skip — not_applicable
+  · prompter_self_closing_hook @ B03: skip — not_applicable
+  · prompter_self_segment_l2 @ B03: pass — ok
+  · prompter_self_segment_l3 @ B03: pass — ok
+  · prompter_dialogue_fidelity @ B11: fail — missing seg_ids=SEG_034
+  · prompter_self_dialogue_fidelity @ B11: pass — ok
+  · prompter_self_kva_coverage @ B11: pass — ok
+  · prompter_self_rhythm_density @ B11: pass — ok
+  · prompter_self_five_stage @ B11: pass — ok
+  · prompter_self_major_climax @ B11: skip — not_applicable
+  · prompter_self_closing_hook @ B11: skip — not_applicable
+  · prompter_self_segment_l2 @ B11: pass — ok
+  · prompter_self_segment_l3 @ B11: pass — ok
+  · prompter_dialogue_fidelity @ B15: fail — missing seg_ids=SEG_045
+  · prompter_self_dialogue_fidelity @ B15: pass — ok
+  · prompter_self_kva_coverage @ B15: pass — ok
+  · prompter_self_rhythm_density @ B15: pass — ok
+  · prompter_self_five_stage @ B15: pass — ok
+  · prompter_self_major_climax @ B15: skip — not_applicable
+  · prompter_self_closing_hook @ B15: skip — not_applicable
+  · prompter_self_segment_l2 @ B15: pass — ok
+  · prompter_self_segment_l3 @ B15: pass — ok
+  · prompter_dialogue_fidelity @ B09: fail — missing seg_ids=SEG_028
+  · prompter_self_dialogue_fidelity @ B09: pass — ok
+  · prompter_self_kva_coverage @ B09: pass — ok
+  · prompter_self_rhythm_density @ B09: pass — ok
+  · prompter_self_five_stage @ B09: pass — ok
+  · prompter_self_major_climax @ B09: skip — not_applicable
+  · prompter_self_closing_hook @ B09: skip — not_applicable
+  · prompter_self_segment_l2 @ B09: pass — ok
+  · prompter_self_segment_l3 @ B09: pass — ok
+  · prompter_dialogue_fidelity @ B07: pass — pass
+  · prompter_self_dialogue_fidelity @ B07: pass — ok
+  · prompter_self_kva_coverage @ B07: pass — ok
+  · prompter_self_rhythm_density @ B07: pass — ok
+  · prompter_self_five_stage @ B07: pass — ok
+  · prompter_self_major_climax @ B07: skip — not_applicable
+  · prompter_self_closing_hook @ B07: skip — not_applicable
+  · prompter_self_segment_l2 @ B07: pass — ok
+  · prompter_self_segment_l3 @ B07: pass — ok
+[call_sd2_block_chain_v6] 路由审计 warnings=29 info=179
+[call_sd2_block_chain_v6] ❌ v6 硬门失败 13 项；如需降级请加 --allow-v6-soft 或对应 --skip-*-hard
+[run_sd2_pipeline] 命令失败 (exit 8): node scripts/sd2_pipeline/call_sd2_block_chain_v6_doubao.mjs --edit-map /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/edit_map_sd2.json --director-payloads /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/sd2_director_payloads.json --out-root /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g --rendering-style 真人电影 --art-style 写实主义 --stagger-ms 400 --kb-dir /Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/3_FewShotKnowledgeBase --aspect-ratio 16:9 --normalized-package /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/normalized_script_package.json

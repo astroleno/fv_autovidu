@@ -1,0 +1,22 @@
+[run_sd2_pipeline] 已复制 --edit-map-input → /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/edit_map_input.json，跳过 prepare_editmap_input
+[run_sd2_pipeline] Stage 0 未实跑，自动挂载既有产物：/Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/normalized_script_package.json（如需刷新请删除后重跑）
+[run_sd2_pipeline] 画面风格: renderingStyle=真人电影；artStyle=写实主义
+[run_sd2_pipeline] 构建 sd2_director_payloads.json …
+[run_sd2_pipeline] 各 Block 内 Director→Prompter 串联；Block 间全 fan-out 并发（v5.0-rev7 · 默认解锁 scene_run_id 串行）…
+[run_sd2_pipeline] HOTFIX J · Stage 2/3 后端切换至豆包（call_sd2_block_chain_v6_doubao.mjs）。需要 ARK_API_KEY（或显式设置 SD2_LLM_*，优先级更高）。
+[call_sd2_block_chain_v6_doubao] 已注入 Ark → SD2_LLM：base=https://ark.cn-beijing.volces.com/api/v3 model=doubao-seed-2-0-pro-260215（默认 ARK 模型名=doubao-seed-2-0-pro-260215）
+[call_sd2_block_chain_v6] 已挂载 Stage 0 产物: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/normalized_script_package.json
+[call_sd2_block_chain_v6] Director+Prompter v6；model=doubao-seed-2-0-pro-260215 base=https://ark.cn-beijing.volces.com/api/v3 blocks=16；调度=全 fan-out slicesRoot=/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/4_KnowledgeSlices aspect=16:9
+[call_sd2_block_chain_v6] 降级 flags: allowV6Soft=false kva=true seg=true info=true dialogue=true prompterSelf=true
+[call_sd2_block_chain_v6] B01：Director … slices=6 hasKva=true tokens=2700/3600
+[call_sd2_block_chain_v6] B02：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B03：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B04：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B05：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B06：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B07：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6] B08：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B09：Director … slices=5 hasKva=true tokens=2400/3600
+[call_sd2_block_chain_v6] B10：Director … slices=4 hasKva=true tokens=2100/3600
+[call_sd2_block_chain_v6_doubao] LLM HTTP 400: {"error":{"code":"InvalidParameter","message":"The parameter `response_format.type` specified in the request are not valid: `json_object` is not supported by this model. Request id: 0217768269121243dba4463efaee3235a05765424283b9b8f010a","param":"response_format.type","type":"BadRequest"}}
+[run_sd2_pipeline] 命令失败 (exit 1): node scripts/sd2_pipeline/call_sd2_block_chain_v6_doubao.mjs --edit-map /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/edit_map_sd2.json --director-payloads /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/sd2_director_payloads.json --out-root /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g --rendering-style 真人电影 --art-style 写实主义 --stagger-ms 400 --kb-dir /Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/3_FewShotKnowledgeBase --aspect-ratio 16:9 --normalized-package /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/normalized_script_package.json

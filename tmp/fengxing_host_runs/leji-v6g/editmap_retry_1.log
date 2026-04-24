@@ -1,0 +1,22 @@
+[call_editmap_sd2_v6] editmap/ v6 静态挂载 · 7 切片 · 合计 11767 tokens（硬限 14000）
+  · dramatic_action.md  1006 chars  ≈ 629 tokens
+  · character_want_need.md  1610 chars  ≈ 1007 tokens
+  · subtext_and_signals.md  2096 chars  ≈ 1310 tokens
+  · hook_strategies.md  1851 chars  ≈ 1157 tokens
+  · two_track_pacing.md  2051 chars  ≈ 1282 tokens
+  · proof_and_info_gap.md  2404 chars  ≈ 1503 tokens
+  · v6_rhythm_templates.md  7806 chars  ≈ 4879 tokens
+[call_editmap_sd2_v6] system prompt 合计 ≈ 23100 tokens（基础 11333 + editmap/ 11767）
+[call_editmap_sd2_v6] 已挂载 Stage 0 产物: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/normalized_script_package.json（冲突以原文为准）
+[call_editmap_sd2_v6] HOTFIX F · 动态硬下限已注入 directorBrief：shot≥61 / block≥16 / tail=SEG_061
+[call_editmap_sd2_v6] 调用 LLM：model=qwen-plus base=https://dashscope.aliyuncs.com/compatible-mode/v1
+[call_editmap_sd2_v6] 生成 EditMap-SD2 v6 …
+[normalizeEditMapSd2V3] skeleton_integrity_check FAIL: markdown_body 未找到 v3 '### 段落 N' / v5 '### B{NN}' / v5 紧凑 'B{NN}｜' 任一骨架；block_count=16
+[normalizeEditMapSd2V3] duration_sum_check FAIL: sum(blocks)=120 ≠ target=0
+[call_editmap_sd2_v6] v6 硬门 · segment_coverage L1: pass (61/61, ratio=1.000)
+[call_editmap_sd2_v6] v6 硬门 · last_seg_covered_check: pass tail=SEG_061
+[call_editmap_sd2_v6] v6 硬门 · source_integrity_check: pass (refs=61)
+[call_editmap_sd2_v6] v6 软门 · rhythm_timeline shape: pass
+[call_editmap_sd2_v6] v6 软门 · style_inference shape: fail missing=meta.style_inference.genre_bias.value
+[call_editmap_sd2_v6] ⚠️ style_inference 三轴不全，下游 renderingStyle 会回退到 meta.rendering_style 或默认值
+[call_editmap_sd2_v6] 已写入 /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6g/edit_map_sd2.json

@@ -1,0 +1,27 @@
+[call_editmap_sd2_v6] editmap/ v6 静态挂载 · 7 切片 · 合计 11767 tokens（硬限 14000）
+  · dramatic_action.md  1006 chars  ≈ 629 tokens
+  · character_want_need.md  1610 chars  ≈ 1007 tokens
+  · subtext_and_signals.md  2096 chars  ≈ 1310 tokens
+  · hook_strategies.md  1851 chars  ≈ 1157 tokens
+  · two_track_pacing.md  2051 chars  ≈ 1282 tokens
+  · proof_and_info_gap.md  2404 chars  ≈ 1503 tokens
+  · v6_rhythm_templates.md  7806 chars  ≈ 4879 tokens
+[call_editmap_sd2_v6] system prompt 合计 ≈ 23100 tokens（基础 11333 + editmap/ 11767）
+[call_editmap_sd2_v6] 已挂载 Stage 0 产物: /Users/zuobowen/Documents/GitHub/fv_autovidu/output/sd2/leji-v6i/normalized_script_package.json（冲突以原文为准）
+[call_editmap_sd2_v6] HOTFIX F · 动态硬下限已注入 directorBrief：shot≥61 / block≥16 / tail=SEG_061
+[call_editmap_sd2_v6] 调用 LLM：model=claude-opus-4-6-thinking base=https://yunwu.ai/v1
+[call_editmap_sd2_v6] 生成 EditMap-SD2 v6 …
+[call_editmap_sd2_v6] JSON 解析失败，原始前 500 字：
+Let me analyze this complex EditMap v6 request carefully.
+
+I need to produce a single JSON object with `markdown_body` and `appendix` following the v5+v6 spec.
+
+Let me first understand the inputs:
+
+1. **Episode Duration**: 120 seconds
+2. **Script**: Two scenes - hospital corridor (1-1) and vice dean's office (1-2)
+3. **Characters**: 秦若岚 (protagonist), 赵凯, 许倩, 医生/护士, 李院长, 赵凯母亲
+4. **Genre**: short_drama_contrast_hook (from Normalizer)
+5. **Rendering**: 真人电影
+6. **Director Brief**: ~65 shots, 120s, 
+[call_editmap_sd2_v6] Unexpected token 'm', "mini_count"... is not valid JSON
