@@ -25,6 +25,8 @@
  *   `forbidden_words_self_check` 必须至少有 **1 个**存在，否则判 incomplete；
  * - `repetitionCollapse`：`global_prefix.length > 4000` 且存在一个 ≥ 3 字短语在
  *   其内出现 ≥ 20 次——典型数值远超正常产物（正常 prefix 数十~数百字符）；
+ * - `shotContractUnderrun`：payload 带 `v5Meta.shotSlots` 时，Prompter 输出的
+ *   `shots.length` 不得少于 slot 数；少了说明它合并/吞掉了 Director 分镜。
  * - 其他情况视为正常。
  *
  * ## 为什么不做严格字段白名单
@@ -105,17 +107,47 @@ export function detectTailFieldsMissing(prParsed) {
 }
 
 /**
+ * 检测 Prompter 是否把 Director 的 shotSlots 压缩成了更少的 final shots。
+ *
+ * @param {unknown} prParsed
+ * @param {number | null | undefined} expectedShotCount
+ * @returns {{ detected: boolean, actual: number | null, expected: number | null }}
+ */
+export function detectShotContractUnderrun(prParsed, expectedShotCount) {
+  const expected = Number(expectedShotCount);
+  const result = {
+    detected: false,
+    actual: /** @type {number | null} */ (null),
+    expected: Number.isFinite(expected) && expected > 0 ? Math.round(expected) : null,
+  };
+  if (!result.expected) return result;
+  if (!prParsed || typeof prParsed !== 'object' || Array.isArray(prParsed)) return result;
+
+  const p = /** @type {Record<string, unknown>} */ (prParsed);
+  if (Array.isArray(p.shots)) {
+    result.actual = p.shots.length;
+  } else if (typeof p.sd2_prompt === 'string') {
+    result.actual = (p.sd2_prompt.match(/\[FRAME\]/g) || []).length;
+  }
+
+  result.detected = result.actual !== null && result.actual < result.expected;
+  return result;
+}
+
+/**
  * 综合判定：Prompter 产物是否应该触发"自动重试 1 次"。
  *
  * @param {unknown} prParsed
+ * @param {number | null | undefined} [expectedShotCount]
  * @returns {{
  *   shouldRetry: boolean,
  *   reasons: string[],
  *   collapse: ReturnType<typeof detectPrefixRepetitionCollapse>,
  *   tail: ReturnType<typeof detectTailFieldsMissing>,
+ *   shotContract: ReturnType<typeof detectShotContractUnderrun>,
  * }}
  */
-export function shouldRetryPrompter(prParsed) {
+export function shouldRetryPrompter(prParsed, expectedShotCount = null) {
   const reasons = [];
   const tail = detectTailFieldsMissing(prParsed);
   if (tail.missing) reasons.push('tail_fields_missing');
@@ -129,11 +161,16 @@ export function shouldRetryPrompter(prParsed) {
   if (collapse.detected) {
     reasons.push(`prefix_repetition_collapse(${collapse.phrase}×${collapse.count})`);
   }
+  const shotContract = detectShotContractUnderrun(prParsed, expectedShotCount);
+  if (shotContract.detected) {
+    reasons.push(`shot_contract_underrun(${shotContract.actual}<${shotContract.expected})`);
+  }
 
   return {
     shouldRetry: reasons.length > 0,
     reasons,
     collapse,
     tail,
+    shotContract,
   };
 }
