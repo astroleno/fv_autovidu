@@ -365,6 +365,24 @@ v5 要求 `markdown_body.## 【组骨架】` 行数 == `appendix.block_index.len
 }
 ```
 
+### B.3.1 `markdown_body` 字符串安全性硬约束（v6.3 新增）
+
+**背景**：v5/v6 的输出是 `{"markdown_body": "...", "appendix": {...}}` JSON 壳。OpenAI-compat/DashScope 的 `response_format=json_object` 模式会自动对 `markdown_body` 字符串里的特殊字符做转义；但 **Anthropic `/messages` 端点（含 APIMart 上的 `claude-opus-*-thinking` 系列）没有同等强制**，模型需自觉遵守 JSON 字符串字面值规则，否则顶层 JSON 立刻在第一个裸 `"` 处崩解。
+
+**硬约束（所有 LLM 后端一律遵守）**：
+
+1. **禁止裸英文双引号**：`markdown_body` 字符串内**严禁**出现 `"`（U+0022）。凡需要引用台词、角色称呼、旁白内容时，**一律改用中文直角引号**：
+   - 对白、旁白、内心独白 → 使用「」（U+300C/300D）；必要时嵌套『』（U+300E/300F）。
+   - 举例：~~母亲VO痛批"心脏有病不能生"~~ → `母亲VO痛批「心脏有病不能生」`。
+2. **禁止裸反斜杠**：`markdown_body` 内如出现单个 `\`，必须写成 `\\`。
+3. **换行只能是 JSON 转义 `\n`**：不要在 `markdown_body` 字符串字面里直接按回车换行（JSON 字符串不允许字面换行）。
+4. **禁止 Markdown 围栏内再次使用英文双引号**：尤其是 ` ```json ... ``` ` 代码块、表格单元格 `| ... |`、`> quote` 块。若确实需要展示英文引号语义，改用 ``` ` ` ``` 反引号或中文「」。
+5. **`appendix` JSON 字段不受本约束**：`appendix.*` 是结构化数据，引号由 JSON 解析器保证；但如果 appendix 里的某个**字符串值**内含裸 `"`，同样要写成中文「」或转义成 `\"`。
+
+**为什么这条是硬约束**：EditMap v6 的 `markdown_body` 动辄数千字、包含大量角色对白与旁白，一次未转义的 `"` 就会让 `JSON.parse` 在 position N 爆错，整份 EditMap 作废——`claude-opus-4-6-thinking` 已在实测中因此连续两次 fail。改用「」既满足 JSON 合法性，又保留了中文剧本的语感，零副作用。
+
+---
+
 ### B.4 §V 自检清单追加（仅追加 v6 项）
 
 在 v5 原有自检条目末尾追加：

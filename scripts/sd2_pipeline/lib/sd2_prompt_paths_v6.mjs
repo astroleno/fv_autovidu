@@ -51,6 +51,25 @@ export const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 /** 默认 prompt root（仓库根 `prompt/1_SD2Workflow`），用于向后兼容。 */
 const DEFAULT_PROMPT_ROOT = path.join(REPO_ROOT, 'prompt', '1_SD2Workflow');
 
+function preferGeneratedPromptPath(basePath, { force = false } = {}) {
+  const useGenerated =
+    force ||
+    process.env.SD2_V7_FULL_PROMPTS === '1' ||
+    process.env.SD2_USE_GENERATED_FULL_PROMPTS === '1';
+  if (!useGenerated) {
+    return basePath;
+  }
+  const generated = basePath.replace(/\.md$/i, '-full.generated.md');
+  try {
+    if (fs.existsSync(generated)) {
+      return generated;
+    }
+  } catch {
+    /* fall back to base path */
+  }
+  return basePath;
+}
+
 /**
  * 计算当前生效的 prompt root。
  *
@@ -81,26 +100,69 @@ export function getPromptRootV6() {
  * @returns {string}
  */
 export function getScriptNormalizerV2PromptPath() {
-  return path.join(
+  return preferGeneratedPromptPath(path.join(
     getPromptRootV6(),
     '0_ScriptNormalizer',
     'ScriptNormalizer-v2.md',
-  );
+  ));
 }
 
 /**
  * EditMap-SD2 v6 系统提示词绝对路径。
  *
- * 对应 `prompt/1_SD2Workflow/1_EditMap-SD2/1_EditMap-SD2-v6.md`（delta 文档）；
- * v6 相对于 v5 新增：
- *   - `meta.style_inference`（风格三轴独立推断）
- *   - `block.covered_segment_ids[]` + `block.script_chunk_hint`（段覆盖显式化）
- *   - `meta.rhythm_timeline`（节奏时间线：golden_open_3s / mini_climaxes / major_climax / closing_hook）
+ * **优先** `1_EditMap-SD2-v6b.md`（含默认纯 Markdown 对外输出约定）；缺失时回退 `1_EditMap-SD2-v6.md`。
+ * v6 相对于 v5 新增：style_inference、covered_segment_ids、rhythm_timeline 等（见 v6 文档）。
  *
  * @returns {string}
  */
 export function getEditMapSd2V6PromptPath() {
-  return path.join(getPromptRootV6(), '1_EditMap-SD2', '1_EditMap-SD2-v6.md');
+  const root = getPromptRootV6();
+  const v6b = path.join(root, '1_EditMap-SD2', '1_EditMap-SD2-v6b.md');
+  const v6 = path.join(root, '1_EditMap-SD2', '1_EditMap-SD2-v6.md');
+  try {
+    if (fs.existsSync(v6b)) {
+      return v6b;
+    }
+  } catch {
+    /* existsSync 极少失败，回退 v6 */
+  }
+  return v6;
+}
+
+/**
+ * EditMap v7 ledger-first pure_md 系统提示词绝对路径。
+ *
+ * 该版本不替换 v6 默认路径；仅在执行侧显式传 `--prompt-file` 时使用。
+ *
+ * @returns {string}
+ */
+export function getEditMapV7PromptPath() {
+  const root = getPromptRootV6();
+  const modern = path.join(root, '1_EditMap-SD2', '1_EditMap-v7.md');
+  try {
+    if (fs.existsSync(modern)) {
+      return preferGeneratedPromptPath(modern, { force: true });
+    }
+  } catch {
+    /* ignore and fall back */
+  }
+  return preferGeneratedPromptPath(path.join(root, '1_EditMap-SD2', '1_EditMap-SD2-v7.md'), {
+    force: true,
+  });
+}
+
+/**
+ * EditMap L2 Translator 系统提示词绝对路径。
+ *
+ * 用于把 v7 ledger-first pure_md 转为 canonical `{ markdown_body, appendix }` JSON。
+ *
+ * @returns {string}
+ */
+export function getEditMapTranslatorPromptPath() {
+  return preferGeneratedPromptPath(
+    path.join(getPromptRootV6(), '1_EditMap-SD2', '1_EditMap-Translator-v1.md'),
+    { force: true },
+  );
 }
 
 /**
@@ -113,7 +175,9 @@ export function getEditMapSd2V6PromptPath() {
  * @returns {string}
  */
 export function getDirectorSd2V6PromptPath() {
-  return path.join(getPromptRootV6(), '2_SD2Director', '2_SD2Director-v6.md');
+  return preferGeneratedPromptPath(
+    path.join(getPromptRootV6(), '2_SD2Director', '2_SD2Director-v6.md'),
+  );
 }
 
 /**
@@ -130,11 +194,11 @@ export function getDirectorSd2V6PromptPath() {
  * @returns {string}
  */
 export function getSceneArchitectV1PromptPath() {
-  return path.join(
+  return preferGeneratedPromptPath(path.join(
     getPromptRootV6(),
     '1_5_SceneArchitect',
     '1_5_SceneArchitect-v1.md',
-  );
+  ));
 }
 
 /**
@@ -147,7 +211,9 @@ export function getSceneArchitectV1PromptPath() {
  * @returns {string}
  */
 export function getPrompterSd2V6PromptPath() {
-  return path.join(getPromptRootV6(), '2_SD2Prompter', '2_SD2Prompter-v6.md');
+  return preferGeneratedPromptPath(
+    path.join(getPromptRootV6(), '2_SD2Prompter', '2_SD2Prompter-v6.md'),
+  );
 }
 
 /**
