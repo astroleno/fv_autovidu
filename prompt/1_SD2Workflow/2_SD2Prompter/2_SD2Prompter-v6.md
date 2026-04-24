@@ -15,12 +15,25 @@
 | 3 | **铁律 17**：信息点密度（5s 滑窗 ≥ 1 非 none 的 info_delta） | §A.3 | **硬门** |
 | 4 | **铁律 18**：五段式完整（mini_climax block 五阶段齐备） | §A.4 | **硬门** |
 | 5 | **铁律 19**：三选一 + closing_hook 可视化签名 | §A.5 | **硬门** |
-| 6 | output JSON 新增自检字段（`dialogue_fidelity_check / kva_visualization_check / rhythm_density_check / five_stage_check / climax_signature_check / segment_coverage_overall`） | §B | — |
-| 7 | scriptChunk / kvaForBlock / rhythmTimelineForBlock 新 payload 消费说明 | §C | — |
+| 6 | **铁律 20**：开场桥段 / 画面内文字 / split_screen_freeze 边界 | §A.6 | **硬门** |
+| 7 | output JSON 新增自检字段（`dialogue_fidelity_check / kva_visualization_check / rhythm_density_check / five_stage_check / climax_signature_check / segment_coverage_overall`） | §B | — |
+| 8 | scriptChunk / kvaForBlock / rhythmTimelineForBlock 新 payload 消费说明 | §C | — |
 
 ---
 
 ## A. 五条新增铁律（插在 v5 §0 强制红线之后）
+
+### A.0 题材契合度 · 都市医疗婚恋背叛短剧
+
+当剧本同时出现医院 / 夫妻 / 出轨 / 怀孕 / 手术 / 权力竞聘 / 小三绿茶等信号时，本集必须按**都市医疗婚恋背叛短剧**编译，而不是按冷静医疗纪录片或普通职场医疗剧编译。
+
+Prompter 的镜头文本必须体现三层短剧爽点：
+
+1. **背叛证据**：手机听筒、门缝、办公室内亲密动作、腹部、诊断书、衣领、关门瞬间等，必须成为可见画面锚点。
+2. **误会讽刺**：女主把男反压力误读为为她承受，男反实际为利益和小三布局；prompt 要保留这种反差，不要拍成普通夫妻关怀。
+3. **快节奏情绪推进**：每 2-3 秒至少一个新信息或新情绪（偷听、转头、手指收紧、电话外放、推门、藏匿、反打、分屏定格）。禁止连续复用“中景，平视，固定镜头”。
+
+推荐镜头语法：门缝窥视、压迫近景、快速反打、手部/腹部/手机/诊断书特写、缓慢推近、短暂停顿、分屏反差。保留真人现实质感，但情绪强度必须服务短剧冲突。
 
 ### A.1 铁律 12 · 对白保真（T01 · 硬门）
 
@@ -148,6 +161,22 @@ P0 KVA 未命中 → 硬门失败。P1 KVA 未命中 → warning，放入 `kva_v
 **规则**：
 - `major_climax.block_id` 覆盖的 block，若 `strategy != null`，对应 prompt shot 必须出现 §Director §A.6 三选一签名元素的中文语义命中（仰拍+头衔 / 慢动作+证据 / 道具光效+节奏突变）；
 - `closing_hook.block_id` 覆盖的 block，末 shot prompt 必须含 `freeze_frame` 或 `split_screen` 的中文语义（定格 / 静止画面 / 分屏 / 画面一分为二）。
+
+### A.6 铁律 20 · 开场桥段 / 画面内文字 / split_screen_freeze 边界（T03/T19 · 硬门）
+
+**规则**：
+
+- 当 `golden_open_3s.type == "signature_entrance"` 且 Director 该 block 消费了 `signature_entrance`：
+  - 允许最多 1 个**源文本明确存在**的医院外景 / 大楼 / 走廊 establishing bridge shot；
+  - 禁止发明城市夜景 / 航拍 / 车流 montage；
+  - 禁止用 title card / 地点字幕 / 时间条代替人物亮相本体。
+- 剧本中的 `字幕：` / 地点条 / 人名条 / 时间条一律视为**后期 overlay**：
+  - prompt 不得要求画面中出现可读文字；
+  - 如需保留其功能，只能写成 `post-added caption / no readable text in frame` 的语义。
+- 当 `closing_hook.type == "split_screen_freeze"`：
+  - 末 shot prompt 必须同时写出 two-pane composition + freeze hold；
+  - 必须明确每个 pane 的主体（如左/右、上/下各是谁）；
+  - 只写"定格"或只写"分屏"其一都不够。
 
 **自检**：
 

@@ -1,0 +1,110 @@
+{
+  "workflow": "sd2_v7",
+  "generated_at": "2026-04-24T09:57:18.253Z",
+  "prompts": [
+    {
+      "id": "script_normalizer_v2",
+      "base_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/0_ScriptNormalizer/ScriptNormalizer-v2.md",
+      "base": "0_ScriptNormalizer/ScriptNormalizer-v2.md",
+      "output_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/0_ScriptNormalizer/ScriptNormalizer-v2-full.generated.md",
+      "output": "0_ScriptNormalizer/ScriptNormalizer-v2-full.generated.md",
+      "prompt_hash": "sha256:6790c4fdb5dd70655d635606b1cb9f5545872c26687c908e18a9d91deb89c7e9",
+      "slices_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "slice_sources": []
+    },
+    {
+      "id": "editmap_v7",
+      "base_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/1_EditMap-SD2/1_EditMap-v7.md",
+      "base": "1_EditMap-SD2/1_EditMap-v7.md",
+      "output_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/1_EditMap-SD2/1_EditMap-v7-full.generated.md",
+      "output": "1_EditMap-SD2/1_EditMap-v7-full.generated.md",
+      "prompt_hash": "sha256:bd918b1670e5e3a85fdcfca0b2768472f9a7d5031b09e155fea1398c61591a99",
+      "slices_hash": "sha256:ff405db93f9de76c73c728bd99acbf6673a93348126f19a72e67e251c08ae20c",
+      "slice_sources": [
+        "4_KnowledgeSlices/editmap/character_want_need.md",
+        "4_KnowledgeSlices/editmap/dramatic_action.md",
+        "4_KnowledgeSlices/editmap/hook_strategies.md",
+        "4_KnowledgeSlices/editmap/proof_and_info_gap.md",
+        "4_KnowledgeSlices/editmap/subtext_and_signals.md",
+        "4_KnowledgeSlices/editmap/two_track_pacing.md",
+        "4_KnowledgeSlices/editmap/v6_rhythm_templates.md"
+      ]
+    },
+    {
+      "id": "editmap_translator_v1",
+      "base_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/1_EditMap-SD2/1_EditMap-Translator-v1.md",
+      "base": "1_EditMap-SD2/1_EditMap-Translator-v1.md",
+      "output_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/1_EditMap-SD2/1_EditMap-Translator-v1-full.generated.md",
+      "output": "1_EditMap-SD2/1_EditMap-Translator-v1-full.generated.md",
+      "prompt_hash": "sha256:08d722f8a3146ab27f82e2640427769dd550bf5081e7f08c2e354acb96a10127",
+      "slices_hash": "sha256:ff405db93f9de76c73c728bd99acbf6673a93348126f19a72e67e251c08ae20c",
+      "slice_sources": [
+        "4_KnowledgeSlices/editmap/character_want_need.md",
+        "4_KnowledgeSlices/editmap/dramatic_action.md",
+        "4_KnowledgeSlices/editmap/hook_strategies.md",
+        "4_KnowledgeSlices/editmap/proof_and_info_gap.md",
+        "4_KnowledgeSlices/editmap/subtext_and_signals.md",
+        "4_KnowledgeSlices/editmap/two_track_pacing.md",
+        "4_KnowledgeSlices/editmap/v6_rhythm_templates.md"
+      ]
+    },
+    {
+      "id": "scene_architect_v1",
+      "base_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/1_5_SceneArchitect/1_5_SceneArchitect-v1.md",
+      "base": "1_5_SceneArchitect/1_5_SceneArchitect-v1.md",
+      "output_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/1_5_SceneArchitect/1_5_SceneArchitect-v1-full.generated.md",
+      "output": "1_5_SceneArchitect/1_5_SceneArchitect-v1-full.generated.md",
+      "prompt_hash": "sha256:5e95de4f7b6ee4b96dfe2e685a02e4deaa7045b22a7e2fcf6d69db81592b6406",
+      "slices_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "slice_sources": []
+    },
+    {
+      "id": "director_v6",
+      "base_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/2_SD2Director/2_SD2Director-v6.md",
+      "base": "2_SD2Director/2_SD2Director-v6.md",
+      "output_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/2_SD2Director/2_SD2Director-v6-full.generated.md",
+      "output": "2_SD2Director/2_SD2Director-v6-full.generated.md",
+      "prompt_hash": "sha256:65c86c236da8c35ec350c1ac452f9528352d9d0e185ec7466e2244497e114070",
+      "slices_hash": "sha256:618b0877ec367cbc7665a7a6b7a7a1893f077da981d316043e1f67f0778e9226",
+      "slice_sources": [
+        "4_KnowledgeSlices/director/paywall/final_cliff.md",
+        "4_KnowledgeSlices/director/paywall/hard.md",
+        "4_KnowledgeSlices/director/paywall/soft.md",
+        "4_KnowledgeSlices/director/psychology/bonding.md",
+        "4_KnowledgeSlices/director/psychology/conversion.md",
+        "4_KnowledgeSlices/director/psychology/hook.md",
+        "4_KnowledgeSlices/director/psychology/payoff.md",
+        "4_KnowledgeSlices/director/psychology/relationship.md",
+        "4_KnowledgeSlices/director/psychology/retention.md",
+        "4_KnowledgeSlices/director/satisfaction/control.md",
+        "4_KnowledgeSlices/director/satisfaction/exclusive_favor.md",
+        "4_KnowledgeSlices/director/satisfaction/instant_justice.md",
+        "4_KnowledgeSlices/director/satisfaction/status_reversal.md",
+        "4_KnowledgeSlices/director/shot_codes/A_event.md",
+        "4_KnowledgeSlices/director/shot_codes/B_emotion.md",
+        "4_KnowledgeSlices/director/shot_codes/C_transition.md",
+        "4_KnowledgeSlices/director/shot_codes/D_welfare.md",
+        "4_KnowledgeSlices/director/status_visual_mapping.md",
+        "4_KnowledgeSlices/director/structure_constraints.md",
+        "4_KnowledgeSlices/director/structure_fewshot.md",
+        "4_KnowledgeSlices/director/v6_kva_examples.md",
+        "4_KnowledgeSlices/director/v6_segment_consumption_priority.md"
+      ]
+    },
+    {
+      "id": "prompter_v6",
+      "base_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/2_SD2Prompter/2_SD2Prompter-v6.md",
+      "base": "2_SD2Prompter/2_SD2Prompter-v6.md",
+      "output_abs": "/Users/zuobowen/Documents/GitHub/fv_autovidu/prompt/1_SD2Workflow/2_SD2Prompter/2_SD2Prompter-v6-full.generated.md",
+      "output": "2_SD2Prompter/2_SD2Prompter-v6-full.generated.md",
+      "prompt_hash": "sha256:f4e4343147e098cd214d381665e9fb7cb6b8136ac41cbcda10c1760ca41d6125",
+      "slices_hash": "sha256:215009628b18cff9f231d7de947a9413a88bcf13fcd96723efb4d45f8774182f",
+      "slice_sources": [
+        "4_KnowledgeSlices/prompter/avsplit_template.md",
+        "4_KnowledgeSlices/prompter/iron_rules_full.md",
+        "4_KnowledgeSlices/prompter/vertical_grammar.md",
+        "4_KnowledgeSlices/prompter/vertical_physical_rules.md"
+      ]
+    }
+  ]
+}

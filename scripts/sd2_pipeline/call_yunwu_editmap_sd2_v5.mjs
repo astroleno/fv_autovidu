@@ -405,15 +405,7 @@ async function main() {
 
   annotateNormalizerRef(parsed, normalizedPackage, normalizedPackagePath);
 
-  // ── v5.0 HOTFIX · H1：maxBlock 硬门最终校验 ──
-  //   位置：retry 流程之后、写盘之前。
-  //   为什么加：retry 链路里只做了 console.warn 保留首次结果，导致
-  //   B08 这类 20s 超时的产物仍会被写盘 + 进入下游 Director/Prompter，
-  //   最终在交付物里留下不符合 SD2 引擎硬上限的 block。
-  //   统一行为：只要最终产物 max_block_duration_check=false，拒绝写盘并非零 exit。
-  //   如何补救：上游 run_sd2_pipeline.mjs 捕获非零 exit 后应让用户回到 Stage 0
-  //             重新生成（或调整 episodeShotCount / targetBlockCount 参数），
-  //             而不是自动降级。
+  // ── v5.0 HOTFIX · H1：maxBlock 最终校验 → **软门**（与 DashScope `call_editmap_sd2_v5` / v6 对齐：只 warn，仍落盘）──
   {
     const finalValidation = /** @type {Record<string, unknown>} */ (parsed)._validation;
     if (finalValidation && typeof finalValidation === 'object') {
@@ -422,17 +414,28 @@ async function main() {
         over_limit_blocks?: string[],
       }} */ (finalValidation);
       if (fv.max_block_duration_check === false) {
-        const overList = Array.isArray(fv.over_limit_blocks) ? fv.over_limit_blocks.join(', ') : '未知';
-        console.error(
-          `[${SCRIPT_TAG}] ❌ 硬门失败：max_block_duration_check=false（${overList} 超过 15s 硬上限）。` +
-            `retry 仍未改善，拒绝写盘。\n` +
-            `    建议处置（v5.0-rev3 Scheme B）：\n` +
-            `      1) 在 --brief 里加入明确的节奏描述（例如 "节奏偏紧，Block 切细一些"）；\n` +
-            `      2) 检查是否误加了 --no-thinking（v5 §0 依赖 thinking chain 做时长预推理）；\n` +
-            `      3) 若剧本本身动作密集 / 场景多，可把 --brief 描述改为 "镜头数 80 左右"、"Block 10+ 块" 等自然语言 hint；\n` +
-            `      4) 极端长段落确实无法切分时，回到剧本层把单个动作拆成多个 beat。`,
+        const overList = Array.isArray(fv.over_limit_blocks) ? fv.over_limit_blocks : [];
+        const overStr = overList.length ? overList.join(', ') : '未知';
+        console.warn(
+          `[${SCRIPT_TAG}] ⚠️ max_block_duration 软告警（${overStr} 超过单组建议上限，默认 16s）· retry 后仍超标也落盘。`,
         );
-        process.exit(7);
+        const app = parsed.appendix && typeof parsed.appendix === 'object'
+          ? /** @type {Record<string, unknown>} */ (parsed.appendix)
+          : null;
+        const diag = app && app.diagnosis && typeof app.diagnosis === 'object'
+          ? /** @type {Record<string, unknown>} */ (app.diagnosis)
+          : null;
+        if (diag) {
+          const entry = `max_block_duration_soft: ${overStr}`;
+          const w = diag.warning_msg;
+          if (Array.isArray(w)) {
+            w.push(entry);
+          } else if (typeof w === 'string' && w.trim()) {
+            diag.warning_msg = [w, entry];
+          } else {
+            diag.warning_msg = [entry];
+          }
+        }
       }
     }
   }

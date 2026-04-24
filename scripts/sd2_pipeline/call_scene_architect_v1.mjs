@@ -23,8 +23,9 @@
  *     --output-dir output/sd2/<id>
  *
  * 可选：
- *   --model        覆盖 APIMart model id（默认 claude-opus-4-6-thinking）
- *   --dry-run      不调 LLM，仅输出 payload 给审计
+ *   --model             覆盖 APIMart model id（默认 claude-opus-4-6-thinking）
+ *   --apimart-messages  使用 Anthropic `/messages`（推荐 thinking 模型）
+ *   --dry-run           不调 LLM，仅输出 payload 给审计
  *
  * 契约源：
  *   - prompt/1_SD2Workflow/1_5_SceneArchitect/1_5_SceneArchitect-v1.md
@@ -36,6 +37,10 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
 import { callApimartChatCompletions } from './lib/apimart_chat.mjs';
+import {
+  callApimartMessages,
+  getApimartMessagesDefaults,
+} from './lib/apimart_messages_chat.mjs';
 import { parseJsonFromModelText } from './lib/llm_client.mjs';
 import {
   getSceneArchitectV1PromptPath,
@@ -143,6 +148,7 @@ export async function main(argv) {
   }
   const dryRun = args['dry-run'] === true;
   const modelOverride = typeof args.model === 'string' ? args.model : '';
+  const useApimartMessages = args['apimart-messages'] === true;
 
   const promptPath = getSceneArchitectV1PromptPath();
   assertV6PromptFileExists(promptPath);
@@ -177,22 +183,65 @@ export async function main(argv) {
     ? payload.block_index_compact.length
     : 0;
   console.log(
-    `[${SCRIPT_TAG}] 调 APIMart（model=${modelOverride || DEFAULT_MODEL}）blocks=${blockCount} kva=${kvaCount}`,
+    `[${SCRIPT_TAG}] 调 APIMart（backend=${useApimartMessages ? 'messages' : 'chat'} model=${modelOverride || DEFAULT_MODEL}）blocks=${blockCount} kva=${kvaCount}`,
   );
 
   const messages = buildMessages(promptPath, payload);
-  const text = await callApimartChatCompletions({
-    messages,
-    model: modelOverride || DEFAULT_MODEL,
-    temperature: 0.2,
-    jsonObject: true,
-    enableThinking: false,
-  });
+  const sceneArchitectTimeoutMs = Math.max(
+    60000,
+    parseInt(process.env.APIMART_SCENE_ARCHITECT_TIMEOUT_MS || '300000', 10),
+  );
+  let text = '';
+  /** @type {string | null} */
+  let llmError = null;
+  try {
+    text = useApimartMessages
+      ? await (async () => {
+          const defaults = getApimartMessagesDefaults();
+          console.log(
+            `[${SCRIPT_TAG}] APIMart /messages：base=${defaults.baseUrl} anthropic-version=${defaults.anthropicVersion}`,
+          );
+          return callApimartMessages({
+            messages,
+            model: modelOverride || DEFAULT_MODEL,
+            temperature: 0.2,
+            maxTokens: Math.max(
+              8192,
+              parseInt(
+                process.env.APIMART_SCENE_ARCHITECT_MAX_TOKENS ||
+                  process.env.APIMART_MAX_OUTPUT_TOKENS ||
+                  '24000',
+                10,
+              ),
+            ),
+            stream: false,
+            timeoutMs: sceneArchitectTimeoutMs,
+          });
+        })()
+      : await callApimartChatCompletions({
+          messages,
+          model: modelOverride || DEFAULT_MODEL,
+          temperature: 0.2,
+          jsonObject: true,
+          timeoutMs: sceneArchitectTimeoutMs,
+          // thinking 由 model id 的 -thinking 后缀决定（APIMart 规范）；
+          // 保留 enableThinking=true 作为自动补后缀的兜底（base 模型无后缀时生效）。
+          enableThinking: true,
+        });
+  } catch (err) {
+    llmError = err instanceof Error ? err.message : String(err);
+    if (args['strict-llm'] === true) {
+      throw err;
+    }
+    console.warn(
+      `[${SCRIPT_TAG}] LLM 调用失败，Stage 1.5 将回退草案并继续：${llmError}`,
+    );
+  }
 
   /** @type {Record<string, unknown> | null} */
   let rawOut = null;
   try {
-    rawOut = parseJsonFromModelText(text);
+    rawOut = text ? parseJsonFromModelText(text) : null;
   } catch (e) {
     console.warn(
       `[${SCRIPT_TAG}] LLM 输出 JSON 解析失败，将回退草案；err=${
@@ -202,6 +251,9 @@ export async function main(argv) {
   }
 
   const { sanitized, issues } = validateSceneArchitectOutput(rawOut, payload);
+  if (llmError) {
+    issues.unshift(`llm_call_failed_fallback: ${llmError}`);
+  }
   if (issues.length > 0) {
     console.warn(
       `[${SCRIPT_TAG}] 发现 ${issues.length} 条不合规项（已自动回退到草案）：`,
@@ -210,7 +262,7 @@ export async function main(argv) {
   }
 
   const rawOutputPath = path.join(outputDir, 'scene_architect_output_raw.json');
-  writeJsonFile(rawOutputPath, rawOut || { _note: 'llm output missing' });
+  writeJsonFile(rawOutputPath, rawOut || { _note: 'llm output missing', llm_error: llmError });
 
   const sanitizedPath = path.join(outputDir, 'scene_architect_output.json');
   writeJsonFile(sanitizedPath, {

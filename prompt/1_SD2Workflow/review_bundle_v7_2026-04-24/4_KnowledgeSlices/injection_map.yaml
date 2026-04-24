@@ -1,0 +1,292 @@
+# injection_map.yaml — 知识切片路由映射表 v2.1
+# 编排层按此表机械执行：路由标签 -> 命中切片 -> 拼接注入
+# 版本：v2.1
+# 日期：2026-04-21
+# 契约源：
+#   - prompt/1_SD2Workflow/docs/v5/07_v5-schema-冻结.md
+#   - prompt/1_SD2Workflow/docs/v6/07_v6-schema-冻结.md
+#
+# v2.1 变更（v6.0）：
+#   1. director 新增 2 个无条件切片：
+#      - v6_segment_consumption_priority（原文消费优先级参考表）
+#      - v6_kva_examples（KVA 正反例库，按 has_kva 条件注入）
+#   2. editmap/v6_rhythm_templates.md 加入编剧方法论静态目录，
+#      EditMap 调用器按 editmap/ 目录 fs.readdirSync 顺序拼接（不登记为 consumer）。
+#   3. director.max_total_tokens 上调：3000 -> 3600（新增切片 ~600 tokens）。
+#   4. prompter 不新增 consumer 切片；Prompter v6 五铁律写在系统提示词本体，不走路由。
+#
+# 说明：
+#   - `director.*` 匹配字段来自 EditMap appendix 中的 `block_index[i].routing`。
+#   - `prompter.*` 的 `aspect_ratio` 匹配字段来自 `meta.video.aspect_ratio`。
+#   - `psychology_group` 为编排层派生字段（由 `meta.psychology_plan[].group` 按 block 复制到 `routing.psychology_group`），
+#     不属于 07 schema 的正式字段，LLM 侧无感知。
+#   - `has_kva`（v6）为编排层派生字段：pipeline 在构造 Director payload 时，
+#     若 `scriptChunk.key_visual_actions.length > 0` 则置 true，
+#     否则 false；不属于 EditMap schema。
+#   - 单份切片正文长度必须 ≤ `max_tokens × 0.9`（超限 → CI 不通过）。
+#
+# ========================================================================
+# ⚠️ editmap/ 切片 · 不进本文件（v5 架构决策）
+# ========================================================================
+# 4_KnowledgeSlices/editmap/ 下的 6 份编剧方法论切片（dramatic_action,
+# character_want_need, subtext_and_signals, hook_strategies,
+# two_track_pacing, proof_and_info_gap）**不登记为 consumer**，
+# 也不占 `max_total_tokens_per_consumer` 预算。
+#
+# 原因：
+#   - EditMap 是 pipeline 的路由器——`routing.structural/satisfaction/
+#     psychology/shot_hint/paywall_level` 全部由 EditMap 一次性产出，
+#     供下游 Director / Prompter 做条件注入。
+#   - 路由器自己不能被自己路由（"要识别才能加载，要加载才能识别"的死循环），
+#     因此 editmap/ 方法论必须在任何路由判断**之前**就已进入 EditMap 视野。
+#   - 结论：pipeline 在构建 EditMap system prompt 时直接
+#     `fs.readdirSync('editmap/')` 静态拼接（见 `call_editmap_sd2_v5.mjs`），
+#     editmap/ 整体 token 硬限 ≤ 4000。
+#
+# 详细机制、拼接顺序、token 预算规则见：
+#   prompt/1_SD2Workflow/docs/v5/08_v5-编剧方法论切片.md
+#
+# v6 追加：
+#   - 新增 editmap/v6_rhythm_templates.md（节奏模板库），同样走静态目录拼接；
+#   - editmap/ 目录整体 token 硬限由 4000 提升到 4800（新增 ~700 tokens）。
+# ========================================================================
+
+version: "2.1"
+
+# ===== 按消费者分组 =====
+
+director:
+  # 无条件注入（每次 Director 调用都带）
+  always:
+    - slice_id: structure_constraints
+      path: director/structure_constraints.md
+      max_tokens: 500
+      priority: 10
+
+    - slice_id: status_visual_mapping
+      path: director/status_visual_mapping.md
+      max_tokens: 500
+      priority: 15
+
+    # --- v6 · 原文消费优先级参考表（T01/T02）---
+    - slice_id: v6_segment_consumption_priority
+      path: director/v6_segment_consumption_priority.md
+      max_tokens: 400
+      priority: 12
+
+  # 条件注入（路由标签命中时注入）
+  conditional:
+    # --- v6 · KVA 正反例库（T03） ---
+    - slice_id: v6_kva_examples
+      path: director/v6_kva_examples.md
+      max_tokens: 700
+      priority: 25
+      match:
+        has_kva:
+          equals: true
+    # --- v4 保留：结构范式示例 ---
+    - slice_id: structure_fewshot
+      path: director/structure_fewshot.md
+      max_tokens: 800
+      priority: 20
+      match:
+        structural:
+          any_of: ["beat_escalation", "emotion_turning", "crisis_burst"]
+
+    # --- T05 · 爽点母题微切片（4 份，按 satisfaction_motif 命中）---
+    - slice_id: satisfaction.status_reversal
+      path: director/satisfaction/status_reversal.md
+      max_tokens: 300
+      priority: 30
+      match:
+        satisfaction:
+          any_of: ["status_reversal"]
+
+    - slice_id: satisfaction.control
+      path: director/satisfaction/control.md
+      max_tokens: 300
+      priority: 30
+      match:
+        satisfaction:
+          any_of: ["control"]
+
+    - slice_id: satisfaction.exclusive_favor
+      path: director/satisfaction/exclusive_favor.md
+      max_tokens: 300
+      priority: 30
+      match:
+        satisfaction:
+          any_of: ["exclusive_favor"]
+
+    - slice_id: satisfaction.instant_justice
+      path: director/satisfaction/instant_justice.md
+      max_tokens: 300
+      priority: 30
+      match:
+        satisfaction:
+          any_of: ["instant_justice"]
+
+    # --- T06 · 心理学功能组微切片（6 份，按 psychology_group 命中）---
+    - slice_id: psychology.hook
+      path: director/psychology/hook.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["hook"]
+
+    - slice_id: psychology.retention
+      path: director/psychology/retention.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["retention"]
+
+    - slice_id: psychology.payoff
+      path: director/psychology/payoff.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["payoff"]
+
+    - slice_id: psychology.bonding
+      path: director/psychology/bonding.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["bonding"]
+
+    - slice_id: psychology.relationship
+      path: director/psychology/relationship.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["relationship"]
+
+    - slice_id: psychology.conversion
+      path: director/psychology/conversion.md
+      max_tokens: 360
+      priority: 40
+      match:
+        psychology_group:
+          any_of: ["conversion"]
+
+    # --- T07 · 镜头大类微切片（4 份，按 shot_hint 命中）---
+    - slice_id: shot_codes.A_event
+      path: director/shot_codes/A_event.md
+      max_tokens: 240
+      priority: 50
+      match:
+        shot_hint:
+          any_of: ["A_event"]
+
+    - slice_id: shot_codes.B_emotion
+      path: director/shot_codes/B_emotion.md
+      max_tokens: 240
+      priority: 50
+      match:
+        shot_hint:
+          any_of: ["B_emotion"]
+
+    - slice_id: shot_codes.C_transition
+      path: director/shot_codes/C_transition.md
+      max_tokens: 240
+      priority: 50
+      match:
+        shot_hint:
+          any_of: ["C_transition"]
+
+    - slice_id: shot_codes.D_welfare
+      path: director/shot_codes/D_welfare.md
+      max_tokens: 240
+      priority: 50
+      match:
+        shot_hint:
+          any_of: ["D_welfare"]
+
+    # --- T12 · 付费级别微切片（3 份，仅尾组会命中非 none）---
+    - slice_id: paywall.soft
+      path: director/paywall/soft.md
+      max_tokens: 480
+      priority: 60
+      match:
+        paywall_level:
+          equals: "soft"
+
+    - slice_id: paywall.hard
+      path: director/paywall/hard.md
+      max_tokens: 480
+      priority: 60
+      match:
+        paywall_level:
+          equals: "hard"
+
+    - slice_id: paywall.final_cliff
+      path: director/paywall/final_cliff.md
+      max_tokens: 480
+      priority: 60
+      match:
+        paywall_level:
+          equals: "final_cliff"
+
+prompter:
+  # 无条件注入（每次 Prompter 调用都带）
+  always:
+    - slice_id: iron_rules_full
+      path: prompter/iron_rules_full.md
+      max_tokens: 600
+      priority: 10
+
+    - slice_id: avsplit_template
+      path: prompter/avsplit_template.md
+      max_tokens: 500
+      priority: 15
+
+  # 条件注入（按 meta.video.aspect_ratio 命中）
+  conditional:
+    - slice_id: vertical_physical_rules
+      path: prompter/vertical_physical_rules.md
+      max_tokens: 400
+      priority: 20
+      match:
+        aspect_ratio:
+          equals: "9:16"
+
+    - slice_id: vertical_grammar
+      path: prompter/vertical_grammar.md
+      max_tokens: 500
+      priority: 25
+      match:
+        aspect_ratio:
+          equals: "9:16"
+
+# ===== 全局规则 =====
+
+rules:
+  # 每个消费者的切片拼接上限（超过则按优先级截断）
+  max_total_tokens_per_consumer:
+    director: 3600
+    prompter: 2000
+
+  # 优先级：always 先于 conditional；conditional 内 priority 越小越优先
+  # 冲突处理：同一字段被多个切片覆盖时，priority 小的生效
+  priority_order: "always_first_then_by_priority_asc"
+
+  # mixed 场景：scene_bucket == "mixed" 时
+  # 编排层从两个最相关主桶各取 1 个 FSKB 示例
+  # knowledge_slices 按 routing.* 正常匹配，不做特殊处理
+  mixed_bucket_strategy: "fskb_dual_bucket_slice_normal"
+
+  # aspect_ratio 追加规则：当 meta.video.aspect_ratio == "9:16" 时
+  # 自动追加匹配 aspect_ratio: "9:16" 的全部切片
+  aspect_ratio_auto_append: true
+
+  # 截断策略：总预算超限时，按优先级从低到高裁切 conditional 切片
+  # 同时在 meta.routing_trace[] 里写入被截切片 ID 以备审计
+  overflow_policy:
+    behavior: "drop_low_priority_conditional_first"
+    emit_trace_field: "meta.routing_trace[].truncated"

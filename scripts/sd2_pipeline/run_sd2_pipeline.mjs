@@ -27,6 +27,10 @@
  *   --rendering-style / --art-style  可选；也可在 edit_map_input.json 顶层写 renderingStyle、artStyle。
  *                   合并优先级：CLI > edit_map_input > edit_map_sd2.meta > 默认。
  *
+ * v6 · EditMap **默认整篇纯 Markdown**（`1_EditMap-SD2-v6b.md` §八）；`edit_map_sd2.json` 由脚本编译。对比旧式 JSON：加 `--legacy-json-output`（或 `SD2_EDITMAP_LEGACY_JSON=1` / `SD2_EDITMAP_OUTPUT_PURE_MD=0`）。
+ * v6 · **文末 json 围栏**（与默认纯 MD 互斥，二者择一）：`--md-appendix-output` 或 `APIMART_EDITMAP_MD_APPENDIX=1` 等。两跑用不同 `--out` 以免覆盖。
+ * v6 · **缩写键**（仅 legacy 整段 JSON 时）：`--abbrev-json` / `SD2_EDITMAP_ABBREV_JSON=1`（`lib/editmap_v6_abbrev_json.mjs`）。
+ *
  * 仅重跑 EditMap + payload（不覆盖已生成的 SD2 最终提示词）:
  *   node scripts/sd2_pipeline/run_sd2_pipeline.mjs ... --skip-prompter
  *
@@ -444,17 +448,13 @@ async function main() {
    * v5.0-rev2 · 防呆警示：`--no-thinking × v5 EditMap` 是已知风险组合。
    *
    * 背景：v5 EditMap Prompt §0（推理前置铁律）要求 LLM **先** 逐段预估时长、**再**切 Block、
-   *       **再**自检 ≤15s。这段"多步链式推理"高度依赖 thinking chain 展开。关掉 thinking 后，
-   *       Opus 更倾向直接吐 Block 产物，容易踩 §0 的 `max_block_duration_check` 硬门
-   *       （call_yunwu_editmap_sd2_v5.mjs H1：仍 false → exit 7 拒绝写盘）。
-   *
-   * 这里只发警示、不阻断——用户显式加了 `--no-thinking`，就尊重选择（也许剧本很短很稀疏，thinking 是浪费）。
-   * 但把风险写在眼前，避免下一次再看到 exit 7 时不知道为什么。
+   *       **再**自检单组时长。这段"多步链式推理"高度依赖 thinking chain 展开。关掉 thinking 后，
+   *       更容易出现 `max_block_duration_check` 告警；编排层自 2026-04 起对超长块**仅软门**（仍落盘）。
    */
   if (args['no-thinking'] === true && sd2Version === 'v5') {
     console.warn(
       '[run_sd2_pipeline] ⚠️  --no-thinking × v5 EditMap：Prompt §0（时长预推理）依赖 thinking chain，\n' +
-        '    关掉 thinking 后 Block 时长容易踩 ≤15s 硬门（call_yunwu_editmap_sd2_v5 H1 会 exit 7 拒写）。\n' +
+        '    关掉 thinking 后 Block 时长可能偏离单组建议上限，pipeline 会打 max_block_duration **软告警**（仍落盘）。\n' +
         '    建议：1) 默认 **不加** --no-thinking；2) 若剧本确实稀疏短小再用。\n' +
         '    （v5.0-rev3 起 Block 切分 / 镜头数等由 LLM 从 directorBrief + 剧本推理，不再依赖输入侧数字。）',
     );
@@ -575,14 +575,23 @@ async function main() {
      * EditMap 脚本路由：v6/v5/v4/v3/v2 各有一份；每份再细分云雾（Yunwu/Opus）和 DashScope。
      * v6 暂不提供 Yunwu 版本（LLM 端统一 DashScope，通过下游 `--downstream-model` 切换）。
      */
+    const resolvedEditMapPromptPath =
+      typeof args['editmap-prompt-file'] === 'string'
+        ? path.resolve(process.cwd(), args['editmap-prompt-file'])
+        : '';
+    const useEditMapV7 =
+      sd2Version === 'v6' &&
+      /1_EditMap(?:-SD2)?-v7\.md$/i.test(resolvedEditMapPromptPath);
     if (sd2Version === 'v6' && useYunwu) {
       console.warn(
-        '[run_sd2_pipeline] v6 EditMap 暂未提供云雾版本，自动回退到 DashScope（call_editmap_sd2_v6.mjs）。',
+        `[run_sd2_pipeline] v6 EditMap 暂未提供云雾版本，自动回退到 DashScope（${useEditMapV7 ? 'call_editmap_v7.mjs' : 'call_editmap_sd2_v6.mjs'}）。`,
       );
     }
     const editMapScript =
       sd2Version === 'v6'
-        ? 'call_editmap_sd2_v6.mjs'
+        ? useEditMapV7
+          ? 'call_editmap_v7.mjs'
+          : 'call_editmap_sd2_v6.mjs'
         : sd2Version === 'v5'
           ? useYunwu
             ? 'call_yunwu_editmap_sd2_v5.mjs'
@@ -647,8 +656,28 @@ async function main() {
         // 导致完整一键跑法下默认回到 DashScope/qwen-plus，与 leji-v6-apimart-* 样本不一致。
         'apimart',
         'apimart-openai-compat',
+        // EditMap v6：Markdown 正文 + 文末 json 围栏（仅 appendix），与 call_editmap_sd2_v6.mjs 对齐
+        'md-appendix-output',
+        'legacy-json-output',
+        'abbrev-json',
       ]) {
         if (args[flag] === true) emArgs.push(`--${flag}`);
+      }
+      // v6b 等合订本：透传 `call_editmap_sd2_v6.mjs --prompt-file`（与 Normalizer 的 --normalizer-prompt 不冲突）
+      if (typeof args['editmap-prompt-file'] === 'string') {
+        emArgs.push(
+          '--prompt-file',
+          path.resolve(process.cwd(), args['editmap-prompt-file']),
+        );
+      }
+      if (typeof args['editmap-translator-prompt-file'] === 'string') {
+        emArgs.push(
+          '--translator-prompt-file',
+          path.resolve(process.cwd(), args['editmap-translator-prompt-file']),
+        );
+      }
+      if (typeof args['editmap-translator-model'] === 'string') {
+        emArgs.push('--translator-model', args['editmap-translator-model']);
       }
     }
     await runNode(emArgs);
@@ -897,6 +926,7 @@ async function main() {
         'skip-info-density-hard',
         'skip-dialogue-fidelity-hard',
         'skip-prompter-selfcheck-hard',
+        'strict-quality-hard',
         'skip-style-inference',
         // HOTFIX L/M/N 降级 flag
         'skip-dialogue-per-shot-hard',

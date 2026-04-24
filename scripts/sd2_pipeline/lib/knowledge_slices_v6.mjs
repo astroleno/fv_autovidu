@@ -101,14 +101,18 @@ function loadInjectionConfig(slicesRoot) {
  * @param {string} slicesRoot
  * @returns {string}
  */
-function readSliceText(entry, slicesRoot) {
+function readSliceText(entry, slicesRoot, opts = {}) {
   const p = entry.path;
   if (typeof p !== 'string' || !p.trim()) {
     return '';
   }
   const abs = path.join(slicesRoot, p.trim());
   if (!fs.existsSync(abs)) {
-    console.warn(`[knowledge_slices_v6] 切片文件不存在，跳过: ${abs}`);
+    const msg = `[knowledge_slices_v6] 切片文件不存在: ${entry.slice_id} (${abs})`;
+    if (opts.critical === true) {
+      throw new Error(`${msg} · critical slice missing`);
+    }
+    console.warn(`${msg}，跳过`);
     return '';
   }
   return fs.readFileSync(abs, 'utf8');
@@ -330,6 +334,12 @@ function applyOverflowPolicy(entries, budget) {
  * @returns {SliceLoadResultV6}
  */
 export function loadKnowledgeSlicesV6({ consumer, routing, aspectRatio, hasKva, slicesRoot }) {
+  const preflight = validateInjectionMapPaths(slicesRoot);
+  if (!preflight.ok) {
+    throw new Error(
+      `[knowledge_slices_v6] injection_map preflight failed: ${preflight.errors.join('; ')}`,
+    );
+  }
   const config = loadInjectionConfig(slicesRoot);
 
   // 取预算（v2.1: director=3600, prompter=2000）
@@ -357,7 +367,7 @@ export function loadKnowledgeSlicesV6({ consumer, routing, aspectRatio, hasKva, 
   const applied = [];
   let totalTokens = 0;
   for (const e of kept) {
-    const text = readSliceText(e, slicesRoot);
+    const text = readSliceText(e, slicesRoot, { critical: e._bucket === 'always' });
     if (!text) {
       continue;
     }
@@ -458,4 +468,61 @@ export function deriveHasKvaFromScriptChunk(scriptChunk) {
   const sc = /** @type {Record<string, unknown>} */ (scriptChunk);
   const kvas = sc.key_visual_actions;
   return Array.isArray(kvas) && kvas.length > 0;
+}
+
+/**
+ * Preflight all paths referenced by injection_map.yaml.
+ *
+ * Production semantics:
+ *   - consumer always entries are critical and must exist.
+ *   - conditional entries are optional; missing paths warn because they only matter when routed.
+ * Review bundle mode:
+ *   - missing critical paths are downgraded to warnings with review_bundle_mode=true.
+ *
+ * @param {string} slicesRoot
+ * @param {{ reviewBundleMode?: boolean }} [opts]
+ * @returns {{ ok: boolean, errors: string[], warnings: string[], missing_critical: string[], missing_optional: string[], review_bundle_mode: boolean }}
+ */
+export function validateInjectionMapPaths(slicesRoot, opts = {}) {
+  const reviewBundleMode = opts.reviewBundleMode === true;
+  const errors = [];
+  const warnings = [];
+  const missingCritical = [];
+  const missingOptional = [];
+  const config = loadInjectionConfig(slicesRoot);
+  for (const consumer of ['director', 'prompter']) {
+    const section = config[consumer];
+    if (!section || typeof section !== 'object') continue;
+    const sec = /** @type {{ always?: unknown[], conditional?: unknown[] }} */ (section);
+    for (const bucket of ['always', 'conditional']) {
+      const critical = bucket === 'always';
+      const entries = Array.isArray(sec[bucket]) ? sec[bucket] : [];
+      for (const raw of entries) {
+        const entry = toSliceEntry(raw);
+        if (!entry) continue;
+        const abs = path.join(slicesRoot, entry.path);
+        if (fs.existsSync(abs)) continue;
+        const msg = `${consumer}.${bucket} slice missing: ${entry.slice_id} (${entry.path})`;
+        if (critical) {
+          missingCritical.push(entry.slice_id);
+          if (reviewBundleMode) {
+            warnings.push(`review_bundle_mode: ${msg}`);
+          } else {
+            errors.push(msg);
+          }
+        } else {
+          missingOptional.push(entry.slice_id);
+          warnings.push(msg);
+        }
+      }
+    }
+  }
+  return {
+    ok: errors.length === 0,
+    errors,
+    warnings,
+    missing_critical: missingCritical,
+    missing_optional: missingOptional,
+    review_bundle_mode: reviewBundleMode,
+  };
 }

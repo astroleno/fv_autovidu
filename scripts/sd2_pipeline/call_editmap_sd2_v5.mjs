@@ -147,9 +147,7 @@ async function main() {
 
   annotateNormalizerRef(parsed, normalizedPackage, normalizedPackagePath);
 
-  // ── v5.0 HOTFIX · H1：maxBlock 硬门（与 Yunwu 版一致） ──
-  //   DashScope 版没有自检 retry 机制，所以这里只做单次硬门；
-  //   任何 block.duration > 15s → 拒绝写盘 + exit 7。
+  // ── v5.0 HOTFIX · H1：maxBlock 校验 → **软门**（与 v6 一致：只 warn，仍落盘）──
   {
     const finalValidation = /** @type {Record<string, unknown>} */ (parsed)._validation;
     if (finalValidation && typeof finalValidation === 'object') {
@@ -158,11 +156,28 @@ async function main() {
         over_limit_blocks?: string[],
       }} */ (finalValidation);
       if (fv.max_block_duration_check === false) {
-        const overList = Array.isArray(fv.over_limit_blocks) ? fv.over_limit_blocks.join(', ') : '未知';
-        console.error(
-          `[${SCRIPT_TAG}] ❌ 硬门失败：max_block_duration_check=false（${overList} 超过 15s 硬上限）。拒绝写盘。`,
+        const overList = Array.isArray(fv.over_limit_blocks) ? fv.over_limit_blocks : [];
+        const overStr = overList.length ? overList.join(', ') : '未知';
+        console.warn(
+          `[${SCRIPT_TAG}] ⚠️ max_block_duration 软告警：${overStr} 超过单组建议上限（默认 16s）· 仍落盘`,
         );
-        process.exit(7);
+        const app = parsed.appendix && typeof parsed.appendix === 'object'
+          ? /** @type {Record<string, unknown>} */ (parsed.appendix)
+          : null;
+        const diag = app && app.diagnosis && typeof app.diagnosis === 'object'
+          ? /** @type {Record<string, unknown>} */ (app.diagnosis)
+          : null;
+        if (diag) {
+          const entry = `max_block_duration_soft: ${overStr}`;
+          const w = diag.warning_msg;
+          if (Array.isArray(w)) {
+            w.push(entry);
+          } else if (typeof w === 'string' && w.trim()) {
+            diag.warning_msg = [w, entry];
+          } else {
+            diag.warning_msg = [entry];
+          }
+        }
       }
     }
   }

@@ -25,6 +25,17 @@
 
 ## A. 新增核心规则（插在 v5 §I.1 之后，§I.2 之前）
 
+### A.0 §I.2.0 题材契合度与短剧节奏
+
+当 `scriptChunk` / `styleInference.genre_bias` 显示医院、夫妻、出轨、怀孕、手术、权力竞聘、小三绿茶等信号时，本 block 必须按**都市医疗婚恋背叛短剧**调度，不按医疗科普、纪实职场剧或普通医院生活流调度。
+
+Director 的 shot 设计必须满足：
+
+1. **每个 shot 有情绪/信息增量**：偷听、门缝、手机、诊断书、腹部、衣领、手指收紧、推门、藏匿、反打、分屏反差等至少命中其一。
+2. **每 2-3 秒一个短剧钩子**：不能让两个连续 shot 都只是位置交代或平静对话。
+3. **镜头语法服务背叛和误会**：优先门缝窥视、压迫近景、快速反打、物件特写、缓慢推近、短暂停顿；禁止连续复用“中景，平视，固定镜头”。
+4. **医疗外壳不压过婚恋冲突**：医院、手术、诊断书是背叛/误会/利益算计的道具，不是科普主体。
+
 ### A.1 §I.2.1 剧本原文消费契约（T01/T02 · 硬门）
 
 **你拿到的新 payload 字段**：
@@ -100,6 +111,11 @@
 2. `priority == "P1"` 未消费 → warning，并在 `appendix.kva_consumption_report[i].deferred_to_block = "B??"` 显式指明推迟到哪个 block。
 3. 禁止在 `forbidden_replacement[]` 枚举的方式下"变形消费"（例：signature_entrance 不可变成"面部直接特写"）。
 4. 消费一条 KVA 时，本 shot 的画面描述应**含有 `required_structure_hints[]` 中至少 1 个语义线索**（如 `low_angle / pan_up`）；纯语义等价即可，不要求原词。
+5. 当 `action_type == "signature_entrance"` 且本 block 命中 `rhythm_timeline.golden_open_3s`：
+   - 允许最多 1 个**源文本明确存在**的 bridge shot（如医院大楼 / 走廊 establishing）；
+   - 但主开镜 beat 仍必须兑现人物亮相，不得被外景 / 标题卡抢走；
+   - 禁止发明城市夜景 / 航拍 / 车流 montage；
+   - 原文中的 `字幕：` / 地点条 / 时间条视为后期 overlay，不得把可读文字写成画面主体。
 
 **输出**（追加到 `appendix.kva_consumption_report[]`）：
 
@@ -134,6 +150,8 @@
 - 枚举：`identity / motion / relation / prop / dialogue / setting / none`
 - `none` 只允许用于纯过渡镜头；连续 2 个 `none` → 硬门失败；
 - 每 5s 滑窗内必须至少 1 个非 `none` 的 `info_delta`（由 pipeline 在整集聚合后校验）。
+- 若末 shot 承担 `closing_hook` 的 `freeze_frame / split_screen / split_screen_freeze`，`info_delta` **不得**填 `none`；
+  该 shot 仍然锁定了人物关系、反差或悬念，优先填 `relation`，其次 `motion` / `setting`。
 
 **输出**（追加到 shot 级 markdown 标注 + appendix）：
 
@@ -191,6 +209,7 @@ appendix（追加）：
 **硬门**：
 
 - 末 shot 画面描述必须含 `freeze_frame` 或 `split_screen` 至少其一（语义等价即可：定格 / 静止画面 / 分屏 / 左右画面 / 画面一分为二）；
+- 若 `closing_hook.type == "split_screen_freeze"`，末 shot 必须**同时**具备 `split_screen + freeze_frame` 两种语义，且明确左右/上下双画面的主体与对照关系；单画面定格或只写"反差感"不算通过；
 - `cliff_sentence_required = true` 时，末 shot 对白段应留"悬念句"（`dialogue` 类 seg 可复用）。
 
 ---
@@ -280,6 +299,7 @@ Payload 追加：
 ### Step 3.5（新增，插在 v5 Step 3 时间片划分之后、Step 4 分镜稿写作之前）
 
 - 若本 block 命中 `mini_climaxes[].block_id` → 按 §A.5 把五段式映射到 slot；
+- 若本 block 同时命中 `golden_open_3s + signature_entrance` → 只允许 1 个极短 source-grounded bridge shot，主开镜 beat 必须留给人物亮相；
 - 若本 block 命中 `major_climax.block_id` 且 `strategy != null` → 预留"必备硬元素"shot；
 - 若本 block 命中 `closing_hook.block_id` → 预留末 shot freeze/split_screen；
 - 对 `scriptChunk.segments[]` 做消费规划：对白类 seg → 落到哪个 slot 的对白段；descriptive 类 seg → 落到哪个 slot 的画面描述。
@@ -291,9 +311,10 @@ Payload 追加：
 22. 每个 shot 都有 `info_delta` 且不连续 2 个 `none`；
 23. 若本 block 命中 `mini_climax` → `shot_meta[].five_stage_role.stage` 覆盖 `{trigger, amplify, pivot, payoff, residue}` 全部五阶段；
 24. 若本 block 命中 `major_climax` 且 `strategy != null` → 相应硬元素已出现在某个 shot；
-25. 若本 block 命中 `closing_hook` → 末 shot 含 freeze_frame 或 split_screen；
+25. 若本 block 命中 `closing_hook` → 末 shot 含 freeze_frame 或 split_screen；若 `type == split_screen_freeze`，则必须两者同时命中并写明双画面主体；
 26. `segment_coverage_report` / `kva_consumption_report` / `structure_hint_consumption` / `shot_meta` 均已填写；
 27. 调性锚点（§C）的反清洁化 / 反哑剧化在"角色 / 场景 / 对白"措辞上已落实。
+28. 若本 block 命中 `golden_open + signature_entrance` → 未用外景 montage / 可读标题卡抢走人物亮相；字幕类说明均按后期 overlay 处理。
 
 ---
 
